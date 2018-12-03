@@ -17,8 +17,8 @@ abstract class BuiltMediumData(
     abstract val width : Int
     /** height of the composited Image */
     abstract val height: Int
-    //abstract val x: Int   // Should probably implement, but for now they're all 0
-    //abstract val y: Int
+    //abstract val xi: Int   // Should probably implement, but for now they're all 0
+    //abstract val yi: Int
 
 
     abstract val tMediumToComposite: Transform

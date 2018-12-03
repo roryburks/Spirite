@@ -7,8 +7,8 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.floor
 import spirite.base.util.glu.GLC
-import spirite.base.util.linear.Vec2
-import spirite.base.util.linear.Vec3
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.linear.Vec3f
 
 class GLStrikeDrawerPixel(gle: IGLEngine)
     : GLStrokeDrawer(gle)
@@ -43,7 +43,7 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
                     x+0f, y+1f,
                     x+1f, y+1f)
             val prim = GLPrimitive(data, intArrayOf(2), intArrayOf(GLC.TRIANGLE_STRIP), intArrayOf(4))
-            gle.applyPrimitiveProgram(PolyRenderCall(Vec3(1f,1f,1f), 1f),
+            gle.applyPrimitiveProgram(PolyRenderCall(Vec3f(1f, 1f, 1f), 1f),
                     prim, params, null)
         }
 
@@ -54,7 +54,7 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
             gle.setTarget(image)
 
             val prim = GLPrimitive(vb, intArrayOf(2), intArrayOf(GLC.LINE_STRIP), intArrayOf(points.length + 1))
-            gle.applyPrimitiveProgram(StrokePixelCall(Vec3(1f,1f,1f)),
+            gle.applyPrimitiveProgram(StrokePixelCall(Vec3f(1f, 1f, 1f)),
                     prim, params, null)
         }
 
@@ -65,10 +65,10 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
             val raw = FloatArray(STRIDE * (num + 1))
 
             for (i in 0 until states.length) {
-                // x y z w
-                val xy = Vec2(states.x[i], states.y[i])
-                raw[STRIDE*i + 0] = xy.x
-                raw[STRIDE*i + 1] = xy.y
+                // xi yi zf wf
+                val xy = Vec2f(states.x[i], states.y[i])
+                raw[STRIDE*i + 0] = xy.xf
+                raw[STRIDE*i + 1] = xy.yf
             }
             raw[STRIDE*num + 0] = states.x.last()
             raw[STRIDE*num + 1] = states.y.last()

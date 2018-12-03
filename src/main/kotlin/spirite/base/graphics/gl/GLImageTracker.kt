@@ -29,7 +29,7 @@ object GLImageTracker {
         _images.removeIf {
             when( it.first.get()) {
                 null -> {
-                    println("Deleting garbage-collected GL Texture of size: ${it.second.w}x${it.second.h}")
+                    println("Deleting garbage-collected GL Texture of size: ${it.second.w}xi${it.second.h}")
                     Hybrid.gl.deleteTexture(it.second.tex)
                     true
                 }

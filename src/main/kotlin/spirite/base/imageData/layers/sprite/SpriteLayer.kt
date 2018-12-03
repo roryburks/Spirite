@@ -20,7 +20,7 @@ import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.floor
 import rb.extendo.dataStructures.SinglyList
 import spirite.base.util.linear.MutableTransform
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
 
@@ -105,22 +105,22 @@ class SpriteLayer : Layer {
     private val _keyPoints get() = parts.flatMap { part ->
         val tPartToWhole = part.tPartToWhole
                 listOf(
-                        Vec2(0f,0f),
-                        Vec2(0f, part.handle.height+0f),
-                        Vec2( part.handle.width+0f,0f),
-                        Vec2(part.handle.width+0f, part.handle.height+0f))
+                        Vec2f(0f,0f),
+                        Vec2f(0f, part.handle.height+0f),
+                        Vec2f( part.handle.width+0f,0f),
+                        Vec2f(part.handle.width+0f, part.handle.height+0f))
                         .map { tPartToWhole.apply(it)}
     }
 
-    override val x: Int get() = _keyPoints.map { it.x.floor }.min() ?: 0
-    override val y: Int get() = _keyPoints.map { it.y.floor }.min() ?: 0
+    override val x: Int get() = _keyPoints.map { it.xf.floor }.min() ?: 0
+    override val y: Int get() = _keyPoints.map { it.yf.floor }.min() ?: 0
 
     override val width: Int get() {
-        val xs = _keyPoints.map { it.x.ceil }
+        val xs = _keyPoints.map { it.xf.ceil }
         return (xs.max() ?: 0) - (xs.min() ?: 0)
     }
     override val height: Int get() {
-        val ys = _keyPoints.map { it.y.ceil }
+        val ys = _keyPoints.map { it.yf.ceil }
         return (ys.max() ?: 0) - (ys.min() ?: 0)
     }
 
@@ -308,7 +308,7 @@ class SpriteLayer : Layer {
 
 
     /** Returns the first highest-drawDepth part that is visible and has
-     * non-transparent data at x, y (in Layer-space)*/
+     * non-transparent data at xi, yi (in Layer-space)*/
     fun grabPart( x: Int, y: Int, select: Boolean) {
         _parts.asReversed().forEach {
             // TODO

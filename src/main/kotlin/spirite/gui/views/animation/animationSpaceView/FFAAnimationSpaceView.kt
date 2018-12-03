@@ -8,8 +8,8 @@ import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimat
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
 import spirite.base.util.*
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Vec2
-import spirite.base.util.linear.Vec2i
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.linear.Vec2i
 import spirite.gui.UIPoint
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IComponent
@@ -68,8 +68,8 @@ private constructor(
 
             animationSpace.animations.forEach {ffa->
                 val location = animationSpace.stateView.logicalSpace[ffa] ?: Vec2i.Zero
-                rows.addFlatGroup(location.y) {
-                    addGap(location.x)
+                rows.addFlatGroup(location.yi) {
+                    addGap(location.xi)
                     add(FFABlock(ffa).also { ffaBlocks.add(it) })
                     val char = animationSpace.stateView.charbinds[ffa]
                     if( char != null) add(Hybrid.ui.EditableLabel(char.toString()))
@@ -96,7 +96,7 @@ private constructor(
         val topleft = animationSpace.stateView.logicalSpace[ffa] ?: return null
         if( frame < ffa.start || frame >= ffa.end) return null
 
-        return Rect(topleft.x + blockSize*(frame - ffa.start), topleft.y, blockSize, blockSize)
+        return Rect(topleft.xi + blockSize*(frame - ffa.start), topleft.yi, blockSize, blockSize)
     }
 
     private inner class FFABlock(
@@ -185,7 +185,8 @@ private constructor(
             }
             override fun onRelease(p: UIPoint) {
                 val old = animationSpace.stateView.logicalSpace[animation]
-                animationSpace.stateView.setLogicalSpace(animation, Vec2i((old?.x ?:0) + p.x - startX,(old?.y ?:0) + p.y - startY))
+                animationSpace.stateView.setLogicalSpace(animation, Vec2i((old?.xi
+                        ?: 0) + p.x - startX, (old?.yi ?: 0) + p.y - startY))
                 behavior = null
                 drawer = null
             }
@@ -378,24 +379,24 @@ private class FFASpacePanelImp : JPanel() {
             g2.stroke = BasicStroke(2f)
 
 
-            val fromX = from.x + size/2 + size * (fromFrame - fromFFA.start)
-            val toX = to.x + size/2 + size * (toFrame - toFFA.start)
+            val fromX = from.xi + size/2 + size * (fromFrame - fromFFA.start)
+            val toX = to.xi + size/2 + size * (toFrame - toFFA.start)
             val fromY : Int
             val toY : Int
-            if( from.y < to.y) {
-                fromY = from.y + size
-                toY = to.y
+            if( from.yi < to.yi) {
+                fromY = from.yi + size
+                toY = to.yi
             }else {
-                fromY = from.y
-                toY = to.y + size
+                fromY = from.yi
+                toY = to.yi + size
             }
             g2.drawLine(fromX, fromY,toX, toY)
 
-            val vec = Vec2(toX - fromX.f, toY - fromY.f).normalize()
+            val vec = Vec2f(toX - fromX.f, toY - fromY.f).normalized
             val left = vec.rotate(PI.f*6f/5f)
             val right = vec.rotate(-PI.f*6f/5f)
-            g2.drawLine(toX, toY, toX + (left.x * 5).round, toY + (left.y * 5).round)
-            g2.drawLine(toX, toY, toX + (right.x * 5).round, toY + (right.y * 5).round)
+            g2.drawLine(toX, toY, toX + (left.xf * 5).round, toY + (left.yf * 5).round)
+            g2.drawLine(toX, toY, toX + (right.xf * 5).round, toY + (right.yf * 5).round)
         }
 
         for (link in space.links) {

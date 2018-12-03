@@ -8,8 +8,8 @@ import spirite.base.graphics.gl.IGLEngine.BlendMethod
 import spirite.base.graphics.gl.IGLEngine.BlendMethod.*
 import spirite.base.graphics.gl.ProgramType.*
 import spirite.base.util.f
-import spirite.base.util.linear.Vec3
-import spirite.base.util.linear.Vec4
+import rb.vectrix.linear.Vec3f
+import rb.vectrix.linear.Vec4f
 
 internal enum class ProgramType(
         internal val method: BlendMethod
@@ -59,8 +59,8 @@ class SquareGradientCall(
 }
 
 class ChangeColorCall(
-        fromColor: Vec4,
-        toColor: Vec4,
+        fromColor: Vec4f,
+        toColor: Vec4f,
         changeMethod: ColorChangeMode)
     : ProgramCall()
 {
@@ -77,8 +77,8 @@ class ChangeColorCall(
 }
 
 class GridCall(
-        color1: Vec3,
-        color2: Vec3,
+        color1: Vec3f,
+        color2: Vec3f,
         size: Int)
     : ProgramCall()
 {
@@ -130,7 +130,7 @@ class RenderCall(
     override val programType: ProgramType get() = PASS_RENDER
 }
 
-class StrokeV2LinePass(color: Vec3)
+class StrokeV2LinePass(color: Vec3f)
     : ProgramCall()
 {
 
@@ -146,7 +146,7 @@ class StrokeV3LinePass : ProgramCall()
 }
 
 class StrokeV2ApplyCall(
-        color: Vec3,
+        color: Vec3f,
         alpha: Float,
         intensifyMethod: IntensifyMethod)
     :ProgramCall()
@@ -164,7 +164,7 @@ class StrokeV2ApplyCall(
 }
 
 class StrokeApplyCall(
-        color: Vec3,
+        color: Vec3f,
         alpha: Float)
     :ProgramCall()
 {
@@ -176,7 +176,7 @@ class StrokeApplyCall(
 
 
 class PolyRenderCall(
-        color: Vec3,
+        color: Vec3f,
         alpha: Float)
     :ProgramCall()
 {
@@ -189,7 +189,7 @@ class PolyRenderCall(
 class LineRenderCall(
         joinMethod: JoinMethod,
         lineWidth: Float,
-        color: Vec3,
+        color: Vec3f,
         alpha: Float)
     : ProgramCall()
 {
@@ -207,7 +207,7 @@ class LineRenderCall(
 }
 
 
-class StrokePixelCall( color: Vec3)
+class StrokePixelCall( color: Vec3f)
     :ProgramCall()
 {
     override val uniforms: List<GLUniform>? = listOf(
@@ -215,7 +215,7 @@ class StrokePixelCall( color: Vec3)
     override val programType: ProgramType get() = STROKE_PIXEL
 }
 
-class FillAfterpassCall( color: Vec4, width: Int, height: Int)
+class FillAfterpassCall(color: Vec4f, width: Int, height: Int)
     :ProgramCall()
 {
     override val uniforms: List<GLUniform>? = listOf(

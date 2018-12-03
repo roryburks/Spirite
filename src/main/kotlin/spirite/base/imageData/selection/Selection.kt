@@ -6,7 +6,7 @@ import spirite.base.graphics.RawImage
 import spirite.base.util.*
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
 import kotlin.math.max
@@ -98,9 +98,9 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
     }
 
     fun contains(x: Int, y: Int): Boolean {
-        val transformed = transform?.invert()?.apply(Vec2(x.f,y.f)) ?: Vec2(x.f,y.f)
-        val tx = transformed.x.round
-        val ty = transformed.y.round
+        val transformed = transform?.invert()?.apply(Vec2f(x.f,y.f)) ?: Vec2f(x.f,y.f)
+        val tx = transformed.xf.round
+        val ty = transformed.yf.round
 
         if( tx < 0 || ty < 0 || tx >= width || ty >= width) return false
 

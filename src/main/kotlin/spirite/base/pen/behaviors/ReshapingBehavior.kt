@@ -12,7 +12,7 @@ import spirite.base.util.f
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.base.util.shapes.Rectangle
@@ -51,8 +51,8 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
                     startX = penner.x
                     startY = penner.y
                     updateCalcTrans()
-                    oldScaleX = scale.x
-                    oldScaleY = scale.y
+                    oldScaleX = scale.xf
+                    oldScaleY = scale.yf
                 }
                 ROTATE -> {
                     startX = penner.x
@@ -71,10 +71,10 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
     private var oldScaleY = 0f
     private var oldRot = 0f
 
-    protected val scaleBind = Bindable(Vec2(1f, 1f))
+    protected val scaleBind = Bindable(Vec2f(1f, 1f))
     protected var scale by scaleBind
 
-    val translationBind = Bindable(Vec2(0f, 0f))
+    val translationBind = Bindable(Vec2f(0f, 0f))
     var translation by translationBind
 
     val rotationBind = Bindable(0f)
@@ -83,9 +83,9 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
     var region : Rect? = null
 
     val workingTransform : Transform get() {
-        val trans = MutableTransform.ScaleMatrix(scale.x, scale.y)
+        val trans = MutableTransform.ScaleMatrix(scale.xf, scale.yf)
         trans.preRotate(rotation)
-        trans.preTranslate(translation.x, translation.y)
+        trans.preTranslate(translation.xf, translation.yf)
         return trans
     }
 
@@ -95,8 +95,8 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         trans.preConcatenate(workingTransform)
         trans.preTranslate(region.width/2f + region.x, region.height/2f + region.y)
         trans.preScale( view.zoom, view.zoom)
-        val orig = view.tWorkspaceToScreen.apply(Vec2.Zero)
-        trans.preTranslate(orig.x, orig.y)
+        val orig = view.tWorkspaceToScreen.apply(Vec2f.Zero)
+        trans.preTranslate(orig.xf, orig.yf)
         return trans
     }
 
@@ -124,7 +124,7 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         gc.color = Colors.GRAY
 //			gc.setStroke(defStroke);
 
-        val p = relTrans.invert().apply(Vec2(penner.rawX.f, penner.rawY.f))
+        val p = relTrans.invert().apply(Vec2f(penner.rawX.f, penner.rawY.f))
 
         val sw = w*0.3f // Width of corner Rect
         val sh = h*0.3f // Height "
@@ -158,7 +158,7 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         if( state == READY)
             overlap = -1
         shapes.forEachIndexed { i, shape ->
-            if( overlap == i || (overlap == -1 && shape.contains(p.x, p.y))) {
+            if( overlap == i || (overlap == -1 && shape.contains(p.xf, p.yf))) {
                 gc.color = Colors.YELLOW
 //					gc.setStroke(new BasicStroke( 4/zoom));
 
@@ -176,21 +176,21 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
     override fun onMove() {
         when( state) {
             MOVING -> if( penner.oldX != penner.x || penner.oldY != penner.y)
-                translation = Vec2(translation.x + penner.x - penner.oldX, translation.y + penner.y - penner.oldY)
+                translation = Vec2f(translation.xf + penner.x - penner.oldX, translation.yf + penner.y - penner.oldY)
             RESIZE -> {
-                val pn = calcTrans.apply(Vec2(penner.x.f, penner.y.f))
-                val ps = calcTrans.apply(Vec2(startX.f, startY.f))
-                val sx = if (overlap == 0 || overlap == 2) scale.x else pn.x / ps.x * oldScaleX
-                val sy = if (overlap == 1 || overlap == 3) scale.y else pn.y / ps.y * oldScaleY
+                val pn = calcTrans.apply(Vec2f(penner.x.f, penner.y.f))
+                val ps = calcTrans.apply(Vec2f(startX.f, startY.f))
+                val sx = if (overlap == 0 || overlap == 2) scale.xf else pn.xf / ps.xf * oldScaleX
+                val sy = if (overlap == 1 || overlap == 3) scale.yf else pn.yf / ps.yf * oldScaleY
 
-                scale = Vec2(sx,sy)
+                scale = Vec2f(sx,sy)
             }
             ROTATE -> {
-                val pn = calcTrans.apply(Vec2(penner.x.f, penner.y.f))
-                val ps = calcTrans.apply(Vec2(startX.f,startY.f))
+                val pn = calcTrans.apply(Vec2f(penner.x.f, penner.y.f))
+                val ps = calcTrans.apply(Vec2f(startX.f,startY.f))
 
-                val start = atan2(ps.y, ps.x)
-                val end = atan2(pn.y, pn.x)
+                val start = atan2(ps.yf, ps.xf)
+                val end = atan2(pn.yf, pn.xf)
                 rotation = end - start + oldRot
             }
             else ->{}
@@ -250,8 +250,8 @@ class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : Transfor
         workspace?.selectionEngine?.selectionChangeObserver?.removeObserver(link4)
         link5.unbind()
 
-        scale = Vec2(1f,1f)
-        translation = Vec2(0f,0f)
+        scale = Vec2f(1f,1f)
+        translation = Vec2f(0f,0f)
         rotation = 0f
 
         drawer.endManipulatingTransform()

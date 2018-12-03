@@ -155,7 +155,7 @@ class NodeRenderer(
                     selectionTransform == null -> proposingTransform
                     else -> selectionTransform * proposingTransform
                 }
-                toTrans?.apply { gc.preTransform(this)}
+                toTrans?.also { gc.preTransform(it) }
                 lifted.draw(gc)
             }
 

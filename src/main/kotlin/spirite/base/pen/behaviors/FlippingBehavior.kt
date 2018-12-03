@@ -37,8 +37,8 @@ int startX, startY;
 
 @Override
 public void start() {
-startX = this.penner.x;
-startY = this.penner.y;
+startX = this.penner.xi;
+startY = this.penner.yi;
 }
 @Override
 public void onMove() {
@@ -46,8 +46,8 @@ public void onMove() {
 }
 @Override
 public void onPenUp() {
-boolean horizontal = MUtil.distance(this.penner.x , this.penner.y, startX, startY) < 5
-||Math.abs(this.penner.x - startX) > Math.abs(this.penner.y - startY);
+boolean horizontal = MUtil.distance(this.penner.xi , this.penner.yi, startX, startY) < 5
+||Math.abs(this.penner.xi - startX) > Math.abs(this.penner.yi - startY);
 this.penner.tryFlip( horizontal);
 
 super.onPenUp();

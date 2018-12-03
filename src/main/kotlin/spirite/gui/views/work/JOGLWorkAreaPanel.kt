@@ -97,8 +97,8 @@ private constructor(
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
             penner.holdingShift = it.holdingShift
-            //penner.rawUpdateX(it.point.x)
-            //penner.rawUpdateY(it.point.y)
+            //penner.rawUpdateX(it.point.xi)
+            //penner.rawUpdateY(it.point.yi)
         }
         onMouseMove += moveEvent
         onMouseDrag += moveEvent

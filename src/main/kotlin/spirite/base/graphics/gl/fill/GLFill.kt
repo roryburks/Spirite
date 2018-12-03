@@ -6,7 +6,7 @@ import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.GLParameters
 import spirite.base.util.f
 import spirite.base.util.glu.GLC
-import spirite.base.util.linear.Vec4
+import rb.vectrix.linear.Vec4f
 import spirite.pc.JOGL.JOGL.JOGLTextureSource
 import spirite.pc.gui.SColor
 import java.nio.IntBuffer
@@ -46,7 +46,7 @@ class GLFill(val filler: IFillArrayAlgorithm)  {
         if( color.alpha != 1.0f) {
             val params = GLParameters(w, h, texture1 = img2)
             params.setBlendMode(GLC.ZERO, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
-            gle.applyPassProgram(FillAfterpassCall(Vec4(1f,1f,1f,1f), w, h),
+            gle.applyPassProgram(FillAfterpassCall(Vec4f(1f, 1f, 1f, 1f), w, h),
                     params, null, 0f, 0f, w.f, h.f)
         }
         // Pass 2: add the fill pixels

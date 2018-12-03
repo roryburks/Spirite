@@ -11,7 +11,7 @@ import spirite.base.util.linear.Mat4
 import spirite.base.util.linear.MatrixBuilder.orthagonalProjectionMatrix
 import spirite.base.util.linear.MatrixBuilder.wrapTransformAs4x4
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec3
+import rb.vectrix.linear.Vec3f
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.pc.JOGL.JOGLProvider
@@ -39,7 +39,7 @@ interface IGLEngine
     fun applyComplexLineProgram(
             xPoints: List<Float>, yPoints: List<Float>, numPoints: Int,
             cap: CapMethod, join: JoinMethod, loop: Boolean, lineWidth: Float,
-            color: Vec3, alpha: Float,
+            color: Vec3f, alpha: Float,
             params: GLParameters, trans: Transform?)
 
     fun applyPolyProgram(
@@ -157,7 +157,7 @@ class GLEngine(
 
         val preparedPrimitive = GLPrimitive(
                 floatArrayOf(
-                        // x  y   u   v
+                        // xi  yi   u   v
                         x1, y1, 0.0f, 0.0f,
                         x2, y1, 1.0f, 0.0f,
                         x1, y2, 0.0f, 1.0f,
@@ -172,8 +172,8 @@ class GLEngine(
      * shape by combining assorted primitive renders to create the specified
      * join/cap methods.
      *
-     * @param xPoints	Array containing the x coordinates.
-     * @param yPoints 	Array containing the x coordinates.
+     * @param xPoints	Array containing the xi coordinates.
+     * @param yPoints 	Array containing the xi coordinates.
      * @param numPoints	Number of points to use for the render.
      * @param cap	How to draw the end-points.
      * @param join	How to draw the line joints.
@@ -188,7 +188,7 @@ class GLEngine(
     override fun applyComplexLineProgram(
             xPoints: List<Float>, yPoints: List<Float>, numPoints: Int,
             cap: CapMethod, join: JoinMethod, loop: Boolean, lineWidth: Float,
-            color: Vec3, alpha: Float,
+            color: Vec3f, alpha: Float,
             params: GLParameters, trans: Transform?)
     {
         
@@ -396,7 +396,7 @@ class GLEngine(
             internalParams.add(GLUniformMatrix4fv("worldMatrix", Mat4(wrapTransformAs4x4(trans ?: Transform.IdentityMatrix)).transpose()))
         }
         else {
-            trans?.apply { perspective = Mat4(wrapTransformAs4x4(this)) * perspective }
+            trans?.also {x  -> perspective = Mat4(wrapTransformAs4x4(x)) * perspective }
             perspective = perspective.transpose()
             internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", perspective))
         }

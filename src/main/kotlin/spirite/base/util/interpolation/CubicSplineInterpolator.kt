@@ -1,12 +1,12 @@
 package spirite.base.util.interpolation
 
 import spirite.base.util.MathUtil
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 import java.util.*
 
 /**
  * CubicSplineInterpolator uses Cubic Hermite Spline Interpolation to
- * construct an interpolation function, f(x) made up of piecewise-cubic
+ * construct an interpolation function, f(xi) made up of piecewise-cubic
  * segments.
  */
 class CubicSplineInterpolator
@@ -19,7 +19,7 @@ class CubicSplineInterpolator
  * Produces a result very similar (though not identical) to a 2D
  * Cubic Spline that only has points with strictly increasing AnimationCommand values.
  */
-(points_: List<Vec2>, fast: Boolean, private val spatial: Boolean) : Interpolator {
+(points_: List<Vec2f>, fast: Boolean, private val spatial: Boolean) : Interpolator {
     private val k: FloatArray
     private val x_: FloatArray
     private val y_: FloatArray
@@ -33,7 +33,7 @@ class CubicSplineInterpolator
         val points = ArrayList(points_)
 
         points.sortWith(Comparator { o1, o2 ->
-            val d = o1.x - o2.x
+            val d = o1.xf - o2.xf
             Math.signum(d).toInt()
         })
 
@@ -43,8 +43,8 @@ class CubicSplineInterpolator
 
         for (i in points.indices) {
             val p = points[i]
-            x_[i] = p.x
-            y_[i] = p.y
+            x_[i] = p.xf
+            y_[i] = p.yf
         }
 
         fastCalculateSlopes()

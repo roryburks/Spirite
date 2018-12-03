@@ -182,7 +182,7 @@ object LoadEngine {
             val name = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
             val type =  ra.readUnsignedByte()
 
-            // !!!! Kind of hack-y that it's even saved, but only the root node should be
+            // !!!! Kind of hack-yi that it's even saved, but only the root node should be
             //	depth 0 and there should only be one (and it's already created)
             if( depth == 0)
                 continue

@@ -25,7 +25,7 @@ class SGradientSliderDemo : JFrame() {
         buttonReset.action = { sliderThing.value = 0.5f }
 
 
-        val sliderBound1 = Hybrid.ui.GradientSlider(label = "Bound 1 (x^2):")
+        val sliderBound1 = Hybrid.ui.GradientSlider(label = "Bound 1 (xi^2):")
         val sliderBound2 = Hybrid.ui.GradientSlider(label = "Bound 2:")
         sliderBound1.mutatorPositionToValue = object: InvertibleFunction<Float> {
             override fun perform(x: Float): Float = Math.pow(x.toDouble(), 2.0).toFloat()

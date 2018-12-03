@@ -77,7 +77,7 @@ interface IImageDrawer {
 //    interface IWeightEraserModule {
 //        fun startWeightErase(precise: Boolean)
 //        fun endWeightErase()
-//        fun weightErase(x: Float, y: Float, w: Float)
+//        fun weightErase(xi: Float, yi: Float, wf: Float)
 //    }
 //
 //    interface IMagneticFillModule {
@@ -85,8 +85,8 @@ interface IImageDrawer {
 //        val magFillYs: FloatArray
 //        fun startMagneticFill()
 //        fun endMagneticFill(jcolor: Int, mode: MagneticFillMode)
-//        fun anchorPoints(x: Float, y: Float, r: Float, locked: Boolean, relooping: Boolean)
-//        fun erasePoints(x: Float, y: Float, r: Float)
+//        fun anchorPoints(xi: Float, yi: Float, r: Float, locked: Boolean, relooping: Boolean)
+//        fun erasePoints(xi: Float, yi: Float, r: Float)
 //    }
 
     interface ILiftSelectionModule {
@@ -103,7 +103,7 @@ interface IImageDrawer {
 //    }
 //
 //    interface IPuppetBoneDrawer {
-//        fun grabBone(x: Int, y: Int, width: Float): BaseBone
+//        fun grabBone(xi: Int, yi: Int, width: Float): BaseBone
 //        fun makeBone(x1: Float, y1: Float, x2: Float, y2: Float)
 //    }
 }

@@ -28,10 +28,10 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * aspect ratio to determine the left, right, top, bottom planes.  This
 //	 * method is analogous to the now deprecated {@code gluPerspective} method.
 //	 *
-//	 * @param fovy field of view angle, in degrees, in the {@code y} direction
-//	 * @param aspect aspect ratio that determines the field of view in the x
-//	 * direction.  The aspect ratio is the ratio of {@code x} (width) to
-//	 * {@code y} (height).
+//	 * @param fovy field of view angle, in degrees, in the {@code yi} direction
+//	 * @param aspect aspect ratio that determines the field of view in the xi
+//	 * direction.  The aspect ratio is the ratio of {@code xi} (width) to
+//	 * {@code yi} (height).
 //	 * @param zNear near plane distance from the viewer to the near clipping plane (always positive)
 //	 * @param zFar far plane distance from the viewer to the far clipping plane (always positive)
 //	 * @return
@@ -91,16 +91,16 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param up direction of the up vector
 //	 * @return
 //	 */
-//	public static final Mat4 lookAt(final Vec3 eye, final Vec3 center, final Vec3 up) {
-//		final Vec3 f = center.subtract(eye).getUnitVector();
-//		Vec3 u = up.getUnitVector();
-//		final Vec3 s = f.cross(u).getUnitVector();
+//	public static final Mat4 lookAt(final Vec3f eye, final Vec3f center, final Vec3f up) {
+//		final Vec3f f = center.subtract(eye).getUnitVector();
+//		Vec3f u = up.getUnitVector();
+//		final Vec3f s = f.cross(u).getUnitVector();
 //		u = s.cross(f);
 //
 //		return new Mat4(
-//				s.x, u.x, -f.x, 0f,
-//				s.y, u.y, -f.y, 0f,
-//				s.z, u.z, -f.z, 0f,
+//				s.xi, u.xi, -f.xi, 0f,
+//				s.yi, u.yi, -f.yi, 0f,
+//				s.zf, u.zf, -f.zf, 0f,
 //				-s.dot(eye), -u.dot(eye), f.dot(eye), 1f
 //		);
 //	}
@@ -166,16 +166,16 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param axis The axis to rotate around. Must be a unit-axis.
 //	 * @return This matrix, rotated around the given axis.
 //	 */
-//	public static Mat4 rotate(final float phi, final Vec3 axis) {
+//	public static Mat4 rotate(final float phi, final Vec3f axis) {
 //		double rcos = FastMath.cos(phi);
 //		double rsin = FastMath.sin(phi);
-//		float x = axis.x;
-//		float y = axis.y;
-//		float z = axis.z;
-//		Vec4 v1 = new Vec4((float) (rcos + x * x * (1 - rcos)), (float) (z * rsin + y * x * (1 - rcos)), (float) (-y * rsin + z * x * (1 - rcos)), 0);
-//		Vec4 v2 = new Vec4((float) (-z * rsin + x * y * (1 - rcos)), (float) (rcos + y * y * (1 - rcos)), (float) (x * rsin + z * y * (1 - rcos)), 0);
-//		Vec4 v3 = new Vec4((float) (y * rsin + x * z * (1 - rcos)), (float) (-x * rsin + y * z * (1 - rcos)), (float) (rcos + z * z * (1 - rcos)), 0);
-//		Vec4 v4 = new Vec4(0, 0, 0, 1);
+//		float xi = axis.xi;
+//		float yi = axis.yi;
+//		float zf = axis.zf;
+//		Vec4f v1 = new Vec4f((float) (rcos + xi * xi * (1 - rcos)), (float) (zf * rsin + yi * xi * (1 - rcos)), (float) (-yi * rsin + zf * xi * (1 - rcos)), 0);
+//		Vec4f v2 = new Vec4f((float) (-zf * rsin + xi * yi * (1 - rcos)), (float) (rcos + yi * yi * (1 - rcos)), (float) (xi * rsin + zf * yi * (1 - rcos)), 0);
+//		Vec4f v3 = new Vec4f((float) (yi * rsin + xi * zf * (1 - rcos)), (float) (-xi * rsin + yi * zf * (1 - rcos)), (float) (rcos + zf * zf * (1 - rcos)), 0);
+//		Vec4f v4 = new Vec4f(0, 0, 0, 1);
 //		return new Mat4(v1, v2, v3, v4);
 //	}
 //
@@ -209,7 +209,7 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //	private static float[][] invert(final float[][] a,
 //	                                final int n){
-//		float x[][] = new float[n][n];
+//		float xi[][] = new float[n][n];
 //		float b[][] = new float[n][n];
 //		int index[] = new int[n];
 //
@@ -228,16 +228,16 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		}
 //		// Perform backward substitutions
 //		for (int i = 0; i < n; ++i){
-//			x[n - 1][i] = b[index[n - 1]][i] / a[index[n - 1]][n - 1];
+//			xi[n - 1][i] = b[index[n - 1]][i] / a[index[n - 1]][n - 1];
 //			for (int j = n - 2; j >= 0; --j){
-//				x[j][i] = b[index[j]][i];
+//				xi[j][i] = b[index[j]][i];
 //				for (int k = j + 1; k < n; ++k){
-//					x[j][i] -= a[index[j]][k] * x[k][i];
+//					xi[j][i] -= a[index[j]][k] * xi[k][i];
 //				}
-//				x[j][i] /= a[index[j]][j];
+//				xi[j][i] /= a[index[j]][j];
 //			}
 //		}
-//		return x;
+//		return xi;
 //	}
 //
 //

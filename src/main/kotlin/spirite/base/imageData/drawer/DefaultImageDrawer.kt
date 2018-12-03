@@ -23,7 +23,7 @@ import spirite.base.util.f
 import spirite.base.util.floor
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 import spirite.hybrid.Hybrid
 
 class DefaultImageDrawer(
@@ -177,13 +177,13 @@ class DefaultImageDrawer(
         workspace.undoEngine.performMaskedImageAction("Fill Color", arranged, mask) { built, mask ->
             when( mask) {
                 null -> built.rawAccessComposite {
-                    val p = built.tWorkspaceToComposite.apply(Vec2(x.f,y.f))
-                    it.drawer.fill(p.x.floor, p.y.floor, color)
+                    val p = built.tWorkspaceToComposite.apply(Vec2f(x.f,y.f))
+                    it.drawer.fill(p.xf.floor, p.yf.floor, color)
                 }
                 else -> built.rawAccessComposite {raw ->
                     mask.doMaskedRequiringTransform(raw, built.tWorkspaceToComposite, color) { maskedRaw, tImageToFloating ->
-                        val p =  tImageToFloating.apply(built.tWorkspaceToComposite.apply(Vec2(x.f,y.f)))
-                        maskedRaw.drawer.fill(p.x.floor,p.y.floor, color)
+                        val p =  tImageToFloating.apply(built.tWorkspaceToComposite.apply(Vec2f(x.f,y.f)))
+                        maskedRaw.drawer.fill(p.xf.floor,p.yf.floor, color)
 
                     }
                 }

@@ -47,7 +47,7 @@ class FreeformSelectionBehavior(
 
     private fun testFinish() : Boolean{
         val start = builder.start
-        if( MathUtil.distance(start.x.f, start.y.f, penner.x.f, penner.y.f) <= 5) {
+        if( MathUtil.distance(start.xi.f, start.yi.f, penner.x.f, penner.y.f) <= 5) {
             penner.workspace?.selectionEngine?.mergeSelection(builder.build(), mode)
             end()
             return true

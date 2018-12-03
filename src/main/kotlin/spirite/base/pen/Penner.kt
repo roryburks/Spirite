@@ -1,6 +1,5 @@
 package spirite.base.pen
 
-import spirite.base.util.binding.Bindable
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
@@ -12,7 +11,7 @@ import spirite.base.pen.behaviors.*
 import spirite.base.util.Colors
 import spirite.base.util.f
 import spirite.base.util.floor
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.views.work.WorkSection
@@ -196,12 +195,12 @@ class Penner(
     override fun rawUpdateX(rawX: Int) {
         if( this.rawX != rawX) {
             this.rawX = rawX
-            val p = context.currentView?.tScreenToWorkspace?.apply(Vec2(rawX.f, rawY.f))
+            val p = context.currentView?.tScreenToWorkspace?.apply(Vec2f(rawX.f, rawY.f))
             if( p != null) {
-                xf = p.x
-                yf = p.y
-                x = p.x.floor
-                y = p.y.floor
+                xf = p.xf
+                yf = p.yf
+                x = p.xf.floor
+                y = p.yf.floor
             }
         }
     }
@@ -209,12 +208,12 @@ class Penner(
     override fun rawUpdateY(rawY: Int) {
         if( this.rawY != rawY) {
             this.rawY = rawY
-            val p = context.currentView?.tScreenToWorkspace?.apply(Vec2(rawX.f, rawY.f))
+            val p = context.currentView?.tScreenToWorkspace?.apply(Vec2f(rawX.f, rawY.f))
             if( p != null) {
-                xf = p.x
-                yf = p.y
-                x = p.x.floor
-                y = p.y.floor
+                xf = p.xf
+                yf = p.yf
+                x = p.xf.floor
+                y = p.yf.floor
             }
         }
     }

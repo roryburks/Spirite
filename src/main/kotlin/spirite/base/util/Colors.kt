@@ -1,15 +1,15 @@
 package spirite.base.util
 
-import spirite.base.util.linear.Vec3
-import spirite.base.util.linear.Vec4
+import rb.vectrix.linear.Vec3f
+import rb.vectrix.linear.Vec4f
 
 /**
  * Created by Guy on 4/29/2017.
  */
 
 sealed class Color {
-    val rgbComponent : Vec3 by lazy { Vec3(red, green, blue) }
-    val rgbaComponent : Vec4 by lazy { Vec4(red, green, blue, alpha) }
+    val rgbComponent : Vec3f by lazy { Vec3f(red, green, blue) }
+    val rgbaComponent : Vec4f by lazy { Vec4f(red, green, blue, alpha) }
     abstract val argb32: Int
     abstract val red : Float
     abstract val green: Float

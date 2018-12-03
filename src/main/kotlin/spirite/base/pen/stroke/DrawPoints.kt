@@ -10,7 +10,7 @@ open class DrawPoints(val x: FloatArray, val y: FloatArray, val w: FloatArray) {
 
     init {
         if (x.size != y.size || x.size != w.size)
-            MDebug.handleWarning(STRUCTURAL, "Miss-matched x/y/w array lengths.")
+            MDebug.handleWarning(STRUCTURAL, "Miss-matched xi/yi/wf array lengths.")
     }
 }
 
@@ -18,7 +18,7 @@ class IndexedDrawPoints(x: FloatArray, y: FloatArray, w: FloatArray, val t: Floa
 
     init {
         if (x.size != t.size)
-            MDebug.handleWarning(STRUCTURAL, "Miss-matched x/y/w/t array lengths.")
+            MDebug.handleWarning(STRUCTURAL, "Miss-matched xi/yi/wf/t array lengths.")
     }
 
     /**

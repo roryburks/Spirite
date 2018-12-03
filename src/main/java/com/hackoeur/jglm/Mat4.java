@@ -75,10 +75,10 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param col2 vector for the third column
 //	 * @param col3 vector for the fourth column
 //	 */
-//	public Mat4(final Vec3 col0, final Vec3 col1, final Vec3 col2, final Vec3 col3) {
-//		this.m00 = col0.x; this.m10 = col1.x; this.m20 = col2.x; this.m30 = col3.x;
-//		this.m01 = col0.y; this.m11 = col1.y; this.m21 = col2.y; this.m31 = col3.y;
-//		this.m02 = col0.z; this.m12 = col1.z; this.m22 = col2.z; this.m32 = col3.z;
+//	public Mat4(final Vec3f col0, final Vec3f col1, final Vec3f col2, final Vec3f col3) {
+//		this.m00 = col0.xi; this.m10 = col1.xi; this.m20 = col2.xi; this.m30 = col3.xi;
+//		this.m01 = col0.yi; this.m11 = col1.yi; this.m21 = col2.yi; this.m31 = col3.yi;
+//		this.m02 = col0.zf; this.m12 = col1.zf; this.m22 = col2.zf; this.m32 = col3.zf;
 //		this.m03 = 0f;     this.m13 = 0f;     this.m23 = 0f;     this.m33 = 0f;
 //	}
 //
@@ -90,32 +90,32 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param col2 vector for the third column
 //	 * @param col3 vector for the fourth column
 //	 */
-//	public Mat4(final Vec4 col0, final Vec4 col1, final Vec4 col2, final Vec4 col3) {
-//		this.m00 = col0.x; this.m10 = col1.x; this.m20 = col2.x; this.m30 = col3.x;
-//		this.m01 = col0.y; this.m11 = col1.y; this.m21 = col2.y; this.m31 = col3.y;
-//		this.m02 = col0.z; this.m12 = col1.z; this.m22 = col2.z; this.m32 = col3.z;
-//		this.m03 = col0.w; this.m13 = col1.w; this.m23 = col2.w; this.m33 = col3.w;
+//	public Mat4(final Vec4f col0, final Vec4f col1, final Vec4f col2, final Vec4f col3) {
+//		this.m00 = col0.xi; this.m10 = col1.xi; this.m20 = col2.xi; this.m30 = col3.xi;
+//		this.m01 = col0.yi; this.m11 = col1.yi; this.m21 = col2.yi; this.m31 = col3.yi;
+//		this.m02 = col0.zf; this.m12 = col1.zf; this.m22 = col2.zf; this.m32 = col3.zf;
+//		this.m03 = col0.wf; this.m13 = col1.wf; this.m23 = col2.wf; this.m33 = col3.wf;
 //	}
 //
 //	/**
 //	 * Creates a matrix using successive 4-tuples as <em>columns</em>.
 //	 *
-//	 * @param x00 first column, x
-//	 * @param x01 first column, y
-//	 * @param x02 first column, z
-//	 * @param x03 first column, w
-//	 * @param x10 second column, x
-//	 * @param x11 second column, y
-//	 * @param x12 second column, z
-//	 * @param x13 second column, w
-//	 * @param x20 third column, x
-//	 * @param x21 third column, y
-//	 * @param x22 third column, z
-//	 * @param x23 third column, w
-//	 * @param x30 fourth column, x
-//	 * @param x31 fourth column, y
-//	 * @param x32 fourth column, z
-//	 * @param x33 fourth column, w
+//	 * @param x00 first column, xi
+//	 * @param x01 first column, yi
+//	 * @param x02 first column, zf
+//	 * @param x03 first column, wf
+//	 * @param x10 second column, xi
+//	 * @param x11 second column, yi
+//	 * @param x12 second column, zf
+//	 * @param x13 second column, wf
+//	 * @param x20 third column, xi
+//	 * @param x21 third column, yi
+//	 * @param x22 third column, zf
+//	 * @param x23 third column, wf
+//	 * @param x30 fourth column, xi
+//	 * @param x31 fourth column, yi
+//	 * @param x32 fourth column, zf
+//	 * @param x33 fourth column, wf
 //	 */
 //	public Mat4(
 //			final float x00, final float x01, final float x02, final float x03,
@@ -265,13 +265,13 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //		switch (columnIndex) {
 //		case 0:
-//			return (T) new Vec4(m00, m01, m02, m03);
+//			return (T) new Vec4f(m00, m01, m02, m03);
 //		case 1:
-//			return (T) new Vec4(m10, m11, m12, m13);
+//			return (T) new Vec4f(m10, m11, m12, m13);
 //		case 2:
-//			return (T) new Vec4(m20, m21, m22, m23);
+//			return (T) new Vec4f(m20, m21, m22, m23);
 //		case 3:
-//			return (T) new Vec4(m30, m31, m32, m33);
+//			return (T) new Vec4f(m30, m31, m32, m33);
 //		default:
 //			throw new IllegalArgumentException("Invalid column index = " + columnIndex);
 //		}
@@ -280,12 +280,12 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	@SuppressWarnings("unchecked")
 //	@Override
 //	public <T extends Vec> Iterable<T> getColumns() {
-//		List<Vec4> cols = new ArrayList<Vec4>(4);
+//		List<Vec4f> cols = new ArrayList<Vec4f>(4);
 //
-//		cols.add(new Vec4(m00, m01, m02, m03));
-//		cols.add(new Vec4(m10, m11, m12, m13));
-//		cols.add(new Vec4(m20, m21, m22, m23));
-//		cols.add(new Vec4(m30, m31, m32, m33));
+//		cols.add(new Vec4f(m00, m01, m02, m03));
+//		cols.add(new Vec4f(m10, m11, m12, m13));
+//		cols.add(new Vec4f(m20, m21, m22, m23));
+//		cols.add(new Vec4f(m30, m31, m32, m33));
 //
 //		return (Iterable<T>) cols;
 //	}
@@ -426,26 +426,26 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //            );
 //        }
 //
-//	public Vec4 multiply(final Vec4 right) {
-//		return new Vec4(this.m00 * right.x + this.m10 * right.y + this.m20 * right.z + this.m30 * right.w,
-//				this.m01 * right.x + this.m11 * right.y + this.m21 * right.z + this.m31 * right.w,
-//				this.m02 * right.x + this.m12 * right.y + this.m22 * right.z + this.m32 * right.w,
-//				this.m03 * right.x + this.m13 * right.y + this.m23 * right.z + this.m33 * right.w);
+//	public Vec4f multiply(final Vec4f right) {
+//		return new Vec4f(this.m00 * right.xi + this.m10 * right.yi + this.m20 * right.zf + this.m30 * right.wf,
+//				this.m01 * right.xi + this.m11 * right.yi + this.m21 * right.zf + this.m31 * right.wf,
+//				this.m02 * right.xi + this.m12 * right.yi + this.m22 * right.zf + this.m32 * right.wf,
+//				this.m03 * right.xi + this.m13 * right.yi + this.m23 * right.zf + this.m33 * right.wf);
 //	}
 //
-//	public Mat4 translate(final Vec3 translation) {
-//		Vec4 v0 = new Vec4(m00 * translation.x, m01 * translation.x, m02 * translation.x, m03 * translation.x);
-//		Vec4 v1 = new Vec4(m10 * translation.y, m11 * translation.y, m12 * translation.y, m13 * translation.y);
-//		Vec4 v2 = new Vec4(m20 * translation.z, m21 * translation.z, m22 * translation.z, m23 * translation.z);
-//		Vec4 v3 = new Vec4(m30, m31, m32, m33);
+//	public Mat4 translate(final Vec3f translation) {
+//		Vec4f v0 = new Vec4f(m00 * translation.xi, m01 * translation.xi, m02 * translation.xi, m03 * translation.xi);
+//		Vec4f v1 = new Vec4f(m10 * translation.yi, m11 * translation.yi, m12 * translation.yi, m13 * translation.yi);
+//		Vec4f v2 = new Vec4f(m20 * translation.zf, m21 * translation.zf, m22 * translation.zf, m23 * translation.zf);
+//		Vec4f v3 = new Vec4f(m30, m31, m32, m33);
 //
-//		Vec4 result = v0.add(v1).add(v2).add(v3);
+//		Vec4f result = v0.add(v1).add(v2).add(v3);
 //
 //		return new Mat4(
 //				m00, m01, m02, m03,
 //				m10, m11, m12, m13,
 //				m20, m21, m22, m23,
-//				result.x, result.y, result.z, result.w
+//				result.xi, result.yi, result.zf, result.wf
 //		);
 //	}
 //

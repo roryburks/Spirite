@@ -45,9 +45,9 @@ class WorkSectionDemo : JFrame() {
 
             val x = mockWs.groupTree.addNewSimpleLayer(null, "Layer1", DYNAMIC)
                     //mockWs.groupTree.addNewSimpleLayer(null, "Layer1", FLAT, 150,150)
-//            x.x = 25
-//            x.y = 25
-            //val gc = (x.layers.activeData.handle.medium as FlatMedium).image.graphics
+//            xi.xi = 25
+//            xi.yi = 25
+            //val gc = (xi.layers.activeData.handle.medium as FlatMedium).image.graphics
             //gc.fillRect( 25, 25, 75,75)
         }
 

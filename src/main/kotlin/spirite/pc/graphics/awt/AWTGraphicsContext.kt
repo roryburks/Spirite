@@ -75,15 +75,15 @@
 //    override fun scale(sx: Float, sy: Float) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
-//    override fun drawRect(x: Int, y: Int, w: Int, h: Int) {
+//    override fun drawRect(xi: Int, yi: Int, wf: Int, h: Int) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //
-//    override fun drawOval(x: Int, y: Int, w: Int, h: Int) {
+//    override fun drawOval(xi: Int, yi: Int, wf: Int, h: Int) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //
-//    override fun drawPolyLine(x: IntArray, y: IntArray, count: Int) {
+//    override fun drawPolyLine(xi: IntArray, yi: IntArray, count: Int) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //
@@ -99,15 +99,15 @@
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //
-//    override fun fillRect(x: Int, y: Int, w: Int, h: Int) {
+//    override fun fillRect(xi: Int, yi: Int, wf: Int, h: Int) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //
-//    override fun fillOval(x: Int, y: Int, w: Int, h: Int) {
+//    override fun fillOval(xi: Int, yi: Int, wf: Int, h: Int) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //
-//    override fun fillPolygon(x: List<Float>, y: List<Float>, length: Int) {
+//    override fun fillPolygon(xi: List<Float>, yi: List<Float>, length: Int) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //
@@ -119,7 +119,7 @@
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //
-//    override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRubric) {
+//    override fun renderImage(rawImage: IImage, xi: Int, yi: Int, render: RenderRubric) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //}

@@ -1,6 +1,7 @@
 package spirite.base.util.linear
 
 import com.hackoeur.jglm.support.FastMath
+import rb.vectrix.linear.Vec2f
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -37,10 +38,10 @@ abstract class Transform()
         )
     }
 
-    fun apply(v: Vec2) : Vec2 {
-        return Vec2(
-                m00*v.x + m01*v.y + m02,
-                m10*v.x + m11*v.y + m12)
+    fun apply(v: Vec2f) : Vec2f {
+        return Vec2f(
+                m00*v.xf + m01*v.yf + m02,
+                m10*v.xf + m11*v.yf + m12)
     }
 
     fun invert(): ImmutableTransform {
@@ -233,7 +234,7 @@ class MutableTransform(
     fun getTranslateX() = m02
     fun getTranslateY() = m12
 
-    fun inverseTransform(from: Vec2): Vec2 {
+    fun inverseTransform(from: Vec2f): Vec2f {
         return invert().apply(from)
     }
 

@@ -6,7 +6,7 @@ import spirite.base.imageData.selection.Selection
 import spirite.base.util.Colors
 import spirite.base.util.compaction.IntCompactor
 import spirite.base.util.f
-import spirite.base.util.linear.Vec2i
+import rb.vectrix.linear.Vec2i
 import spirite.hybrid.Hybrid
 
 class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(workspace) {
@@ -38,7 +38,7 @@ class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(w
         }
     }
 
-    val start get() = Vec2i( xCompactor[0], yCompactor[0])
-    val end get() = Vec2i( xCompactor[xCompactor.size-1], yCompactor[yCompactor.size-1])
+    val start get() = Vec2i(xCompactor[0], yCompactor[0])
+    val end get() = Vec2i(xCompactor[xCompactor.size - 1], yCompactor[yCompactor.size - 1])
 
 }

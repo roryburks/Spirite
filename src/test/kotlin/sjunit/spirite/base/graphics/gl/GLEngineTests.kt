@@ -11,8 +11,8 @@ import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.graphics.gl.SquareGradientCall.GradientType
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.util.Colors
-import spirite.base.util.linear.Vec3
-import spirite.base.util.linear.Vec4
+import rb.vectrix.linear.Vec3f
+import rb.vectrix.linear.Vec4f
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File
@@ -34,7 +34,7 @@ class GLEngineTests {
 
         gle.setTarget(img)
         gle.applyPolyProgram(
-                PolyRenderCall(Vec3(0f, 1f, 1f), 1f),
+                PolyRenderCall(Vec3f(0f, 1f, 1f), 1f),
                 listOf(10f, 40f, 10f, 40f),
                 listOf(10f, 10f, 40f, 40f),
                 4, STRIP,
@@ -69,7 +69,7 @@ class GLEngineTests {
         gle.applyComplexLineProgram(
                 xs.map { it.toFloat() }, ys.map { it.toFloat() }, 4,
                 NONE, MITER, false, 5f,
-                Vec3(0f, 1f, 1f), 1f,
+                Vec3f(0f, 1f, 1f), 1f,
                 params, null)
 
         // Verify that a shape has been drawn
@@ -112,9 +112,9 @@ class GLEngineTests {
                 params, null, 200f, 50f, 250f, 100f)
         gle.applyPassProgram( SquareGradientCall(0.5f, GradientType.V),
                 params, null, 0f, 0f, 50f, 50f)
-        gle.applyPassProgram( ChangeColorCall(Vec4(1f, 0f, 0f, 1f), Vec4( 0f, 1f, 0f, 1f), IGNORE_ALPHA),
+        gle.applyPassProgram( ChangeColorCall(Vec4f(1f, 0f, 0f, 1f), Vec4f(0f, 1f, 0f, 1f), IGNORE_ALPHA),
                 params, null, 50f, 0f, 100f, 50f)
-        gle.applyPassProgram( GridCall(Vec3(0.25f, 0.25f, 0.25f), Vec3( 0.5f, 0.5f, 0.5f), 4),
+        gle.applyPassProgram( GridCall(Vec3f(0.25f, 0.25f, 0.25f), Vec3f(0.5f, 0.5f, 0.5f), 4),
                 params, null, 100f, 0f, 150f, 50f)
         gle.applyPassProgram( BasicCall(),
                 params, null, 150f, 0f, 200f, 50f)

@@ -22,37 +22,37 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 ///**
 // * @author James Royalty
 // */
-//public final class Vec4 extends AbstractVec {
-//	public static final Vec4 VEC4_ZERO = new Vec4();
+//public final class Vec4f extends AbstractVec {
+//	public static final Vec4f VEC4_ZERO = new Vec4f();
 //
-//	final float x, y, z, w;
+//	final float xi, yi, zf, wf;
 //
-//	public Vec4() {
-//		this.x = 0f;
-//		this.y = 0f;
-//		this.z = 0f;
-//		this.w = 0f;
+//	public Vec4f() {
+//		this.xi = 0f;
+//		this.yi = 0f;
+//		this.zf = 0f;
+//		this.wf = 0f;
 //	}
 //
-//	public Vec4(final float x, final float y, final float z, final float w) {
-//		this.x = x;
-//		this.y = y;
-//		this.z = z;
-//		this.w = w;
+//	public Vec4f(final float xi, final float yi, final float zf, final float wf) {
+//		this.xi = xi;
+//		this.yi = yi;
+//		this.zf = zf;
+//		this.wf = wf;
 //	}
 //
-//	public Vec4(final Vec4 other) {
-//		this.x = other.x;
-//		this.y = other.y;
-//		this.z = other.z;
-//		this.w = other.w;
+//	public Vec4f(final Vec4f other) {
+//		this.xi = other.xi;
+//		this.yi = other.yi;
+//		this.zf = other.zf;
+//		this.wf = other.wf;
 //	}
 //
-//	public Vec4(final Vec3 other, final float w) {
-//		this.x = other.x;
-//		this.y = other.y;
-//		this.z = other.z;
-//		this.w = w;
+//	public Vec4f(final Vec3f other, final float wf) {
+//		this.xi = other.xi;
+//		this.yi = other.yi;
+//		this.zf = other.zf;
+//		this.wf = wf;
 //	}
 //
 //	@Override
@@ -62,34 +62,34 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //	@Override
 //	public float getLengthSquared() {
-//		return x * x + y * y + z * z + w * w;
+//		return xi * xi + yi * yi + zf * zf + wf * wf;
 //	}
 //
-//	public Vec4 getUnitVector() {
+//	public Vec4f getUnitVector() {
 //		final float sqLength = getLengthSquared();
 //		final float invLength = FastMath.invSqrtFast(sqLength);
 //
-//		Vec4 normalVec = new Vec4(x * invLength, y * invLength, z * invLength, w * invLength);
+//		Vec4f normalVec = new Vec4f(xi * invLength, yi * invLength, zf * invLength, wf * invLength);
 //		return normalVec;
 //	}
 //
-//	public Vec4 getNegated() {
-//		return new Vec4(-x, -y, -z, -w);
+//	public Vec4f getNegated() {
+//		return new Vec4f(-xi, -yi, -zf, -wf);
 //	}
 //
-//	public Vec4 add(final Vec4 vec) {
-//		return new Vec4( x + vec.x, y + vec.y, z + vec.z, w + vec.w );
+//	public Vec4f add(final Vec4f vec) {
+//		return new Vec4f( xi + vec.xi, yi + vec.yi, zf + vec.zf, wf + vec.wf );
 //	}
 //
-//	public Vec4 subtract(final Vec4 vec) {
-//		return new Vec4( x - vec.x, y - vec.y, z - vec.z, w - vec.w );
+//	public Vec4f subtract(final Vec4f vec) {
+//		return new Vec4f( xi - vec.xi, yi - vec.yi, zf - vec.zf, wf - vec.wf );
 //	}
 //
-//	public Vec4 multiply(final float scalar) {
-//		return new Vec4( x * scalar, y * scalar, z * scalar, w * scalar );
+//	public Vec4f multiply(final float scalar) {
+//		return new Vec4f( xi * scalar, yi * scalar, zf * scalar, wf * scalar );
 //	}
 //
-//	public Vec4 scale(final float scalar) {
+//	public Vec4f scale(final float scalar) {
 //		return multiply(scalar);
 //	}
 //
@@ -97,33 +97,33 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @return A new vector where every scroll of the original vector has
 //	 * been multiplied with the corresponding scroll of the given vector.
 //	 */
-//	public Vec4 scale(final Vec4 vec) {
-//		return new Vec4(
-//				this.x * vec.x,
-//				this.y * vec.y,
-//				this.z * vec.z,
-//				this.w * vec.w
+//	public Vec4f scale(final Vec4f vec) {
+//		return new Vec4f(
+//				this.xi * vec.xi,
+//				this.yi * vec.yi,
+//				this.zf * vec.zf,
+//				this.wf * vec.wf
 //		);
 //	}
 //
-//	public float dot(final Vec4 vec) {
-//		return this.x * vec.x + this.y * vec.y + this.z * vec.z + this.w * vec.w;
+//	public float dot(final Vec4f vec) {
+//		return this.xi * vec.xi + this.yi * vec.yi + this.zf * vec.zf + this.wf * vec.wf;
 //	}
 //
-//	public float getX() {
-//		return x;
+//	public float getXi() {
+//		return xi;
 //	}
 //
-//	public float getY() {
-//		return y;
+//	public float getYi() {
+//		return yi;
 //	}
 //
-//	public float getZ() {
-//		return z;
+//	public float getZf() {
+//		return zf;
 //	}
 //
-//	public float getW() {
-//		return w;
+//	public float getWf() {
+//		return wf;
 //	}
 //
 //	@Override
@@ -131,7 +131,7 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		final FloatBuffer buffer = allocateFloatBuffer();
 //		final int startPos = buffer.position();
 //
-//		buffer.put(x).put(y).put(z).put(x);
+//		buffer.put(xi).put(yi).put(zf).put(xi);
 //
 //		buffer.position(startPos);
 //
@@ -142,10 +142,10 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	public int hashCode() {
 //		final int prime = 31;
 //		int result = 1;
-//		result = prime * result + Float.floatToIntBits(w);
-//		result = prime * result + Float.floatToIntBits(x);
-//		result = prime * result + Float.floatToIntBits(y);
-//		result = prime * result + Float.floatToIntBits(z);
+//		result = prime * result + Float.floatToIntBits(wf);
+//		result = prime * result + Float.floatToIntBits(xi);
+//		result = prime * result + Float.floatToIntBits(yi);
+//		result = prime * result + Float.floatToIntBits(zf);
 //		return result;
 //	}
 //
@@ -157,20 +157,20 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		if (obj == null) {
 //			return false;
 //		}
-//		if (!(obj instanceof Vec4)) {
+//		if (!(obj instanceof Vec4f)) {
 //			return false;
 //		}
-//		Vec4 other = (Vec4) obj;
-//		if (Float.floatToIntBits(w) != Float.floatToIntBits(other.w)) {
+//		Vec4f other = (Vec4f) obj;
+//		if (Float.floatToIntBits(wf) != Float.floatToIntBits(other.wf)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(x) != Float.floatToIntBits(other.x)) {
+//		if (Float.floatToIntBits(xi) != Float.floatToIntBits(other.xi)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(y) != Float.floatToIntBits(other.y)) {
+//		if (Float.floatToIntBits(yi) != Float.floatToIntBits(other.yi)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(z) != Float.floatToIntBits(other.z)) {
+//		if (Float.floatToIntBits(zf) != Float.floatToIntBits(other.zf)) {
 //			return false;
 //		}
 //		return true;
@@ -186,26 +186,26 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //			return false;
 //		}
 //
-//		if (!(obj instanceof Vec4)) {
+//		if (!(obj instanceof Vec4f)) {
 //			return false;
 //		}
 //
-//		Vec4 other = (Vec4) obj;
+//		Vec4f other = (Vec4f) obj;
 //
-//		return Compare.equals(x, other.x, epsilon)
-//				&& Compare.equals(y, other.y, epsilon)
-//				&& Compare.equals(z, other.z, epsilon)
-//				&& Compare.equals(w, other.w, epsilon);
+//		return Compare.equals(xi, other.xi, epsilon)
+//				&& Compare.equals(yi, other.yi, epsilon)
+//				&& Compare.equals(zf, other.zf, epsilon)
+//				&& Compare.equals(wf, other.wf, epsilon);
 //	}
 //
 //	public String toString() {
 //		return new StringBuilder()
 //			.append(getClass().getSimpleName())
 //			.append("{")
-//			.append(x).append(", ")
-//			.append(y).append(", ")
-//			.append(z).append(", ")
-//			.append(w)
+//			.append(xi).append(", ")
+//			.append(yi).append(", ")
+//			.append(zf).append(", ")
+//			.append(wf)
 //			.append("}")
 //			.toString();
 //	}

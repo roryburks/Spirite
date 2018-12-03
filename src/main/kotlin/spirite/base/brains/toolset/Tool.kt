@@ -4,7 +4,7 @@ import spirite.base.util.binding.Bindable
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.ICommand
 import spirite.base.util.linear.MutableTransform
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 import kotlin.reflect.KProperty
 
 abstract class Tool(
@@ -46,7 +46,7 @@ class DropDownProperty<T>( override val hrName: String, default: T, val values: 
 class RadioButtonProperty<T>( override val hrName: String, default: T, val values: Array<T>) : ToolProperty<T>(default)
 class ButtonProperty(override val hrName: String, val command: ICommand) : ToolProperty<Boolean>(false)
 class FloatBoxProperty(override val hrName: String, default: Float) : ToolProperty<Float>(default)
-class DualFloatBoxProperty(override val hrName: String, val label1: String, val label2: String, default: Vec2) : ToolProperty<Vec2>(default)
+class DualFloatBoxProperty(override val hrName: String, val label1: String, val label2: String, default: Vec2f) : ToolProperty<Vec2f>(default)
 
 enum class PenDrawMode( val hrName: String) {
     NORMAL("Normal"),
@@ -161,17 +161,17 @@ class Reshaper(toolset: Toolset) : Tool(toolset){
     override val description = "Reshaper"
 
     val transform : MutableTransform get() {
-        val t = MutableTransform.ScaleMatrix(scale.x, scale.y)
+        val t = MutableTransform.ScaleMatrix(scale.xf, scale.yf)
         t.preRotate(rotation)
-        t.preTranslate(translation.x, translation.y)
+        t.preTranslate(translation.xf, translation.yf)
         return t
     }
 
     val applyTransformBind by scheme.Property(ButtonProperty("Apply Transform", DrawCommand.APPLY_TRANFORM))
     var applyTransform by applyTransformBind
-    val scaleBind by scheme.Property(DualFloatBoxProperty("Scale", "x","y", Vec2(1f,1f)))
+    val scaleBind by scheme.Property(DualFloatBoxProperty("Scale", "xi","yi", Vec2f(1f,1f)))
     var scale by scaleBind
-    val translationBind by scheme.Property(DualFloatBoxProperty("Translation", "x","y", Vec2(0f,0f)))
+    val translationBind by scheme.Property(DualFloatBoxProperty("Translation", "xi","yi", Vec2f(0f,0f)))
     var translation by translationBind
     val rotationBind by scheme.Property(FloatBoxProperty("Rotation", 0f))
     var rotation by rotationBind

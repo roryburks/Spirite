@@ -1,11 +1,9 @@
 package spirite.base.util
 
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Vec2i
+import rb.vectrix.linear.Vec2i
 import java.lang.Math.max
 import java.lang.Math.round
-import java.util.*
-import kotlin.collections.ArrayList
 
 data class PackedRectangle (
         val packedRects : List<Rect>
@@ -18,9 +16,9 @@ fun modifiedSleatorAlgorithm(  toPack : List<Vec2i>) : PackedRectangle {
     val cropped = toPack.toMutableList()
 
     // Remove bad Rects
-    cropped.removeIf {it.x <= 0 || it.y <= 0}
+    cropped.removeIf {it.xi <= 0 || it.yi <= 0}
 
-    val minWidth = toPack.maxBy { it.x }?.x ?: return PackedRectangle(emptyList())
+    val minWidth = toPack.maxBy { it.xi }?.xi ?: return PackedRectangle(emptyList())
 
     // maxWidth and inc can be modified to effect the time spent finding
     //	the optimal Strip size (larget maxWidth and smaller inc mean more
@@ -57,37 +55,37 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
 
     // Step 0: Sort by non-increasing width
     var wy = 0
-    rects.sortBy { -it.x }
+    rects.sortBy { -it.xi }
 
     val packed = mutableListOf<Rect>()
 
     // Step 1: for each Rect of width greater then half the strip width,
     //	stack them on top of each other
     rects.removeIf {
-        if( it.x >= width/2) {
+        if( it.xi >= width/2) {
             val row = IntArray(width)
-            for( x in it.x until width)
+            for( x in it.xi until width)
                 row[x] = width-x
 
             field.add(row)  // Note:height guaranteed to be at least 1
-            for( y in 1 until it.y)
+            for( y in 1 until it.yi)
                 field.add(row.clone())
 
-            packed.add(Rect(0,wy,it.x,it.y))
-            wy += it.y
+            packed.add(Rect(0,wy,it.xi,it.yi))
+            wy += it.yi
             return@removeIf true
         }
         false
     }
 
     // Step 2 Sort by non-increasing height for reasons
-    rects.sortBy { -it.y }
+    rects.sortBy { -it.yi }
 
     // Step 3: go row-by-row trying to fit anything that can into the empty
     //	spaces.
     // Note: Because of our construction it's guaranteed that there are no
     //	"ceilings", i.e. Rects whose bottom is touching any air higher than
-    //	y.
+    //	yi.
     var y=0
     while( rects.any()) {
         if( field.size <= y)
@@ -100,11 +98,11 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
             if( space == 0)
                 ++x
             else {
-                val rect = rects.firstOrNull {it.x <= row[x]}
+                val rect = rects.firstOrNull {it.xi <= row[x]}
                 if( rect != null) {
                     // Puts it (the tallest box found that can fit) at the right-most
                     //	spot to minimize weird-looking areas.
-                    val newRect = Rect( x+row[x]-rect.x, y, rect.x, rect.y)
+                    val newRect = Rect( x+row[x]-rect.xi, y, rect.xi, rect.yi)
                     packed.add(newRect)
                     rects.remove(rect)
 

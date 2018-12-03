@@ -46,7 +46,7 @@ class FlatMediumTests {
         val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20),mockWorkspace.mediumRepository)
         val transform = MutableTransform.TranslationMatrix(-10f,-10f)
 
-        // Note: because we are using a non-standard coordinate setup (y down) and we aren't using helper functions that
+        // Note: because we are using a non-standard coordinate setup (yi down) and we aren't using helper functions that
         //  make rotation behave in a more intuitive way for the coordinate system, positive rotation rotates clockwise
         //  rather than counterclockwise
         transform.preRotate(-0.785398163f)
@@ -73,7 +73,7 @@ class FlatMediumTests {
         val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20),mockWorkspace.mediumRepository)
         val transform = MutableTransform.TranslationMatrix(-10f,-10f)
 
-        // Note: because we are using a non-standard coordinate setup (y down) and we aren't using helper functions that
+        // Note: because we are using a non-standard coordinate setup (yi down) and we aren't using helper functions that
         //  make rotation behave in a more intuitive way for the coordinate system, positive rotation rotates clockwise
         //  rather than counterclockwise
         transform.preRotate(-0.785398163f)

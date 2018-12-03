@@ -1,5 +1,8 @@
 package spirite.base.graphics.gl
 
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.linear.Vec3f
+import rb.vectrix.linear.Vec4f
 import spirite.base.util.linear.*
 
 data class GLParameters(
@@ -57,17 +60,17 @@ class GLUniform1f(name: String, val x: Float) : GLUniform(name) {
     override fun apply(gl: IGL, program: IGLProgram)
     {gl.uniform1f(getUniformLocation(gl, program) ?: return, x)}
 }
-class GLUniform2f(name: String, val v: Vec2) : GLUniform(name) {
+class GLUniform2f(name: String, val v: Vec2f) : GLUniform(name) {
     override fun apply(gl: IGL, program: IGLProgram)
-    {gl.uniform2f(getUniformLocation(gl, program) ?: return, v.x, v.y)}
+    {gl.uniform2f(getUniformLocation(gl, program) ?: return, v.xf, v.yf)}
 }
-class GLUniform3f(name: String, val v: Vec3) : GLUniform(name) {
+class GLUniform3f(name: String, val v: Vec3f) : GLUniform(name) {
     override fun apply(gl: IGL, program: IGLProgram)
-    {gl.uniform3f(getUniformLocation(gl, program) ?: return, v.x, v.y, v.z)}
+    {gl.uniform3f(getUniformLocation(gl, program) ?: return, v.xf, v.yf, v.zf)}
 }
-class GLUniform4f(name: String, val v: Vec4) : GLUniform(name) {
+class GLUniform4f(name: String, val v: Vec4f) : GLUniform(name) {
     override fun apply(gl: IGL, program: IGLProgram)
-    {gl.uniform4f(getUniformLocation(gl, program) ?: return, v.x, v.y, v.z, v.w)}
+    {gl.uniform4f(getUniformLocation(gl, program) ?: return, v.xf, v.yf, v.zf, v.wf)}
 }
 
 class GLUniform1i(name: String, val x: Int) : GLUniform(name) {

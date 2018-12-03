@@ -2,7 +2,7 @@ package spirite.base.util
 
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 import kotlin.math.roundToInt
 
 object MathUtil {
@@ -84,10 +84,10 @@ object MathUtil {
      */
     fun findBounds(region: Rect, matrix: Transform): Rect {
         // Might be some slightly-more-clever way to determing this
-        val (x) = matrix.apply(Vec2(region.x.toFloat(), region.y.toFloat()))
-        val (x3) = matrix.apply(Vec2((region.x + region.width).toFloat(), region.y.toFloat()))
-        val (x4) = matrix.apply(Vec2(region.x.toFloat(), (region.y + region.height).toFloat()))
-        val (_, y) = matrix.apply(Vec2((region.x + region.width).toFloat(), (region.y + region.height).toFloat()))
+        val (x) = matrix.apply(Vec2f(region.x.toFloat(), region.y.toFloat()))
+        val (x3) = matrix.apply(Vec2f((region.x + region.width).toFloat(), region.y.toFloat()))
+        val (x4) = matrix.apply(Vec2f(region.x.toFloat(), (region.y + region.height).toFloat()))
+        val (_, y) = matrix.apply(Vec2f((region.x + region.width).toFloat(), (region.y + region.height).toFloat()))
 
         val x1 = Math.floor(Math.min(Math.min(Math.min(x, x3), x4), y).toDouble()).toInt()
         val y1 = Math.floor(Math.min(Math.min(Math.min(x, x3), x4), y).toDouble()).toInt()
@@ -106,13 +106,13 @@ object MathUtil {
     }
 
     /** Creates the smallest rectangle that contains all given points.  */
-    fun rectFromPoints(points: List<Vec2>): Rect {
+    fun rectFromPoints(points: List<Vec2f>): Rect {
         if (points.isEmpty())
             return Rect(0, 0, 0, 0)
-        var x1 = Math.floor(points[0].x.toDouble()).toInt()
-        var y1 = Math.floor(points[0].y.toDouble()).toInt()
-        var x2 = Math.ceil(points[0].x.toDouble()).toInt()
-        var y2 = Math.ceil(points[0].y.toDouble()).toInt()
+        var x1 = Math.floor(points[0].xf.toDouble()).toInt()
+        var y1 = Math.floor(points[0].yf.toDouble()).toInt()
+        var x2 = Math.ceil(points[0].xf.toDouble()).toInt()
+        var y2 = Math.ceil(points[0].yf.toDouble()).toInt()
 
         val it = points.iterator()
         it.next()    // Ignore 1 because we already did it
@@ -154,10 +154,10 @@ object MathUtil {
     }
 
     fun circumscribeTrans(oldRect: Rect, trans: Transform): Rect {
-        val (x, y) = trans.apply(Vec2(oldRect.x.toFloat(), oldRect.y.toFloat()))
-        val (x3, y3) = trans.apply(Vec2((oldRect.x + oldRect.width).toFloat(), oldRect.y.toFloat()))
-        val (x4, y4) = trans.apply(Vec2(oldRect.x.toFloat(), (oldRect.y + oldRect.height).toFloat()))
-        val (x5, y5) = trans.apply(Vec2((oldRect.x + oldRect.width).toFloat(), (oldRect.y + oldRect.height).toFloat()))
+        val (x, y) = trans.apply(Vec2f(oldRect.x.toFloat(), oldRect.y.toFloat()))
+        val (x3, y3) = trans.apply(Vec2f((oldRect.x + oldRect.width).toFloat(), oldRect.y.toFloat()))
+        val (x4, y4) = trans.apply(Vec2f(oldRect.x.toFloat(), (oldRect.y + oldRect.height).toFloat()))
+        val (x5, y5) = trans.apply(Vec2f((oldRect.x + oldRect.width).toFloat(), (oldRect.y + oldRect.height).toFloat()))
 
         val x1 = Math.min(Math.floor(x.toDouble()), Math.min(Math.floor(x3.toDouble()), Math.min(Math.floor(x4.toDouble()), Math.floor(x5.toDouble())))).toInt()
         val y1 = Math.min(Math.floor(y.toDouble()), Math.min(Math.floor(y3.toDouble()), Math.min(Math.floor(y4.toDouble()), Math.floor(y5.toDouble())))).toInt()
@@ -172,17 +172,17 @@ object MathUtil {
     * to (x1,y1) and t=1 for (x2,y2).  The second representing the distance from the line
     * extended from the line segment
     */
-    fun projectOnto(x1: Float, y1: Float, x2: Float, y2: Float, p: Vec2): Vec2 {
-        val b = Vec2(x2 - x1, y2 - y1)
+    fun projectOnto(x1: Float, y1: Float, x2: Float, y2: Float, p: Vec2f): Vec2f {
+        val b = Vec2f(x2 - x1, y2 - y1)
         val scale_b = b.mag
         val scale_b2 = scale_b * scale_b
 
-        val a = Vec2(p.x - x1, p.y - y1)
+        val a = Vec2f(p.xf - x1, p.yf - y1)
 
         val t = a.dot(b) / scale_b2    // the extra / ||b|| is to normalize it to ||b|| = 1
         val m = a.cross(b) / scale_b
 
-        return Vec2(t, m)
+        return Vec2f(t, m)
     }
 
 }

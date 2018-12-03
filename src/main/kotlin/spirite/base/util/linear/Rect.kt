@@ -1,5 +1,6 @@
 package spirite.base.util.linear
 
+import rb.vectrix.linear.Vec2i
 import kotlin.math.max
 import kotlin.math.min
 
@@ -18,7 +19,7 @@ data class Rect(
 
     constructor(other: Rect) :this(other.x,other.y,other.width,other.height){}
 
-    constructor(v: Vec2i) : this( 0, 0, v.x, v.y) {}
+    constructor(v: Vec2i) : this( 0, 0, v.xi, v.yi) {}
 
     infix fun intersection(other: Rect): Rect {
         val x1 = Math.max(x, other.x)
@@ -93,5 +94,5 @@ data class Rect(
                 (th < ty || th > ry)
     }
 
-    override fun toString() = "($x,$y),[$width x $height]"
+    override fun toString() = "($x,$y),[$width xi $height]"
 }

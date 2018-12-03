@@ -12,8 +12,7 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import spirite.base.util.i
-import spirite.base.util.linear.Vec2i
+import rb.vectrix.linear.Vec2i
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
@@ -118,7 +117,7 @@ object SaveEngine {
                 // [4] : alpha
                 ra.writeFloat( node.alpha)
 
-                // [2] : x offset, [2] : y offset
+                // [2] : xi offset, [2] : yi offset
                 ra.writeShort(node.x)
                 ra.writeShort(node.y)
 
@@ -256,8 +255,8 @@ object SaveEngine {
                                 ra.writeInt(onEnd!!.second)    // 4: on-end Frame
 
                             val logSpace = space.stateView.logicalSpace[anim] ?: Vec2i.Zero
-                            ra.writeShort(logSpace.x)    // 2: Logical AnimationCommand
-                            ra.writeShort(logSpace.y)    // 2: Logical Y
+                            ra.writeShort(logSpace.xi)    // 2: Logical AnimationCommand
+                            ra.writeShort(logSpace.yi)    // 2: Logical Y
                         }
 
                         ra.writeShort(links.size)   // [2] : Number of Links

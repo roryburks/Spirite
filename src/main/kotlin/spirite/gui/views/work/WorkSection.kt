@@ -8,7 +8,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.pen.Penner
 import spirite.base.util.f
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 import spirite.base.util.round
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
@@ -79,13 +79,13 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
         }
     }
 
-    fun doPreservingMousePoint( point: Vec2, lambda: () -> Unit) {
+    fun doPreservingMousePoint(point: Vec2f, lambda: () -> Unit) {
         val view = currentView
-        val pointInWorkspace = view?.tScreenToWorkspace?.apply(point) ?: Vec2.Zero
+        val pointInWorkspace = view?.tScreenToWorkspace?.apply(point) ?: Vec2f.Zero
         lambda.invoke()
         if( view != null) {
-            hScroll.scroll = ((pointInWorkspace.x * view.zoom - point.x ) / scrollRatio).round
-            vScroll.scroll = ((pointInWorkspace.y * view.zoom - point.y ) / scrollRatio).round
+            hScroll.scroll = ((pointInWorkspace.xf * view.zoom - point.xf ) / scrollRatio).round
+            vScroll.scroll = ((pointInWorkspace.yf * view.zoom - point.yf ) / scrollRatio).round
         }
     }
 
@@ -132,7 +132,7 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
         hScroll.scrollBind.addListener {new, old ->currentView?.offsetX = new * scrollRatio}
         vScroll.scrollBind.addListener {new, old ->currentView?.offsetY = new * scrollRatio}
         workAreaContainer.onMouseWheelMoved = {
-            doPreservingMousePoint(Vec2(it.point.x.f, it.point.y.f)) {
+            doPreservingMousePoint(Vec2f(it.point.x.f, it.point.y.f)) {
                 if( it.moveAmount > 0) currentView?.zoomOut()
                 if( it.moveAmount < 0) currentView?.zoomIn()
                 calibrateScrolls()

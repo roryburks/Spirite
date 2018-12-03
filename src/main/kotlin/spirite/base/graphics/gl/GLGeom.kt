@@ -2,8 +2,6 @@ package spirite.base.graphics.gl
 
 import spirite.base.util.compaction.FloatCompactor
 import spirite.base.util.compaction.ReverseFloatCompactor
-import spirite.base.util.glu.GLC
-import spirite.base.util.linear.Vec2
 
 class PrimitiveBuilder(
         val attrLengths: IntArray,

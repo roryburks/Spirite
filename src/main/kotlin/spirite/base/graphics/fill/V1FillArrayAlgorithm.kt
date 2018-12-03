@@ -4,7 +4,7 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import spirite.base.util.MathUtil
-import spirite.base.util.linear.Vec2i
+import rb.vectrix.linear.Vec2i
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
@@ -30,7 +30,7 @@ object V1FillArrayAlgorithm : IFillArrayAlgorithm {
         val workers = Array( (w-1)/9 + 1) {ox ->
             Array( (h-1)/9 + 1) {oy ->
                 when {
-                    ox == cx && oy == cy -> V1FillWorker(context, ox, oy, start = Vec2i(x%9, y%9))
+                    ox == cx && oy == cy -> V1FillWorker(context, ox, oy, start = Vec2i(x % 9, y % 9))
                     else -> V1FillWorker(context, ox, oy)
                 }
             }
@@ -89,10 +89,10 @@ object V1FillArrayAlgorithm : IFillArrayAlgorithm {
 
         init {
             if( start != null) {
-                toCheck =  posToMask(start.x, start.y)
+                toCheck =  posToMask(start.xi, start.yi)
 
                 if( toCheck == 0) {
-                    checkQueue.offer(MathUtil.packInt(start.x, start.y))
+                    checkQueue.offer(MathUtil.packInt(start.xi, start.yi))
                 }
             }
             else{
@@ -134,9 +134,9 @@ object V1FillArrayAlgorithm : IFillArrayAlgorithm {
                 if( checkMask and mask != 0){
                     checkQueue.offer( when {
                         offset < 8 -> MathUtil.packInt(offset, 0)
-                        offset < 16 -> MathUtil.packInt(8, offset-8)  // x = 9 : 8,1
-                        offset < 24 -> MathUtil.packInt(24-offset, 8)  // x = 17: 7,8
-                        else -> MathUtil.packInt(0, 32-offset)   // x = 25: 0, 7
+                        offset < 16 -> MathUtil.packInt(8, offset-8)  // xi = 9 : 8,1
+                        offset < 24 -> MathUtil.packInt(24-offset, 8)  // xi = 17: 7,8
+                        else -> MathUtil.packInt(0, 32-offset)   // xi = 25: 0, 7
                     })
                 }
 
@@ -189,7 +189,7 @@ object V1FillArrayAlgorithm : IFillArrayAlgorithm {
             y == 0 -> 1 shl x
             x == 8 -> 1 shl (8 + y)
             y == 8 -> 1 shl (24 - x)
-            x == 0 -> 1 shl (32 - y)    // Note: x == 0, y == 0 will be handled by case 1
+            x == 0 -> 1 shl (32 - y)    // Note: xi == 0, yi == 0 will be handled by case 1
             else -> 0
         }
 
@@ -210,7 +210,7 @@ object V1FillArrayAlgorithm : IFillArrayAlgorithm {
                     if( actualChecked and mask != 0 ) return true
                     if(change) actualChecked = actualChecked or mask
                 }
-                x == 0 ->  {    // Note: x == 0, y == 0 will be handled by case 1
+                x == 0 ->  {    // Note: xi == 0, yi == 0 will be handled by case 1
                     val mask = 1 shl (32-y)
                     if( actualChecked and mask != 0 ) return true
                     if(change) actualChecked = actualChecked or mask

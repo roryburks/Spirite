@@ -6,10 +6,8 @@ import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.graphics.LineAttributes
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.Colors
-import spirite.base.util.linear.Vec2i
+import rb.vectrix.linear.Vec2i
 import spirite.hybrid.Hybrid
-import spirite.pc.JOGL.JOGLProvider
-import spirite.pc.resources.JClassScriptService
 import spirite.pc.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -65,16 +63,16 @@ class GLGraphicsContextTests {
 
         // Corners
         val corners = listOf(
-                Vec2i( 5, 5),
-                Vec2i( 5, 15),
-                Vec2i( 15, 5),
-                Vec2i( 15, 15))
+                Vec2i(5, 5),
+                Vec2i(5, 15),
+                Vec2i(15, 5),
+                Vec2i(15, 15))
 
         corners.forEach {
-            assertEquals(red, img.getARGB(it.x+1, it.y+1))
-            assertEquals(red, img.getARGB(it.x-1, it.y-1))
-            assertEquals(transparent, img.getARGB(it.x+3, it.y+3))
-            assertEquals(transparent, img.getARGB(it.x-3, it.y-3))
+            assertEquals(red, img.getARGB(it.xi+1, it.yi+1))
+            assertEquals(red, img.getARGB(it.xi-1, it.yi-1))
+            assertEquals(transparent, img.getARGB(it.xi+3, it.yi+3))
+            assertEquals(transparent, img.getARGB(it.xi-3, it.yi-3))
         }
         assertEquals(transparent, img.getARGB(10, 10))
         assertEquals(transparent, img.getARGB(0, 0))

@@ -1,9 +1,9 @@
 package spirite.base.brains.settings
 
+import rb.vectrix.linear.Vec2f
 import spirite.base.util.delegates.MutableLazy
 import spirite.base.util.i
 import spirite.base.util.interpolation.CubicSplineInterpolator
-import spirite.base.util.linear.Vec2
 import java.io.File
 import java.nio.ByteBuffer
 import kotlin.reflect.KProperty
@@ -138,15 +138,15 @@ class SettingsManager (
      * be in between (0,0) and (1,1), inclusive
      * @return the constructed Interpolator
      * */
-    fun setTabletInterpolationPoints( points: List<Vec2>) : CubicSplineInterpolator {
+    fun setTabletInterpolationPoints( points: List<Vec2f>) : CubicSplineInterpolator {
         // TODO: Error Checking
 
         val bb = ByteBuffer.allocate( 2 + 8*2*points.size)
 
         bb.putShort( points.size.toShort())
         points.forEach {
-            bb.putFloat( it.x)
-            bb.putFloat( it.y)
+            bb.putFloat( it.xf)
+            bb.putFloat( it.yf)
         }
         preferences.putByteArray("tpcPoints", bb.array())
 
@@ -163,7 +163,7 @@ class SettingsManager (
         val points = List( num.toInt()) {
             val x = buff.float
             val y = buff.float
-            Vec2( x, y)
+            Vec2f( x, y)
         }
 
         return CubicSplineInterpolator( points, true, true)

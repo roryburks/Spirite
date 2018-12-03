@@ -9,7 +9,7 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationPlayObserver
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
-import spirite.base.util.linear.Vec2i
+import rb.vectrix.linear.Vec2i
 
 class FFASpaceViewState(val space: FFAAnimationSpace)
     : IAnimationSpaceView
@@ -29,8 +29,8 @@ class FFASpaceViewState(val space: FFAAnimationSpace)
     // endregion
 
     // region Logical Space
-    val logicalSpace : Map<FixedFrameAnimation,Vec2i> get() = _logicalSpace
-    private val _logicalSpace = mutableMapOf<FixedFrameAnimation,Vec2i>()
+    val logicalSpace : Map<FixedFrameAnimation, Vec2i> get() = _logicalSpace
+    private val _logicalSpace = mutableMapOf<FixedFrameAnimation, Vec2i>()
 
     private val frameSize = 24
     private val gap = 8
@@ -39,16 +39,16 @@ class FFASpaceViewState(val space: FFAAnimationSpace)
     {
         if(space.animations.contains(ffa))
         {
-            if( point.x < 0 || point.y < 0)
+            if( point.xi < 0 || point.yi < 0)
             {
-                val shiftX = if(point.x < 0) -point.x else 0
-                val shiftY = if(point.y < 0) -point.y else 0
+                val shiftX = if(point.xi < 0) -point.xi else 0
+                val shiftY = if(point.yi < 0) -point.yi else 0
 
                 _logicalSpace.replaceAll { key, value ->
                     if( key == ffa)
-                        Vec2i(point.x + shiftX, point.y + shiftY)
+                        Vec2i(point.xi + shiftX, point.yi + shiftY)
                     else
-                        Vec2i(value.x + shiftX, value.y + shiftY)
+                        Vec2i(value.xi + shiftX, value.yi + shiftY)
                 }
 
             }
@@ -81,8 +81,8 @@ class FFASpaceViewState(val space: FFAAnimationSpace)
     }
     internal fun triggerAnimationAdded(animation: FixedFrameAnimation)
     {
-        val lowest = _logicalSpace.values.map { it.y }.max()
-        _logicalSpace[animation] = Vec2i(0, if(lowest == null) 0 else (lowest + frameSize +  gap))
+        val lowest = _logicalSpace.values.map { it.yi }.max()
+        _logicalSpace[animation] = Vec2i(0, if (lowest == null) 0 else (lowest + frameSize + gap))
         _animationSpaceObservable.trigger { it.animationSpaceChanged(true) }
 
     }

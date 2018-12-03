@@ -37,7 +37,7 @@ private constructor( val imp : ICrossPanel)
 
             sb.appendln("${GLImageTracker.images.size} : ${GLImageTracker.bytesUsed}")
             GLImageTracker.images.forEach {
-                sb.appendln("  [${it.width} x ${it.height}]")
+                sb.appendln("  [${it.width} xi ${it.height}]")
             }
 
             glArea.text = sb.toString()

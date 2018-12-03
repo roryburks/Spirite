@@ -7,7 +7,7 @@ import spirite.base.pen.stroke.StrokeParams.InterpolationMethod.NONE
 import spirite.base.util.interpolation.CubicSplineInterpolator2D
 import spirite.base.util.interpolation.Interpolator2D
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 
 class StrokeBuilder(
         val strokeDrawer: IStrokeDrawer,
@@ -65,9 +65,9 @@ class StrokeBuilder(
     }
 
     private fun convertPS( ps : PenState) : PenState {
-        val transformed = tWorkspaceToComposite.apply(Vec2(ps.x, ps.y))
+        val transformed = tWorkspaceToComposite.apply(Vec2f(ps.x, ps.y))
         val pressure = params.dynamics.getSize(ps)
-        return PenState( transformed.x, transformed.y, pressure)
+        return PenState( transformed.xf, transformed.yf, pressure)
     }
 }
 

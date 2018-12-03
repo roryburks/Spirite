@@ -1,7 +1,7 @@
 package spirite.base.util.interpolation
 
 import spirite.base.util.MathUtil
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 
 /**
  * CubicSplineInterpolator2D is a two-dimensional curve interpolator which
@@ -14,10 +14,10 @@ import spirite.base.util.linear.Vec2
  * make up the key-points.
  */
 class CubicSplineInterpolator2D : Interpolator2D {
-    private var kx: FloatArray    // x-differentials
-    private var ky: FloatArray    // y-differentials
-    private var x_: FloatArray    // x-values
-    private var y_: FloatArray    // y-values
+    private var kx: FloatArray    // xi-differentials
+    private var ky: FloatArray    // yi-differentials
+    private var x_: FloatArray    // xi-values
+    private var y_: FloatArray    // yi-values
     private var t_: FloatArray    // t-values
     var numPoints = 0
         private set
@@ -37,7 +37,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
      * system)
      * !!!!CURRENTLY UNIMPLEMENTED!!!!
      */
-    constructor(points: List<Vec2>? = null, fast: Boolean = false) {
+    constructor(points: List<Vec2f>? = null, fast: Boolean = false) {
         numPoints = points?.size ?: 0
 
         val l = Math.max(numPoints, 10)
@@ -49,15 +49,15 @@ class CubicSplineInterpolator2D : Interpolator2D {
         distance = 0f
 
         if (numPoints != 0) {
-            x_[0] = points!![0].x
-            y_[0] = points[0].y
+            x_[0] = points!![0].xf
+            y_[0] = points[0].yf
             t_[0] = 0f
 
         }
 
         for (i in 1 until numPoints) {
-            x_[i] = points!![i].x
-            y_[i] = points[i].y
+            x_[i] = points!![i].xf
+            y_[i] = points[i].yf
             t_[i] = distance + MathUtil.distance(x_[i - 1], y_[i - 1], x_[i], y_[i])
             distance = t_[i]
         }
@@ -206,38 +206,38 @@ class CubicSplineInterpolator2D : Interpolator2D {
     }
 
 
-    override fun eval(t: Float): Vec2 {
-        if (numPoints == 0) return Vec2(0f, 0f)
+    override fun eval(t: Float): Vec2f {
+        if (numPoints == 0) return Vec2f(0f, 0f)
 
-        if (t <= 0 && !isExtrapolating) return Vec2(x_[0], y_[0])
-        if (t >= distance && !isExtrapolating) return Vec2(x_[numPoints - 1], y_[numPoints - 1])
+        if (t <= 0 && !isExtrapolating) return Vec2f(x_[0], y_[0])
+        if (t >= distance && !isExtrapolating) return Vec2f(x_[numPoints - 1], y_[numPoints - 1])
 
         var i = 0
         while (t > t_[i] && ++i < numPoints);
-        if (i == numPoints && !isExtrapolating) return Vec2(x_[numPoints - 1], y_[numPoints - 1])
+        if (i == numPoints && !isExtrapolating) return Vec2f(x_[numPoints - 1], y_[numPoints - 1])
 
         if (i == 0) {
             val p1 = _eval(0.075f, 0, 1)
 
-            val dt = MathUtil.distance(p1.x, p1.y, x_[0], y_[0])
+            val dt = MathUtil.distance(p1.xf, p1.yf, x_[0], y_[0])
             val d = t / dt
 
-            return Vec2(x_[0] + d * (p1.x - x_[0]), y_[0] + d * (p1.y - y_[0]))
+            return Vec2f(x_[0] + d * (p1.xf - x_[0]), y_[0] + d * (p1.yf - y_[0]))
         }
         if (i == numPoints) {
 
             val p1 = _eval(0.925f, numPoints - 2, numPoints - 1)
 
-            val dt = MathUtil.distance(p1.x, p1.y, x_[numPoints - 1], y_[numPoints - 1])
+            val dt = MathUtil.distance(p1.xf, p1.yf, x_[numPoints - 1], y_[numPoints - 1])
             val d = (t - distance) / dt + 1
 
-            return Vec2(x_[numPoints - 1] + d * (x_[numPoints - 1] - p1.x), y_[numPoints - 1] + d * (y_[numPoints - 1] - p1.y))
+            return Vec2f(x_[numPoints - 1] + d * (x_[numPoints - 1] - p1.xf), y_[numPoints - 1] + d * (y_[numPoints - 1] - p1.yf))
         }
 
         return _eval((t - t_[i - 1]) / (t_[i] - t_[i - 1]), i - 1, i)
     }
 
-    private fun _eval(n: Float, i1: Int, i2: Int): Vec2 {
+    private fun _eval(n: Float, i1: Int, i2: Int): Vec2f {
         val dt = t_[i2] - t_[i1]
         val a_x = kx[i1] * dt - (x_[i2] - x_[i1])
         val b_x = -kx[i2] * dt + x_[i2] - x_[i1]
@@ -247,7 +247,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
         val qx = (1 - n) * x_[i1] + n * x_[i2] + n * (1 - n) * (a_x * (1 - n) + b_x * n)
         val qy = (1 - n) * y_[i1] + n * y_[i2] + n * (1 - n) * (a_y * (1 - n) + b_y * n)
 
-        return Vec2(qx, qy)
+        return Vec2f(qx, qy)
     }
 
     override fun evalExt(t: Float): Interpolator2D.InterpolatedPoint {

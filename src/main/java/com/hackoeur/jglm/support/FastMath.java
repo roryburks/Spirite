@@ -23,9 +23,9 @@ import java.io.PrintStream;
  * {@link StrictMath} for large scale computation.
  * <p>
  * FastMath is a drop-in replacement for both Math and StrictMath. This
- * means that for any method in Math (say {@code Math.sin(x)} or
- * {@code Math.cbrt(y)}), user can directly change the class and use the
- * methods as is (using {@code FastMath.sin(x)} or {@code FastMath.cbrt(y)}
+ * means that for any method in Math (say {@code Math.sin(xi)} or
+ * {@code Math.cbrt(yi)}), user can directly change the class and use the
+ * methods as is (using {@code FastMath.sin(xi)} or {@code FastMath.cbrt(yi)}
  * in the previous example).
  * </p>
  * <p>
@@ -111,7 +111,7 @@ public class FastMath {
     /** log(2) (low bits). */
     private static final double LN_2_B = 1.17304635250823482e-7;
 
-    /** Coefficients for log, when input 0.99 < x < 1.01. */
+    /** Coefficients for log, when input 0.99 < xi < 1.01. */
     private static final double LN_QUICK_COEF[][] = {
         {1.0, 5.669184079525E-24},
         {-0.25, -0.25},
@@ -124,7 +124,7 @@ public class FastMath {
         {0.11113807559013367, 9.219544613762692E-9},
     };
 
-    /** Coefficients for log in the range of 1.0 < x < 1.0 + 2^-10. */
+    /** Coefficients for log in the range of 1.0 < xi < 1.0 + 2^-10. */
     private static final double LN_HI_PREC_COEF[][] = {
         {1.0, -6.032174644509064E-23},
         {-0.25, -0.25},
@@ -421,17 +421,17 @@ public class FastMath {
     
     /** Compute the hyperbolic cosine of a number.
      * @param x number on which evaluation is done
-     * @return hyperbolic cosine of x
+     * @return hyperbolic cosine of xi
      */
     public static double cosh(double x) {
       if (x != x) {
           return x;
       }
 
-      // cosh[z] = (exp(z) + exp(-z))/2
+      // cosh[zf] = (exp(zf) + exp(-zf))/2
 
       // for numbers with magnitude 20 or so,
-      // exp(-z) can be ignored in comparison with exp(z)
+      // exp(-zf) can be ignored in comparison with exp(zf)
 
       if (x > 20) {
           if (x >= LOG_MAX_VALUE) {
@@ -464,7 +464,7 @@ public class FastMath {
       double yaa = ya + temp - temp;
       double yab = ya - yaa;
 
-      // recip = 1/y
+      // recip = 1/yi
       double recip = 1.0/ya;
       temp = recip * HEX_40000000;
       double recipa = recip + temp - temp;
@@ -475,7 +475,7 @@ public class FastMath {
       // Account for yb
       recipb += -yb * recip * recip;
 
-      // y = y + 1/y
+      // yi = yi + 1/yi
       temp = ya + recipa;
       yb += -(temp - ya - recipa);
       ya = temp;
@@ -490,7 +490,7 @@ public class FastMath {
 
     /** Compute the hyperbolic sine of a number.
      * @param x number on which evaluation is done
-     * @return hyperbolic sine of x
+     * @return hyperbolic sine of xi
      */
     public static double sinh(double x) {
       boolean negate = false;
@@ -498,10 +498,10 @@ public class FastMath {
           return x;
       }
 
-      // sinh[z] = (exp(z) - exp(-z) / 2
+      // sinh[zf] = (exp(zf) - exp(-zf) / 2
 
-      // for values of z larger than about 20,
-      // exp(-z) can be ignored in comparison with exp(z)
+      // for values of zf larger than about 20,
+      // exp(-zf) can be ignored in comparison with exp(zf)
 
       if (x > 20) {
           if (x >= LOG_MAX_VALUE) {
@@ -543,7 +543,7 @@ public class FastMath {
           double yaa = ya + temp - temp;
           double yab = ya - yaa;
 
-          // recip = 1/y
+          // recip = 1/yi
           double recip = 1.0/ya;
           temp = recip * HEX_40000000;
           double recipa = recip + temp - temp;
@@ -557,7 +557,7 @@ public class FastMath {
           recipa = -recipa;
           recipb = -recipb;
 
-          // y = y + 1/y
+          // yi = yi + 1/yi
           temp = ya + recipa;
           yb += -(temp - ya - recipa);
           ya = temp;
@@ -575,7 +575,7 @@ public class FastMath {
           double ya = hiPrec[0] + hiPrec[1];
           double yb = -(ya - hiPrec[0] - hiPrec[1]);
 
-          /* Compute expm1(-x) = -expm1(x) / (expm1(x) + 1) */
+          /* Compute expm1(-xi) = -expm1(xi) / (expm1(xi) + 1) */
           double denom = 1.0 + ya;
           double denomr = 1.0 / denom;
           double denomb = -(denom - 1.0 - ya) + yb;
@@ -594,7 +594,7 @@ public class FastMath {
           rb += yb*denomr;                        // numerator
           rb += -ya * denomb * denomr * denomr;   // denominator
 
-          // y = y - 1/y
+          // yi = yi - 1/yi
           temp = ya + ra;
           yb += -(temp - ya - ra);
           ya = temp;
@@ -615,7 +615,7 @@ public class FastMath {
 
     /** Compute the hyperbolic tangent of a number.
      * @param x number on which evaluation is done
-     * @return hyperbolic tangent of x
+     * @return hyperbolic tangent of xi
      */
     public static double tanh(double x) {
       boolean negate = false;
@@ -624,11 +624,11 @@ public class FastMath {
           return x;
       }
 
-      // tanh[z] = sinh[z] / cosh[z]
-      // = (exp(z) - exp(-z)) / (exp(z) + exp(-z))
+      // tanh[zf] = sinh[zf] / cosh[zf]
+      // = (exp(zf) - exp(-zf)) / (exp(zf) + exp(-zf))
       // = (exp(2x) - 1) / (exp(2x) + 1)
 
-      // for magnitude > 20, sinh[z] == cosh[z] in double precision
+      // for magnitude > 20, sinh[zf] == cosh[zf] in double precision
 
       if (x > 20.0) {
           return 1.0;
@@ -650,7 +650,7 @@ public class FastMath {
       double result;
       if (x >= 0.5) {
           double hiPrec[] = new double[2];
-          // tanh(x) = (exp(2x) - 1) / (exp(2x) + 1)
+          // tanh(xi) = (exp(2x) - 1) / (exp(2x) + 1)
           exp(x*2.0, 0.0, hiPrec);
 
           double ya = hiPrec[0] + hiPrec[1];
@@ -692,7 +692,7 @@ public class FastMath {
       }
       else {
           double hiPrec[] = new double[2];
-          // tanh(x) = expm1(2x) / (expm1(2x) + 2)
+          // tanh(xi) = expm1(2x) / (expm1(2x) + 2)
           expm1(x*2.0, hiPrec);
 
           double ya = hiPrec[0] + hiPrec[1];
@@ -850,22 +850,22 @@ public class FastMath {
     /**
      * Exponential function.
      *
-     * Computes exp(x), function result is nearly rounded.   It will be correctly
+     * Computes exp(xi), function result is nearly rounded.   It will be correctly
      * rounded to the theoretical scroll for 99.9% of input values, otherwise it will
      * have a 1 UPL error.
      *
      * Method:
-     *    Lookup intVal = exp(int(x))
-     *    Lookup fracVal = exp(int(x-int(x) / 1024.0) * 1024.0 );
-     *    Compute z as the exponential of the remaining bits by a polynomial minus one
-     *    exp(x) = intVal * fracVal * (1 + z)
+     *    Lookup intVal = exp(int(xi))
+     *    Lookup fracVal = exp(int(xi-int(xi) / 1024.0) * 1024.0 );
+     *    Compute zf as the exponential of the remaining bits by a polynomial minus one
+     *    exp(xi) = intVal * fracVal * (1 + zf)
      *
      * Accuracy:
      *    Calculation is done with 63 bits of precision, so result should be correctly
      *    rounded for 99.9% of input values, with less than 1 ULP error otherwise.
      *
      * @param x   a double
-     * @return double e<sup>x</sup>
+     * @return double e<sup>xi</sup>
      */
     public static double exp(double x) {
         return exp(x, 0.0, null);
@@ -876,14 +876,14 @@ public class FastMath {
      * @param x original argument of the exponential function
      * @param extra extra bits of precision on input (To Be Confirmed)
      * @param hiPrec extra bits of precision on output (To Be Confirmed)
-     * @return exp(x)
+     * @return exp(xi)
      */
     private static double exp(double x, double extra, double[] hiPrec) {
         double intPartA;
         double intPartB;
         int intVal;
 
-        /* Lookup exp(floor(x)).
+        /* Lookup exp(floor(xi)).
          * intPartA will have the upper 22 bits, intPartB will have the lower
          * 52 bits.
          */
@@ -939,22 +939,22 @@ public class FastMath {
             intPartB = ExpIntTable.EXP_INT_TABLE_B[EXP_INT_TABLE_MAX_INDEX+intVal];
         }
 
-        /* Get the fractional part of x, find the greatest multiple of 2^-10 less than
-         * x and look up the exp function of it.
+        /* Get the fractional part of xi, find the greatest multiple of 2^-10 less than
+         * xi and look up the exp function of it.
          * fracPartA will have the upper 22 bits, fracPartB the lower 52 bits.
          */
         final int intFrac = (int) ((x - intVal) * 1024.0);
         final double fracPartA = ExpFracTable.EXP_FRAC_TABLE_A[intFrac];
         final double fracPartB = ExpFracTable.EXP_FRAC_TABLE_B[intFrac];
 
-        /* epsilon is the difference in x from the nearest multiple of 2^-10.  It
+        /* epsilon is the difference in xi from the nearest multiple of 2^-10.  It
          * has a scroll in the range 0 <= epsilon < 2^-10.
-         * Do the subtraction from x as the last step to avoid possible loss of percison.
+         * Do the subtraction from xi as the last step to avoid possible loss of percison.
          */
         final double epsilon = x - (intVal + intFrac / 1024.0);
 
-        /* Compute z = exp(epsilon) - 1.0 via a minimax polynomial.  z has
-       full double precision (52 bits).  Since z < 2^-10, we will have
+        /* Compute zf = exp(epsilon) - 1.0 via a minimax polynomial.  zf has
+       full double precision (52 bits).  Since zf < 2^-10, we will have
        62 bits of precision when combined with the contant 1.  This will be
        used in the last addition below to get proper rounding. */
 
@@ -974,7 +974,7 @@ public class FastMath {
         double tempA = intPartA * fracPartA;
         double tempB = intPartA * fracPartB + intPartB * fracPartA + intPartB * fracPartB;
 
-        /* Compute the result.  (1+z)(tempA+tempB).  Order of operations is
+        /* Compute the result.  (1+zf)(tempA+tempB).  Order of operations is
        important.  For accuracy add by increasing size.  tempA is exact and
        much larger than the others.  If there are extra bits specified from the
        pow() function, use them. */
@@ -995,9 +995,9 @@ public class FastMath {
         return result;
     }
 
-    /** Compute exp(x) - 1
+    /** Compute exp(xi) - 1
      * @param x number to compute shifted exponential
-     * @return exp(x) - 1
+     * @return exp(xi) - 1
      */
     public static double expm1(double x) {
       return expm1(x, null);
@@ -1005,8 +1005,8 @@ public class FastMath {
 
     /** Internal helper method for expm1
      * @param x number to compute shifted exponential
-     * @param hiPrecOut receive high precision result for -1.0 < x < 1.0
-     * @return exp(x) - 1
+     * @param hiPrecOut receive high precision result for -1.0 < xi < 1.0
+     * @return exp(xi) - 1
      */
     private static double expm1(double x, double hiPrecOut[]) {
         if (x != x || x == 0.0) { // NaN or zero
@@ -1015,7 +1015,7 @@ public class FastMath {
 
         if (x <= -1.0 || x >= 1.0) {
             // If not between +/- 1.0
-            //return exp(x) - 1.0;
+            //return exp(xi) - 1.0;
             double hiPrec[] = new double[2];
             exp(x, 0.0, hiPrec);
             if (x > 0.0) {
@@ -1110,7 +1110,7 @@ public class FastMath {
         ya = temp;
 
         if (negative) {
-            /* Compute expm1(-x) = -expm1(x) / (expm1(x) + 1) */
+            /* Compute expm1(-xi) = -expm1(xi) / (expm1(xi) + 1) */
             double denom = 1.0 + ya;
             double denomr = 1.0 / denom;
             double denomb = -(denom - 1.0 - ya) + yb;
@@ -1125,13 +1125,13 @@ public class FastMath {
 
             rb += (ya - za * ra - za * rb - zb * ra - zb * rb) * denomr;
 
-            // f(x) = x/1+x
-            // Compute f'(x)
+            // f(xi) = xi/1+xi
+            // Compute f'(xi)
             // Product rule:  d(uv) = du*v + u*dv
-            // Chain rule:  d(f(g(x)) = f'(g(x))*f(g'(x))
-            // d(1/x) = -1/(x*x)
-            // d(1/1+x) = -1/( (1+x)^2) *  1 =  -1/((1+x)*(1+x))
-            // d(x/1+x) = -x/((1+x)(1+x)) + 1/1+x = 1 / ((1+x)(1+x))
+            // Chain rule:  d(f(g(xi)) = f'(g(xi))*f(g'(xi))
+            // d(1/xi) = -1/(xi*xi)
+            // d(1/1+xi) = -1/( (1+xi)^2) *  1 =  -1/((1+xi)*(1+xi))
+            // d(xi/1+xi) = -xi/((1+xi)(1+xi)) + 1/1+xi = 1 / ((1+xi)(1+xi))
 
             // Adjust for yb
             rb += yb * denomr;                      // numerator
@@ -1154,7 +1154,7 @@ public class FastMath {
      * Natural logarithm.
      *
      * @param x   a double
-     * @return log(x)
+     * @return log(xi)
      */
     public static double log(final double x) {
         return log(x, null);
@@ -1164,7 +1164,7 @@ public class FastMath {
      * Internal helper method for natural logarithm function.
      * @param x original argument of the natural logarithm function
      * @param hiPrec extra bits of precision on output (To Be Confirmed)
-     * @return log(x)
+     * @return log(xi)
      */
     private static double log(final double x, final double[] hiPrec) {
         if (x==0) { // Handle special case of +0/-0
@@ -1220,7 +1220,7 @@ public class FastMath {
                 /* The normal method doesn't work well in the range [0.99, 1.01], so call do a straight
            polynomial expansion in higer precision. */
 
-               /* Compute x - 1.0 and split it */
+               /* Compute xi - 1.0 and split it */
                 double xa = x - 1.0;
                 double xb = xa - x + 1.0;
                 double tmp = xa * HEX_40000000;
@@ -1234,28 +1234,28 @@ public class FastMath {
                 double yb = lnCoef_last[1];
 
                 for (int i = LN_QUICK_COEF.length - 2; i >= 0; i--) {
-                    /* Multiply a = y * x */
+                    /* Multiply a = yi * xi */
                     aa = ya * xa;
                     ab = ya * xb + yb * xa + yb * xb;
-                    /* split, so now y = a */
+                    /* split, so now yi = a */
                     tmp = aa * HEX_40000000;
                     ya = aa + tmp - tmp;
                     yb = aa - ya + ab;
 
-                    /* Add  a = y + lnQuickCoef */
+                    /* Add  a = yi + lnQuickCoef */
                     final double[] lnCoef_i = LN_QUICK_COEF[i];
                     aa = ya + lnCoef_i[0];
                     ab = yb + lnCoef_i[1];
-                    /* Split y = a */
+                    /* Split yi = a */
                     tmp = aa * HEX_40000000;
                     ya = aa + tmp - tmp;
                     yb = aa - ya + ab;
                 }
 
-                /* Multiply a = y * x */
+                /* Multiply a = yi * xi */
                 aa = ya * xa;
                 ab = ya * xb + yb * xa + yb * xb;
-                /* split, so now y = a */
+                /* split, so now yi = a */
                 tmp = aa * HEX_40000000;
                 ya = aa + tmp - tmp;
                 yb = aa - ya + ab;
@@ -1268,21 +1268,21 @@ public class FastMath {
         final double[] lnm = lnMant.LN_MANT[(int)((bits & 0x000ffc0000000000L) >> 42)];
 
         /*
-    double epsilon = x / Double.longBitsToDouble(bits & 0xfffffc0000000000L);
+    double epsilon = xi / Double.longBitsToDouble(bits & 0xfffffc0000000000L);
 
     epsilon -= 1.0;
          */
 
-        // y is the most significant 10 bits of the mantissa
-        //double y = Double.longBitsToDouble(bits & 0xfffffc0000000000L);
-        //double epsilon = (x - y) / y;
+        // yi is the most significant 10 bits of the mantissa
+        //double yi = Double.longBitsToDouble(bits & 0xfffffc0000000000L);
+        //double epsilon = (xi - yi) / yi;
         final double epsilon = (bits & 0x3ffffffffffL) / (TWO_POWER_52 + (bits & 0x000ffc0000000000L));
 
         double lnza = 0.0;
         double lnzb = 0.0;
 
         if (hiPrec != null) {
-            /* split epsilon -> x */
+            /* split epsilon -> xi */
             double tmp = epsilon * HEX_40000000;
             double aa = epsilon + tmp - tmp;
             double ab = epsilon - aa;
@@ -1301,25 +1301,25 @@ public class FastMath {
             double yb = lnCoef_last[1];
 
             for (int i = LN_HI_PREC_COEF.length - 2; i >= 0; i--) {
-                /* Multiply a = y * x */
+                /* Multiply a = yi * xi */
                 aa = ya * xa;
                 ab = ya * xb + yb * xa + yb * xb;
-                /* split, so now y = a */
+                /* split, so now yi = a */
                 tmp = aa * HEX_40000000;
                 ya = aa + tmp - tmp;
                 yb = aa - ya + ab;
 
-                /* Add  a = y + lnHiPrecCoef */
+                /* Add  a = yi + lnHiPrecCoef */
                 final double[] lnCoef_i = LN_HI_PREC_COEF[i];
                 aa = ya + lnCoef_i[0];
                 ab = yb + lnCoef_i[1];
-                /* Split y = a */
+                /* Split yi = a */
                 tmp = aa * HEX_40000000;
                 ya = aa + tmp - tmp;
                 yb = aa - ya + ab;
             }
 
-            /* Multiply a = y * x */
+            /* Multiply a = yi * xi */
             aa = ya * xa;
             ab = ya * xb + yb * xa + yb * xb;
 
@@ -1393,10 +1393,10 @@ public class FastMath {
     }
 
     /**
-     * Computes log(1 + x).
+     * Computes log(1 + xi).
      *
      * @param x Number.
-     * @return {@code log(1 + x)}.
+     * @return {@code log(1 + xi)}.
      */
     public static double log1p(final double x) {
         if (x == -1) {
@@ -1419,12 +1419,12 @@ public class FastMath {
             }
 
             // Do a taylor series expansion around xpa:
-            //   f(x+y) = f(x) + f'(x) y + f''(x)/2 y^2
+            //   f(xi+yi) = f(xi) + f'(xi) yi + f''(xi)/2 yi^2
             final double fx1 = xpb / xpa;
             final double epsilon = 0.5 * fx1 + 1;
             return epsilon * fx1 + hiPrec[1] + hiPrec[0];
         } else {
-            // Value is small |x| < 1e6, do a Taylor series centered on 1.
+            // Value is small |xi| < 1e6, do a Taylor series centered on 1.
             final double y = (x * F_1_3 - F_1_2) * x + 1;
             return y * x;
         }
@@ -1432,7 +1432,7 @@ public class FastMath {
 
     /** Compute the base 10 logarithm.
      * @param x a number
-     * @return log10(x)
+     * @return log10(xi)
      */
     public static double log10(final double x) {
         final double hiPrec[] = new double[2];
@@ -1457,15 +1457,15 @@ public class FastMath {
      * logarithm</a> in a given base.
      *
      * Returns {@code NaN} if either argument is negative.
-     * If {@code base} is 0 and {@code x} is positive, 0 is returned.
-     * If {@code base} is positive and {@code x} is 0,
+     * If {@code base} is 0 and {@code xi} is positive, 0 is returned.
+     * If {@code base} is positive and {@code xi} is 0,
      * {@code Double.NEGATIVE_INFINITY} is returned.
      * If both arguments are 0, the result is {@code NaN}.
      *
      * @param base Base of the logarithm, must be greater than 0.
      * @param x Argument, must be greater than 0.
-     * @return the scroll of the logarithm, i.e. the number {@code y} such that
-     * <code>base<sup>y</sup> = x</code>.
+     * @return the scroll of the logarithm, i.e. the number {@code yi} such that
+     * <code>base<sup>yi</sup> = xi</code>.
      * @since 1.2 (previously in {@code MathUtils}, moved as of version 3.0)
      */
     public static double log(double base, double x) {
@@ -1473,7 +1473,7 @@ public class FastMath {
     }
 
     /**
-     * Power function.  Compute x^y.
+     * Power function.  Compute xi^yi.
      *
      * @param x   a double
      * @param y   a double
@@ -1517,7 +1517,7 @@ public class FastMath {
         }
 
         if (x == Double.POSITIVE_INFINITY) {
-            if (y != y) { // y is NaN
+            if (y != y) { // yi is NaN
                 return y;
             }
             if (y < 0.0) {
@@ -1540,7 +1540,7 @@ public class FastMath {
         }
 
         if (x == Double.NEGATIVE_INFINITY) {
-            if (y != y) { // y is NaN
+            if (y != y) { // yi is NaN
                 return y;
             }
 
@@ -1576,22 +1576,22 @@ public class FastMath {
             }
         }
 
-        /* Handle special case x<0 */
+        /* Handle special case xi<0 */
         if (x < 0) {
-            // y is an even integer in this case
+            // yi is an even integer in this case
             if (y >= TWO_POWER_53 || y <= -TWO_POWER_53) {
                 return pow(-x, y);
             }
 
             if (y == (long) y) {
-                // If y is an integer
+                // If yi is an integer
                 return ((long)y & 1) == 0 ? pow(-x, y) : -pow(-x, y);
             } else {
                 return Double.NaN;
             }
         }
 
-        /* Split y into ya and yb such that y = ya+yb */
+        /* Split yi into ya and yb such that yi = ya+yb */
         double ya;
         double yb;
         if (y < 8e298 && y > -8e298) {
@@ -1605,7 +1605,7 @@ public class FastMath {
             yb = y - ya;
         }
 
-        /* Compute ln(x) */
+        /* Compute ln(xi) */
         final double lores = log(x, lns);
         if (Double.isInfinite(lores)){ // don't allow this to be converted to NaN
             return lores;
@@ -1620,7 +1620,7 @@ public class FastMath {
         lnb += lna - tmp2;
         lna = tmp2;
 
-        // y*ln(x) = (aa+ab)
+        // yi*ln(xi) = (aa+ab)
         final double aa = lna * ya;
         final double ab = lna * yb + lnb * ya + lnb * yb;
 
@@ -1635,7 +1635,7 @@ public class FastMath {
         z = z * lnb;
 
         final double result = exp(lna, z, null);
-        //result = result + result * z;
+        //result = result + result * zf;
         return result;
     }
 
@@ -1708,10 +1708,10 @@ public class FastMath {
     }
 
     /**
-     *  Computes sin(x) - x, where |x| < 1/16.
+     *  Computes sin(xi) - xi, where |xi| < 1/16.
      *  Use a Remez polynomial approximation.
      *  @param x a number smaller than 1/16
-     *  @return sin(x) - x
+     *  @return sin(xi) - xi
      */
     private static double polySine(final double x)
     {
@@ -1722,17 +1722,17 @@ public class FastMath {
         p = p * x2 + 0.008333333333329196;
         p = p * x2 + -0.16666666666666666;
         //p *= x2;
-        //p *= x;
+        //p *= xi;
         p = p * x2 * x;
 
         return p;
     }
 
     /**
-     *  Computes cos(x) - 1, where |x| < 1/16.
+     *  Computes cos(xi) - 1, where |xi| < 1/16.
      *  Use a Remez polynomial approximation.
      *  @param x a number smaller than 1/16
-     *  @return cos(x) - 1
+     *  @return cos(xi) - 1
      */
     private static double polyCosine(double x) {
         double x2 = x*x;
@@ -1747,10 +1747,10 @@ public class FastMath {
     }
 
     /**
-     *  Compute sine over the first quadrant (0 < x < pi/2).
+     *  Compute sine over the first quadrant (0 < xi < pi/2).
      *  Use combination of table lookup and rational polynomial expansion.
      *  @param xa number from which sine is requested
-     *  @param xb extra bits for x (may be 0.0)
+     *  @param xb extra bits for xi (may be 0.0)
      *  @return sin(xa + xb)
      */
     private static double sinQ(double xa, double xb) {
@@ -1769,13 +1769,13 @@ public class FastMath {
         final double cosEpsA = 1.0;
         final double cosEpsB = polyCosine(epsilon);
 
-        // Split epsilon   xa + xb = x
+        // Split epsilon   xa + xb = xi
         final double temp = sinEpsA * HEX_40000000;
         double temp2 = (sinEpsA + temp) - temp;
         sinEpsB +=  sinEpsA - temp2;
         sinEpsA = temp2;
 
-        /* Compute sin(x) by angle addition formula */
+        /* Compute sin(xi) by angle addition formula */
         double result;
 
         /* Compute the following sum:
@@ -1874,7 +1874,7 @@ public class FastMath {
      * Compute cosine in the first quadrant by subtracting input from PI/2 and
      * then calling sinQ.  This is more accurate as the input approaches PI/2.
      *  @param xa number from which cosine is requested
-     *  @param xb extra bits for x (may be 0.0)
+     *  @param xb extra bits for xi (may be 0.0)
      *  @return cos(xa + xb)
      */
     private static double cosQ(double xa, double xb) {
@@ -1889,10 +1889,10 @@ public class FastMath {
     }
 
     /**
-     *  Compute tangent (or cotangent) over the first quadrant.   0 < x < pi/2
+     *  Compute tangent (or cotangent) over the first quadrant.   0 < xi < pi/2
      *  Use combination of table lookup and rational polynomial expansion.
      *  @param xa number from which sine is requested
-     *  @param xb extra bits for x (may be 0.0)
+     *  @param xb extra bits for xi (may be 0.0)
      *  @param cotanFlag if true, compute the cotangent instead of the tangent
      *  @return tan(xa+xb) (or cotangent, depending on cotanFlag)
      */
@@ -1913,13 +1913,13 @@ public class FastMath {
         final double cosEpsA = 1.0;
         final double cosEpsB = polyCosine(epsilon);
 
-        // Split epsilon   xa + xb = x
+        // Split epsilon   xa + xb = xi
         double temp = sinEpsA * HEX_40000000;
         double temp2 = (sinEpsA + temp) - temp;
         sinEpsB +=  sinEpsA - temp2;
         sinEpsA = temp2;
 
-        /* Compute sin(x) by angle addition formula */
+        /* Compute sin(xi) by angle addition formula */
 
         /* Compute the following sum:
          *
@@ -2001,7 +2001,7 @@ public class FastMath {
     err = (sina - cosa*est) + (sinb - cosb*est);
          */
 
-        // f(x) = 1/x,   f'(x) = -1/x^2
+        // f(xi) = 1/xi,   f'(xi) = -1/xi^2
 
         double est = sina/cosa;
 
@@ -2034,7 +2034,7 @@ public class FastMath {
     }
 
     /** Reduce the input argument using the Payne and Hanek method.
-     *  This is good for all inputs 0.0 < x < inf
+     *  This is good for all inputs 0.0 < xi < inf
      *  Output is remainder after dividing by PI/2
      *  The result array should contain 3 numbers.
      *  result[0] is the integer portion, so mod 4 this gives the quadrant.
@@ -2260,7 +2260,7 @@ public class FastMath {
      * Sine function.
      *
      * @param x Argument.
-     * @return sin(x)
+     * @return sin(xi)
      */
     public static double sin(double x) {
         boolean negative = false;
@@ -2327,7 +2327,7 @@ public class FastMath {
      * Cosine function.
      *
      * @param x Argument.
-     * @return cos(x)
+     * @return cos(xi)
      */
     public static double cos(double x) {
         int quadrant = 0;
@@ -2381,7 +2381,7 @@ public class FastMath {
      * Tangent function.
      *
      * @param x Argument.
-     * @return tan(x)
+     * @return tan(xi)
      */
     public static double tan(double x) {
         boolean negative = false;
@@ -2457,7 +2457,7 @@ public class FastMath {
     /**
      * Arctangent function
      *  @param x a number
-     *  @return atan(x)
+     *  @return atan(xi)
      */
     public static double atan(double x) {
         return atan(x, 0.0, false);
@@ -2465,7 +2465,7 @@ public class FastMath {
 
     /** Internal helper function to compute arctangent.
      * @param xa number from which arctangent is requested
-     * @param xb extra bits for x (may be 0.0)
+     * @param xb extra bits for xi (may be 0.0)
      * @param leftPlane if true, result angle must be put in the left half plane
      * @return atan(xa + xb) (or angle shifted by {@code PI} if leftPlane is true)
      */
@@ -2576,7 +2576,7 @@ public class FastMath {
         yb = -(temp - ya - yb);
         ya = temp;
 
-        /* Add in effect of epsB.   atan'(x) = 1/(1+x^2) */
+        /* Add in effect of epsB.   atan'(xi) = 1/(1+xi^2) */
         yb += epsB / (1d + epsA * epsA);
 
         //result = yb + eighths[idx] + ya;
@@ -2614,7 +2614,7 @@ public class FastMath {
      * Two arguments arctangent function
      * @param y ordinate
      * @param x abscissa
-     * @return phase angle of point (x,y) between {@code -PI} and {@code PI}
+     * @return phase angle of point (xi,yi) between {@code -PI} and {@code PI}
      */
     public static double atan2(double y, double x) {
         if (x != x || y != y) {
@@ -2645,7 +2645,7 @@ public class FastMath {
             }
         }
 
-        // y cannot now be zero
+        // yi cannot now be zero
 
         if (y == Double.POSITIVE_INFINITY) {
             if (x == Double.POSITIVE_INFINITY) {
@@ -2692,7 +2692,7 @@ public class FastMath {
             }
         }
 
-        // Neither y nor x can be infinite or NAN here
+        // Neither yi nor xi can be infinite or NAN here
 
         if (x == 0) {
             if (y > 0 || 1 / y > 0) {
@@ -2704,7 +2704,7 @@ public class FastMath {
             }
         }
 
-        // Compute ratio r = y/x
+        // Compute ratio r = yi/xi
         final double r = y / x;
         if (Double.isInfinite(r)) { // bypass calculations that can create NaN
             return atan(r, 0, x < 0);
@@ -2713,7 +2713,7 @@ public class FastMath {
         double ra = doubleHighPart(r);
         double rb = r - ra;
 
-        // Split x
+        // Split xi
         final double xa = doubleHighPart(x);
         final double xb = x - xa;
 
@@ -2735,7 +2735,7 @@ public class FastMath {
 
     /** Compute the arc sine of a number.
      * @param x number on which evaluation is done
-     * @return arc sine of x
+     * @return arc sine of xi
      */
     public static double asin(double x) {
       if (x != x) {
@@ -2758,9 +2758,9 @@ public class FastMath {
           return x;
       }
 
-      /* Compute asin(x) = atan(x/sqrt(1-x*x)) */
+      /* Compute asin(xi) = atan(xi/sqrt(1-xi*xi)) */
 
-      /* Split x */
+      /* Split xi */
       double temp = x * HEX_40000000;
       final double xa = x + temp - temp;
       final double xb = x - xa;
@@ -2793,7 +2793,7 @@ public class FastMath {
       /* Contribution of zb to sqrt */
       double dx = zb / (2.0*y);
 
-      // Compute ratio r = x/y
+      // Compute ratio r = xi/yi
       double r = x/y;
       temp = r * HEX_40000000;
       double ra = r + temp - temp;
@@ -2811,7 +2811,7 @@ public class FastMath {
 
     /** Compute the arc cosine of a number.
      * @param x number on which evaluation is done
-     * @return arc cosine of x
+     * @return arc cosine of xi
      */
     public static double acos(double x) {
       if (x != x) {
@@ -2834,9 +2834,9 @@ public class FastMath {
           return Math.PI/2.0;
       }
 
-      /* Compute acos(x) = atan(sqrt(1-x*x)/x) */
+      /* Compute acos(xi) = atan(sqrt(1-xi*xi)/xi) */
 
-      /* Split x */
+      /* Split xi */
       double temp = x * HEX_40000000;
       final double xa = x + temp - temp;
       final double xb = x - xa;
@@ -2870,11 +2870,11 @@ public class FastMath {
       y = ya+yb;
       yb = -(y - ya - yb);
 
-      // Compute ratio r = y/x
+      // Compute ratio r = yi/xi
       double r = y/x;
 
       // Did r overflow?
-      if (Double.isInfinite(r)) { // x is effectively zero
+      if (Double.isInfinite(r)) { // xi is effectively zero
           return Math.PI/2; // so return the appropriate scroll
       }
 
@@ -2893,7 +2893,7 @@ public class FastMath {
 
     /** Compute the cubic root of a number.
      * @param x number on which evaluation is done
-     * @return cubic root of x
+     * @return cubic root of xi
      */
     public static double cbrt(double x) {
       /* Convert input double to bits */
@@ -2921,7 +2921,7 @@ public class FastMath {
       /* Divide the exponent by 3 */
       int exp3 = exponent / 3;
 
-      /* p2 will be the nearest power of 2 to x with its exponent divided by 3 */
+      /* p2 will be the nearest power of 2 to xi with its exponent divided by 3 */
       double p2 = Double.longBitsToDouble((inbits & 0x8000000000000000L) |
                                           (long)(((exp3 + 1023) & 0x7ff)) << 52);
 
@@ -2939,7 +2939,7 @@ public class FastMath {
 
       // est should now be good to about 15 bits of precision.   Do 2 rounds of
       // Newton's method to get closer,  this should get us full double precision
-      // Scale down x for the purpose of doing newtons method.  This avoids over/under flows.
+      // Scale down xi for the purpose of doing newtons method.  This avoids over/under flows.
       final double xs = x / (p2*p2*p2);
       est += (xs - est*est*est) / (3*est*est);
       est += (xs - est*est*est) / (3*est*est);
@@ -2978,7 +2978,7 @@ public class FastMath {
     /**
      *  Convert degrees to radians, with error of less than 0.5 ULP
      *  @param x angle in degrees
-     *  @return x converted into radians
+     *  @return xi converted into radians
      */
     public static double toRadians(double x)
     {
@@ -3003,7 +3003,7 @@ public class FastMath {
     /**
      *  Convert radians to degrees, with error of less than 0.5 ULP
      *  @param x angle in radians
-     *  @return x converted into degrees
+     *  @return xi converted into degrees
      */
     public static double toDegrees(double x)
     {
@@ -3024,7 +3024,7 @@ public class FastMath {
     /**
      * Absolute scroll.
      * @param x number from which absolute scroll is requested
-     * @return abs(x)
+     * @return abs(xi)
      */
     public static int abs(final int x) {
         return (x < 0) ? -x : x;
@@ -3033,7 +3033,7 @@ public class FastMath {
     /**
      * Absolute scroll.
      * @param x number from which absolute scroll is requested
-     * @return abs(x)
+     * @return abs(xi)
      */
     public static long abs(final long x) {
         return (x < 0l) ? -x : x;
@@ -3042,7 +3042,7 @@ public class FastMath {
     /**
      * Absolute scroll.
      * @param x number from which absolute scroll is requested
-     * @return abs(x)
+     * @return abs(xi)
      */
     public static float abs(final float x) {
         return (x < 0.0f) ? -x : (x == 0.0f) ? 0.0f : x; // -0.0 => +0.0
@@ -3051,7 +3051,7 @@ public class FastMath {
     /**
      * Absolute scroll.
      * @param x number from which absolute scroll is requested
-     * @return abs(x)
+     * @return abs(xi)
      */
     public static double abs(double x) {
         return (x < 0.0) ? -x : (x == 0.0) ? 0.0 : x; // -0.0 => +0.0
@@ -3060,7 +3060,7 @@ public class FastMath {
     /**
      * Compute least significant bit (Unit in Last Position) for a number.
      * @param x number from which ulp is requested
-     * @return ulp(x)
+     * @return ulp(xi)
      */
     public static double ulp(double x) {
         if (Double.isInfinite(x)) {
@@ -3072,7 +3072,7 @@ public class FastMath {
     /**
      * Compute least significant bit (Unit in Last Position) for a number.
      * @param x number from which ulp is requested
-     * @return ulp(x)
+     * @return ulp(xi)
      */
     public static float ulp(float x) {
         if (Float.isInfinite(x)) {
@@ -3361,9 +3361,9 @@ public class FastMath {
 
     }
 
-    /** Get the largest whole number smaller than x.
+    /** Get the largest whole number smaller than xi.
      * @param x number from which floor is requested
-     * @return a double number f such that f is an integer f <= x < f + 1.0
+     * @return a double number f such that f is an integer f <= xi < f + 1.0
      */
     public static double floor(double x) {
         long y;
@@ -3388,9 +3388,9 @@ public class FastMath {
         return y;
     }
 
-    /** Get the smallest whole number larger than x.
+    /** Get the smallest whole number larger than xi.
      * @param x number from which ceil is requested
-     * @return a double number c such that c is an integer c - 1.0 < x <= c
+     * @return a double number c such that c is an integer c - 1.0 < xi <= c
      */
     public static double ceil(double x) {
         double y;
@@ -3413,9 +3413,9 @@ public class FastMath {
         return y;
     }
 
-    /** Get the whole number that is the nearest to x, or the even one if x is exactly half way between two integers.
+    /** Get the whole number that is the nearest to xi, or the even one if xi is exactly half way between two integers.
      * @param x number from which nearest whole number is requested
-     * @return a double number r such that r is an integer r - 0.5 <= x <= r + 0.5
+     * @return a double number r such that r is an integer r - 0.5 <= xi <= r + 0.5
      */
     public static double rint(double x) {
         double y = floor(x);
@@ -3436,17 +3436,17 @@ public class FastMath {
         return (z & 1) == 0 ? y : y + 1.0;
     }
 
-    /** Get the closest long to x.
+    /** Get the closest long to xi.
      * @param x number from which closest long is requested
-     * @return closest long to x
+     * @return closest long to xi
      */
     public static long round(double x) {
         return (long) floor(x + 0.5);
     }
 
-    /** Get the closest int to x.
+    /** Get the closest int to xi.
      * @param x number from which closest int is requested
-     * @return closest int to x
+     * @return closest int to xi
      */
     public static int round(final float x) {
         return (int) floor(x + 0.5f);
@@ -3589,8 +3589,8 @@ public class FastMath {
     }
 
     /**
-     * Returns the hypotenuse of a triangle with sides {@code x} and {@code y}
-     * - sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)<br/>
+     * Returns the hypotenuse of a triangle with sides {@code xi} and {@code yi}
+     * - sqrt(<i>xi</i><sup>2</sup>&nbsp;+<i>yi</i><sup>2</sup>)<br/>
      * avoiding intermediate overflow or underflow.
      *
      * <ul>
@@ -3600,7 +3600,7 @@ public class FastMath {
      *
      * @param x a scroll
      * @param y a scroll
-     * @return sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
+     * @return sqrt(<i>xi</i><sup>2</sup>&nbsp;+<i>yi</i><sup>2</sup>)
      */
     public static double hypot(final double x, final double y) {
         if (Double.isInfinite(x) || Double.isInfinite(y)) {
@@ -3612,10 +3612,10 @@ public class FastMath {
             final int expX = getExponent(x);
             final int expY = getExponent(y);
             if (expX > expY + 27) {
-                // y is neglectible with respect to x
+                // yi is neglectible with respect to xi
                 return abs(x);
             } else if (expY > expX + 27) {
-                // x is neglectible with respect to y
+                // xi is neglectible with respect to yi
                 return abs(y);
             } else {
 
@@ -3639,10 +3639,10 @@ public class FastMath {
 
     /**
      * Computes the remainder as prescribed by the IEEE 754 standard.
-     * The remainder scroll is mathematically equal to {@code x - y*n}
+     * The remainder scroll is mathematically equal to {@code xi - yi*n}
      * where {@code n} is the mathematical integer closest to the exact mathematical scroll
-     * of the quotient {@code x/y}.
-     * If two mathematical integers are equally close to {@code x/y} then
+     * of the quotient {@code xi/yi}.
+     * If two mathematical integers are equally close to {@code xi/yi} then
      * {@code n} is the integer that is even.
      * <p>
      * <ul>
@@ -3698,8 +3698,8 @@ public class FastMath {
     /**
      * Return the exponent of a double number, removing the bias.
      * <p>
-     * For double numbers of the form 2<sup>x</sup>, the unbiased
-     * exponent is exactly x.
+     * For double numbers of the form 2<sup>xi</sup>, the unbiased
+     * exponent is exactly xi.
      * </p>
      * @param d number from which exponent is requested
      * @return exponent for d in IEEE754 representation, without bias
@@ -3711,8 +3711,8 @@ public class FastMath {
     /**
      * Return the exponent of a float number, removing the bias.
      * <p>
-     * For float numbers of the form 2<sup>x</sup>, the unbiased
-     * exponent is exactly x.
+     * For float numbers of the form 2<sup>xi</sup>, the unbiased
+     * exponent is exactly xi.
      * </p>
      * @param f number from which exponent is requested
      * @return exponent for d in IEEE754 representation, without bias
@@ -3744,11 +3744,11 @@ public class FastMath {
     /** Enclose large data table in nested static class so it's only loaded on first access. */
     private static class ExpIntTable {
         /** Exponential evaluated at integer values,
-         * exp(x) =  expIntTableA[x + EXP_INT_TABLE_MAX_INDEX] + expIntTableB[x+EXP_INT_TABLE_MAX_INDEX].
+         * exp(xi) =  expIntTableA[xi + EXP_INT_TABLE_MAX_INDEX] + expIntTableB[xi+EXP_INT_TABLE_MAX_INDEX].
          */
         private static final double[] EXP_INT_TABLE_A;
         /** Exponential evaluated at integer values,
-         * exp(x) =  expIntTableA[x + EXP_INT_TABLE_MAX_INDEX] + expIntTableB[x+EXP_INT_TABLE_MAX_INDEX]
+         * exp(xi) =  expIntTableA[xi + EXP_INT_TABLE_MAX_INDEX] + expIntTableB[xi+EXP_INT_TABLE_MAX_INDEX]
          */
         private static final double[] EXP_INT_TABLE_B;
 
@@ -3783,12 +3783,12 @@ public class FastMath {
     /** Enclose large data table in nested static class so it's only loaded on first access. */
     private static class ExpFracTable {
         /** Exponential over the range of 0 - 1 in increments of 2^-10
-         * exp(x/1024) =  expFracTableA[x] + expFracTableB[x].
+         * exp(xi/1024) =  expFracTableA[xi] + expFracTableB[xi].
          * 1024 = 2^10
          */
         private static final double[] EXP_FRAC_TABLE_A;
         /** Exponential over the range of 0 - 1 in increments of 2^-10
-         * exp(x/1024) =  expFracTableA[x] + expFracTableB[x].
+         * exp(xi/1024) =  expFracTableA[xi] + expFracTableB[xi].
          */
         private static final double[] EXP_FRAC_TABLE_B;
 

@@ -12,7 +12,7 @@ import spirite.base.util.f
 import spirite.base.util.floor
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 
 class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         IClearModule,
@@ -34,8 +34,8 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
     }
     override fun fill(x: Int, y: Int, color: Color): Boolean {
         doToUnderlyingWithTrans { rawImage, transform ->
-            val p = transform?.invert()?.apply(Vec2(x.f,y.f)) ?: Vec2(x.f,y.f)
-            rawImage.drawer.fill(p.x.floor, p.y.floor, color)
+            val p = transform?.invert()?.apply(Vec2f(x.f,y.f)) ?: Vec2f(x.f,y.f)
+            rawImage.drawer.fill(p.xf.floor, p.yf.floor, color)
         }
 
         return true

@@ -7,11 +7,9 @@ import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree.Node
-import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.util.f
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec2
-import spirite.hybrid.Hybrid
+import rb.vectrix.linear.Vec2f
 import spirite.hybrid.MDebug
 
 class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: IToolsetManager) : ICommandExecuter
@@ -51,8 +49,8 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
                 val reshape = toolsetManager.toolset.Reshape
                 val transform = reshape.transform
                 (workspace.activeDrawer as? ITransformModule)?.transform( transform)
-                reshape.translation = Vec2(0f,0f)
-                reshape.scale = Vec2(1f,1f)
+                reshape.translation = Vec2f(0f,0f)
+                reshape.scale = Vec2f(1f,1f)
                 reshape.rotation = 0f
                 workspace.selectionEngine.proposingTransform = null
             }

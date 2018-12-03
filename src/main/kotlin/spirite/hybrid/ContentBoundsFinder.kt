@@ -149,7 +149,7 @@ object ContentBoundsFinder {
         internal abstract fun setBG(x: Int, y: Int)
 
         // Kind of Ugly code in here, but it's a bit much to copy all that
-        // code just to swap AnimationCommand and Y and w for h
+        // code just to swap AnimationCommand and Y and wf for h
 
         /**
          * @return true if the line contains only BG data

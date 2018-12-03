@@ -1,7 +1,6 @@
 package spirite.base.file.aaf
 
 import rb.extendo.extensions.toLookup
-import spirite.base.file.writeUFT8NT
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -10,7 +9,7 @@ import spirite.base.imageData.mediums.IImageMedium
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.util.*
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Vec2i
+import rb.vectrix.linear.Vec2i
 import spirite.hybrid.Hybrid
 import spirite.hybrid.IImageCreator
 import spirite.hybrid.IImageIO

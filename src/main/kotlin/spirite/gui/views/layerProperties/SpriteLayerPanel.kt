@@ -152,18 +152,18 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             }
             rows.add(Hybrid.ui.Label("Translation").also { it.textSize = 9; it.bold = false }, height = 10)
                 rows += {
-                add(Hybrid.ui.Label("x"), width = 30, height = 16)
+                add(Hybrid.ui.Label("xi"), width = 30, height = 16)
                 add(tfTransX, height = 16, flex = 1f)
                 addGap(4)
-                add(Hybrid.ui.Label("y"), width = 30, height = 16)
+                add(Hybrid.ui.Label("yi"), width = 30, height = 16)
                 add(tfTransY, height = 16, flex = 1f)
             }
             rows.add(Hybrid.ui.Label("Scale").also { it.textSize = 9; it.bold = false }, height = 10)
             rows += {
-                add(Hybrid.ui.Label("x"), width = 30, height = 16)
+                add(Hybrid.ui.Label("xi"), width = 30, height = 16)
                 add(tfScaleX, height = 16, flex = 1f)
                 addGap(4)
-                add(Hybrid.ui.Label("y"), width = 30, height = 16)
+                add(Hybrid.ui.Label("yi"), width = 30, height = 16)
                 add(tfScaleY, height = 16, flex = 1f)
             }
             rows.addGap(1)

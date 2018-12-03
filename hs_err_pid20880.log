@@ -463,9 +463,9 @@ Event: 8.939 Thread 0x000000002c1dc000 2491   !   3       java.awt.Container::ge
 Event: 8.940 Thread 0x000000002c1dc000 nmethod 2491 0x0000000012bc9c90 code [0x0000000012bc9f40, 0x0000000012bcb388]
 Event: 8.940 Thread 0x000000002c1dc000 2490       3       java.awt.Container::getMouseEventTarget (50 bytes)
 Event: 8.940 Thread 0x000000002c1dc000 nmethod 2490 0x0000000012bcb990 code [0x0000000012bcbb60, 0x0000000012bcbe78]
-Event: 8.940 Thread 0x000000002c1dc000 2492       1       spirite.base.util.linear.Vec2::getX (5 bytes)
+Event: 8.940 Thread 0x000000002c1dc000 2492       1       rb.vectrix.linear.Vec2f::getX (5 bytes)
 Event: 8.940 Thread 0x000000002c1dc000 nmethod 2492 0x0000000019d12410 code [0x0000000019d125c0, 0x0000000019d126d0]
-Event: 8.940 Thread 0x000000002c1dc000 2493       1       spirite.base.util.linear.Vec2::getY (5 bytes)
+Event: 8.940 Thread 0x000000002c1dc000 2493       1       rb.vectrix.linear.Vec2f::getY (5 bytes)
 Event: 8.940 Thread 0x000000002c1dc000 nmethod 2493 0x0000000019d12790 code [0x0000000019d12940, 0x0000000019d12a50]
 
 GC Heap History (4 events):

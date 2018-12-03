@@ -102,7 +102,7 @@ class FastMathCalc {
                                           int SINE_TABLE_LEN, double[] TANGENT_TABLE_A, double[] TANGENT_TABLE_B) {
         final double result[] = new double[2];
 
-        /* Use taylor series for 0 <= x <= 6/8 */
+        /* Use taylor series for 0 <= xi <= 6/8 */
         for (int i = 0; i < 7; i++) {
             double x = i / 8.0;
 
@@ -194,12 +194,12 @@ class FastMathCalc {
     }
 
     /**
-     *  For x between 0 and pi/4 compute cosine using Talor series
-     *  cos(x) = 1 - x^2/2! + x^4/4! ...
+     *  For xi between 0 and pi/4 compute cosine using Talor series
+     *  cos(xi) = 1 - xi^2/2! + xi^4/4! ...
      * @param x number from which cosine is requested
      * @param result placeholder where to put the result in extended precision
      * (may be null)
-     * @return cos(x)
+     * @return cos(xi)
      */
     static double slowCos(final double x, final double result[]) {
 
@@ -239,12 +239,12 @@ class FastMathCalc {
     }
 
     /**
-     * For x between 0 and pi/4 compute sine using Taylor expansion:
-     * sin(x) = x - x^3/3! + x^5/5! - x^7/7! ...
+     * For xi between 0 and pi/4 compute sine using Taylor expansion:
+     * sin(xi) = xi - xi^3/3! + xi^5/5! - xi^7/7! ...
      * @param x number from which sine is requested
      * @param result placeholder where to put the result in extended precision
      * (may be null)
-     * @return sin(x)
+     * @return sin(xi)
      */
     static double slowSin(final double x, final double result[]) {
         final double xs[] = new double[2];
@@ -284,11 +284,11 @@ class FastMathCalc {
 
 
     /**
-     *  For x between 0 and 1, returns exp(x), uses extended precision
+     *  For xi between 0 and 1, returns exp(xi), uses extended precision
      *  @param x argument of exponential
-     *  @param result placeholder where to place exp(x) split in two terms
-     *  for extra precision (i.e. exp(x) = result[0] + result[1]
-     *  @return exp(x)
+     *  @param result placeholder where to place exp(xi) split in two terms
+     *  for extra precision (i.e. exp(xi) = result[0] + result[1]
+     *  @return exp(xi)
      */
     static double slowexp(final double x, final double result[]) {
         final double xs[] = new double[2];
@@ -382,17 +382,17 @@ class FastMathCalc {
 
     /** Compute the reciprocal of in.  Use the following algorithm.
      *  in = c + d.
-     *  want to find x + y such that x+y = 1/(c+d) and x is much
-     *  larger than y and x has several zero bits on the right.
+     *  want to find xi + yi such that xi+yi = 1/(c+d) and xi is much
+     *  larger than yi and xi has several zero bits on the right.
      *
      *  Set b = 1/(2^22),  a = 1 - b.  Thus (a+b) = 1.
      *  Use following identity to compute (a+b)/(c+d)
      *
      *  (a+b)/(c+d)  =   a/c   +    (bc - ad) / (c^2 + cd)
-     *  set x = a/c  and y = (bc - ad) / (c^2 + cd)
+     *  set xi = a/c  and yi = (bc - ad) / (c^2 + cd)
      *  This will be close to the right answer, but there will be
      *  some rounding in the calculation of AnimationCommand.  So by carefully
-     *  computing 1 - (c+d)(x+y) we can compute an error and
+     *  computing 1 - (c+d)(xi+yi) we can compute an error and
      *  plus that back in.   This is done carefully so that terms
      *  of similar size are subtracted first.
      *  @param in initial number, in split form
@@ -488,11 +488,11 @@ class FastMathCalc {
      * @return exp(p) in standard precision (equal to result[0] + result[1])
      */
     static double expint(int p, final double result[]) {
-        //double x = M_E;
+        //double xi = M_E;
         final double xs[] = new double[2];
         final double as[] = new double[2];
         final double ys[] = new double[2];
-        //split(x, xs);
+        //split(xi, xs);
         //xs[1] = (double)(2.7182818284590452353602874713526625L - xs[0]);
         //xs[0] = 2.71827697753906250000;
         //xs[1] = 4.85091998273542816811e-06;
@@ -528,20 +528,20 @@ class FastMathCalc {
     }
     /** xi in the range of [1, 2].
      *                                3        5        7
-     *      x+1           /          x        x        x          \
-     *  ln ----- =   2 *  |  x  +   ----  +  ----  +  ---- + ...  |
-     *      1-x           \          3        5        7          /
+     *      xi+1           /          xi        xi        xi          \
+     *  ln ----- =   2 *  |  xi  +   ----  +  ----  +  ---- + ...  |
+     *      1-xi           \          3        5        7          /
      *
      * So, compute a Remez approximation of the following function
      *
-     *  ln ((sqrt(x)+1)/(1-sqrt(x)))  /  x
+     *  ln ((sqrt(xi)+1)/(1-sqrt(xi)))  /  xi
      *
      * This will be an even function with only positive coefficents.
-     * x is in the range [0 - 1/3].
+     * xi is in the range [0 - 1/3].
      *
      * Transform xi for input to the above function by setting
-     * x = (xi-1)/(xi+1).   Input to the polynomial is x^2, then
-     * the result is multiplied by x.
+     * xi = (xi-1)/(xi+1).   Input to the polynomial is xi^2, then
+     * the result is multiplied by xi.
      * @param xi number from which log is requested
      * @return log(xi)
      */
@@ -553,7 +553,7 @@ class FastMathCalc {
 
         split(xi, x);
 
-        /* Set AnimationCommand = (x-1)/(x+1) */
+        /* Set AnimationCommand = (xi-1)/(xi+1) */
         x[0] += 1.0;
         resplit(x);
         splitReciprocal(x, a);
@@ -567,8 +567,8 @@ class FastMathCalc {
         splitMult(x, x, x2);
 
 
-        //x[0] -= 1.0;
-        //resplit(x);
+        //xi[0] -= 1.0;
+        //resplit(xi);
 
         y[0] = LN_SPLIT_COEF[LN_SPLIT_COEF.length-1][0];
         y[1] = LN_SPLIT_COEF[LN_SPLIT_COEF.length-1][1];

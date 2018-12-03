@@ -5,7 +5,7 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.SpacialLink
-import spirite.base.util.linear.Vec2i
+import rb.vectrix.linear.Vec2i
 
 
 interface IAnimationSpaceLoader
@@ -46,7 +46,7 @@ object FFASpaceLoader : IAnimationSpaceLoader
                 if( endLinkAnim != null)
                     space.setOnEndBehavior(animation, Pair(endLinkAnim, endLinkFrame))
 
-                space.stateView.setLogicalSpace(animation, Vec2i(logX,logY))
+                space.stateView.setLogicalSpace(animation, Vec2i(logX, logY))
             }
         }
 

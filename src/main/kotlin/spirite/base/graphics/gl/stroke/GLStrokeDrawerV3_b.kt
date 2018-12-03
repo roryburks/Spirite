@@ -8,8 +8,8 @@ import spirite.base.util.d
 import spirite.base.util.f
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec2
-import spirite.base.util.linear.Vec3
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.linear.Vec3f
 import kotlin.math.PI
 
 // Dot
@@ -41,7 +41,7 @@ class GLStrokeDrawerV3_b(
             // DEBUG
 //            var cycle = 0.01f
 //            for( i in 0 until states.length) {
-//                states.w[i] = when {
+//                states.wf[i] = when {
 //                    cycle % 2f < 1f -> cycle % 1f
 //                    else -> 1 - (cycle % 1f)
 //                }
@@ -49,7 +49,7 @@ class GLStrokeDrawerV3_b(
 //            }
             // DEBUG
 
-            val rgb = Vec3(1f, 1f, 1f)
+            val rgb = Vec3f(1f, 1f, 1f)
             val dot = linePassGeom(states, lineWidth)
 
 //            gle.applyPrimitiveProgram(PolyRenderCall(rgb, 1f), dot.circles, params, trans)
@@ -101,16 +101,16 @@ class GLStrokeDrawerV3_b(
 
                     if(!inSmall && i > 2) {
                         val r0 = (width * states.w[i-1]-1f)/2
-                        val p0 = Vec2(states.x[i-1], states.y[i-1])
-                        val p1 = Vec2(states.x[i], states.y[i])
-                        val dif = (p1-p0).normalize()*r0
+                        val p0 = Vec2f(states.x[i-1], states.y[i-1])
+                        val p1 = Vec2f(states.x[i], states.y[i])
+                        val dif = (p1-p0).normalized*r0
 
 
-                        f2[0] = p0.x - dif.y ; f2[1] = p0.y - dif.x
+                        f2[0] = p0.xf - dif.yf ; f2[1] = p0.yf - dif.xf
                         lineBuilder.emitVertex(f2)
-                        f2[0] = p1.x ; f2[1] = p1.y
+                        f2[0] = p1.xf ; f2[1] = p1.yf
                         lineBuilder.emitVertex(f2)
-                        f2[0] = p0.x + dif.y ; f2[1] = p0.y - dif.x
+                        f2[0] = p0.xf + dif.yf ; f2[1] = p0.yf - dif.xf
                         lineBuilder.emitVertex(f2)
                         lineBuilder.emitPrimitive()
                     }
@@ -151,33 +151,33 @@ class GLStrokeDrawerV3_b(
                     if( i != 0) {
 
                         if (inSmall) {
-                            val p0 = Vec2(states.x[i-1], states.y[i-1])
-                            val p1 = Vec2(states.x[i], states.y[i])
-                            val dif = (p1-p0).normalize()
+                            val p0 = Vec2f(states.x[i-1], states.y[i-1])
+                            val p1 = Vec2f(states.x[i], states.y[i])
+                            val dif = (p1-p0).normalized
 
 
-                            f2[0] = p1.x - dif.y*r ; f2[1] = p1.y - dif.x*r
+                            f2[0] = p1.xf - dif.yf*r ; f2[1] = p1.yf - dif.xf*r
                             lineBuilder.emitVertex(f2)
-                            f2[0] = p0.x ; f2[1] = p0.y
+                            f2[0] = p0.xf ; f2[1] = p0.yf
                             lineBuilder.emitVertex(f2)
-                            f2[0] = p1.x + dif.y*r ; f2[1] = p1.y - dif.x*r
+                            f2[0] = p1.xf + dif.yf*r ; f2[1] = p1.yf - dif.xf*r
                             lineBuilder.emitVertex(f2)
                             lineBuilder.emitPrimitive()
                         } else {
                             val r0 = (width * states.w[i-1]-1f)/2
-                            val p0 = Vec2(states.x[i-1], states.y[i-1])
-                            val p1 = Vec2(states.x[i], states.y[i])
-                            val dif = (p1-p0).normalize()
+                            val p0 = Vec2f(states.x[i-1], states.y[i-1])
+                            val p1 = Vec2f(states.x[i], states.y[i])
+                            val dif = (p1-p0).normalized
 
-                            f2[0] = p0.x - dif.y*r0 ; f2[1] = p0.y - dif.x*r0
+                            f2[0] = p0.xf - dif.yf*r0 ; f2[1] = p0.yf - dif.xf*r0
                             lineBuilder.emitVertex(f2)
-                            f2[0] = p1.x - dif.y*r ; f2[1] = p1.y - dif.x*r
+                            f2[0] = p1.xf - dif.yf*r ; f2[1] = p1.yf - dif.xf*r
                             lineBuilder.emitVertex(f2)
                             lineBuilder.emitPrimitive()
 
-                            f2[0] = p0.x + dif.y*r0 ; f2[1] = p0.y - dif.x*r0
+                            f2[0] = p0.xf + dif.yf*r0 ; f2[1] = p0.yf - dif.xf*r0
                             lineBuilder.emitVertex(f2)
-                            f2[0] = p1.x + dif.y*r ; f2[1] = p1.y - dif.x*r
+                            f2[0] = p1.xf + dif.yf*r ; f2[1] = p1.yf - dif.xf*r
                             lineBuilder.emitVertex(f2)
                             lineBuilder.emitPrimitive()
                         }

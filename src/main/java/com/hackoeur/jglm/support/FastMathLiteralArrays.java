@@ -24,7 +24,7 @@ package com.hackoeur.jglm.support;
  */
 class FastMathLiteralArrays {
     /** Exponential evaluated at integer values,
-     * exp(x) =  expIntTableA[x + EXP_INT_TABLE_MAX_INDEX] + expIntTableB[x+EXP_INT_TABLE_MAX_INDEX].
+     * exp(xi) =  expIntTableA[xi + EXP_INT_TABLE_MAX_INDEX] + expIntTableB[xi+EXP_INT_TABLE_MAX_INDEX].
      */
     private static final double[] EXP_INT_A = new double[] {
         +0.0d,
@@ -1530,7 +1530,7 @@ class FastMathLiteralArrays {
     };
 
     /** Exponential evaluated at integer values,
-     * exp(x) =  expIntTableA[x + EXP_INT_TABLE_MAX_INDEX] + expIntTableB[x+EXP_INT_TABLE_MAX_INDEX]
+     * exp(xi) =  expIntTableA[xi + EXP_INT_TABLE_MAX_INDEX] + expIntTableB[xi+EXP_INT_TABLE_MAX_INDEX]
      */
     private static final double[] EXP_INT_B = new double[] {
         +0.0d,
@@ -3037,7 +3037,7 @@ class FastMathLiteralArrays {
 
 
     /** Exponential over the range of 0 - 1 in increments of 2^-10
-     * exp(x/1024) =  expFracTableA[x] + expFracTableB[x].
+     * exp(xi/1024) =  expFracTableA[xi] + expFracTableB[xi].
      * 1024 = 2^10
      */
     private static final double[] EXP_FRAC_A = new double[] {
@@ -4069,7 +4069,7 @@ class FastMathLiteralArrays {
     };
 
     /** Exponential over the range of 0 - 1 in increments of 2^-10
-     * exp(x/1024) =  expFracTableA[x] + expFracTableB[x].
+     * exp(xi/1024) =  expFracTableA[xi] + expFracTableB[xi].
      */
     private static final double[] EXP_FRAC_B = new double[] {
       +0.0d,

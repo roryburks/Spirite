@@ -66,9 +66,9 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * Create a matrix using the given vectors as <em>columns</em>. For example,
 //	 * <pre>
 //	 * Mat3 m1 = new Mat3(
-//	 * 	new Vec3(1f, 2f, 3f), // first column
-//	 * 	new Vec3(4f, 5f, 6f), // second
-//	 * 	new Vec3(7f, 8f, 9f)  // third
+//	 * 	new Vec3f(1f, 2f, 3f), // first column
+//	 * 	new Vec3f(4f, 5f, 6f), // second
+//	 * 	new Vec3f(7f, 8f, 9f)  // third
 //	 * );</pre>
 //	 *
 //	 * will create the following 3x3 matrix:
@@ -82,10 +82,10 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param col1 vector for the second column
 //	 * @param col2 vector for the third column
 //	 */
-//	public Mat3(final Vec3 col0, final Vec3 col1, final Vec3 col2) {
-//		this.m00 = col0.x; this.m10 = col1.x; this.m20 = col2.x;
-//		this.m01 = col0.y; this.m11 = col1.y; this.m21 = col2.y;
-//		this.m02 = col0.z; this.m12 = col1.z; this.m22 = col2.z;
+//	public Mat3(final Vec3f col0, final Vec3f col1, final Vec3f col2) {
+//		this.m00 = col0.xi; this.m10 = col1.xi; this.m20 = col2.xi;
+//		this.m01 = col0.yi; this.m11 = col1.yi; this.m21 = col2.yi;
+//		this.m02 = col0.zf; this.m12 = col1.zf; this.m22 = col2.zf;
 //	}
 //
 //	/**
@@ -104,15 +104,15 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * | 3 6 9 |
 //	 * </pre>
 //	 *
-//	 * @param x00 first column, x
-//	 * @param x01 first column, y
-//	 * @param x02 first column, z
-//	 * @param x10 second column, x
-//	 * @param x11 second column, y
-//	 * @param x12 second column, z
-//	 * @param x20 third column, x
-//	 * @param x21 third column, y
-//	 * @param x22 third column, z
+//	 * @param x00 first column, xi
+//	 * @param x01 first column, yi
+//	 * @param x02 first column, zf
+//	 * @param x10 second column, xi
+//	 * @param x11 second column, yi
+//	 * @param x12 second column, zf
+//	 * @param x20 third column, xi
+//	 * @param x21 third column, yi
+//	 * @param x22 third column, zf
 //	 */
 //	public Mat3(
 //			final float x00, final float x01, final float x02,
@@ -236,11 +236,11 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //		switch (columnIndex) {
 //		case 0:
-//			return (T) new Vec3(m00, m01, m02);
+//			return (T) new Vec3f(m00, m01, m02);
 //		case 1:
-//			return (T) new Vec3(m10, m11, m12);
+//			return (T) new Vec3f(m10, m11, m12);
 //		case 2:
-//			return (T) new Vec3(m20, m21, m22);
+//			return (T) new Vec3f(m20, m21, m22);
 //		default:
 //			throw new IllegalArgumentException("Invalid column index = " + columnIndex);
 //		}
@@ -249,11 +249,11 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	@SuppressWarnings("unchecked")
 //	@Override
 //	public <T extends Vec> Iterable<T> getColumns() {
-//		List<Vec3> cols = new ArrayList<Vec3>(3);
+//		List<Vec3f> cols = new ArrayList<Vec3f>(3);
 //
-//		cols.add(new Vec3(m00, m01, m02));
-//		cols.add(new Vec3(m10, m11, m12));
-//		cols.add(new Vec3(m20, m21, m22));
+//		cols.add(new Vec3f(m00, m01, m02));
+//		cols.add(new Vec3f(m10, m11, m12));
+//		cols.add(new Vec3f(m20, m21, m22));
 //
 //		return (Iterable<T>) cols;
 //	}
@@ -341,16 +341,16 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	/**
 //	 * This is the equivalent of <strong>this * vector</strong> (if we had operator
 //	 * overloading).  If you want <strong>vector * this</strong> then
-//	 * see {@groupLink Vec3#multiply(Mat3)}.
+//	 * see {@groupLink Vec3f#multiply(Mat3)}.
 //	 *
 //	 * @param vec
 //	 * @return
 //	 */
-//	public Vec3 multiply(final Vec3 vec) {
-//		return new Vec3(
-//				m00 * vec.x + m10 * vec.y + m20 * vec.z,
-//				m01 * vec.x + m11 * vec.y + m21 * vec.z,
-//				m02 * vec.x + m12 * vec.y + m22 * vec.z
+//	public Vec3f multiply(final Vec3f vec) {
+//		return new Vec3f(
+//				m00 * vec.xi + m10 * vec.yi + m20 * vec.zf,
+//				m01 * vec.xi + m11 * vec.yi + m21 * vec.zf,
+//				m02 * vec.xi + m12 * vec.yi + m22 * vec.zf
 //		);
 //	}
 //

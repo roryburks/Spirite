@@ -11,7 +11,7 @@ import spirite.base.util.d
 import spirite.base.util.f
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec3
+import rb.vectrix.linear.Vec3f
 import kotlin.math.PI
 
 // Dot
@@ -43,7 +43,7 @@ class GLStrokeDrawerV3(
             // DEBUG
 //            var cycle = 0.01f
 //            for( i in 0 until states.length) {
-//                states.w[i] = when {
+//                states.wf[i] = when {
 //                    cycle % 2f < 1f -> cycle % 1f
 //                    else -> 1 - (cycle % 1f)
 //                }
@@ -51,7 +51,7 @@ class GLStrokeDrawerV3(
 //            }
             // DEBUG
 
-            val rgb = Vec3(1f, 1f, 1f)
+            val rgb = Vec3f(1f, 1f, 1f)
             val dot = linePassGeom(states, lineWidth)
 
             gle.applyPrimitiveProgram(PolyRenderCall(rgb, 1f), dot.circles, params, trans)

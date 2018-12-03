@@ -22,27 +22,27 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 ///**
 // * @author James Royalty
 // */
-//public final class Vec3 extends AbstractVec {
-//	public static final Vec3 VEC3_ZERO = new Vec3();
+//public final class Vec3f extends AbstractVec {
+//	public static final Vec3f VEC3_ZERO = new Vec3f();
 //
-//	final float x, y, z;
+//	final float xi, yi, zf;
 //
-//	public Vec3() {
-//		this.x = 0f;
-//		this.y = 0f;
-//		this.z = 0f;
+//	public Vec3f() {
+//		this.xi = 0f;
+//		this.yi = 0f;
+//		this.zf = 0f;
 //	}
 //
-//	public Vec3(final float x, final float y, final float z) {
-//		this.x = x;
-//		this.y = y;
-//		this.z = z;
+//	public Vec3f(final float xi, final float yi, final float zf) {
+//		this.xi = xi;
+//		this.yi = yi;
+//		this.zf = zf;
 //	}
 //
-//	public Vec3(final Vec3 vec) {
-//		this.x = vec.x;
-//		this.y = vec.y;
-//		this.z = vec.z;
+//	public Vec3f(final Vec3f vec) {
+//		this.xi = vec.xi;
+//		this.yi = vec.yi;
+//		this.zf = vec.zf;
 //	}
 //
 //	@Override
@@ -52,41 +52,41 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //	@Override
 //	public float getLengthSquared() {
-//		return x * x + y * y + z * z;
+//		return xi * xi + yi * yi + zf * zf;
 //	}
 //
-//	public Vec3 getUnitVector() {
+//	public Vec3f getUnitVector() {
 //		final float sqLength = getLengthSquared();
 //		final float invLength = FastMath.invSqrtFast(sqLength);
 //
-//		return new Vec3(x * invLength, y * invLength, z * invLength);
+//		return new Vec3f(xi * invLength, yi * invLength, zf * invLength);
 //	}
 //
-//	public Vec3 getNegated() {
-//		return new Vec3(-x, -y, -z);
+//	public Vec3f getNegated() {
+//		return new Vec3f(-xi, -yi, -zf);
 //	}
 //
-//	public Vec3 add(final Vec3 vec) {
-//		return new Vec3( x + vec.x, y + vec.y, z + vec.z );
+//	public Vec3f add(final Vec3f vec) {
+//		return new Vec3f( xi + vec.xi, yi + vec.yi, zf + vec.zf );
 //	}
 //
-//	public Vec3 subtract(final Vec3 vec) {
-//		return new Vec3( x - vec.x, y - vec.y, z - vec.z );
+//	public Vec3f subtract(final Vec3f vec) {
+//		return new Vec3f( xi - vec.xi, yi - vec.yi, zf - vec.zf );
 //	}
 //
-//	public Vec3 multiply(final Mat3 mat) {
-//		return new Vec3(
-//				mat.m00 * x + mat.m01 * y + mat.m02 * z,
-//				mat.m10 * x + mat.m11 * y + mat.m12 * z,
-//				mat.m20 * x + mat.m21 * y + mat.m22 * z
+//	public Vec3f multiply(final Mat3 mat) {
+//		return new Vec3f(
+//				mat.m00 * xi + mat.m01 * yi + mat.m02 * zf,
+//				mat.m10 * xi + mat.m11 * yi + mat.m12 * zf,
+//				mat.m20 * xi + mat.m21 * yi + mat.m22 * zf
 //		);
 //	}
 //
-//	public Vec3 multiply(final float scalar) {
-//		return new Vec3( x * scalar, y * scalar, z * scalar );
+//	public Vec3f multiply(final float scalar) {
+//		return new Vec3f( xi * scalar, yi * scalar, zf * scalar );
 //	}
 //
-//	public Vec3 scale(final float scalar) {
+//	public Vec3f scale(final float scalar) {
 //		return multiply(scalar);
 //	}
 //
@@ -94,23 +94,23 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @return A new vector where every scroll of the original vector has
 //	 * been multiplied with the corresponding scroll of the given vector.
 //	 */
-//	public Vec3 scale(final Vec3 vec) {
-//		return new Vec3(
-//				this.x * vec.x,
-//				this.y * vec.y,
-//				this.z * vec.z
+//	public Vec3f scale(final Vec3f vec) {
+//		return new Vec3f(
+//				this.xi * vec.xi,
+//				this.yi * vec.yi,
+//				this.zf * vec.zf
 //		);
 //	}
 //
-//	public float dot(final Vec3 vec) {
-//		return this.x * vec.x + this.y * vec.y + this.z * vec.z;
+//	public float dot(final Vec3f vec) {
+//		return this.xi * vec.xi + this.yi * vec.yi + this.zf * vec.zf;
 //	}
 //
-//	public Vec3 cross(final Vec3 vec) {
-//		return new Vec3(
-//				this.y * vec.z - vec.y * this.z,
-//				this.z * vec.x - vec.z * this.x,
-//				this.x * vec.y - vec.x * this.y
+//	public Vec3f cross(final Vec3f vec) {
+//		return new Vec3f(
+//				this.yi * vec.zf - vec.yi * this.zf,
+//				this.zf * vec.xi - vec.zf * this.xi,
+//				this.xi * vec.yi - vec.xi * this.yi
 //		);
 //	}
 //
@@ -118,27 +118,27 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param vec
 //	 * @return the angle between this and the given vector, in <em>radians</em>.
 //	 */
-//	public float angleInRadians(final Vec3 vec) {
+//	public float angleInRadians(final Vec3f vec) {
 //		final float dot = dot(vec);
 //		final float lenSq = FastMath.sqrtFast( getLengthSquared() * vec.getLengthSquared() );
 //		return (float) FastMath.acos( dot / lenSq );
 //	}
 //
-//	public Vec3 lerp(final Vec3 vec, final float amount) {
+//	public Vec3f lerp(final Vec3f vec, final float amount) {
 //		final float diff = 1f - amount;
-//		return new Vec3(
-//				(diff*this.x + amount*vec.x),
-//				(diff*this.y + amount*vec.y),
-//				(diff*this.z + amount*vec.z)
+//		return new Vec3f(
+//				(diff*this.xi + amount*vec.xi),
+//				(diff*this.yi + amount*vec.yi),
+//				(diff*this.zf + amount*vec.zf)
 //		);
 //	}
 //
-//	public Vec4 toDirection() {
-//		return new Vec4(x, y, z, 0f);
+//	public Vec4f toDirection() {
+//		return new Vec4f(xi, yi, zf, 0f);
 //	}
 //
-//	public Vec4 toPoint() {
-//		return new Vec4(x, y, z, 1f);
+//	public Vec4f toPoint() {
+//		return new Vec4f(xi, yi, zf, 1f);
 //	}
 //
 //	@Override
@@ -146,40 +146,40 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		final FloatBuffer buffer = allocateFloatBuffer();
 //		final int startPos = buffer.position();
 //
-//		buffer.put(x).put(y).put(z);
+//		buffer.put(xi).put(yi).put(zf);
 //
 //		buffer.position(startPos);
 //
 //		return buffer;
 //	}
 //	/**
-//	 * Get the coordinates of this Vec3 as a float array.
+//	 * Get the coordinates of this Vec3f as a float array.
 //	 *
-//	 * @return new float[]{x, y, z};
+//	 * @return new float[]{xi, yi, zf};
 //	 */
 //	public float[] getArray() {
-//		return new float[]{x, y, z};
+//		return new float[]{xi, yi, zf};
 //	}
 //
-//	public float getX() {
-//		return x;
+//	public float getXi() {
+//		return xi;
 //	}
 //
-//	public float getY() {
-//		return y;
+//	public float getYi() {
+//		return yi;
 //	}
 //
-//	public float getZ() {
-//		return z;
+//	public float getZf() {
+//		return zf;
 //	}
 //
 //	@Override
 //	public int hashCode() {
 //		final int prime = 31;
 //		int result = 1;
-//		result = prime * result + Float.floatToIntBits(x);
-//		result = prime * result + Float.floatToIntBits(y);
-//		result = prime * result + Float.floatToIntBits(z);
+//		result = prime * result + Float.floatToIntBits(xi);
+//		result = prime * result + Float.floatToIntBits(yi);
+//		result = prime * result + Float.floatToIntBits(zf);
 //		return result;
 //	}
 //
@@ -191,18 +191,18 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		if (obj == null) {
 //			return false;
 //		}
-//		if (!(obj instanceof Vec3)) {
+//		if (!(obj instanceof Vec3f)) {
 //			return false;
 //		}
 //
-//		final Vec3 other = (Vec3) obj;
-//		if (Float.floatToIntBits(x) != Float.floatToIntBits(other.x)) {
+//		final Vec3f other = (Vec3f) obj;
+//		if (Float.floatToIntBits(xi) != Float.floatToIntBits(other.xi)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(y) != Float.floatToIntBits(other.y)) {
+//		if (Float.floatToIntBits(yi) != Float.floatToIntBits(other.yi)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(z) != Float.floatToIntBits(other.z)) {
+//		if (Float.floatToIntBits(zf) != Float.floatToIntBits(other.zf)) {
 //			return false;
 //		}
 //
@@ -219,15 +219,15 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //			return false;
 //		}
 //
-//		if (!(obj instanceof Vec3)) {
+//		if (!(obj instanceof Vec3f)) {
 //			return false;
 //		}
 //
-//		final Vec3 other = (Vec3) obj;
+//		final Vec3f other = (Vec3f) obj;
 //
-//		return Compare.equals(x, other.x, epsilon)
-//				&& Compare.equals(y, other.y, epsilon)
-//				&& Compare.equals(z, other.z, epsilon);
+//		return Compare.equals(xi, other.xi, epsilon)
+//				&& Compare.equals(yi, other.yi, epsilon)
+//				&& Compare.equals(zf, other.zf, epsilon);
 //	}
 //
 //	@Override
@@ -235,7 +235,7 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		return new StringBuilder()
 //			.append(getClass().getSimpleName())
 //			.append("{")
-//			.append(String.format("%8.5f %8.5f %8.5f", x, y, z))
+//			.append(String.format("%8.5f %8.5f %8.5f", xi, yi, zf))
 //			.append("}")
 //			.toString();
 //	}

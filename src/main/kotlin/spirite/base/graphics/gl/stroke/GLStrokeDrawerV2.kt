@@ -8,8 +8,8 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec2
-import spirite.base.util.linear.Vec3
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.linear.Vec3f
 
 class GLStrokeDrawerV2(
         gle: IGLEngine) : GLStrokeDrawer(gle)
@@ -39,7 +39,7 @@ class GLStrokeDrawerV2(
             gle.setTarget(target)
 
             val primitives = strokeV2LinePassGeom(vb)
-            val rgb = Vec3(1f, 1f, 1f)
+            val rgb = Vec3f(1f, 1f, 1f)
 
             // Inner Poly Pass
             gle.applyPrimitiveProgram(PolyRenderCall(rgb, 1f),
@@ -61,11 +61,11 @@ class GLStrokeDrawerV2(
         for (i in 0 until states.length) {
             val off = o++ * STRIDE
 
-            // x y z w
-            val xy = Vec2(states.x[i], states.y[i])
-            //val xy = tMediumToWorkspace!!.apply(Vec2(states.x[i], states.y[i]))
-            raw[off + 0] = xy.x
-            raw[off + 1] = xy.y
+            // xi yi zf wf
+            val xy = Vec2f(states.x[i], states.y[i])
+            //val xy = tMediumToWorkspace!!.apply(Vec2f(states.xi[i], states.yi[i]))
+            raw[off + 0] = xy.xf
+            raw[off + 1] = xy.yf
 
             // size pressure
             raw[off + 2] = states.w[i] * lineWidth
@@ -73,8 +73,8 @@ class GLStrokeDrawerV2(
 
             /*			if( i == states.size()-1 && stroke.getMethod() == Method.PIXEL) {
 				// TODO: Exagerate last line segment so pixel drawing works as expected
-				raw[off+0] = data.convertX(ps.x)+0.5f;
-				raw[off+1] = data.convertY(ps.y)+0.5f;
+				raw[off+0] = data.convertX(ps.xi)+0.5f;
+				raw[off+1] = data.convertY(ps.yi)+0.5f;
 			}*/
         }
 
@@ -93,36 +93,36 @@ class GLStrokeDrawerV2(
         val polyBuilder = PrimitiveBuilder(intArrayOf(2), GLC.TRIANGLE_STRIP)
 
         for( i in 0 until (raw.size / SV2_STRIDE) - 3) {
-            val p0 = Vec2(raw[(i + 0) * SV2_STRIDE], raw[(i + 0) * SV2_STRIDE + 1])
-            val p1 = Vec2(raw[(i + 1) * SV2_STRIDE], raw[(i + 1) * SV2_STRIDE + 1])
-            val p2 = Vec2(raw[(i + 2) * SV2_STRIDE], raw[(i + 2) * SV2_STRIDE + 1])
-            val p3 = Vec2(raw[(i + 3) * SV2_STRIDE], raw[(i + 3) * SV2_STRIDE + 1])
+            val p0 = Vec2f(raw[(i + 0) * SV2_STRIDE], raw[(i + 0) * SV2_STRIDE + 1])
+            val p1 = Vec2f(raw[(i + 1) * SV2_STRIDE], raw[(i + 1) * SV2_STRIDE + 1])
+            val p2 = Vec2f(raw[(i + 2) * SV2_STRIDE], raw[(i + 2) * SV2_STRIDE + 1])
+            val p3 = Vec2f(raw[(i + 3) * SV2_STRIDE], raw[(i + 3) * SV2_STRIDE + 1])
             val size1 = raw[(i + 1) * SV2_STRIDE + 2] / 2
             val size2 = raw[(i + 2) * SV2_STRIDE + 2] / 2
-            //Vec2 n10 = p1.minus(p0).normalize();
-            val (x, y) = p2.minus(p1).normalize()
-            //Vec2 n32 = p3.minus(p2).normalize();
+            //Vec2f n10 = p1.minus(p0).normalize();
+            val (x, y) = p2.minus(p1).normalized
+            //Vec2f n32 = p3.minus(p2).normalize();
 
             if (p0 == p1) {
-                lineBuilder.emitVertexFront(floatArrayOf(p1.x - x * size1 / 2, p1.y - y * size1 / 2))
-                lineBuilder.emitVertexBack(floatArrayOf(p1.x - x * size1 / 2, p1.y - y * size1 / 2))
+                lineBuilder.emitVertexFront(floatArrayOf(p1.xf - x * size1 / 2, p1.yf - y * size1 / 2))
+                lineBuilder.emitVertexBack(floatArrayOf(p1.xf - x * size1 / 2, p1.yf - y * size1 / 2))
 
                 //if( size1 > 0.5) {
-                polyBuilder.emitVertex(floatArrayOf(p1.x - x * size1 / 2, p1.y - y * size1 / 2))
-                polyBuilder.emitVertex(floatArrayOf(p1.x - x * size1 / 2, p1.y - y * size1 / 2))
+                polyBuilder.emitVertex(floatArrayOf(p1.xf - x * size1 / 2, p1.yf - y * size1 / 2))
+                polyBuilder.emitVertex(floatArrayOf(p1.xf - x * size1 / 2, p1.yf - y * size1 / 2))
                 //}
                 //else polyBuilder.emitPrimitive();
             } else {
-                //                Vec2 tangent = p2.minus(p1).normalize().plus( p1.minus(p0).normalize()).normalize();
-                //                Vec2 miter = new Vec2( -tangent.y, tangent.x);
-                //                Vec2 n1 = (new Vec2( -(p1.y - p0.y), p1.x - p0.x)).normalize();
+                //                Vec2f tangent = p2.minus(p1).normalize().plus( p1.minus(p0).normalize()).normalize();
+                //                Vec2f miter = new Vec2f( -tangent.yi, tangent.xi);
+                //                Vec2f n1 = (new Vec2f( -(p1.yi - p0.yi), p1.xi - p0.xi)).normalize();
 
 
                 val length = Math.max(0f, size1 - 0.5f)
                 //                float length = Math.max( 0.5f, Math.min( MITER_MAX2*size1, size1 / miter.dot(n1)));
 
-                val left = floatArrayOf(p1.x + (p2.y - p0.y) * length / 2, p1.y - (p2.x - p0.x) * length / 2)
-                val right = floatArrayOf(p1.x - (p2.y - p0.y) * length / 2, p1.y + (p2.x - p0.x) * length / 2)
+                val left = floatArrayOf(p1.xf + (p2.yf - p0.yf) * length / 2, p1.yf - (p2.xf - p0.xf) * length / 2)
+                val right = floatArrayOf(p1.xf - (p2.yf - p0.yf) * length / 2, p1.yf + (p2.xf - p0.xf) * length / 2)
 
                 lineBuilder.emitVertexFront(left)
                 lineBuilder.emitVertexBack(right)
@@ -133,33 +133,33 @@ class GLStrokeDrawerV2(
                 //}
                 //else polyBuilder.emitPrimitive();
                 //
-                //                lineBuilder.emitVertexFront(new float[] { miter.x*length + p1.x, miter.y*length + p1.y});
-                //                lineBuilder.emitVertexBack(new float[] { -miter.x*length + p1.x, -miter.y*length + p1.y});
+                //                lineBuilder.emitVertexFront(new float[] { miter.xi*length + p1.xi, miter.yi*length + p1.yi});
+                //                lineBuilder.emitVertexBack(new float[] { -miter.xi*length + p1.xi, -miter.yi*length + p1.yi});
                 //        		if( length > 0.5) {
                 //        			float s = length;//-0.5f;
-                //        			polyBuilder.emitVertex(new float[] { miter.x*s + p1.x, miter.y*s + p1.y});
-                //        			polyBuilder.emitVertex(new float[] { -miter.x*s + p1.x, -miter.y*s + p1.y});
+                //        			polyBuilder.emitVertex(new float[] { miter.xi*s + p1.xi, miter.yi*s + p1.yi});
+                //        			polyBuilder.emitVertex(new float[] { -miter.xi*s + p1.xi, -miter.yi*s + p1.yi});
                 //        		}
                 //        		else polyBuilder.emitPrimitive();
             }
             if (p2 == p3) {
                 val length = Math.max(0f, size2 - 0.5f)
-                lineBuilder.emitVertexFront(floatArrayOf(p2.x + x * length / 2, p2.y + y * length / 2))
-                lineBuilder.emitVertexBack(floatArrayOf(p2.x + x * length / 2, p2.y + y * length / 2))
+                lineBuilder.emitVertexFront(floatArrayOf(p2.xf + x * length / 2, p2.yf + y * length / 2))
+                lineBuilder.emitVertexBack(floatArrayOf(p2.xf + x * length / 2, p2.yf + y * length / 2))
                 //if( size2 > 0.5) {
-                polyBuilder.emitVertex(floatArrayOf(p2.x + x * size2 / 2, p2.y + y * size2 / 2))
-                polyBuilder.emitVertex(floatArrayOf(p2.x + x * size2 / 2, p2.y + y * size2 / 2))
+                polyBuilder.emitVertex(floatArrayOf(p2.xf + x * size2 / 2, p2.yf + y * size2 / 2))
+                polyBuilder.emitVertex(floatArrayOf(p2.xf + x * size2 / 2, p2.yf + y * size2 / 2))
                 //}
                 polyBuilder.emitPrimitive()
             }
             /*else {
-                Vec2 tangent = p3.minus(p2).normalize().plus( p2.minus(p1).normalize()).normalize();
-                Vec2 miter = new Vec2( -tangent.y, tangent.x);
-                Vec2 n2 = (new Vec2( -(p2.y - p1.y), p2.x - p1.x)).normalize();
+                Vec2f tangent = p3.minus(p2).normalize().plus( p2.minus(p1).normalize()).normalize();
+                Vec2f miter = new Vec2f( -tangent.yi, tangent.xi);
+                Vec2f n2 = (new Vec2f( -(p2.yi - p1.yi), p2.xi - p1.xi)).normalize();
                 float length = Math.max( 0.5f, Math.min( MITER_MAX2, size2 / miter.dot(n2)));
 
-                lineBuilder.emitVertexFront( new float[]{ miter.x*length + p2.x, miter.y*length + p2.y});
-                lineBuilder.emitVertexBack( new float[]{ -miter.x*length + p2.x, -miter.y*length + p2.y});
+                lineBuilder.emitVertexFront( new float[]{ miter.xi*length + p2.xi, miter.yi*length + p2.yi});
+                lineBuilder.emitVertexBack( new float[]{ -miter.xi*length + p2.xi, -miter.yi*length + p2.yi});
         	}*/
         }
 

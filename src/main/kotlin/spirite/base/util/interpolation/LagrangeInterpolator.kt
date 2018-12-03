@@ -1,6 +1,6 @@
 package spirite.base.util.interpolation
 
-import spirite.base.util.linear.Vec2
+import rb.vectrix.linear.Vec2f
 
 /** Constructs a Polygon of degree N-1 which goes through the given N
  * points and uses that Polygon to interpolate the data.
@@ -9,7 +9,7 @@ import spirite.base.util.linear.Vec2
  * that results in an infinitely differentiable curve (meaning it is
  * extremely smooth), but creates a curve which can have a lot of hills
  * and valleys, resulting in a very erratic-looking curve.  */
-class LagrangeInterpolator(points: List<Vec2>) : Interpolator {
+class LagrangeInterpolator(points: List<Vec2f>) : Interpolator {
     private var coef: FloatArray
 
     init {
@@ -24,12 +24,12 @@ class LagrangeInterpolator(points: List<Vec2>) : Interpolator {
 
             // Calculate the divisor of the coefficient
             val p_i = points[i]
-            var p_j: Vec2
+            var p_j: Vec2f
 
             for (j in 0 until N) {
                 if (j == i) continue
                 p_j = points[j]
-                divisor *= p_i.x - p_j.x
+                divisor *= p_i.xf - p_j.xf
             }
 
             // Calculate the denominator coefficients that p_i contribute to the
@@ -43,12 +43,12 @@ class LagrangeInterpolator(points: List<Vec2>) : Interpolator {
                 if (j == i) continue
                 p_j = points[j]
 
-                // * (x - x_j)
+                // * (xi - x_j)
                 //	- x_j)
                 for (k in 0 until N) {
-                    pi_coef2[k] = pi_coef[k] * -p_j.x
+                    pi_coef2[k] = pi_coef[k] * -p_j.xf
                 }
-                // (x
+                // (xi
                 for (k in N - 2 downTo 0) {
                     pi_coef[k + 1] = pi_coef[k]
                 }
@@ -61,7 +61,7 @@ class LagrangeInterpolator(points: List<Vec2>) : Interpolator {
             }
             // Add the calculated coefficients to the final coefficients
             for (j in 0 until N) {
-                coef[j] += pi_coef[j] * p_i.y / divisor
+                coef[j] += pi_coef[j] * p_i.yf / divisor
             }
         }
     }
