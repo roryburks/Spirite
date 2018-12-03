@@ -1,4 +1,4 @@
-package spirite.base.util.groupExtensions
+package rb.extendo.dataStructures
 
 class SinglySet<T>(val singly : T) : Set<T> {
     override val size: Int get() = 1

@@ -1,8 +1,8 @@
 package spirite.base.imageData
 
+import rb.extendo.dataStructures.SinglySet
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.util.groupExtensions.SinglySet
 
 
 /**

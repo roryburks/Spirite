@@ -25,8 +25,7 @@ import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.delegates.UndoableDelegate
-import spirite.base.util.groupExtensions.SinglyList
-import spirite.base.util.groupExtensions.mapAggregated
+import rb.extendo.dataStructures.SinglyList
 import java.io.File
 
 interface IImageWorkspace {
@@ -181,7 +180,7 @@ class ImageWorkspace(
 
     private val treeListener = object : TreeObserver {
         override fun treeStructureChanged(evt: TreeChangeEvent) {
-            imageObservatory.triggerRefresh(ImageChangeEvent(evt.changedNodes.mapAggregated { it.imageDependencies }, evt.changedNodes, this@ImageWorkspace))
+            imageObservatory.triggerRefresh(ImageChangeEvent(evt.changedNodes.flatMap { it.imageDependencies }, evt.changedNodes, this@ImageWorkspace))
         }
 
         override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {

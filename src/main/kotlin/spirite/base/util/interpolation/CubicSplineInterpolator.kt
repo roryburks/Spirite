@@ -15,9 +15,9 @@ class CubicSplineInterpolator
  * @param points_
  * @param fast
  * @param spatial spatial weighting weights the point slopes by
- * the total distance between two points, not just the X-distance.
+ * the total distance between two points, not just the AnimationCommand-distance.
  * Produces a result very similar (though not identical) to a 2D
- * Cubic Spline that only has points with strictly increasing X values.
+ * Cubic Spline that only has points with strictly increasing AnimationCommand values.
  */
 (points_: List<Vec2>, fast: Boolean, private val spatial: Boolean) : Interpolator {
     private val k: FloatArray
@@ -29,7 +29,7 @@ class CubicSplineInterpolator
 
     init {
 
-        // Sorts the points by X
+        // Sorts the points by AnimationCommand
         val points = ArrayList(points_)
 
         points.sortWith(Comparator { o1, o2 ->

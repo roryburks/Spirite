@@ -1,6 +1,6 @@
 package spirite.base.graphics
 
-import spirite.base.util.groupExtensions.SinglyList
+import rb.extendo.dataStructures.SinglyList
 import spirite.base.util.linear.Transform
 
 

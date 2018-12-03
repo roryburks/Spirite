@@ -10,7 +10,6 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.floor
-import spirite.base.util.groupExtensions.mapAggregated
 
 class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     : MediumBasedAnimation(name, workspace)
@@ -48,7 +47,7 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
 
     class FFAUpdateContract(val changedNodes: Set<Node>)
     {
-        val ancestors by lazy {changedNodes.mapAggregated { it.ancestors}.union(changedNodes)}
+        val ancestors by lazy {changedNodes.flatMap { it.ancestors}.union(changedNodes)}
     }
     fun treeChanged( changedNodes : Set<Node>) {
         // Remove All Layers referencing nonexistent Groups

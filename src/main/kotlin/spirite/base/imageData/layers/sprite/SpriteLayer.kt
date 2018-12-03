@@ -18,8 +18,7 @@ import spirite.base.util.StringUtil
 import spirite.base.util.ceil
 import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.floor
-import spirite.base.util.groupExtensions.SinglyList
-import spirite.base.util.groupExtensions.mapAggregated
+import rb.extendo.dataStructures.SinglyList
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.MDebug
@@ -103,7 +102,7 @@ class SpriteLayer : Layer {
     // region ILayer methods
 
 //    private val _keyPointsDerived = DerivedLazy{ etc }
-    private val _keyPoints get() = parts.mapAggregated { part ->
+    private val _keyPoints get() = parts.flatMap { part ->
         val tPartToWhole = part.tPartToWhole
                 listOf(
                         Vec2(0f,0f),
@@ -161,7 +160,7 @@ class SpriteLayer : Layer {
     fun addPartLinked(partName: String, depth: Int? = null)
     {
         val linked = getAllLinkedLayers()
-        val names = linked.mapAggregated { it.parts.map { it.partName } }.distinct()
+        val names = linked.flatMap { it.parts.map { it.partName } }.distinct()
         val realName = StringUtil.getNonDuplicateName(names, partName)
 
         val aPart = activePart

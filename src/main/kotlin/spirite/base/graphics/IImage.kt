@@ -33,7 +33,7 @@ interface IImage {
      *
      * Note: Though you could use getJcolor().argb, this can often be more efficient
      *
-     * @param x X coordinate
+     * @param x AnimationCommand coordinate
      * @param y Y coordinate (top-to-bottom format)
      * @return an integer packed in ARGB form
      *  * bits 24-31: Alpha

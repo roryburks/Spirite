@@ -1,13 +1,13 @@
 package sjunit.spirite.base.util.dataContainers
 
 
-import spirite.base.util.dataContainers.MutableOneToManyMap
+import rb.extendo.dataStructures.MutableOneToManyMap
 import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class OneToManyMapTests {
     @test fun Inserts() {
-        val map = MutableOneToManyMap< Int, String>()
+        val map = MutableOneToManyMap<Int, String>()
 
         map.assosciate("a", 1)
         map.assosciate("b", 1)
@@ -20,7 +20,7 @@ class OneToManyMapTests {
     }
 
     @test fun Removes() {
-        val map = MutableOneToManyMap< Int, String>()
+        val map = MutableOneToManyMap<Int, String>()
 
         map.assosciate("a", 1)
         map.assosciate("b", 1)
@@ -36,7 +36,7 @@ class OneToManyMapTests {
     }
 
     @test fun RemovesAndDeletes() {
-        val map = MutableOneToManyMap< Int, String>()
+        val map = MutableOneToManyMap<Int, String>()
 
         map.assosciate("a", 1)
         map.assosciate("b", 1)
@@ -49,7 +49,7 @@ class OneToManyMapTests {
     }
 
     @test fun Reassosciates() {
-        val map = MutableOneToManyMap< Int, String>()
+        val map = MutableOneToManyMap<Int, String>()
 
         map.assosciate("a", 1)
         map.assosciate("b", 1)

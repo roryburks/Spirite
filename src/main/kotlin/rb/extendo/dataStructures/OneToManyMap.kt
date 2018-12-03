@@ -1,8 +1,8 @@
-package spirite.base.util.dataContainers
+package rb.extendo.dataStructures
 
 
 /**
- * NOTE: Not Concurrent
+ * NOTE: Not Concurrent-safe
  */
 class MutableOneToManyMap<ONE,MANY>
 {

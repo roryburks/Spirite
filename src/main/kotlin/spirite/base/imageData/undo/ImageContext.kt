@@ -4,7 +4,7 @@ import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
-import spirite.base.util.groupExtensions.SinglySet
+import rb.extendo.dataStructures.SinglySet
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
@@ -13,7 +13,7 @@ val MAX_TICKS_PER_KEY = 10
 
 /**
  * Because actions on image data destructively covers a large amount of data, instead of either storing every individual
- * change as an image or painstakingly calculating the delta between two images, instead only every X (default 10)
+ * change as an image or painstakingly calculating the delta between two images, instead only every AnimationCommand (default 10)
  * changes are stored as images and the in-between frames are calculated working forward from that frame.
  */
 class ImageContext(

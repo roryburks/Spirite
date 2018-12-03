@@ -1,4 +1,4 @@
-package spirite.base.util.groupExtensions
+package rb.extendo.dataStructures
 
 class SinglyList<T>( val singly : T) : List<T> {
     override val size: Int get() = 1
@@ -48,14 +48,12 @@ class SinglyList<T>( val singly : T) : List<T> {
     }
 
     inner class SinglyListIterable : ListIterator<T>{
-        var done = true
+        var done = false
 
         override fun hasNext() = !done
-
         override fun hasPrevious(): Boolean = done
-
         override fun next(): T = when {
-            done -> {
+            !done -> {
                 done = true
                 singly
             }

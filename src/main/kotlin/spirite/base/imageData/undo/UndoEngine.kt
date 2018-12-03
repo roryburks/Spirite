@@ -2,13 +2,12 @@ package spirite.base.imageData.undo
 
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
-import spirite.base.util.groupExtensions.SinglyList
-import spirite.base.util.groupExtensions.then
+import rb.extendo.dataStructures.SinglyList
+import rb.extendo.extensions.then
 
 interface IUndoEngine {
     /** Cleans the slate, removing all undoable actions and reinitializing the base contexts*/

@@ -1,5 +1,7 @@
 package spirite.gui.views.animation.structureView
 
+import rb.extendo.extensions.append
+import rb.extendo.extensions.lookup
 import spirite.base.util.binding.IBoundListener
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
@@ -15,9 +17,6 @@ import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
-import spirite.base.util.groupExtensions.append
-import spirite.base.util.groupExtensions.lookup
-import spirite.base.util.groupExtensions.mapAggregated
 import spirite.base.util.i
 import spirite.base.util.linear.Rect
 import spirite.base.util.round
@@ -134,7 +133,7 @@ private constructor(
 
     private fun buildLayerInfo(layer: FFALayer) : Pair<Int,CrossRowInitializer.() -> Unit>{
         val state = RememberedStates.getState(layer)
-        val distinctNames = layer.frames.mapAggregated {frame ->
+        val distinctNames = layer.frames.flatMap {frame ->
             ((frame.node as? LayerNode)?.layer as? SpriteLayer)?.parts?.map { it.partName } ?: listOf<String?>(null)
         }.distinct()
         val distinctCount = distinctNames.count()
@@ -529,7 +528,7 @@ private constructor(
         apb?.unbind()
         if( old != null) {
             frameLinks.lookup(old).forEach { it.setBasicBorder(null) }
-            partLinks.values.mapAggregated { it }.forEach { it.setBasicBorder(null) }
+            partLinks.values.flatMap { it }.forEach { it.setBasicBorder(null) }
         }
         if( new != null)
             setBordersForNode(new)
@@ -540,7 +539,7 @@ private constructor(
         val spriteLayer = ((node as? LayerNode)?.layer as? SpriteLayer)
         if( spriteLayer != null) {
             apb = spriteLayer.activePartBind.addWeakListener { new, old ->
-                partLinks.values.mapAggregated { it }.forEach { it.setBasicBorder(null) }
+                partLinks.values.flatMap { it }.forEach { it.setBasicBorder(null) }
                 if( new != null)
                     partLinks.lookup(new).forEach { it.setColoredBorder(Colors.BLACK, 2) }
             }

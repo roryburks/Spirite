@@ -2,12 +2,10 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
-import spirite.base.file.defaultAafExporter
+import spirite.base.file.aaf.defaultAafExporter
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.gui.components.dialogs.IDialog
 import spirite.gui.components.dialogs.IDialog.FilePickType.AAF
 
 class AnimationCommandExecutor (val master: IMasterControl)
@@ -26,26 +24,23 @@ class AnimationCommandExecutor (val master: IMasterControl)
 
 }
 
-internal val executers = mutableListOf<IAnimationCommand>()
+internal val executers = mutableListOf<AnimationCommand>()
 
-interface IAnimationCommand : ICommand
+abstract class AnimationCommand : ICommand
 {
-    val name : String
-    fun execute( master: IMasterControl, workspace: IImageWorkspace, animation: Animation?) : Boolean
+    // Note: this is somewhat of a hacky way to make sure each AnimationCommand added gets added to the list
+    init {executers.add(this)}
+
+    abstract val name: String
+    abstract fun execute( master: IMasterControl, workspace: IImageWorkspace, animation: Animation?) : Boolean
 
     override val commandString: String get() = "anim.$name"
     override val keyCommand: KeyCommand
         get() = KeyCommand(commandString) {it.workspaceSet.currentWorkspace?.animationManager?.currentAnimation}
 }
 
-abstract class X : IAnimationCommand
+object ExportAafCommand : AnimationCommand()
 {
-    init {executers.add(this)}
-}
-
-object ExportAafCommand : X()
-{
-    //init {executers.add(this)}
     override val name: String get() = "exportAsAaf"
     override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
         animation as? FixedFrameAnimation ?: return false
@@ -55,15 +50,26 @@ object ExportAafCommand : X()
         return true
     }
 }
-
-object RenameAnimationCommand : X()
-{
-    //init {executers.add(this)}
-    override val name: String get() = "renameAnimation"
+object RenameAnimationCommand : AnimationCommand() {
+    override val name: String get() = "rename"
     override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
         animation ?: return false
         val newName = master.dialog.promptForString("Enter New Animation Name:", animation.name) ?: return true
         animation.name = newName
+        return true
+    }
+}
+object DeleteAnimationCommand : AnimationCommand() {
+    override val name: String get() = "delete"
+    override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
+        workspace.animationManager.removeAnimation(animation ?: return false)
+        return true
+    }
+}
+object DuplicateAnimationCommand : AnimationCommand() {
+    override val name: String get() = "dupe"
+    override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
+        workspace.animationManager.addAnimation( animation?.dupe() ?: return false)
         return true
     }
 }

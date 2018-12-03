@@ -4,7 +4,7 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.floor
-import spirite.base.util.groupExtensions.then
+import rb.extendo.extensions.then
 
 interface IFFAPlayback {
     fun advance( miliseconds: Float)

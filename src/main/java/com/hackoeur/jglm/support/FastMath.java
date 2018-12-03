@@ -1486,7 +1486,7 @@ public class FastMath {
             return 1.0;
         }
 
-        if (x != x) { // X is NaN
+        if (x != x) { // AnimationCommand is NaN
             return x;
         }
 
@@ -2626,7 +2626,7 @@ public class FastMath {
             final double invx = 1d / x;
             final double invy = 1d / y;
 
-            if (invx == 0) { // X is infinite
+            if (invx == 0) { // AnimationCommand is infinite
                 if (x > 0) {
                     return y; // return +/- 0.0
                 } else {

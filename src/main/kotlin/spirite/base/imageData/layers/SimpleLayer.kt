@@ -5,7 +5,7 @@ import spirite.base.imageData.IIsolator
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
-import spirite.base.util.groupExtensions.SinglyList
+import rb.extendo.dataStructures.SinglyList
 
 class SimpleLayer(val medium: MediumHandle) : Layer {
     override val x: Int get() = medium.x

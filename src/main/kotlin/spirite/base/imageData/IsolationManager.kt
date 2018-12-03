@@ -7,8 +7,7 @@ import spirite.base.imageData.IsolationManager.SpriteIsolationStruct
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import spirite.base.util.groupExtensions.then
-import spirite.base.util.groupExtensions.toHashMap
+import rb.extendo.extensions.then
 
 /**
  *

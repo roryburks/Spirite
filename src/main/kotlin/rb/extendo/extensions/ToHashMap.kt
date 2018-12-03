@@ -1,4 +1,4 @@
-package spirite.base.util.groupExtensions
+package rb.extendo.extensions
 
 
 fun <T,Key> Collection<T>.toHashMap( selector: (T)->Key) : HashMap<Key,T> {

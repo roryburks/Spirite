@@ -10,7 +10,6 @@ import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChan
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.undo.NullAction
-import spirite.base.util.groupExtensions.mapAggregated
 
 
 interface IAnimationManager {
@@ -94,7 +93,7 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
                 return;
 
             val changedWithAncestors = mutableSetOf<Node>()
-            val allAncestors = evt.changedNodes.mapAggregated { it.ancestors }
+            val allAncestors = evt.changedNodes.flatMap { it.ancestors }
             changedWithAncestors.addAll(evt.changedNodes)
             changedWithAncestors.addAll(allAncestors)
 

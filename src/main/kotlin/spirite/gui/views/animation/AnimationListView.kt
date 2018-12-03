@@ -1,6 +1,8 @@
 package spirite.gui.views.animation
 
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.commands.DeleteAnimationCommand
+import spirite.base.brains.commands.DuplicateAnimationCommand
 import spirite.base.brains.commands.ExportAafCommand
 import spirite.base.brains.commands.RenameAnimationCommand
 import spirite.base.imageData.animation.Animation
@@ -74,8 +76,8 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
 
                 if( animation != null) {
                     menuItems.add(MenuItem("Rename Animation", RenameAnimationCommand))
-                    menuItems.add(MenuItem("Duplicate Animation", customAction = {animationManager.addAnimation(animation.dupe())}))
-                    menuItems.add(MenuItem("Delete Animation", customAction = {animationManager.removeAnimation(animation)}))
+                    menuItems.add(MenuItem("Duplicate Animation", DuplicateAnimationCommand))
+                    menuItems.add(MenuItem("Delete Animation", DeleteAnimationCommand))
                 }
                 if( animation is FixedFrameAnimation) {
                     menuItems.add(MenuItem("Export Animation To Aaf", ExportAafCommand))

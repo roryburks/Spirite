@@ -391,7 +391,7 @@ class FastMathCalc {
      *  (a+b)/(c+d)  =   a/c   +    (bc - ad) / (c^2 + cd)
      *  set x = a/c  and y = (bc - ad) / (c^2 + cd)
      *  This will be close to the right answer, but there will be
-     *  some rounding in the calculation of X.  So by carefully
+     *  some rounding in the calculation of AnimationCommand.  So by carefully
      *  computing 1 - (c+d)(x+y) we can compute an error and
      *  plus that back in.   This is done carefully so that terms
      *  of similar size are subtracted first.
@@ -553,7 +553,7 @@ class FastMathCalc {
 
         split(xi, x);
 
-        /* Set X = (x-1)/(x+1) */
+        /* Set AnimationCommand = (x-1)/(x+1) */
         x[0] += 1.0;
         resplit(x);
         splitReciprocal(x, a);
@@ -563,7 +563,7 @@ class FastMathCalc {
         x[0] = y[0];
         x[1] = y[1];
 
-        /* Square X -> X2*/
+        /* Square AnimationCommand -> X2*/
         splitMult(x, x, x2);
 
 

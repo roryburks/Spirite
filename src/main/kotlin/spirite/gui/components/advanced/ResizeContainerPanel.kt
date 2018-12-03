@@ -2,7 +2,7 @@ package spirite.gui.components.advanced
 
 import spirite.base.util.binding.Bindable
 import spirite.base.util.MathUtil
-import spirite.base.util.groupExtensions.then
+import rb.extendo.extensions.then
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL

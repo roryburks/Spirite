@@ -9,7 +9,7 @@ import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand
 import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand
 import spirite.base.brains.commands.WorkspaceCommandExecuter.ViewCommand
 import spirite.base.brains.settings.IPreferences
-import spirite.base.util.dataContainers.MutableOneToManyMap
+import rb.extendo.dataStructures.MutableOneToManyMap
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 

@@ -218,7 +218,7 @@ object SaveEngine {
                     }
                     is PreparedDynamicMedium -> {
                         ra.writeByte(SaveLoadUtil.MEDIUM_DYNAMIC) // [1] : Medium Type
-                        ra.writeShort( prepared.offsetX)        // [2] : Dynamic X Offset
+                        ra.writeShort( prepared.offsetX)        // [2] : Dynamic AnimationCommand Offset
                         ra.writeShort( prepared.offsetY)        // [2] : Dynamic Y Offset
 
                         val byteArray = prepared.image?.run { Hybrid.imageIO.writePNG(this)}
@@ -256,7 +256,7 @@ object SaveEngine {
                                 ra.writeInt(onEnd!!.second)    // 4: on-end Frame
 
                             val logSpace = space.stateView.logicalSpace[anim] ?: Vec2i.Zero
-                            ra.writeShort(logSpace.x)    // 2: Logical X
+                            ra.writeShort(logSpace.x)    // 2: Logical AnimationCommand
                             ra.writeShort(logSpace.y)    // 2: Logical Y
                         }
 

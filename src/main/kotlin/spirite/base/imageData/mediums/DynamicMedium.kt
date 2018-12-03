@@ -7,7 +7,7 @@ import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
-import spirite.base.util.groupExtensions.SinglyList
+import rb.extendo.dataStructures.SinglyList
 import spirite.base.util.linear.Transform
 
 

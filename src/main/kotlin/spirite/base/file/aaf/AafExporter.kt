@@ -1,6 +1,7 @@
-package spirite.base.file
+package spirite.base.file.aaf
 
-import com.jogamp.opengl.util.packrect.RectanglePacker
+import rb.extendo.extensions.toLookup
+import spirite.base.file.writeUFT8NT
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -8,9 +9,7 @@ import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.mediums.IImageMedium
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.util.*
-import spirite.base.util.groupExtensions.toLookup
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec2i
 import spirite.hybrid.Hybrid
 import spirite.hybrid.IImageCreator
@@ -34,8 +33,6 @@ class AafExporter(
         val hasher: IDataStreamHasher)
     : IAafExporter
 {
-
-
     override fun export(animation: FixedFrameAnimation, filename: String) {
         val (pngFilename, aafFilename) = getFilenames(filename)
 
@@ -62,7 +59,7 @@ class AafExporter(
         file.createNewFile()
 
         val ra = RandomAccessFile(file, "rw")
-        saveAAF(ra, animation, imgMap)
+        AafFileSaver.saveAAF(ra, animation, imgMap)
     }
 
     val regex = Regex("""\.([^.\\\/]+)${'$'}""")
@@ -79,18 +76,13 @@ class AafExporter(
     }
 
     fun getAllImages(animation: FixedFrameAnimation) : Sequence<ShiftedImage> {
-        val list1 = animation.layers.flatMap { it.frames.map { it.node }.filterIsInstance<LayerNode>() }
-        val list2 = list1.flatMap { it.getDrawList() }
-        val list3 = list2.map { it.handle.medium }
-        val list4 = list3.filterIsInstance<IImageMedium>()
-        val list5 = list4.flatMap { it.getImages() }
-        return list5.asSequence()
-    } /*animation.layers.asSequence()
-            .flatMap { it.frames.asSequence().filterIsInstance<LayerNode>() }
-            .flatMap { it.getDrawList().asSequence() }
-            .map { it.handle.medium }
-            .filterIsInstance<IImageMedium>()
-            .flatMap { it.getImages().asSequence() }*/
+        return animation.layers.asSequence()
+                .flatMap { it.frames.asSequence().map { it.node }.filterIsInstance<LayerNode>() }
+                .flatMap { it.getDrawList().asSequence() }
+                .map { it.handle.medium }
+                .filterIsInstance<IImageMedium>()
+                .flatMap { it.getImages().asSequence() }
+    }
 
     fun deDuplicateImages(images: Sequence<ShiftedImage>) : Map<Vec2i,MutableList<ShiftedImage>>
     {
@@ -135,7 +127,7 @@ class AafExporter(
         return imagesByDimension
     }
 
-    private data class ImageLink(
+    internal data class ImageLink(
             val img: ShiftedImage,
             val rect: Rect,
             val id: Int)
@@ -152,45 +144,5 @@ class AafExporter(
                 }
 
         return Pair(img,map)
-    }
-
-    private fun saveAAF(ra: RandomAccessFile, animation: FixedFrameAnimation, imgMap: List<ImageLink>)
-    {
-        // [4]: Header
-        ra.writeInt(2)
-
-        ra.writeShort(1) // [2] : Num Anims
-        ra.writeUFT8NT(animation.name)  // [n] : Animation Name
-
-
-        val imgIdByImage = imgMap
-                .map { Pair(it.img, it.id) }
-                .toMap()
-
-        val len = animation.end - animation.start
-        ra.writeShort(len)    // [2] : Number of Layers
-        for( met in animation.start until animation.end) {
-            val things = animation.getDrawList(met.f).asSequence()
-                    .mapNotNull { Pair(it, it.handle.medium as? IImageMedium ?: return@mapNotNull null) }
-                    .flatMap { (a,b) -> b.getImages().asSequence().map { Pair(it, a) } }
-                    .toList()
-
-            ra.writeShort(things.size)  // [2] : Number of Chunks
-            for( (img,transformed) in things) {
-                ra.writeShort(imgIdByImage[img]!!)  // [2]: ChunkId
-                ra.writeShort(transformed.renderRubric.transform.m02.round + img.x) // [2] OffsetX
-                ra.writeShort(transformed.renderRubric.transform.m12.round + img.y) // [2] OffsetY
-                ra.writeInt(transformed.drawDepth)  // [4] : DrawDepth
-            }
-        }
-
-        ra.writeShort(imgMap.size)  // [2]: Num ImgChunks
-        for (link in imgMap) {
-            ra.writeShort(link.rect.x)
-            ra.writeShort(link.rect.y)
-            ra.writeShort(link.rect.width)
-            ra.writeShort(link.rect.height)
-
-        }
     }
 }
