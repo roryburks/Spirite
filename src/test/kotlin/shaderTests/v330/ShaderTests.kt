@@ -2,7 +2,7 @@ package shaderTests.v330
 
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.shader.GL330ShaderLoader
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Mat4
 import spirite.base.util.linear.MatrixBuilder

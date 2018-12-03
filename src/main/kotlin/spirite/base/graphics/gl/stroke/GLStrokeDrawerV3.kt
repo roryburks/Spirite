@@ -7,8 +7,8 @@ import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
-import spirite.base.util.d
-import spirite.base.util.f
+import rb.vectrix.mathUtil.d
+import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Transform
 import rb.vectrix.linear.Vec3f

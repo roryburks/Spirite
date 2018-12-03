@@ -9,8 +9,8 @@ import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
 import spirite.base.util.Colors
-import spirite.base.util.f
-import spirite.base.util.floor
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
 import rb.vectrix.linear.Vec2f
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT

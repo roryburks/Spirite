@@ -19,7 +19,7 @@ import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.Colors
 import spirite.base.util.MathUtil
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Transform.Companion

@@ -1,4 +1,4 @@
-import spirite.base.util.floor
+import rb.vectrix.mathUtil.floor
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.advanced.crossContainer.CSE_Component

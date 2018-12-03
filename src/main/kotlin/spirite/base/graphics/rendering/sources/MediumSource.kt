@@ -5,7 +5,7 @@ import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.Node
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import rb.extendo.dataStructures.SinglyList
 
 data class MediumSource(val medium: MediumHandle, override val workspace: IImageWorkspace) : RenderSource {

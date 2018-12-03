@@ -1,8 +1,8 @@
 package spirite.pc.gui.basic
 
-import spirite.base.util.d
+import rb.vectrix.mathUtil.d
 import spirite.base.util.linear.Rect
-import spirite.base.util.round
+import rb.vectrix.mathUtil.round
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IScrollBar
 import spirite.gui.components.basic.IScrollContainer

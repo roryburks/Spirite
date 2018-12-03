@@ -2,7 +2,7 @@ package spirite.base.util.shapes
 
 import spirite.base.graphics.gl.GLPrimitive
 import spirite.base.util.compaction.FloatCompactor
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 
 interface IShape {
     fun buildPrimitive(

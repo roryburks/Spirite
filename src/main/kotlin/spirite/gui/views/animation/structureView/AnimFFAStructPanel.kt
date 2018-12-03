@@ -17,9 +17,9 @@ import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
-import spirite.base.util.i
+import rb.vectrix.mathUtil.i
 import spirite.base.util.linear.Rect
-import spirite.base.util.round
+import rb.vectrix.mathUtil.round
 import spirite.gui.Direction
 import spirite.gui.Direction.*
 import spirite.gui.components.advanced.crossContainer.CrossInitializer

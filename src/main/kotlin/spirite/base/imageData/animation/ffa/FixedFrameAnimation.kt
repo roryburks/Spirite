@@ -8,8 +8,8 @@ import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameClu
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.undo.NullAction
 import spirite.base.util.MathUtil
-import spirite.base.util.f
-import spirite.base.util.floor
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
 
 class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     : MediumBasedAnimation(name, workspace)

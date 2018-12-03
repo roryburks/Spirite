@@ -7,9 +7,9 @@ import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.GLPrimitive
 import spirite.base.graphics.gl.IGLEngine
 import spirite.base.graphics.gl.PreparedPrimitive
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
-import spirite.base.util.i
+import rb.vectrix.mathUtil.i
 import spirite.pc.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -24,7 +24,7 @@ class FiltersShaderTests {
     val gl get() = ShaderTests.gl
 
     init {
-        every { mockGle.getGl() } returns gl
+        //every { mockGle.getGl() } returns gl
 
         every { mockGle.setTarget(any()) } answers { ShaderTests.bindTexture(firstArg<GLImage>().tex)}
     }

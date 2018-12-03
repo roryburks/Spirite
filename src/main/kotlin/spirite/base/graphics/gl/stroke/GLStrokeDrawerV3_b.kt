@@ -4,8 +4,8 @@ import com.hackoeur.jglm.support.FastMath
 import spirite.base.graphics.gl.*
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
-import spirite.base.util.d
-import spirite.base.util.f
+import rb.vectrix.mathUtil.d
+import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Transform
 import rb.vectrix.linear.Vec2f

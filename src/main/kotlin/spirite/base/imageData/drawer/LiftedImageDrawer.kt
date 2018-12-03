@@ -8,11 +8,12 @@ import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.util.Color
 import spirite.base.util.MathUtil
-import spirite.base.util.f
-import spirite.base.util.floor
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import rb.vectrix.linear.Vec2f
+import spirite.base.util.RectangleUtil
 
 class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         IClearModule,
@@ -45,7 +46,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         val mask = workspace.selectionEngine.selection ?: return
         val rect = when {
             mask.transform == null -> Rect(mask.width, mask.height)
-            else -> MathUtil.circumscribeTrans(Rect(mask.width, mask.height), mask.transform)
+            else -> RectangleUtil.circumscribeTrans(Rect(mask.width, mask.height), mask.transform)
         }
 
         val cx = rect.x + rect.width /2f
@@ -67,7 +68,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
 
         return when(selected.transform) {
             null -> Rect(lifted.width, lifted.height)
-            else -> MathUtil.circumscribeTrans(Rect(lifted.width,lifted.height), selected.transform)
+            else -> RectangleUtil.circumscribeTrans(Rect(lifted.width,lifted.height), selected.transform)
         }
     }
 

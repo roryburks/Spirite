@@ -10,6 +10,9 @@ import spirite.base.util.*
 import spirite.base.util.linear.Rect
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec2i
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
+import rb.vectrix.mathUtil.round
 import spirite.gui.UIPoint
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IComponent

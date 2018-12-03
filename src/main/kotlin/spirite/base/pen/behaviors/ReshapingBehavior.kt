@@ -8,7 +8,7 @@ import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.pen.Penner
 import spirite.base.pen.behaviors.TransformBehavior.TransformStates.*
 import spirite.base.util.Colors
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform

@@ -15,9 +15,9 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.StringUtil
-import spirite.base.util.ceil
+import rb.vectrix.mathUtil.ceil
 import spirite.base.util.delegates.UndoableDelegate
-import spirite.base.util.floor
+import rb.vectrix.mathUtil.floor
 import rb.extendo.dataStructures.SinglyList
 import spirite.base.util.linear.MutableTransform
 import rb.vectrix.linear.Vec2f

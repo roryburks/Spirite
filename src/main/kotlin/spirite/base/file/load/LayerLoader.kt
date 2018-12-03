@@ -6,7 +6,7 @@ import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
-import spirite.base.util.i
+import rb.vectrix.mathUtil.i
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 

@@ -3,7 +3,7 @@ package spirite.base.pen.behaviors
 import spirite.base.imageData.drawer.IImageDrawer.IFlipModule
 import spirite.base.pen.Penner
 import spirite.base.util.MathUtil
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import kotlin.math.abs
 
 

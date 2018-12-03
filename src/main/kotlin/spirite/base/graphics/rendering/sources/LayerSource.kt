@@ -6,7 +6,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.Layer
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 
 data class LayerSource(val layer: Layer, override val workspace: IImageWorkspace) : RenderSource {
     override val defaultWidth: Int get() = layer.width

@@ -11,7 +11,7 @@ import jpen.event.PenListener
 import jpen.owner.multiAwt.AwtPenToolkit
 import spirite.base.graphics.gl.GLGraphicsContext
 import spirite.base.pen.Penner
-import spirite.base.util.round
+import rb.vectrix.mathUtil.round
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.hybrid.Hybrid

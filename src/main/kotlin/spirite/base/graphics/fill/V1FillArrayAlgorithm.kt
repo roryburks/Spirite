@@ -1,8 +1,5 @@
 package spirite.base.graphics.fill
 
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
 import spirite.base.util.MathUtil
 import rb.vectrix.linear.Vec2i
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -38,11 +35,11 @@ object V1FillArrayAlgorithm : IFillArrayAlgorithm {
         context.workers = workers
         workers.forEach { it.forEach { it.loop() } }
 
-        runBlocking {
-            while( !context.done) {
-                delay(20)
+//        runBlocking {
+            while (!context.done) {
+//                delay(20)
             }
-        }
+//        }
 
         return context.fillArray
     }
@@ -108,12 +105,12 @@ object V1FillArrayAlgorithm : IFillArrayAlgorithm {
         }
 
         fun loop() {
-            launch {
+//            launch {
                 while(!ctx.done) {
                     work()
-                    delay(10, MILLISECONDS)
+//                    delay(10, MILLISECONDS)
                 }
-            }
+//            }
         }
 
 

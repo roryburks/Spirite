@@ -5,9 +5,9 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.util.MathUtil
-import spirite.base.util.ceil
-import spirite.base.util.floor
-import spirite.base.util.round
+import rb.vectrix.mathUtil.ceil
+import rb.vectrix.mathUtil.floor
+import rb.vectrix.mathUtil.round
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_RAISED

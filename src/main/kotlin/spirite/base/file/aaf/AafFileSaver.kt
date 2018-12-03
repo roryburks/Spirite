@@ -4,8 +4,8 @@ import spirite.base.file.aaf.AafExporter.ImageLink
 import spirite.base.file.writeUFT8NT
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.mediums.IImageMedium
-import spirite.base.util.f
-import spirite.base.util.round
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.round
 import java.io.RandomAccessFile
 
 object AafFileSaver {

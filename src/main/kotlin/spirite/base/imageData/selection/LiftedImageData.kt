@@ -6,7 +6,8 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.LiftedImageDrawer
 import spirite.base.util.MathUtil
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
+import spirite.base.util.RectangleUtil
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.hybrid.Hybrid
@@ -19,7 +20,7 @@ class LiftedImageData(val image: IImage): ILiftedData {
 
     override fun bake(transform: Transform): ILiftedData {
         // Bakes the rotation and scale, spits out the translation
-        val bakedArea = MathUtil.circumscribeTrans(Rect(image.width, image.height),transform)
+        val bakedArea = RectangleUtil.circumscribeTrans(Rect(image.width, image.height),transform)
         val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
         val gc = newImage.graphics
         gc.transform = transform

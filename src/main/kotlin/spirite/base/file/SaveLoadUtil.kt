@@ -1,6 +1,6 @@
 package spirite.base.file
 
-import spirite.base.util.i
+import rb.vectrix.mathUtil.i
 import java.io.ByteArrayOutputStream
 import java.io.RandomAccessFile
 import java.nio.charset.Charset

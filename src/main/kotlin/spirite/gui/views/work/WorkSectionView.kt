@@ -5,7 +5,7 @@ import spirite.base.brains.Observable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.delegates.OnChangeDelegate
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import spirite.base.util.linear.Transform
 
 /** The view describes which part of the image is currently being seen and

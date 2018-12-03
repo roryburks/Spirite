@@ -19,11 +19,12 @@ import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.Color
 import spirite.base.util.MathUtil
-import spirite.base.util.f
-import spirite.base.util.floor
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import rb.vectrix.linear.Vec2f
+import spirite.base.util.RectangleUtil
 import spirite.hybrid.Hybrid
 
 class DefaultImageDrawer(
@@ -199,7 +200,7 @@ class DefaultImageDrawer(
         val rect = when {
             mask == null -> arranged.handle.run { Rect(x,y,width, height) }
             mask.transform == null -> Rect(mask.width, mask.height)
-            else -> MathUtil.circumscribeTrans(Rect(mask.width, mask.height), mask.transform)
+            else -> RectangleUtil.circumscribeTrans(Rect(mask.width, mask.height), mask.transform)
         }
 
         val cx = rect.x + rect.width /2f
@@ -277,7 +278,7 @@ class DefaultImageDrawer(
         }
 
         val m = arranged.handle
-        return MathUtil.circumscribeTrans(Rect(m.x, m.y, m.width, m.height), arranged.tMediumToWorkspace)
+        return RectangleUtil.circumscribeTrans(Rect(m.x, m.y, m.width, m.height), arranged.tMediumToWorkspace)
     }
 
     override fun stepManipulatingTransform() {

@@ -1,7 +1,7 @@
 package spirite.base.imageData.animation
 
 import spirite.base.util.binding.Bindable
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 
 class AnimationState(
     met: Float = 0f,

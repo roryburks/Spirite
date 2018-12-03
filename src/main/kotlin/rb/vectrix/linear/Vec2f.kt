@@ -1,6 +1,6 @@
 package rb.vectrix.linear
 
-import spirite.base.util.d
+import rb.vectrix.mathUtil.d
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt

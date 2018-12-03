@@ -5,7 +5,7 @@ import io.mockk.mockk
 import sjunit.TestConfig
 import spirite.base.graphics.gl.*
 import spirite.base.util.glu.GLC
-import spirite.base.util.i
+import rb.vectrix.mathUtil.i
 import spirite.base.util.linear.*
 import spirite.pc.toBufferedImage
 import java.io.File

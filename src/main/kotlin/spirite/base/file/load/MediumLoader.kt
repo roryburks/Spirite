@@ -5,7 +5,7 @@ import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.util.i
+import rb.vectrix.mathUtil.i
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED

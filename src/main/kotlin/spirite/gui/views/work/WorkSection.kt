@@ -6,10 +6,10 @@ import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.brains.Observable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.pen.Penner
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import spirite.base.util.linear.Rect
 import rb.vectrix.linear.Vec2f
-import spirite.base.util.round
+import rb.vectrix.mathUtil.round
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.basic.IComponent

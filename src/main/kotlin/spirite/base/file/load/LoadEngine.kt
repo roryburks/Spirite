@@ -7,7 +7,7 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.util.i
+import rb.vectrix.mathUtil.i
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile

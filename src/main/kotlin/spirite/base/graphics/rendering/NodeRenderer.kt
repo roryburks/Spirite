@@ -1,5 +1,6 @@
 package spirite.base.graphics.rendering
 
+import rb.vectrix.mathUtil.ceil
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
@@ -125,8 +126,8 @@ class NodeRenderer(
 
             // Should be killed by NodeRenderer at the end of render
             val compositeImage = Hybrid.imageCreator.createImage(
-                    MathUtil.ceil(built.width*ratioW),
-                    MathUtil.ceil(built.height*ratioH))
+                    (built.width*ratioW).ceil,
+                    (built.height*ratioH).ceil)
             val gc = compositeImage.graphics
             val baseTransform = Transform.ScaleMatrix(ratioW, ratioH)
             gc.transform = baseTransform

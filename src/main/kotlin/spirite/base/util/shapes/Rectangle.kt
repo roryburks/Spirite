@@ -2,7 +2,7 @@ package spirite.base.util.shapes
 
 import spirite.base.graphics.gl.GLPrimitive
 import spirite.base.util.compaction.FloatCompactor
-import spirite.base.util.d
+import rb.vectrix.mathUtil.d
 import spirite.base.util.glu.GLC
 
 class Rectangle(

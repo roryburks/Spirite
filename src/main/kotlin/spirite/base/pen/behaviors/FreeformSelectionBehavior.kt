@@ -6,7 +6,7 @@ import spirite.base.pen.Penner
 import spirite.base.pen.selectionBuilders.FreeformSelectionBuilder
 import spirite.base.util.Colors
 import spirite.base.util.MathUtil
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import spirite.gui.views.work.WorkSectionView
 
 class FreeformSelectionBehavior(

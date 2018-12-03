@@ -1,8 +1,8 @@
 package spirite.base.pen.behaviors
 
 import spirite.base.pen.Penner
-import spirite.base.util.d
-import spirite.base.util.f
+import rb.vectrix.mathUtil.d
+import rb.vectrix.mathUtil.f
 
 class ZoomingReferenceBehavior(penner: Penner) : PennerBehavior(penner) {
 

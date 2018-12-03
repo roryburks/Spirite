@@ -7,7 +7,7 @@ import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
-import spirite.base.util.i
+import rb.vectrix.mathUtil.i
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED

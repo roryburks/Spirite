@@ -14,7 +14,8 @@ import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.MathUtil
 import spirite.base.util.delegates.DerivedLazy
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
+import spirite.base.util.RectangleUtil
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.hybrid.Hybrid
@@ -170,7 +171,7 @@ class SelectionEngine(
 
         val baked = liftedData.bake(transform)
 
-        val bakedArea = MathUtil.circumscribeTrans(Rect(selectionMask.width, selectionMask.height),transform)
+        val bakedArea = RectangleUtil.circumscribeTrans(Rect(selectionMask.width, selectionMask.height),transform)
         val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
         val gc = newImage.graphics
         gc.transform = transform

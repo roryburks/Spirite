@@ -4,6 +4,7 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.MathUtil
+import spirite.base.util.RectangleUtil
 
 class RectSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( workspace) {
     var startX: Int = 0
@@ -24,7 +25,7 @@ class RectSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( work
     }
 
     override fun build(): Selection {
-        return Selection.RectangleSelection(MathUtil.rectFromEndpoints(startX, startY, currentX, currentY))
+        return Selection.RectangleSelection(RectangleUtil.rectFromEndpoints(startX, startY, currentX, currentY))
     }
 
     override fun drawBuilding(gc: GraphicsContext) {

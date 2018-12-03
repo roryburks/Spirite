@@ -7,7 +7,7 @@ import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.util.Color
 import spirite.base.util.Colors
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
 import spirite.base.util.glu.PolygonTesselater
 import spirite.base.util.linear.MutableTransform

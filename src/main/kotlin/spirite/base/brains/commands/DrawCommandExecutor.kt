@@ -7,7 +7,7 @@ import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree.Node
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import spirite.base.util.linear.Transform
 import rb.vectrix.linear.Vec2f
 import spirite.hybrid.MDebug

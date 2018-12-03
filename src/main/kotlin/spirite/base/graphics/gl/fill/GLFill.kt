@@ -4,7 +4,7 @@ import spirite.base.graphics.fill.IFillArrayAlgorithm
 import spirite.base.graphics.gl.FillAfterpassCall
 import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.GLParameters
-import spirite.base.util.f
+import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
 import rb.vectrix.linear.Vec4f
 import spirite.pc.JOGL.JOGL.JOGLTextureSource

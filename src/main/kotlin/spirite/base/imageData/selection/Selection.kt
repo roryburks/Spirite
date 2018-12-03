@@ -3,10 +3,14 @@ package spirite.base.imageData.selection
 import spirite.base.graphics.Composite.*
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
-import spirite.base.util.*
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.*
+import spirite.base.util.Color
+import spirite.base.util.Colors
+import spirite.base.util.MathUtil
+import spirite.base.util.RectangleUtil
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
 import kotlin.math.max
@@ -50,8 +54,8 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
 
 
     operator fun plus( other : Selection) : Selection {
-        val area = (transform?.let { MathUtil.circumscribeTrans(Rect(width, height), it)} ?: Rect(width, height)) union
-                (other.transform?.let { MathUtil.circumscribeTrans(Rect(other.width, other.height), it)} ?: Rect(other.width, other.height))
+        val area = (transform?.let { RectangleUtil.circumscribeTrans(Rect(width, height), it)} ?: Rect(width, height)) union
+                (other.transform?.let { RectangleUtil.circumscribeTrans(Rect(other.width, other.height), it)} ?: Rect(other.width, other.height))
 
         val image = Hybrid.imageCreator.createImage(area.width, area.height)
         val gc = image.graphics
@@ -82,7 +86,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
 
     infix fun intersection( other: Selection) : Selection? {
         val tOtherToThis = (other.transform ?: Transform.IdentityMatrix) * (transform?.invert() ?: Transform.IdentityMatrix)
-        val area = Rect(width, height) intersection MathUtil.circumscribeTrans(Rect(other.width, other.height), tOtherToThis)
+        val area = Rect(width, height) intersection RectangleUtil.circumscribeTrans(Rect(other.width, other.height), tOtherToThis)
 
         if( area.isEmpty) return null
 
@@ -153,7 +157,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
     fun doMaskedRequiringTransform( image: RawImage, tBaseToImage: Transform? = null, backgroundColor: Color? = null, lambda: (RawImage, Transform)->Any?) : Boolean{
         val tSelToImage = (tBaseToImage ?: Transform.IdentityMatrix) * (transform ?: Transform.IdentityMatrix)
 
-        val floatingArea = MathUtil.circumscribeTrans( Rect(mask.width, mask.height), tSelToImage) intersection Rect(image.width, image.height)
+        val floatingArea = RectangleUtil.circumscribeTrans( Rect(mask.width, mask.height), tSelToImage) intersection Rect(image.width, image.height)
         if( floatingArea.isEmpty)
             return false
 
