@@ -14,10 +14,10 @@ import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.delegates.DerivedLazy
 import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.RectangleUtil
+import spirite.base.util.linear.RectangleUtil
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.ITransformF
-import spirite.base.util.linear.ImmutableTransformF
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.Hybrid
 import java.io.File
 

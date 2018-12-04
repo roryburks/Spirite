@@ -12,8 +12,7 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.delegates.UndoableDelegate
-import spirite.base.util.linear.ITransformF
-import spirite.base.util.linear.ImmutableTransformF
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL

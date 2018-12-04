@@ -10,6 +10,8 @@ import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.util.*
 import spirite.base.util.linear.Rect
 import rb.vectrix.linear.Vec2i
+import spirite.base.util.rectanglePacking.ModifiedSleatorAlgorithm2
+import spirite.base.util.rectanglePacking.PackedRectangle
 import spirite.hybrid.Hybrid
 import spirite.hybrid.IImageCreator
 import spirite.hybrid.IImageIO
@@ -42,7 +44,7 @@ class AafExporter(
         val deduplicated = deDuplicateImages(images)
 
         // Step 3: Use Rectangle Packing Algorithm to pack them.
-        val packed = modifiedSleatorAlgorithm(
+        val packed = ModifiedSleatorAlgorithm2(
                 deduplicated.flatMap { (0 until it.value.size).map { _ -> it.key } })
 
         // Step 4: Construct packed Image and map from Image -> Rect
@@ -61,7 +63,7 @@ class AafExporter(
         AafFileSaver.saveAAF(ra, animation, imgMap)
     }
 
-    val regex = Regex("""\.([^.\\\/]+)${'$'}""")
+    val regex = Regex("""\.([^.\\/]+)${'$'}""")
     fun getFilenames(filename: String) : Pair<String, String>
     {
         val extension = regex.find(filename)?.groupValues?.getOrNull(1)
@@ -131,7 +133,7 @@ class AafExporter(
             val rect: Rect,
             val id: Int)
 
-    private fun drawAndMap( packed: PackedRectangle, images: Map<Vec2i, MutableList<ShiftedImage>>) : Pair<RawImage, List<ImageLink>>
+    private fun drawAndMap(packed: PackedRectangle, images: Map<Vec2i, MutableList<ShiftedImage>>) : Pair<RawImage, List<ImageLink>>
     {
         val img = imageCreator.createImage(packed.width, packed.height)
 

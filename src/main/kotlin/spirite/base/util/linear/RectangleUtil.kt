@@ -1,8 +1,7 @@
-package rb.vectrix.mathUtil
+package spirite.base.util.linear
 
 import rb.vectrix.linear.Vec2f
-import spirite.base.util.linear.Rect
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.ITransformF
 
 object RectangleUtil {
     /**

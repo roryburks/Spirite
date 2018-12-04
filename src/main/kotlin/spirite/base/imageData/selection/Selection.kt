@@ -4,13 +4,13 @@ import spirite.base.graphics.Composite.*
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.*
 import spirite.base.util.Color
 import spirite.base.util.Colors
-import rb.vectrix.mathUtil.RectangleUtil
-import spirite.base.util.linear.ImmutableTransformF
+import spirite.base.util.linear.RectangleUtil
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
 import kotlin.math.max
@@ -241,7 +241,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
             gc.color = Colors.WHITE
             gc.fillRect(1,1,rect.width,rect.height)
 
-            return Selection( img, spirite.base.util.linear.ImmutableTransformF.Translation(rect.x-1f, rect.y-1f))
+            return Selection( img, ImmutableTransformF.Translation(rect.x-1f, rect.y-1f))
         }
     }
 }

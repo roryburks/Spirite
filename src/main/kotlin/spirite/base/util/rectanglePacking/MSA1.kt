@@ -1,4 +1,4 @@
-package spirite.base.util
+package spirite.base.util.rectanglePacking
 
 import spirite.base.util.linear.Rect
 import rb.vectrix.linear.Vec2i
@@ -47,10 +47,6 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
     //	the vertical is the position of the outer Vector whereas the horizontal
     //	is the position of the inner Array
     val field = mutableListOf<IntArray>()
-
-    // Since we'll be doing a lot of arbitrary-index removing and the memory
-    //	overhead is tiny compared to that of the field's memory consumption,
-    //	LinkedList will probably be better
     val rects = toPack.toMutableList()
 
     // Step 0: Sort by non-increasing width

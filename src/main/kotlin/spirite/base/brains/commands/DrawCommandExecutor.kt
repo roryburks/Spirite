@@ -8,9 +8,8 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree.Node
 import rb.vectrix.mathUtil.f
-import spirite.base.util.linear.ITransformF
 import rb.vectrix.linear.Vec2f
-import spirite.base.util.linear.ImmutableTransformF
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.MDebug
 
 class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: IToolsetManager) : ICommandExecuter

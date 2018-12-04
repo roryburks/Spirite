@@ -150,7 +150,7 @@ class SettingsManager (
         }
         preferences.putByteArray("tpcPoints", bb.array())
 
-        _tabletPressureInterpolator = CubicSplineInterpolator( points, true, true)
+        _tabletPressureInterpolator = CubicSplineInterpolator( points, true)
         return _tabletPressureInterpolator
     }
 
@@ -166,7 +166,7 @@ class SettingsManager (
             Vec2f( x, y)
         }
 
-        return CubicSplineInterpolator( points, true, true)
+        return CubicSplineInterpolator( points, true)
     }
     // endregion
 

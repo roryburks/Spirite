@@ -6,9 +6,9 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.LiftedImageDrawer
 import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.RectangleUtil
+import spirite.base.util.linear.RectangleUtil
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.ITransformF
 import spirite.hybrid.Hybrid
 
 class LiftedImageData(val image: IImage): ILiftedData {

@@ -10,8 +10,8 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-import spirite.base.util.linear.ITransformF
-import spirite.base.util.linear.ImmutableTransformF
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 
 
 /**

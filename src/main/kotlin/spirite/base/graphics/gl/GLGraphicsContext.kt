@@ -10,9 +10,9 @@ import spirite.base.util.Colors
 import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
 import spirite.base.util.glu.PolygonTesselater
-import spirite.base.util.linear.MutableTransformF
+import rb.vectrix.linear.MutableTransformF
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.ITransformF
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.hybrid.ImageConverter

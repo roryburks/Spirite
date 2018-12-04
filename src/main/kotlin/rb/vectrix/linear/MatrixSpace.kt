@@ -1,7 +1,7 @@
-package spirite.base.util.linear
+package rb.vectrix.linear
 
-import spirite.base.util.linear.ImmutableTransformF.Companion
-import java.util.*
+import rb.extendo.dataStructures.Dequeue
+import rb.vectrix.linear.ImmutableTransformF.Companion
 
 /**
  * A MatrixSpace is a collection of Spaces and Matrices defining how to convert from one Space to another.  A (preferably)
@@ -11,7 +11,7 @@ class MatrixSpace(
         map: Map<Pair<String,String>, ITransformF>
 )
 {
-    private val map = mutableMapOf<Pair<String,String>,ITransformF>()
+    private val map = mutableMapOf<Pair<String,String>, ITransformF>()
     private val keys : List<String>
 
     init {
@@ -19,14 +19,14 @@ class MatrixSpace(
         keys = (map.keys.map { it.first } union map.keys.map{it.second}).distinct()
     }
 
-    fun extend(moreEntries: Map<Pair<String,String>, ITransformF>) :MatrixSpace {
-        val newMap = mutableMapOf<Pair<String,String>,ITransformF>()
+    fun extend(moreEntries: Map<Pair<String,String>, ITransformF>) : MatrixSpace {
+        val newMap = mutableMapOf<Pair<String,String>, ITransformF>()
         newMap.putAll(map)
         newMap.putAll(moreEntries)
-        return MatrixSpace( newMap)
+        return MatrixSpace(newMap)
     }
 
-    fun convertSpace( from: String, to: String):ITransformF {
+    fun convertSpace( from: String, to: String): ITransformF {
         // Note: could cache all the transforms from A to B during the attempt to find a groupLink
         if( from == to)
             return ImmutableTransformF.Identity
@@ -43,13 +43,13 @@ class MatrixSpace(
 
         // Bredth-first search for a groupLink
         val remaining = keys.filter { it != from }
-        val recurseQueue = LinkedList<MapNavigationState>()
-        recurseQueue.add(
+        val recurseQueue = Dequeue<MapNavigationState>()
+        recurseQueue.addBack(
                 MapNavigationState(from,remaining.toMutableList())
         )
 
-        while( recurseQueue.isNotEmpty()) {
-            val entry = recurseQueue.removeFirst()!!
+        while( recurseQueue.any()) {
+            val entry = recurseQueue.popFront() ?: break
             for( iTo in entry.remaining ) {
                 key = Pair(entry.current, iTo)
                 if( map.containsKey(key)) {
@@ -58,7 +58,7 @@ class MatrixSpace(
                         map[Pair(from,to)] = trans
                         return trans
                     }
-                    recurseQueue.add(MapNavigationState(
+                    recurseQueue.addBack(MapNavigationState(
                             iTo,
                             remaining.filter { it != iTo }.toMutableList(),
                             trans))
@@ -71,7 +71,7 @@ class MatrixSpace(
                         map[Pair(from,to)] = trans
                         return trans
                     }
-                    recurseQueue.add(MapNavigationState(
+                    recurseQueue.addBack(MapNavigationState(
                             iTo,
                             remaining.filter { it != iTo }.toMutableList(),
                             trans))

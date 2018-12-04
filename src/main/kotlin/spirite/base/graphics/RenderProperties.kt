@@ -1,8 +1,8 @@
 package spirite.base.graphics
 
 import rb.extendo.dataStructures.SinglyList
-import spirite.base.util.linear.ITransformF
-import spirite.base.util.linear.ImmutableTransformF
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 
 
 data class RenderRubric constructor(

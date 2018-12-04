@@ -6,7 +6,7 @@ import spirite.base.pen.stroke.StrokeParams.InterpolationMethod.CUBIC_SPLINE
 import spirite.base.pen.stroke.StrokeParams.InterpolationMethod.NONE
 import spirite.base.util.interpolation.CubicSplineInterpolator2D
 import spirite.base.util.interpolation.Interpolator2D
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 
 class StrokeBuilder(

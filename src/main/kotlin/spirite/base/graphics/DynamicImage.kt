@@ -1,10 +1,10 @@
 package spirite.base.graphics
 
 import spirite.base.graphics.Composite.SRC
-import rb.vectrix.mathUtil.RectangleUtil
+import spirite.base.util.linear.RectangleUtil
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.ITransformF
-import spirite.base.util.linear.ImmutableTransformF
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
 

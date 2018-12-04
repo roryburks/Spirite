@@ -7,12 +7,12 @@ import spirite.base.graphics.gl.ProgramType.STROKE_V3_LINE_PASS
 import spirite.base.graphics.gl.shader.GL330ShaderLoader
 import spirite.base.resources.IScriptService
 import spirite.base.util.glu.GLC
-import spirite.base.util.linear.Mat4f
+import rb.vectrix.linear.Mat4f
 import spirite.base.util.linear.MatrixBuilder.orthagonalProjectionMatrix
 import spirite.base.util.linear.MatrixBuilder.wrapTransformAs4x4
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec3f
-import spirite.base.util.linear.ImmutableTransformF
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.pc.JOGL.JOGLProvider
@@ -394,7 +394,8 @@ class GLEngine(
 
         if( separateWorldTransfom) {
             internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", perspective.transpose))
-            internalParams.add(GLUniformMatrix4fv("worldMatrix", Mat4f(wrapTransformAs4x4(trans ?: ImmutableTransformF.Identity)).transpose))
+            internalParams.add(GLUniformMatrix4fv("worldMatrix", Mat4f(wrapTransformAs4x4(trans
+                    ?: ImmutableTransformF.Identity)).transpose))
         }
         else {
             trans?.also {x  -> perspective = Mat4f(wrapTransformAs4x4(x)) * perspective }

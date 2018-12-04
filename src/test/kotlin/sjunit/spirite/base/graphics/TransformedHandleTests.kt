@@ -9,8 +9,8 @@ import spirite.base.graphics.RenderRubric
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.MediumHandle
 import spirite.base.util.Colors
-import spirite.base.util.linear.MutableTransformF
-import spirite.base.util.linear.ITransformF.Companion
+import rb.vectrix.linear.MutableTransformF
+import rb.vectrix.linear.ITransformF.Companion
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
 import spirite.pc.graphics.ImageBI

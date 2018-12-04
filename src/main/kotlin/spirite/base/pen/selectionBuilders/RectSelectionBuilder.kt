@@ -3,7 +3,7 @@ package spirite.base.pen.selectionBuilders
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
-import rb.vectrix.mathUtil.RectangleUtil
+import spirite.base.util.linear.RectangleUtil
 
 class RectSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( workspace) {
     var startX: Int = 0

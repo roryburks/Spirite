@@ -3,7 +3,7 @@ package spirite.base.graphics
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.util.Color
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.ITransformF
 import spirite.base.util.shapes.IShape
 import java.util.*
 

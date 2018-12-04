@@ -6,8 +6,8 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.delegates.OnChangeDelegate
 import rb.vectrix.mathUtil.f
-import spirite.base.util.linear.ITransformF
-import spirite.base.util.linear.ImmutableTransformF
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 
 /** The view describes which part of the image is currently being seen and
  * manages conversions between the screen space and the image space. */

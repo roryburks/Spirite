@@ -1,9 +1,5 @@
-package spirite.base.util.linear
+package rb.vectrix.linear
 
-import com.hackoeur.jglm.support.FastMath
-import rb.vectrix.linear.Vec2
-import rb.vectrix.linear.Vec2d
-import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.d
 import kotlin.math.cos
 import kotlin.math.sin

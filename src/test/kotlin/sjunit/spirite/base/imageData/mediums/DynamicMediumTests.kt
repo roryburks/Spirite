@@ -9,7 +9,7 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.util.Colors
-import spirite.base.util.linear.MutableTransformF
+import rb.vectrix.linear.MutableTransformF
 import spirite.hybrid.EngineLaunchpoint
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter

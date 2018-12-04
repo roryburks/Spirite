@@ -2,6 +2,8 @@ package shaderTests.v330
 
 import io.mockk.every
 import io.mockk.mockk
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Mat4f
 import sjunit.TestConfig
 import spirite.base.graphics.gl.*
 import spirite.base.util.glu.GLC

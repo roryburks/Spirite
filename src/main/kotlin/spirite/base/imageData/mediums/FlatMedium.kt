@@ -8,8 +8,8 @@ import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import rb.extendo.dataStructures.SinglyList
-import spirite.base.util.linear.ITransformF
-import spirite.base.util.linear.ImmutableTransformF
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 
 /***
  * A FlatMedium is a thin wrapper for a RawImage, exposing its functionality to the program.

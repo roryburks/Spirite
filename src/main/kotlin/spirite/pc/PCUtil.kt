@@ -3,8 +3,8 @@ package spirite.pc
 import spirite.base.graphics.gl.IGLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.glu.GLC
-import spirite.base.util.linear.MutableTransformF
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.MutableTransformF
+import rb.vectrix.linear.ITransformF
 import spirite.pc.JOGL.JOGL.JOGLInt32Source
 import spirite.pc.util.RasterHelper
 import java.awt.geom.AffineTransform

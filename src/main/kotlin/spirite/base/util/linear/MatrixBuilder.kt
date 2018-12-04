@@ -1,5 +1,7 @@
 package spirite.base.util.linear
 
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.Mat4f
 import spirite.base.graphics.gl.IFloat32Source
 import spirite.base.graphics.gl.IGL
 

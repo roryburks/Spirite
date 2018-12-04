@@ -1,5 +1,6 @@
 package spirite.base.graphics.gl
 
+import rb.vectrix.linear.Mat4f
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f

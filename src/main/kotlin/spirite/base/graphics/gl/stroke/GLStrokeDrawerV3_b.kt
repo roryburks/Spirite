@@ -7,7 +7,7 @@ import spirite.base.pen.stroke.StrokeParams
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import kotlin.math.PI

@@ -21,10 +21,10 @@ import spirite.base.util.Color
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
-import rb.vectrix.mathUtil.RectangleUtil
-import spirite.base.util.linear.ImmutableTransformF
+import spirite.base.util.linear.RectangleUtil
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.Hybrid
 
 class DefaultImageDrawer(

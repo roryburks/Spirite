@@ -19,9 +19,8 @@ import rb.vectrix.mathUtil.ceil
 import spirite.base.util.delegates.UndoableDelegate
 import rb.vectrix.mathUtil.floor
 import rb.extendo.dataStructures.SinglyList
-import spirite.base.util.linear.MutableTransformF
+import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
-import spirite.base.util.linear.MutableTransformF.Companion
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
 
@@ -409,7 +408,8 @@ class SpriteLayer : Layer {
         // endregion
 
         val isVisible: Boolean get() = structure.visible && structure.alpha != 0f
-        val tPartToWhole : MutableTransformF get() {
+        val tPartToWhole : MutableTransformF
+            get() {
             val cx = structure.centerX?.toFloat() ?: handle.width/2f
             val cy = structure.centerY?.toFloat() ?: handle.height/2f
             val ret = MutableTransformF.Translation(-cx, -cy)

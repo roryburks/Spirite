@@ -1,4 +1,4 @@
-package spirite.base.util.linear
+package rb.vectrix.linear
 
 import rb.vectrix.mathUtil.d
 
@@ -9,7 +9,7 @@ interface IMat4 {
     val m20 : Double ; val m21 : Double ; val m22 : Double ; val m23 : Double
     val m30 : Double ; val m31 : Double ; val m32 : Double ; val m33 : Double
 
-    operator fun times( other: IMat4) :Mat4d {
+    operator fun times( other: IMat4) : Mat4d {
         val nm00 = this.m00 * other.m00 + this.m10 * other.m01 + this.m20 * other.m02 + this.m30 * other.m03
         val nm01 = this.m01 * other.m00 + this.m11 * other.m01 + this.m21 * other.m02 + this.m31 * other.m03
         val nm02 = this.m02 * other.m00 + this.m12 * other.m01 + this.m22 * other.m02 + this.m32 * other.m03
@@ -110,7 +110,7 @@ data class Mat4f(
     override val m32 get() = m32f.d
     override val m33 get() = m33f.d
 
-    operator fun times( other: Mat4f) :Mat4f {
+    operator fun times( other: Mat4f) : Mat4f {
         val nm00 = this.m00f * other.m00f + this.m10f * other.m01f + this.m20f * other.m02f + this.m30f * other.m03f
         val nm01 = this.m01f * other.m00f + this.m11f * other.m01f + this.m21f * other.m02f + this.m31f * other.m03f
         val nm02 = this.m02f * other.m00f + this.m12f * other.m01f + this.m22f * other.m02f + this.m32f * other.m03f

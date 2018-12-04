@@ -9,12 +9,11 @@ import spirite.base.pen.Penner
 import spirite.base.pen.behaviors.TransformBehavior.TransformStates.*
 import spirite.base.util.Colors
 import rb.vectrix.mathUtil.f
-import spirite.base.util.linear.MutableTransformF
+import rb.vectrix.linear.MutableTransformF
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
-import spirite.base.util.linear.ImmutableTransformF
-import spirite.base.util.linear.MutableTransformF.Companion
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.base.util.shapes.Rectangle
@@ -84,7 +83,8 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
 
     var region : Rect? = null
 
-    val workingTransform : ITransformF get() {
+    val workingTransform : ITransformF
+        get() {
         val trans = MutableTransformF.Scale(scale.xf, scale.yf)
         trans.preRotate(rotation)
         trans.preTranslate(translation.xf, translation.yf)

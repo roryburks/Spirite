@@ -5,7 +5,7 @@
 //import spirite.base.graphics.LineAttributes
 //import spirite.base.graphics.RenderRubric
 //import spirite.base.util.Color
-//import spirite.base.util.linear.ITransformF
+//import rb.vectrix.linear.ITransformF
 //import java.awt.Graphics
 //import java.awt.Graphics2D
 //import java.awt.Shape

@@ -1,8 +1,7 @@
 package sjunit.spirite.base.util
 
 
-import spirite.base.util.linear.MatrixSpace
-import spirite.base.util.linear.ITransformF
+import rb.vectrix.linear.MatrixSpace
 import rb.vectrix.linear.Vec2f
 import org.junit.Test as test
 

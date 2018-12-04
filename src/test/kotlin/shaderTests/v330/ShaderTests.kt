@@ -4,9 +4,8 @@ import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.shader.GL330ShaderLoader
 import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
-import spirite.base.util.linear.Mat4f
+import rb.vectrix.linear.Mat4f
 import spirite.base.util.linear.MatrixBuilder
-import spirite.base.util.linear.toIFloat32Source
 import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGL.JOGLUniformLocation
 import spirite.pc.resources.JClassScriptService
