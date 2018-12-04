@@ -4,14 +4,12 @@ import io.mockk.every
 import io.mockk.mockk
 import sjunit.TestConfig
 import spirite.base.graphics.DynamicImage
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
-import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.util.Colors
-import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.MutableTransformF
 import spirite.hybrid.EngineLaunchpoint
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
@@ -57,7 +55,7 @@ class DynamicMediumTests {
 
     @test fun buildsTransformedDataCorrectly() {
         val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage(),mockWorkspace.mediumRepository)
-        val tMediumToWorkspace = MutableTransform.TranslationMatrix(-10f, -10f)
+        val tMediumToWorkspace = MutableTransformF.TranslationMatrix(-10f, -10f)
         val built = dynamicMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), tMediumToWorkspace))
 
         built.drawOnComposite { gc ->

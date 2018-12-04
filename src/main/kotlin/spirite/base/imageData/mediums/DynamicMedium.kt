@@ -8,7 +8,8 @@ import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import rb.extendo.dataStructures.SinglyList
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 
 
 /***
@@ -48,8 +49,8 @@ class DynamicMedium(
     inner class DynamicBuiltImageData(arranged: ArrangedMediumData) : BuiltMediumData(arranged, mediumRepo) {
         override val width: Int get() = workspace.width
         override val height: Int get() = workspace.height
-        override val tMediumToComposite: Transform get() = arranged.tMediumToWorkspace
-        override val tWorkspaceToComposite: Transform get() = Transform.IdentityMatrix
+        override val tMediumToComposite: ITransformF get() = arranged.tMediumToWorkspace
+        override val tWorkspaceToComposite: ITransformF get() = ImmutableTransformF.Identity
 
         override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {
             image.drawToImage( {raw -> doer.invoke(raw.graphics)},

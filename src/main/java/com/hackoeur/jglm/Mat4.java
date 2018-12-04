@@ -25,32 +25,32 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 // *
 // * @author James Royalty
 // */
-//public final class Mat4 extends AbstractMat {
-//	public static final Mat4 MAT4_ZERO = new Mat4();
-//	public static final Mat4 MAT4_IDENTITY = new Mat4(1.0f);
+//public final class Mat4f extends AbstractMat {
+//	public static final Mat4f MAT4_ZERO = new Mat4f();
+//	public static final Mat4f MAT4_IDENTITY = new Mat4f(1.0f);
 //
 //	/* ::-------------------------------------------------------------------------::
 //	 * COLUMN MAJOR LAYOUT: The first index indicates the COLUMN NUMBER.
 //	 * The second is the ROW NUMBER.
 //	 *
-//	 * | A E I M |   | m00 m10 m20 m30 |
-//	 * | B F J N | = | m01 m11 m21 m31 |
-//	 * | C G K O |   | m02 m12 m22 m32 |
-//	 * | D H L P |   | m03 m13 m23 m33 |
+//	 * | A E I M |   | m00f m10f m20f m30f |
+//	 * | B F J N | = | m01f m11f m21f m31f |
+//	 * | C G K O |   | m02f m12f m22f m32f |
+//	 * | D H L P |   | m03f m13f m23f m33f |
 //	 */
-//	public final float m00, m10, m20, m30;
-//	public final float m01, m11, m21, m31;
-//	public final float m02, m12, m22, m32;
-//	public final float m03, m13, m23, m33;
+//	public final float m00f, m10f, m20f, m30f;
+//	public final float m01f, m11f, m21f, m31f;
+//	public final float m02f, m12f, m22f, m32f;
+//	public final float m03f, m13f, m23f, m33f;
 //
 //	/**
 //	 * Creates a matrix with all elements equal to ZERO.
 //	 */
-//	public Mat4() {
-//		m00 = m10 = m20 = m30 = 0f;
-//		m01 = m11 = m21 = m31 = 0f;
-//		m02 = m12 = m22 = m32 = 0f;
-//		m03 = m13 = m23 = m33 = 0f;
+//	public Mat4f() {
+//		m00f = m10f = m20f = m30f = 0f;
+//		m01f = m11f = m21f = m31f = 0f;
+//		m02f = m12f = m22f = m32f = 0f;
+//		m03f = m13f = m23f = m33f = 0f;
 //	}
 //
 //	/**
@@ -58,12 +58,12 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 *
 //	 * @param diagonalValue
 //	 */
-//	public Mat4(final float diagonalValue) {
-//		m00 = m11 = m22 = m33 = diagonalValue;
-//		m01 = m02 = m03 = 0f;
-//		m10 = m12 = m13 = 0f;
-//		m20 = m21 = m23 = 0f;
-//		m30 = m31 = m32 = 0f;
+//	public Mat4f(final float diagonalValue) {
+//		m00f = m11f = m22f = m33f = diagonalValue;
+//		m01f = m02f = m03f = 0f;
+//		m10f = m12f = m13f = 0f;
+//		m20f = m21f = m23f = 0f;
+//		m30f = m31f = m32f = 0f;
 //	}
 //
 //	/**
@@ -75,11 +75,11 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param col2 vector for the third column
 //	 * @param col3 vector for the fourth column
 //	 */
-//	public Mat4(final Vec3f col0, final Vec3f col1, final Vec3f col2, final Vec3f col3) {
-//		this.m00 = col0.xi; this.m10 = col1.xi; this.m20 = col2.xi; this.m30 = col3.xi;
-//		this.m01 = col0.yi; this.m11 = col1.yi; this.m21 = col2.yi; this.m31 = col3.yi;
-//		this.m02 = col0.zf; this.m12 = col1.zf; this.m22 = col2.zf; this.m32 = col3.zf;
-//		this.m03 = 0f;     this.m13 = 0f;     this.m23 = 0f;     this.m33 = 0f;
+//	public Mat4f(final Vec3f col0, final Vec3f col1, final Vec3f col2, final Vec3f col3) {
+//		this.m00f = col0.xi; this.m10f = col1.xi; this.m20f = col2.xi; this.m30f = col3.xi;
+//		this.m01f = col0.yi; this.m11f = col1.yi; this.m21f = col2.yi; this.m31f = col3.yi;
+//		this.m02f = col0.zf; this.m12f = col1.zf; this.m22f = col2.zf; this.m32f = col3.zf;
+//		this.m03f = 0f;     this.m13f = 0f;     this.m23f = 0f;     this.m33f = 0f;
 //	}
 //
 //	/**
@@ -90,11 +90,11 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param col2 vector for the third column
 //	 * @param col3 vector for the fourth column
 //	 */
-//	public Mat4(final Vec4f col0, final Vec4f col1, final Vec4f col2, final Vec4f col3) {
-//		this.m00 = col0.xi; this.m10 = col1.xi; this.m20 = col2.xi; this.m30 = col3.xi;
-//		this.m01 = col0.yi; this.m11 = col1.yi; this.m21 = col2.yi; this.m31 = col3.yi;
-//		this.m02 = col0.zf; this.m12 = col1.zf; this.m22 = col2.zf; this.m32 = col3.zf;
-//		this.m03 = col0.wf; this.m13 = col1.wf; this.m23 = col2.wf; this.m33 = col3.wf;
+//	public Mat4f(final Vec4f col0, final Vec4f col1, final Vec4f col2, final Vec4f col3) {
+//		this.m00f = col0.xi; this.m10f = col1.xi; this.m20f = col2.xi; this.m30f = col3.xi;
+//		this.m01f = col0.yi; this.m11f = col1.yi; this.m21f = col2.yi; this.m31f = col3.yi;
+//		this.m02f = col0.zf; this.m12f = col1.zf; this.m22f = col2.zf; this.m32f = col3.zf;
+//		this.m03f = col0.wf; this.m13f = col1.wf; this.m23f = col2.wf; this.m33f = col3.wf;
 //	}
 //
 //	/**
@@ -117,34 +117,34 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param x32 fourth column, zf
 //	 * @param x33 fourth column, wf
 //	 */
-//	public Mat4(
+//	public Mat4f(
 //			final float x00, final float x01, final float x02, final float x03,
 //			final float x10, final float x11, final float x12, final float x13,
 //			final float x20, final float x21, final float x22, final float x23,
 //			final float x30, final float x31, final float x32, final float x33) {
 //		// Col 1
-//		this.m00 = x00;
-//		this.m01 = x01;
-//		this.m02 = x02;
-//		this.m03 = x03;
+//		this.m00f = x00;
+//		this.m01f = x01;
+//		this.m02f = x02;
+//		this.m03f = x03;
 //
 //		// Col 2
-//		this.m10 = x10;
-//		this.m11 = x11;
-//		this.m12 = x12;
-//		this.m13 = x13;
+//		this.m10f = x10;
+//		this.m11f = x11;
+//		this.m12f = x12;
+//		this.m13f = x13;
 //
 //		// Col 3
-//		this.m20 = x20;
-//		this.m21 = x21;
-//		this.m22 = x22;
-//		this.m23 = x23;
+//		this.m20f = x20;
+//		this.m21f = x21;
+//		this.m22f = x22;
+//		this.m23f = x23;
 //
 //		// Col 4
-//		this.m30 = x30;
-//		this.m31 = x31;
-//		this.m32 = x32;
-//		this.m33 = x33;
+//		this.m30f = x30;
+//		this.m31f = x31;
+//		this.m32f = x32;
+//		this.m33f = x33;
 //	}
 //
 //	/**
@@ -153,34 +153,34 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param mat array containing <em>at least</em> 16 elements.  It's okay if
 //	 * the given array is larger than 16 elements; those elements will be ignored.
 //	 */
-//	public Mat4(final float[] mat) {
+//	public Mat4f(final float[] mat) {
 //		assert mat.length >= 16 : "Invalid matrix array length";
 //
 //		int i = 0;
 //
 //		// Col 1
-//		m00 = mat[i++];
-//		m01 = mat[i++];
-//		m02 = mat[i++];
-//		m03 = mat[i++];
+//		m00f = mat[i++];
+//		m01f = mat[i++];
+//		m02f = mat[i++];
+//		m03f = mat[i++];
 //
 //		// Col 2
-//		m10 = mat[i++];
-//		m11 = mat[i++];
-//		m12 = mat[i++];
-//		m13 = mat[i++];
+//		m10f = mat[i++];
+//		m11f = mat[i++];
+//		m12f = mat[i++];
+//		m13f = mat[i++];
 //
 //		// Col 3
-//		m20 = mat[i++];
-//		m21 = mat[i++];
-//		m22 = mat[i++];
-//		m23 = mat[i++];
+//		m20f = mat[i++];
+//		m21f = mat[i++];
+//		m22f = mat[i++];
+//		m23f = mat[i++];
 //
 //		// Col 4
-//		m30 = mat[i++];
-//		m31 = mat[i++];
-//		m32 = mat[i++];
-//		m33 = mat[i++];
+//		m30f = mat[i++];
+//		m31f = mat[i++];
+//		m32f = mat[i++];
+//		m33f = mat[i++];
 //	}
 //
 //	/**
@@ -189,34 +189,34 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 *
 //	 * @param buffer
 //	 */
-//	public Mat4(final FloatBuffer buffer) {
+//	public Mat4f(final FloatBuffer buffer) {
 //		assert buffer.capacity() >= 16 : "Invalid matrix buffer length";
 //
 //		final int startPos = buffer.position();
 //
 //		// Col 1
-//		m00 = buffer.get();
-//		m01 = buffer.get();
-//		m02 = buffer.get();
-//		m03 = buffer.get();
+//		m00f = buffer.get();
+//		m01f = buffer.get();
+//		m02f = buffer.get();
+//		m03f = buffer.get();
 //
 //		// Col 2
-//		m10 = buffer.get();
-//		m11 = buffer.get();
-//		m12 = buffer.get();
-//		m13 = buffer.get();
+//		m10f = buffer.get();
+//		m11f = buffer.get();
+//		m12f = buffer.get();
+//		m13f = buffer.get();
 //
 //		// Col 3
-//		m20 = buffer.get();
-//		m21 = buffer.get();
-//		m22 = buffer.get();
-//		m23 = buffer.get();
+//		m20f = buffer.get();
+//		m21f = buffer.get();
+//		m22f = buffer.get();
+//		m23f = buffer.get();
 //
 //		// Col 4
-//		m30 = buffer.get();
-//		m31 = buffer.get();
-//		m32 = buffer.get();
-//		m33 = buffer.get();
+//		m30f = buffer.get();
+//		m31f = buffer.get();
+//		m32f = buffer.get();
+//		m33f = buffer.get();
 //
 //		buffer.position(startPos);
 //	}
@@ -226,26 +226,26 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 *
 //	 * @param mat matrix to copy
 //	 */
-//	public Mat4(final Mat4 mat) {
-//		this.m00 = mat.m00;
-//		this.m01 = mat.m01;
-//		this.m02 = mat.m02;
-//		this.m03 = mat.m03;
+//	public Mat4f(final Mat4f mat) {
+//		this.m00f = mat.m00f;
+//		this.m01f = mat.m01f;
+//		this.m02f = mat.m02f;
+//		this.m03f = mat.m03f;
 //
-//		this.m10 = mat.m10;
-//		this.m11 = mat.m11;
-//		this.m12 = mat.m12;
-//		this.m13 = mat.m13;
+//		this.m10f = mat.m10f;
+//		this.m11f = mat.m11f;
+//		this.m12f = mat.m12f;
+//		this.m13f = mat.m13f;
 //
-//		this.m20 = mat.m20;
-//		this.m21 = mat.m21;
-//		this.m22 = mat.m22;
-//		this.m23 = mat.m23;
+//		this.m20f = mat.m20f;
+//		this.m21f = mat.m21f;
+//		this.m22f = mat.m22f;
+//		this.m23f = mat.m23f;
 //
-//		this.m30 = mat.m30;
-//		this.m31 = mat.m31;
-//		this.m32 = mat.m32;
-//		this.m33 = mat.m33;
+//		this.m30f = mat.m30f;
+//		this.m31f = mat.m31f;
+//		this.m32f = mat.m32f;
+//		this.m33f = mat.m33f;
 //	}
 //
 //	@Override
@@ -265,13 +265,13 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //		switch (columnIndex) {
 //		case 0:
-//			return (T) new Vec4f(m00, m01, m02, m03);
+//			return (T) new Vec4f(m00f, m01f, m02f, m03f);
 //		case 1:
-//			return (T) new Vec4f(m10, m11, m12, m13);
+//			return (T) new Vec4f(m10f, m11f, m12f, m13f);
 //		case 2:
-//			return (T) new Vec4f(m20, m21, m22, m23);
+//			return (T) new Vec4f(m20f, m21f, m22f, m23f);
 //		case 3:
-//			return (T) new Vec4f(m30, m31, m32, m33);
+//			return (T) new Vec4f(m30f, m31f, m32f, m33f);
 //		default:
 //			throw new IllegalArgumentException("Invalid column index = " + columnIndex);
 //		}
@@ -282,10 +282,10 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	public <T extends Vec> Iterable<T> getColumns() {
 //		List<Vec4f> cols = new ArrayList<Vec4f>(4);
 //
-//		cols.add(new Vec4f(m00, m01, m02, m03));
-//		cols.add(new Vec4f(m10, m11, m12, m13));
-//		cols.add(new Vec4f(m20, m21, m22, m23));
-//		cols.add(new Vec4f(m30, m31, m32, m33));
+//		cols.add(new Vec4f(m00f, m01f, m02f, m03f));
+//		cols.add(new Vec4f(m10f, m11f, m12f, m13f));
+//		cols.add(new Vec4f(m20f, m21f, m22f, m23f));
+//		cols.add(new Vec4f(m30f, m31f, m32f, m33f));
 //
 //		return (Iterable<T>) cols;
 //	}
@@ -296,28 +296,28 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		final int startPos = buffer.position();
 //
 //		// Col1
-//		buffer.put(m00)
-//			.put(m01)
-//			.put(m02)
-//			.put(m03);
+//		buffer.put(m00f)
+//			.put(m01f)
+//			.put(m02f)
+//			.put(m03f);
 //
 //		// Col 2
-//		buffer.put(m10)
-//			.put(m11)
-//			.put(m12)
-//			.put(m13);
+//		buffer.put(m10f)
+//			.put(m11f)
+//			.put(m12f)
+//			.put(m13f);
 //
 //		// Col 3
-//		buffer.put(m20)
-//			.put(m21)
-//			.put(m22)
-//			.put(m23);
+//		buffer.put(m20f)
+//			.put(m21f)
+//			.put(m22f)
+//			.put(m23f);
 //
 //		// Col 4
-//		buffer.put(m30)
-//			.put(m31)
-//			.put(m32)
-//			.put(m33);
+//		buffer.put(m30f)
+//			.put(m31f)
+//			.put(m32f)
+//			.put(m33f);
 //
 //		buffer.position(startPos);
 //
@@ -326,73 +326,73 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //	@Override
 //	public boolean isIdentity() {
-//		return Compare.equals(m00, 1f, Compare.MAT_EPSILON)
-//				&& Compare.equals(m11, 1f, Compare.MAT_EPSILON)
-//				&& Compare.equals(m22, 1f, Compare.MAT_EPSILON)
-//				&& Compare.equals(m33, 1f, Compare.MAT_EPSILON)
+//		return Compare.equals(m00f, 1f, Compare.MAT_EPSILON)
+//				&& Compare.equals(m11f, 1f, Compare.MAT_EPSILON)
+//				&& Compare.equals(m22f, 1f, Compare.MAT_EPSILON)
+//				&& Compare.equals(m33f, 1f, Compare.MAT_EPSILON)
 //
-//				&& Compare.equalsZero(m01)
-//				&& Compare.equalsZero(m02)
-//				&& Compare.equalsZero(m03)
+//				&& Compare.equalsZero(m01f)
+//				&& Compare.equalsZero(m02f)
+//				&& Compare.equalsZero(m03f)
 //
-//				&& Compare.equalsZero(m10)
-//				&& Compare.equalsZero(m12)
-//				&& Compare.equalsZero(m13)
+//				&& Compare.equalsZero(m10f)
+//				&& Compare.equalsZero(m12f)
+//				&& Compare.equalsZero(m13f)
 //
-//				&& Compare.equalsZero(m20)
-//				&& Compare.equalsZero(m21)
-//				&& Compare.equalsZero(m23)
+//				&& Compare.equalsZero(m20f)
+//				&& Compare.equalsZero(m21f)
+//				&& Compare.equalsZero(m23f)
 //
-//				&& Compare.equalsZero(m30)
-//				&& Compare.equalsZero(m31)
-//				&& Compare.equalsZero(m32);
+//				&& Compare.equalsZero(m30f)
+//				&& Compare.equalsZero(m31f)
+//				&& Compare.equalsZero(m32f);
 //	}
 //
 //	@Override
 //	public boolean isZero() {
-//		return Compare.equalsZero(m00)
-//				&& Compare.equalsZero(m01)
-//				&& Compare.equalsZero(m02)
-//				&& Compare.equalsZero(m03)
+//		return Compare.equalsZero(m00f)
+//				&& Compare.equalsZero(m01f)
+//				&& Compare.equalsZero(m02f)
+//				&& Compare.equalsZero(m03f)
 //
-//				&& Compare.equalsZero(m10)
-//				&& Compare.equalsZero(m11)
-//				&& Compare.equalsZero(m12)
-//				&& Compare.equalsZero(m13)
+//				&& Compare.equalsZero(m10f)
+//				&& Compare.equalsZero(m11f)
+//				&& Compare.equalsZero(m12f)
+//				&& Compare.equalsZero(m13f)
 //
-//				&& Compare.equalsZero(m20)
-//				&& Compare.equalsZero(m21)
-//				&& Compare.equalsZero(m22)
-//				&& Compare.equalsZero(m23)
+//				&& Compare.equalsZero(m20f)
+//				&& Compare.equalsZero(m21f)
+//				&& Compare.equalsZero(m22f)
+//				&& Compare.equalsZero(m23f)
 //
-//				&& Compare.equalsZero(m30)
-//				&& Compare.equalsZero(m31)
-//				&& Compare.equalsZero(m32)
-//				&& Compare.equalsZero(m33);
+//				&& Compare.equalsZero(m30f)
+//				&& Compare.equalsZero(m31f)
+//				&& Compare.equalsZero(m32f)
+//				&& Compare.equalsZero(m33f);
 //	}
 //
 //        /**
 //         * Multiply this matrix with another and return the result.
 //         */
-//        public Mat4 multiply(final Mat4 right) {
-//            float nm00 = this.m00 * right.m00 + this.m10 * right.m01 + this.m20 * right.m02 + this.m30 * right.m03;
-//            float nm01 = this.m01 * right.m00 + this.m11 * right.m01 + this.m21 * right.m02 + this.m31 * right.m03;
-//            float nm02 = this.m02 * right.m00 + this.m12 * right.m01 + this.m22 * right.m02 + this.m32 * right.m03;
-//            float nm03 = this.m03 * right.m00 + this.m13 * right.m01 + this.m23 * right.m02 + this.m33 * right.m03;
-//            float nm10 = this.m00 * right.m10 + this.m10 * right.m11 + this.m20 * right.m12 + this.m30 * right.m13;
-//            float nm11 = this.m01 * right.m10 + this.m11 * right.m11 + this.m21 * right.m12 + this.m31 * right.m13;
-//            float nm12 = this.m02 * right.m10 + this.m12 * right.m11 + this.m22 * right.m12 + this.m32 * right.m13;
-//            float nm13 = this.m03 * right.m10 + this.m13 * right.m11 + this.m23 * right.m12 + this.m33 * right.m13;
-//            float nm20 = this.m00 * right.m20 + this.m10 * right.m21 + this.m20 * right.m22 + this.m30 * right.m23;
-//            float nm21 = this.m01 * right.m20 + this.m11 * right.m21 + this.m21 * right.m22 + this.m31 * right.m23;
-//            float nm22 = this.m02 * right.m20 + this.m12 * right.m21 + this.m22 * right.m22 + this.m32 * right.m23;
-//            float nm23 = this.m03 * right.m20 + this.m13 * right.m21 + this.m23 * right.m22 + this.m33 * right.m23;
-//            float nm30 = this.m00 * right.m30 + this.m10 * right.m31 + this.m20 * right.m32 + this.m30 * right.m33;
-//            float nm31 = this.m01 * right.m30 + this.m11 * right.m31 + this.m21 * right.m32 + this.m31 * right.m33;
-//            float nm32 = this.m02 * right.m30 + this.m12 * right.m31 + this.m22 * right.m32 + this.m32 * right.m33;
-//            float nm33 = this.m03 * right.m30 + this.m13 * right.m31 + this.m23 * right.m32 + this.m33 * right.m33;
+//        public Mat4f multiply(final Mat4f right) {
+//            float nm00 = this.m00f * right.m00f + this.m10f * right.m01f + this.m20f * right.m02f + this.m30f * right.m03f;
+//            float nm01 = this.m01f * right.m00f + this.m11f * right.m01f + this.m21f * right.m02f + this.m31f * right.m03f;
+//            float nm02 = this.m02f * right.m00f + this.m12f * right.m01f + this.m22f * right.m02f + this.m32f * right.m03f;
+//            float nm03 = this.m03f * right.m00f + this.m13f * right.m01f + this.m23f * right.m02f + this.m33f * right.m03f;
+//            float nm10 = this.m00f * right.m10f + this.m10f * right.m11f + this.m20f * right.m12f + this.m30f * right.m13f;
+//            float nm11 = this.m01f * right.m10f + this.m11f * right.m11f + this.m21f * right.m12f + this.m31f * right.m13f;
+//            float nm12 = this.m02f * right.m10f + this.m12f * right.m11f + this.m22f * right.m12f + this.m32f * right.m13f;
+//            float nm13 = this.m03f * right.m10f + this.m13f * right.m11f + this.m23f * right.m12f + this.m33f * right.m13f;
+//            float nm20 = this.m00f * right.m20f + this.m10f * right.m21f + this.m20f * right.m22f + this.m30f * right.m23f;
+//            float nm21 = this.m01f * right.m20f + this.m11f * right.m21f + this.m21f * right.m22f + this.m31f * right.m23f;
+//            float nm22 = this.m02f * right.m20f + this.m12f * right.m21f + this.m22f * right.m22f + this.m32f * right.m23f;
+//            float nm23 = this.m03f * right.m20f + this.m13f * right.m21f + this.m23f * right.m22f + this.m33f * right.m23f;
+//            float nm30 = this.m00f * right.m30f + this.m10f * right.m31f + this.m20f * right.m32f + this.m30f * right.m33f;
+//            float nm31 = this.m01f * right.m30f + this.m11f * right.m31f + this.m21f * right.m32f + this.m31f * right.m33f;
+//            float nm32 = this.m02f * right.m30f + this.m12f * right.m31f + this.m22f * right.m32f + this.m32f * right.m33f;
+//            float nm33 = this.m03f * right.m30f + this.m13f * right.m31f + this.m23f * right.m32f + this.m33f * right.m33f;
 //
-//            return new Mat4(
+//            return new Mat4f(
 //                            nm00, nm01, nm02, nm03,
 //                            nm10, nm11, nm12, nm13,
 //                            nm20, nm21, nm22, nm23,
@@ -404,12 +404,12 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //         * Subtract other matrix from this one and return the result ( this - right )
 //         * @param right
 //         */
-//        public Mat4 subtract(final Mat4 right) {
-//            return new Mat4(
-//                            m00 - right.m00, m01 - right.m01, m02 - right.m02, m03 - right.m03,
-//                            m10 - right.m10, m11 - right.m11, m12 - right.m12, m13 - right.m13,
-//                            m20 - right.m20, m21 - right.m21, m22 - right.m22, m23 - right.m23,
-//                            m30 - right.m30, m31 - right.m31, m32 - right.m32, m33 - right.m33
+//        public Mat4f subtract(final Mat4f right) {
+//            return new Mat4f(
+//                            m00f - right.m00f, m01f - right.m01f, m02f - right.m02f, m03f - right.m03f,
+//                            m10f - right.m10f, m11f - right.m11f, m12f - right.m12f, m13f - right.m13f,
+//                            m20f - right.m20f, m21f - right.m21f, m22f - right.m22f, m23f - right.m23f,
+//                            m30f - right.m30f, m31f - right.m31f, m32f - right.m32f, m33f - right.m33f
 //            );
 //        }
 //
@@ -417,44 +417,44 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //         * Add two matrices together and return the result
 //         * @param other
 //         */
-//        public Mat4 add(final Mat4 other) {
-//            return new Mat4(
-//                            m00 + other.m00, m01 + other.m01, m02 + other.m02, m03 + other.m03,
-//                            m10 + other.m10, m11 + other.m11, m12 + other.m12, m13 + other.m13,
-//                            m20 + other.m20, m21 + other.m21, m22 + other.m22, m23 + other.m23,
-//                            m30 + other.m30, m31 + other.m31, m32 + other.m32, m33 + other.m33
+//        public Mat4f add(final Mat4f other) {
+//            return new Mat4f(
+//                            m00f + other.m00f, m01f + other.m01f, m02f + other.m02f, m03f + other.m03f,
+//                            m10f + other.m10f, m11f + other.m11f, m12f + other.m12f, m13f + other.m13f,
+//                            m20f + other.m20f, m21f + other.m21f, m22f + other.m22f, m23f + other.m23f,
+//                            m30f + other.m30f, m31f + other.m31f, m32f + other.m32f, m33f + other.m33f
 //            );
 //        }
 //
 //	public Vec4f multiply(final Vec4f right) {
-//		return new Vec4f(this.m00 * right.xi + this.m10 * right.yi + this.m20 * right.zf + this.m30 * right.wf,
-//				this.m01 * right.xi + this.m11 * right.yi + this.m21 * right.zf + this.m31 * right.wf,
-//				this.m02 * right.xi + this.m12 * right.yi + this.m22 * right.zf + this.m32 * right.wf,
-//				this.m03 * right.xi + this.m13 * right.yi + this.m23 * right.zf + this.m33 * right.wf);
+//		return new Vec4f(this.m00f * right.xi + this.m10f * right.yi + this.m20f * right.zf + this.m30f * right.wf,
+//				this.m01f * right.xi + this.m11f * right.yi + this.m21f * right.zf + this.m31f * right.wf,
+//				this.m02f * right.xi + this.m12f * right.yi + this.m22f * right.zf + this.m32f * right.wf,
+//				this.m03f * right.xi + this.m13f * right.yi + this.m23f * right.zf + this.m33f * right.wf);
 //	}
 //
-//	public Mat4 translate(final Vec3f translation) {
-//		Vec4f v0 = new Vec4f(m00 * translation.xi, m01 * translation.xi, m02 * translation.xi, m03 * translation.xi);
-//		Vec4f v1 = new Vec4f(m10 * translation.yi, m11 * translation.yi, m12 * translation.yi, m13 * translation.yi);
-//		Vec4f v2 = new Vec4f(m20 * translation.zf, m21 * translation.zf, m22 * translation.zf, m23 * translation.zf);
-//		Vec4f v3 = new Vec4f(m30, m31, m32, m33);
+//	public Mat4f translate(final Vec3f translation) {
+//		Vec4f v0 = new Vec4f(m00f * translation.xi, m01f * translation.xi, m02f * translation.xi, m03f * translation.xi);
+//		Vec4f v1 = new Vec4f(m10f * translation.yi, m11f * translation.yi, m12f * translation.yi, m13f * translation.yi);
+//		Vec4f v2 = new Vec4f(m20f * translation.zf, m21f * translation.zf, m22f * translation.zf, m23f * translation.zf);
+//		Vec4f v3 = new Vec4f(m30f, m31f, m32f, m33f);
 //
 //		Vec4f result = v0.add(v1).add(v2).add(v3);
 //
-//		return new Mat4(
-//				m00, m01, m02, m03,
-//				m10, m11, m12, m13,
-//				m20, m21, m22, m23,
+//		return new Mat4f(
+//				m00f, m01f, m02f, m03f,
+//				m10f, m11f, m12f, m13f,
+//				m20f, m21f, m22f, m23f,
 //				result.xi, result.yi, result.zf, result.wf
 //		);
 //	}
 //
-//	public Mat4 transpose() {
-//		return new Mat4(
-//				m00, m10, m20, m30,
-//				m01, m11, m21, m31,
-//				m02, m12, m22, m32,
-//				m03, m13, m23, m33
+//	public Mat4f transpose() {
+//		return new Mat4f(
+//				m00f, m10f, m20f, m30f,
+//				m01f, m11f, m21f, m31f,
+//				m02f, m12f, m22f, m32f,
+//				m03f, m13f, m23f, m33f
 //		);
 //	}
 //
@@ -462,22 +462,22 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	public int hashCode() {
 //		final int prime = 31;
 //		int result = 1;
-//		result = prime * result + Float.floatToIntBits(m00);
-//		result = prime * result + Float.floatToIntBits(m01);
-//		result = prime * result + Float.floatToIntBits(m02);
-//		result = prime * result + Float.floatToIntBits(m03);
-//		result = prime * result + Float.floatToIntBits(m10);
-//		result = prime * result + Float.floatToIntBits(m11);
-//		result = prime * result + Float.floatToIntBits(m12);
-//		result = prime * result + Float.floatToIntBits(m13);
-//		result = prime * result + Float.floatToIntBits(m20);
-//		result = prime * result + Float.floatToIntBits(m21);
-//		result = prime * result + Float.floatToIntBits(m22);
-//		result = prime * result + Float.floatToIntBits(m23);
-//		result = prime * result + Float.floatToIntBits(m30);
-//		result = prime * result + Float.floatToIntBits(m31);
-//		result = prime * result + Float.floatToIntBits(m32);
-//		result = prime * result + Float.floatToIntBits(m33);
+//		result = prime * result + Float.floatToIntBits(m00f);
+//		result = prime * result + Float.floatToIntBits(m01f);
+//		result = prime * result + Float.floatToIntBits(m02f);
+//		result = prime * result + Float.floatToIntBits(m03f);
+//		result = prime * result + Float.floatToIntBits(m10f);
+//		result = prime * result + Float.floatToIntBits(m11f);
+//		result = prime * result + Float.floatToIntBits(m12f);
+//		result = prime * result + Float.floatToIntBits(m13f);
+//		result = prime * result + Float.floatToIntBits(m20f);
+//		result = prime * result + Float.floatToIntBits(m21f);
+//		result = prime * result + Float.floatToIntBits(m22f);
+//		result = prime * result + Float.floatToIntBits(m23f);
+//		result = prime * result + Float.floatToIntBits(m30f);
+//		result = prime * result + Float.floatToIntBits(m31f);
+//		result = prime * result + Float.floatToIntBits(m32f);
+//		result = prime * result + Float.floatToIntBits(m33f);
 //		return result;
 //	}
 //
@@ -489,56 +489,56 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		if (obj == null) {
 //			return false;
 //		}
-//		if (!(obj instanceof Mat4)) {
+//		if (!(obj instanceof Mat4f)) {
 //			return false;
 //		}
-//		Mat4 other = (Mat4) obj;
-//		if (Float.floatToIntBits(m00) != Float.floatToIntBits(other.m00)) {
+//		Mat4f other = (Mat4f) obj;
+//		if (Float.floatToIntBits(m00f) != Float.floatToIntBits(other.m00f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m01) != Float.floatToIntBits(other.m01)) {
+//		if (Float.floatToIntBits(m01f) != Float.floatToIntBits(other.m01f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m02) != Float.floatToIntBits(other.m02)) {
+//		if (Float.floatToIntBits(m02f) != Float.floatToIntBits(other.m02f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m03) != Float.floatToIntBits(other.m03)) {
+//		if (Float.floatToIntBits(m03f) != Float.floatToIntBits(other.m03f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m10) != Float.floatToIntBits(other.m10)) {
+//		if (Float.floatToIntBits(m10f) != Float.floatToIntBits(other.m10f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m11) != Float.floatToIntBits(other.m11)) {
+//		if (Float.floatToIntBits(m11f) != Float.floatToIntBits(other.m11f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m12) != Float.floatToIntBits(other.m12)) {
+//		if (Float.floatToIntBits(m12f) != Float.floatToIntBits(other.m12f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m13) != Float.floatToIntBits(other.m13)) {
+//		if (Float.floatToIntBits(m13f) != Float.floatToIntBits(other.m13f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m20) != Float.floatToIntBits(other.m20)) {
+//		if (Float.floatToIntBits(m20f) != Float.floatToIntBits(other.m20f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m21) != Float.floatToIntBits(other.m21)) {
+//		if (Float.floatToIntBits(m21f) != Float.floatToIntBits(other.m21f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m22) != Float.floatToIntBits(other.m22)) {
+//		if (Float.floatToIntBits(m22f) != Float.floatToIntBits(other.m22f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m23) != Float.floatToIntBits(other.m23)) {
+//		if (Float.floatToIntBits(m23f) != Float.floatToIntBits(other.m23f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m30) != Float.floatToIntBits(other.m30)) {
+//		if (Float.floatToIntBits(m30f) != Float.floatToIntBits(other.m30f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m31) != Float.floatToIntBits(other.m31)) {
+//		if (Float.floatToIntBits(m31f) != Float.floatToIntBits(other.m31f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m32) != Float.floatToIntBits(other.m32)) {
+//		if (Float.floatToIntBits(m32f) != Float.floatToIntBits(other.m32f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m33) != Float.floatToIntBits(other.m33)) {
+//		if (Float.floatToIntBits(m33f) != Float.floatToIntBits(other.m33f)) {
 //			return false;
 //		}
 //		return true;
@@ -554,41 +554,41 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //			return false;
 //		}
 //
-//		if (!(obj instanceof Mat4)) {
+//		if (!(obj instanceof Mat4f)) {
 //			return false;
 //		}
 //
-//		final Mat4 other = (Mat4) obj;
+//		final Mat4f other = (Mat4f) obj;
 //
-//		return Compare.equals(m00, other.m00, epsilon)
-//				&& Compare.equals(m01, other.m01, epsilon)
-//				&& Compare.equals(m02, other.m02, epsilon)
-//				&& Compare.equals(m03, other.m03, epsilon)
+//		return Compare.equals(m00f, other.m00f, epsilon)
+//				&& Compare.equals(m01f, other.m01f, epsilon)
+//				&& Compare.equals(m02f, other.m02f, epsilon)
+//				&& Compare.equals(m03f, other.m03f, epsilon)
 //
-//				&& Compare.equals(m10, other.m10, epsilon)
-//				&& Compare.equals(m11, other.m11, epsilon)
-//				&& Compare.equals(m12, other.m12, epsilon)
-//				&& Compare.equals(m13, other.m13, epsilon)
+//				&& Compare.equals(m10f, other.m10f, epsilon)
+//				&& Compare.equals(m11f, other.m11f, epsilon)
+//				&& Compare.equals(m12f, other.m12f, epsilon)
+//				&& Compare.equals(m13f, other.m13f, epsilon)
 //
-//				&& Compare.equals(m20, other.m20, epsilon)
-//				&& Compare.equals(m21, other.m21, epsilon)
-//				&& Compare.equals(m22, other.m22, epsilon)
-//				&& Compare.equals(m23, other.m23, epsilon)
+//				&& Compare.equals(m20f, other.m20f, epsilon)
+//				&& Compare.equals(m21f, other.m21f, epsilon)
+//				&& Compare.equals(m22f, other.m22f, epsilon)
+//				&& Compare.equals(m23f, other.m23f, epsilon)
 //
-//				&& Compare.equals(m30, other.m30, epsilon)
-//				&& Compare.equals(m31, other.m31, epsilon)
-//				&& Compare.equals(m32, other.m32, epsilon)
-//				&& Compare.equals(m33, other.m33, epsilon);
+//				&& Compare.equals(m30f, other.m30f, epsilon)
+//				&& Compare.equals(m31f, other.m31f, epsilon)
+//				&& Compare.equals(m32f, other.m32f, epsilon)
+//				&& Compare.equals(m33f, other.m33f, epsilon);
 //	}
 //
 //	public String toString() {
 //		return new StringBuilder()
 //			.append(getClass().getSimpleName())
 //			.append("{")
-//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f %8.5f", m00, m10, m20, m30))
-//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f %8.5f", m01, m11, m21, m31))
-//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f %8.5f", m02, m12, m22, m32))
-//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f %8.5f", m03, m13, m23, m33))
+//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f %8.5f", m00f, m10f, m20f, m30f))
+//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f %8.5f", m01f, m11f, m21f, m31f))
+//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f %8.5f", m02f, m12f, m22f, m32f))
+//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f %8.5f", m03f, m13f, m23f, m33f))
 //			.append("\n}")
 //			.toString();
 //	}

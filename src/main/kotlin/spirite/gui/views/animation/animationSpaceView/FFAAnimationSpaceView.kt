@@ -6,10 +6,10 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.SpacialLink
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationPlayObserver
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
-import spirite.base.util.*
 import spirite.base.util.linear.Rect
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec2i
+import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round

@@ -11,7 +11,8 @@ import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.Color
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 
 
 fun IUndoEngine.performMaskedImageAction(description: String, arranged: ArrangedMediumData, mask: Selection?, action: (BuiltMediumData, Selection?)->Any? )
@@ -51,7 +52,7 @@ interface IImageDrawer {
         fun flip(horizontal: Boolean)
     }
     interface ITransformModule : IFlipModule {
-        fun transform(trans: Transform)
+        fun transform(trans: ITransformF)
 
         fun startManipulatingTransform() : Rect?
         fun stepManipulatingTransform()
@@ -59,8 +60,8 @@ interface IImageDrawer {
 
         override fun flip(horizontal: Boolean) {
             transform(when( horizontal) {
-                true -> Transform.ScaleMatrix(-1f,1f)
-                false -> Transform.ScaleMatrix(1f, -1f)
+                true -> ImmutableTransformF.Scale(-1f,1f)
+                false -> ImmutableTransformF.Scale(1f, -1f)
             })
         }
     }
@@ -95,7 +96,7 @@ interface IImageDrawer {
 
     interface IAnchorLiftModule {
         fun acceptsLifted(lifted: ILiftedData): Boolean
-        fun anchorLifted(lifted: ILiftedData, trans: Transform?)
+        fun anchorLifted(lifted: ILiftedData, trans: ITransformF?)
     }
 //
 //    interface IBoneDrawer {

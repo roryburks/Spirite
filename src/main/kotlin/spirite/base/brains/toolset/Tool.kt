@@ -3,7 +3,7 @@ package spirite.base.brains.toolset
 import spirite.base.util.binding.Bindable
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.ICommand
-import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
 import kotlin.reflect.KProperty
 
@@ -160,14 +160,14 @@ class Reshaper(toolset: Toolset) : Tool(toolset){
     override val iconY = 2
     override val description = "Reshaper"
 
-    val transform : MutableTransform get() {
-        val t = MutableTransform.ScaleMatrix(scale.xf, scale.yf)
+    val transform : MutableTransformF get() {
+        val t = MutableTransformF.Scale(scale.xf, scale.yf)
         t.preRotate(rotation)
         t.preTranslate(translation.xf, translation.yf)
         return t
     }
 
-    val applyTransformBind by scheme.Property(ButtonProperty("Apply Transform", DrawCommand.APPLY_TRANFORM))
+    val applyTransformBind by scheme.Property(ButtonProperty("Apply ITransformF", DrawCommand.APPLY_TRANFORM))
     var applyTransform by applyTransformBind
     val scaleBind by scheme.Property(DualFloatBoxProperty("Scale", "xi","yi", Vec2f(1f,1f)))
     var scale by scaleBind

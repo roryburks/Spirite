@@ -3,7 +3,7 @@ package spirite.base.brains.palette
 import spirite.base.util.binding.Bindable
 import spirite.base.util.Color
 import spirite.base.util.Colors
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 
 class PaletteBelt
 {

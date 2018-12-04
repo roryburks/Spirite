@@ -6,7 +6,8 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.delegates.OnChangeDelegate
 import rb.vectrix.mathUtil.f
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 
 /** The view describes which part of the image is currently being seen and
  * manages conversions between the screen space and the image space. */
@@ -39,16 +40,16 @@ class WorkSectionView(val workspace: IImageWorkspace) {
     }
 
     private val tWorkspaceToScreenDerived = DerivedLazy{
-        Transform.TranslationMatrix(-offsetX.f, -offsetY.f) *
-                Transform.RotationMatrix(rotation) *
-                Transform.ScaleMatrix(zoom, zoom)
+        ImmutableTransformF.Translation(-offsetX.f, -offsetY.f) *
+                ImmutableTransformF.Rotation(rotation) *
+                ImmutableTransformF.Scale(zoom, zoom)
     }
-    val tWorkspaceToScreen : Transform by tWorkspaceToScreenDerived
+    val tWorkspaceToScreen : ITransformF by tWorkspaceToScreenDerived
 
     private val tScreenToWorkspaceDerived = DerivedLazy{
-        tWorkspaceToScreen.invert()
+        tWorkspaceToScreen.invert() ?: ImmutableTransformF.Identity
     }
-    val tScreenToWorkspace : Transform by tScreenToWorkspaceDerived
+    val tScreenToWorkspace : ITransformF by tScreenToWorkspaceDerived
 
     val viewObserver : IObservable<()->Unit> get() = _viewObserver
     private val _viewObserver = Observable<()->Unit>()

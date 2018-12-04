@@ -10,7 +10,8 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 
 
 /**
@@ -94,8 +95,8 @@ object NilMedium : IMedium {
     override fun render( gc: GraphicsContext, render: RenderRubric?) {}
 
     class NilBuiltMedium(arranged: ArrangedMediumData) : BuiltMediumData(arranged, NilMMediumRepo) {
-        override val tWorkspaceToComposite: Transform get() = Transform.IdentityMatrix
-        override val tMediumToComposite: Transform get() = Transform.IdentityMatrix
+        override val tWorkspaceToComposite: ITransformF get() = ImmutableTransformF.Identity
+        override val tMediumToComposite: ITransformF get() = ImmutableTransformF.Identity
         override val width: Int get() = 1
         override val height: Int get() = 1
         override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {}

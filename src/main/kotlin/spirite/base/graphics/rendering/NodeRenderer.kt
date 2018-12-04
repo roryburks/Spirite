@@ -9,8 +9,8 @@ import spirite.base.imageData.IIsolator
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.mediums.IComplexMedium
-import spirite.base.util.MathUtil
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -111,7 +111,7 @@ class NodeRenderer(
     private class BuiltComposite(
             val handle: MediumHandle,
             val compositeImage: RawImage,
-            val tCompositeToMedium : Transform)
+            val tCompositeToMedium : ITransformF)
 
     private var builtComposite: BuiltComposite? = null
 
@@ -129,7 +129,7 @@ class NodeRenderer(
                     (built.width*ratioW).ceil,
                     (built.height*ratioH).ceil)
             val gc = compositeImage.graphics
-            val baseTransform = Transform.ScaleMatrix(ratioW, ratioH)
+            val baseTransform = ImmutableTransformF.Scale(ratioW, ratioH)
             gc.transform = baseTransform
 
 

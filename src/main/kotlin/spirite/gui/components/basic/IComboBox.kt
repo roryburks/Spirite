@@ -1,7 +1,7 @@
 package spirite.gui.components.basic
 
 import spirite.base.util.binding.Bindable
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent

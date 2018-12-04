@@ -4,7 +4,7 @@ import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.shader.GL330ShaderLoader
 import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
-import spirite.base.util.linear.Mat4
+import spirite.base.util.linear.Mat4f
 import spirite.base.util.linear.MatrixBuilder
 import spirite.base.util.linear.toIFloat32Source
 import spirite.hybrid.Hybrid
@@ -46,7 +46,7 @@ object ShaderTests
 
     fun addPerpective(program: IGLProgram, x1: Float, x2: Float, y1: Float, y2: Float) {
 
-        val mat = Mat4(MatrixBuilder.orthagonalProjectionMatrix(x1, x2, y1, y2, -1f, 1f)).transpose()
+        val mat = Mat4f(MatrixBuilder.orthagonalProjectionMatrix(x1, x2, y1, y2, -1f, 1f)).transpose()
 
         gl.uniformMatrix4fv(getAndVerifyLocation(program,"perspectiveMatrix"), mat.toIFloat32Source(gl))
         gl.uniform1i(getAndVerifyLocation(program,"u_flags"), 0)

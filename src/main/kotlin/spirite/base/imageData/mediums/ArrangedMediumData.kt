@@ -2,7 +2,8 @@ package spirite.base.imageData.mediums
 
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.selection.Selection
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 
 /***
  * ArrangedMediumData serves as a context upon which things are done.  Since most drawing actions and many other actions
@@ -11,11 +12,11 @@ import spirite.base.util.linear.Transform
  */
 data class ArrangedMediumData(
         val handle: MediumHandle,
-        val tMediumToWorkspace: Transform = Transform.IdentityMatrix,
+        val tMediumToWorkspace: ITransformF = ImmutableTransformF.Identity,
         val selection: Selection? = null)
 {
     val built  get() = handle.medium.build(this)
 
     constructor(handle: MediumHandle, ox: Float, oy: Float, selection: Selection? = null ) :
-            this( handle, Transform.TranslationMatrix(ox, oy), selection)
+            this( handle, ImmutableTransformF.Translation(ox, oy), selection)
 }

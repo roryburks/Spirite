@@ -8,8 +8,9 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree.Node
 import rb.vectrix.mathUtil.f
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import rb.vectrix.linear.Vec2f
+import spirite.base.util.linear.ImmutableTransformF
 import spirite.hybrid.MDebug
 
 class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: IToolsetManager) : ICommandExecuter
@@ -71,7 +72,7 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
 
     fun shift( ox: Int, oy: Int, workspace: IImageWorkspace) : Boolean {
         val active = workspace.activeDrawer as? ITransformModule ?: return false
-        active.transform(Transform.TranslationMatrix(ox.f, oy.f))
+        active.transform(ImmutableTransformF.Translation(ox.f, oy.f))
         return true
     }
 

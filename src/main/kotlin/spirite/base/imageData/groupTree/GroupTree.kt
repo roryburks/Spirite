@@ -12,7 +12,8 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.delegates.UndoableDelegate
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -69,7 +70,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
 
         val isVisible : Boolean get() = visible && alpha > 0f
 
-        val tNodeToContext get() = Transform.TranslationMatrix(x+0f, y+0f)
+        val tNodeToContext get() = ImmutableTransformF.Translation(x+0f, y+0f)
 
         // region Delegates
         private inner class NodePosition {

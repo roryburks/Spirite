@@ -1,7 +1,7 @@
 package spirite.gui.components.basic
 
 import spirite.base.util.binding.Bindable
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IBoxList.*

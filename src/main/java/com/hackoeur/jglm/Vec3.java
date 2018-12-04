@@ -76,9 +76,9 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //	public Vec3f multiply(final Mat3 mat) {
 //		return new Vec3f(
-//				mat.m00 * xi + mat.m01 * yi + mat.m02 * zf,
-//				mat.m10 * xi + mat.m11 * yi + mat.m12 * zf,
-//				mat.m20 * xi + mat.m21 * yi + mat.m22 * zf
+//				mat.m00f * xi + mat.m01f * yi + mat.m02f * zf,
+//				mat.m10f * xi + mat.m11f * yi + mat.m12f * zf,
+//				mat.m20f * xi + mat.m21f * yi + mat.m22f * zf
 //		);
 //	}
 //

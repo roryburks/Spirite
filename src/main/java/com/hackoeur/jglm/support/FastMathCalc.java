@@ -539,7 +539,7 @@ class FastMathCalc {
      * This will be an even function with only positive coefficents.
      * xi is in the range [0 - 1/3].
      *
-     * Transform xi for input to the above function by setting
+     * ITransformF xi for input to the above function by setting
      * xi = (xi-1)/(xi+1).   Input to the polynomial is xi^2, then
      * the result is multiplied by xi.
      * @param xi number from which log is requested

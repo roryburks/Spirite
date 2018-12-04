@@ -18,13 +18,13 @@ import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.Color
-import spirite.base.util.MathUtil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import rb.vectrix.linear.Vec2f
-import spirite.base.util.RectangleUtil
+import rb.vectrix.mathUtil.RectangleUtil
+import spirite.base.util.linear.ImmutableTransformF
 import spirite.hybrid.Hybrid
 
 class DefaultImageDrawer(
@@ -129,7 +129,7 @@ class DefaultImageDrawer(
                 built.rawAccessComposite {
                     it.graphics.apply {
                         val tSelToImage = (built.tWorkspaceToComposite) * (selection.transform
-                                ?: Transform.IdentityMatrix)
+                                ?: ImmutableTransformF.Identity)
                         transform = tSelToImage
                         composite = DST_OUT
                         renderImage(selection.mask, 0, 0)
@@ -146,7 +146,7 @@ class DefaultImageDrawer(
 
     override fun acceptsLifted(lifted: ILiftedData) = true
 
-    override fun anchorLifted(lifted: ILiftedData, trans: Transform?) {
+    override fun anchorLifted(lifted: ILiftedData, trans: ITransformF?) {
         workspace.undoEngine.performMaskedImageAction("Anchor Lifted", arranged, null) { built, mask ->
             built.drawOnComposite { gc->
                 if(trans != null)
@@ -194,7 +194,7 @@ class DefaultImageDrawer(
     }
     // endregion
 
-    override fun transform(trans: Transform) {
+    override fun transform(trans: ITransformF) {
         val mask = mask
 
         val rect = when {
@@ -206,7 +206,7 @@ class DefaultImageDrawer(
         val cx = rect.x + rect.width /2f
         val cy = rect.y + rect.height /2f
 
-        val effectiveTrans = Transform.TranslationMatrix(cx,cy) * trans * Transform.TranslationMatrix(-cx,-cy)
+        val effectiveTrans = ImmutableTransformF.Translation(cx,cy) * trans * ImmutableTransformF.Translation(-cx,-cy)
 
         doTransformStraight(effectiveTrans)
     }
@@ -216,15 +216,15 @@ class DefaultImageDrawer(
         val cy = built.height /2f
 
         doTransformStraight(when( horizontal) {
-            true -> Transform.TranslationMatrix(cx,cy) * Transform.ScaleMatrix(-1f,1f) * Transform.TranslationMatrix(-cx,-cy)
-            false -> Transform.TranslationMatrix(cx,cy) * Transform.ScaleMatrix(1f, -1f) * Transform.TranslationMatrix(-cx,-cy)
+            true -> ImmutableTransformF.Translation(cx,cy) * ImmutableTransformF.Scale(-1f,1f) * ImmutableTransformF.Translation(-cx,-cy)
+            false -> ImmutableTransformF.Translation(cx,cy) * ImmutableTransformF.Scale(1f, -1f) * ImmutableTransformF.Translation(-cx,-cy)
         })
     }
 
-    private fun doTransformStraight( effectiveTrans: Transform) {
+    private fun doTransformStraight( effectiveTrans: ITransformF) {
         if( mask == null) {
             workspace.undoEngine.performAndStore(object: ImageAction(arranged) {
-                override val description: String get() = "Transform"
+                override val description: String get() = "ITransformF"
 
                 override fun performImageAction(built: BuiltMediumData) {
                     built.rawAccessComposite {
@@ -242,7 +242,7 @@ class DefaultImageDrawer(
             })
         }
         else {
-            workspace.undoEngine.doAsAggregateAction("Lift and Transform") {
+            workspace.undoEngine.doAsAggregateAction("Lift and ITransformF") {
                 workspace.selectionEngine.transformSelection(effectiveTrans, true)
                 workspace.selectionEngine.bakeTranslationIntoLifted()
             }
@@ -271,7 +271,7 @@ class DefaultImageDrawer(
             val cx = medium.width / 2f + medium.x
             val cy = medium.height / 2f + medium.y
 
-            val effectiveTrans = Transform.TranslationMatrix(cx,cy) * tool.transform * Transform.TranslationMatrix(-cx,-cy)
+            val effectiveTrans = ImmutableTransformF.Translation(cx,cy) * tool.transform * ImmutableTransformF.Translation(-cx,-cy)
 
             gc.transform = effectiveTrans
             arranged.handle.medium.render(gc)

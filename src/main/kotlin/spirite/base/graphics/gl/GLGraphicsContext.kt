@@ -10,9 +10,9 @@ import spirite.base.util.Colors
 import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
 import spirite.base.util.glu.PolygonTesselater
-import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.MutableTransformF
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.hybrid.ImageConverter
@@ -84,16 +84,16 @@ class GLGraphicsContext : GraphicsContext {
     }
 
     // region Transforms
-    override var transform: Transform
+    override var transform: ITransformF
         get() = _trans
         set(value) {_trans = value.toMutable()}
-    private var _trans : MutableTransform = MutableTransform.IdentityMatrix()
+    private var _trans : MutableTransformF = MutableTransformF.Identity
 
     override fun preTranslate(offsetX: Float, offsetY: Float) = _trans.preTranslate(offsetX.toFloat(), offsetY.toFloat())
     override fun translate(offsetX: Float, offsetY: Float) = _trans.translate(offsetX.toFloat(), offsetY.toFloat())
 
-    override fun preTransform(trans: Transform) = _trans .preConcatenate(trans)
-    override fun transform(trans: Transform) = _trans.concatenate(trans)
+    override fun preTransform(trans: ITransformF) = _trans .preConcatenate(trans)
+    override fun transform(trans: ITransformF) = _trans.concatenate(trans)
 
     override fun preScale(sx: Float, sy: Float) = _trans.preScale(sx.toFloat(), sy.toFloat())
     override fun scale(sx: Float, sy: Float) = _trans.scale(sx.toFloat(), sy.toFloat())
@@ -282,8 +282,8 @@ class GLGraphicsContext : GraphicsContext {
 
     }
 
-    private fun applyPassProgram( programCall: ProgramCall, params: GLParameters, trans: Transform?,
-                          x1: Float = 0f, y1: Float = 0f, x2: Float = width.f, y2: Float = height.f)
+    private fun applyPassProgram(programCall: ProgramCall, params: GLParameters, trans: ITransformF?,
+                                 x1: Float = 0f, y1: Float = 0f, x2: Float = width.f, y2: Float = height.f)
     {
         reset()
         gle.applyPassProgram( programCall, params, trans,  x1, y1, x2, y2)

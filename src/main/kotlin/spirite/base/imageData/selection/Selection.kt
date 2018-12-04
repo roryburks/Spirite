@@ -4,13 +4,13 @@ import spirite.base.graphics.Composite.*
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.*
 import spirite.base.util.Color
 import spirite.base.util.Colors
-import spirite.base.util.MathUtil
-import spirite.base.util.RectangleUtil
+import rb.vectrix.mathUtil.RectangleUtil
+import spirite.base.util.linear.ImmutableTransformF
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
 import kotlin.math.max
@@ -27,9 +27,9 @@ import kotlin.math.max
  * it's worth adding a more generic ImageDependency for Actions (not just Medium Dependencies) or maybe just a specific
  * one for selections.
  */
-class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = false){
+class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = false){
     val mask: IImage
-    val transform: Transform?
+    val transform: ITransformF?
     val width get() = mask.width
     val height get() = mask.height
     val empty: Boolean
@@ -48,7 +48,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
             maskBeingBuilt.graphics.renderImage(mask, -cropped.x, -cropped.y)
 
             this.mask = maskBeingBuilt
-            this.transform = transform ?: Transform.TranslationMatrix(cropped.x.f, cropped.y.f)
+            this.transform = transform ?: ImmutableTransformF.Translation(cropped.x.f, cropped.y.f)
         }
     }
 
@@ -67,7 +67,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
         other.transform?.apply{ gc.preTransform( this)}
         gc.renderImage(other.mask, 0, 0)
 
-        return Selection(image, Transform.TranslationMatrix(area.x.f, area.y.f))
+        return Selection(image, ImmutableTransformF.Translation(area.x.f, area.y.f))
     }
 
     operator fun minus(other: Selection) : Selection {
@@ -78,14 +78,14 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
         val gc = image.graphics
         gc.renderImage(mask, 0, 0)
         gc.composite = DST_OUT
-        gc.transform = (other.transform ?: Transform.IdentityMatrix) * (transform?.invert() ?: Transform.IdentityMatrix)
+        gc.transform = (other.transform ?: ImmutableTransformF.Identity) * (transform?.invert() ?: ImmutableTransformF.Identity)
         gc.renderImage(other.mask, 0, 0)
 
         return Selection(image, transform, true)
     }
 
     infix fun intersection( other: Selection) : Selection? {
-        val tOtherToThis = (other.transform ?: Transform.IdentityMatrix) * (transform?.invert() ?: Transform.IdentityMatrix)
+        val tOtherToThis = (other.transform ?: ImmutableTransformF.Identity) * (transform?.invert() ?: ImmutableTransformF.Identity)
         val area = Rect(width, height) intersection RectangleUtil.circumscribeTrans(Rect(other.width, other.height), tOtherToThis)
 
         if( area.isEmpty) return null
@@ -97,7 +97,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
         gc.transform = tOtherToThis
         gc.renderImage(other.mask, 0, 0)
 
-        val retTransform = Transform.TranslationMatrix(area.x.f, area.y.f) * (transform?: Transform.IdentityMatrix)
+        val retTransform = ImmutableTransformF.Translation(area.x.f, area.y.f) * (transform?: ImmutableTransformF.Identity)
         return Selection(image, retTransform)
     }
 
@@ -128,14 +128,14 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
 
 
     // region Lifting
-    fun lift( image: IImage, tBaseToImage: Transform? = null) : RawImage {
-        val tSelToImage = (tBaseToImage ?: Transform.IdentityMatrix) * (transform ?: Transform.IdentityMatrix)
+    fun lift( image: IImage, tBaseToImage: ITransformF? = null) : RawImage {
+        val tSelToImage = (tBaseToImage ?: ImmutableTransformF.Identity) * (transform ?: ImmutableTransformF.Identity)
         val tImageToSel = tSelToImage.invert()
         val lifted = Hybrid.imageCreator.createImage(mask.width, mask.height)
 
         lifted.graphics.apply {
             renderImage(mask, 0, 0)
-            transform = tImageToSel
+            transform = tImageToSel ?: ImmutableTransformF.Identity
             composite = SRC_IN
             renderImage( image, 0, 0)
         }
@@ -154,14 +154,14 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
      *
      * @return doMasked may not execute the Lambda at all (if the selection doesn't intersect the image) in which case it returns false
      */
-    fun doMaskedRequiringTransform( image: RawImage, tBaseToImage: Transform? = null, backgroundColor: Color? = null, lambda: (RawImage, Transform)->Any?) : Boolean{
-        val tSelToImage = (tBaseToImage ?: Transform.IdentityMatrix) * (transform ?: Transform.IdentityMatrix)
+    fun doMaskedRequiringTransform(image: RawImage, tBaseToImage: ITransformF? = null, backgroundColor: Color? = null, lambda: (RawImage, ITransformF)->Any?) : Boolean{
+        val tSelToImage = (tBaseToImage ?: ImmutableTransformF.Identity) * (transform ?: ImmutableTransformF.Identity)
 
         val floatingArea = RectangleUtil.circumscribeTrans( Rect(mask.width, mask.height), tSelToImage) intersection Rect(image.width, image.height)
         if( floatingArea.isEmpty)
             return false
 
-        val tImageToFloating = Transform.TranslationMatrix(-floatingArea.x.f, -floatingArea.y.f)
+        val tImageToFloating = ImmutableTransformF.Translation(-floatingArea.x.f, -floatingArea.y.f)
         val floatingImage = Hybrid.imageCreator.createImage(floatingArea.width, floatingArea.height)
         val compositingImage = Hybrid.imageCreator.createImage(floatingArea.width, floatingArea.height)
 
@@ -173,7 +173,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
             val gc = floatingImage.graphics
 
             if( backgroundColor != null) {
-                gc.transform = Transform.IdentityMatrix
+                gc.transform = ImmutableTransformF.Identity
                 gc.color = backgroundColor ?: Colors.RED
                 gc.fillRect(0, 0, floatingArea.width, floatingArea.height)
                 gc.composite = DST_OUT
@@ -208,7 +208,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
             igc.renderImage(mask, 0, 0)
 
             // Step 5: Fill in the empty spot with the image from step 3
-            igc.transform = Transform.IdentityMatrix
+            igc.transform = ImmutableTransformF.Identity
             igc.composite = SRC_OVER
             igc.renderImage(compositingImage, floatingArea.x, floatingArea.y)
 
@@ -227,7 +227,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
      *     product, the lambda still has access to it.
      * @return doMasked may not execute the Lambda at all (if the selection doesn't intersect the image) in which case it returns false
      */
-    inline fun doMasked(image: RawImage, tBaseToImage: Transform? = null, backgroundColor: Color? = null, crossinline lambda: (RawImage)->Any?) : Boolean{
+    inline fun doMasked(image: RawImage, tBaseToImage: ITransformF? = null, backgroundColor: Color? = null, crossinline lambda: (RawImage)->Any?) : Boolean{
         return doMaskedRequiringTransform(image, tBaseToImage, backgroundColor) {raw, UNUSED -> lambda.invoke(raw)}
     }
 
@@ -241,7 +241,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
             gc.color = Colors.WHITE
             gc.fillRect(1,1,rect.width,rect.height)
 
-            return Selection( img, spirite.base.util.linear.Transform.TranslationMatrix(rect.x-1f, rect.y-1f))
+            return Selection( img, spirite.base.util.linear.ImmutableTransformF.Translation(rect.x-1f, rect.y-1f))
         }
     }
 }

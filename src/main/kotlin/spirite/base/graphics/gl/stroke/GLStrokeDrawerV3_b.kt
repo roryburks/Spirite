@@ -7,7 +7,7 @@ import spirite.base.pen.stroke.StrokeParams
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import kotlin.math.PI
@@ -33,7 +33,7 @@ class GLStrokeDrawerV3_b(
         else -> StrokeV2ApplyCall.IntensifyMethod.DEFAULT
     }
 
-    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: Transform? = null) {
+    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: ITransformF? = null) {
         if( true /* 330 */ ) {
             target.graphics.clear()
             gle.setTarget(target)

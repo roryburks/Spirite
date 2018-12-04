@@ -6,7 +6,7 @@ import spirite.base.pen.stroke.StrokeParams.InterpolationMethod.CUBIC_SPLINE
 import spirite.base.pen.stroke.StrokeParams.InterpolationMethod.NONE
 import spirite.base.util.interpolation.CubicSplineInterpolator2D
 import spirite.base.util.interpolation.Interpolator2D
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 
 class StrokeBuilder(
@@ -14,7 +14,7 @@ class StrokeBuilder(
         val params: StrokeParams,
         val arranged: ArrangedMediumData
 ) {
-    private val tWorkspaceToComposite : Transform
+    private val tWorkspaceToComposite : ITransformF
     private val baseStates = mutableListOf<PenState>()
     private val width: Int
     private val height: Int

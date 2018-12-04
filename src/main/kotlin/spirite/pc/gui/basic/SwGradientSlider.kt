@@ -1,6 +1,6 @@
 package spirite.pc.gui.basic
 
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.UIUtil
 import spirite.gui.components.basic.GradientSliderNonUI

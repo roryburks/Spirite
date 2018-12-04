@@ -6,8 +6,7 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.MediumBasedAnimation
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.groupTree.GroupTree.*
-import spirite.base.imageData.undo.NullAction
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 

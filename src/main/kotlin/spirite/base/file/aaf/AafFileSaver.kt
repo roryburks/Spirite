@@ -34,8 +34,8 @@ object AafFileSaver {
             ra.writeShort(things.size)  // [2] : Number of Chunks
             for( (img,transformed) in things) {
                 ra.writeShort(imgIdByImage[img]!!)  // [2]: ChunkId
-                ra.writeShort(transformed.renderRubric.transform.m02.round + img.x) // [2] OffsetX
-                ra.writeShort(transformed.renderRubric.transform.m12.round + img.y) // [2] OffsetY
+                ra.writeShort(transformed.renderRubric.transform.m02f.round + img.x) // [2] OffsetX
+                ra.writeShort(transformed.renderRubric.transform.m12f.round + img.y) // [2] OffsetY
                 ra.writeInt(transformed.drawDepth)  // [4] : DrawDepth
             }
         }

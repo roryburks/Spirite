@@ -1,10 +1,10 @@
 package spirite.base.graphics
 
 import spirite.base.graphics.Composite.SRC
-import spirite.base.util.MathUtil
-import spirite.base.util.RectangleUtil
+import rb.vectrix.mathUtil.RectangleUtil
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
 
@@ -34,7 +34,7 @@ class DynamicImage(
 
     fun drawToImage(drawer: (RawImage) -> Unit,
                     compositionWidth: Int, compositionHeight: Int,
-                    tImageToComposition: Transform = Transform.IdentityMatrix)
+                    tImageToComposition: ITransformF = ImmutableTransformF.Identity)
     {
         val checkoutContext = checkoutRaw(compositionWidth, compositionHeight, tImageToComposition)
         drawer.invoke(checkoutContext.buffer)
@@ -43,14 +43,14 @@ class DynamicImage(
 
     // region Checkin/Checkout
     private inner class CompositionContext(
-            val tImageToComposite: Transform,
+            val tImageToComposite: ITransformF,
             val compositionWidth : Int,
             val compositionHeight : Int)
     {
         val buffer = Hybrid.imageCreator.createImage(compositionWidth, compositionHeight)
     }
 
-    private fun checkoutRaw(compositionWidth: Int, compositionHeight: Int, tImageToComposition: Transform) : CompositionContext {
+    private fun checkoutRaw(compositionWidth: Int, compositionHeight: Int, tImageToComposition: ITransformF) : CompositionContext {
         val newContext = CompositionContext(tImageToComposition, compositionWidth, compositionHeight)
 
         val gc = newContext.buffer.graphics
@@ -62,7 +62,7 @@ class DynamicImage(
     }
 
     private fun checkin(context: CompositionContext) {
-        val tCompositeToImage = context.tImageToComposite.invert()
+        val tCompositeToImage = context.tImageToComposite.invert() ?: ImmutableTransformF.Identity
 
 
         // Step 1: Draw Composite and Base to the combining image

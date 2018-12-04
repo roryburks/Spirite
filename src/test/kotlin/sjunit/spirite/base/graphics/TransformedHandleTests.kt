@@ -9,13 +9,11 @@ import spirite.base.graphics.RenderRubric
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.MediumHandle
 import spirite.base.util.Colors
-import spirite.base.util.linear.MutableTransform
-import spirite.base.util.linear.Transform.Companion
+import spirite.base.util.linear.MutableTransformF
+import spirite.base.util.linear.ITransformF.Companion
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
-import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.graphics.ImageBI
-import spirite.pc.resources.JClassScriptService
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.test.assertEquals
@@ -32,17 +30,17 @@ class TransformedHandleTests {
                 MediumHandle(workspace, 0),
                 0,
                 RenderRubric(
-                        MutableTransform.RotationMatrix(30f),
+                        MutableTransformF.RotationMatrix(30f),
                         0.5f,
                         RenderMethod(COLOR_CHANGE_HUE, Colors.RED.argb)))
         val rubric2 = RenderRubric(
-                MutableTransform.TranslationMatrix(-10f,-10f),
+                MutableTransformF.TranslationMatrix(-10f,-10f),
                 0.5f,
                 RenderMethod(DISOLVE, Colors.RED.argb))
 
         val tf3 = tf.stack(rubric2)
 
-        val tExpected = MutableTransform.RotationMatrix(30f)
+        val tExpected = MutableTransformF.RotationMatrix(30f)
         tExpected.preTranslate(-10f, -10f)
 
         assertEquals(COLOR_CHANGE_HUE,tf3.renderRubric.methods[0].methodType)
@@ -52,7 +50,7 @@ class TransformedHandleTests {
     }
 
     @test fun renders() {
-        val rotate = MutableTransform.TranslationMatrix(-50f,-50f)
+        val rotate = MutableTransformF.TranslationMatrix(-50f,-50f)
         rotate.preRotate(1f)
         rotate.preTranslate(50f,50f)
         val tf = TransformedHandle(

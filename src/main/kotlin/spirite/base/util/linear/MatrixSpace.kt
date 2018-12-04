@@ -1,5 +1,6 @@
 package spirite.base.util.linear
 
+import spirite.base.util.linear.ImmutableTransformF.Companion
 import java.util.*
 
 /**
@@ -7,10 +8,10 @@ import java.util.*
  * connected graph of transformations is given and all other transformations are calculated and cached as requested.
  */
 class MatrixSpace(
-        map: Map<Pair<String,String>, Transform>
+        map: Map<Pair<String,String>, ITransformF>
 )
 {
-    private val map = mutableMapOf<Pair<String,String>,Transform>()
+    private val map = mutableMapOf<Pair<String,String>,ITransformF>()
     private val keys : List<String>
 
     init {
@@ -18,24 +19,24 @@ class MatrixSpace(
         keys = (map.keys.map { it.first } union map.keys.map{it.second}).distinct()
     }
 
-    fun extend(moreEntries: Map<Pair<String,String>, Transform>) :MatrixSpace {
-        val newMap = mutableMapOf<Pair<String,String>,Transform>()
+    fun extend(moreEntries: Map<Pair<String,String>, ITransformF>) :MatrixSpace {
+        val newMap = mutableMapOf<Pair<String,String>,ITransformF>()
         newMap.putAll(map)
         newMap.putAll(moreEntries)
         return MatrixSpace( newMap)
     }
 
-    fun convertSpace( from: String, to: String):Transform {
+    fun convertSpace( from: String, to: String):ITransformF {
         // Note: could cache all the transforms from A to B during the attempt to find a groupLink
         if( from == to)
-            return Transform.IdentityMatrix
+            return ImmutableTransformF.Identity
 
         var key = Pair(from, to)
         if( map.containsKey( key))
             return map[key]!!
         var inverseKey = Pair(to,from)
         if( map.containsKey(inverseKey)) {
-            val inv = map[inverseKey]!!.invert()
+            val inv = map[inverseKey]!!.invert() ?: ImmutableTransformF.Identity
             map[key] = inv
             return inv
         }
@@ -65,7 +66,7 @@ class MatrixSpace(
 
                 inverseKey = Pair(iTo, entry.current)
                 if( map.containsKey(inverseKey)) {
-                    val trans = map[inverseKey]!!.invert() * entry.transform
+                    val trans = map[inverseKey]!!.invert() ?: Companion.Identity * entry.transform
                     if( iTo == to) {
                         map[Pair(from,to)] = trans
                         return trans
@@ -84,6 +85,6 @@ class MatrixSpace(
     private inner class MapNavigationState(
             val current : String,
             val remaining : MutableList<String>,
-            val transform : Transform = Transform.IdentityMatrix
+            val transform : ITransformF = ImmutableTransformF.Identity
     )
 }

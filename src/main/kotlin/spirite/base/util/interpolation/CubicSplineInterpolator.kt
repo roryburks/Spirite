@@ -1,6 +1,6 @@
 package spirite.base.util.interpolation
 
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.linear.Vec2f
 import java.util.*
 

@@ -1,6 +1,6 @@
 package spirite.base.graphics.fill
 
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import java.util.*
 
 object V0FillArrayAlgorithm : IFillArrayAlgorithm{

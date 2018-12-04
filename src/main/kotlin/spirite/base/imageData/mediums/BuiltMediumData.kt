@@ -3,7 +3,8 @@ package spirite.base.imageData.mediums
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.MMediumRepository
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
@@ -21,9 +22,9 @@ abstract class BuiltMediumData(
     //abstract val yi: Int
 
 
-    abstract val tMediumToComposite: Transform
-    val tCompositeToMedium: Transform by lazy { tMediumToComposite.invert() }
-    abstract val tWorkspaceToComposite: Transform
+    abstract val tMediumToComposite: ITransformF
+    val tCompositeToMedium: ITransformF by lazy { tMediumToComposite.invert() ?: ImmutableTransformF.Identity }
+    abstract val tWorkspaceToComposite: ITransformF
 
     // Note: Can be changed to return Boolean if we want to be able to differentiate between image-changing calls and
     //  non-image-changing calls (assuming there's ever a need for such a thing)
@@ -33,11 +34,11 @@ abstract class BuiltMediumData(
             MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
             return
         }
-        mediumRepo.changeMedium(arranged.handle.id, {
+        mediumRepo.changeMedium(arranged.handle.id) {
             doing = true
             _drawOnComposite(drawer)
             doing = false
-        })
+        }
         arranged.handle.refresh()
     }
 
@@ -46,11 +47,11 @@ abstract class BuiltMediumData(
             MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
             return
         }
-        mediumRepo.changeMedium(arranged.handle.id, {
+        mediumRepo.changeMedium(arranged.handle.id) {
             doing = true
             _rawAccessComposite(doer)
             doing = false
-        })
+        }
         arranged.handle.refresh()
     }
 

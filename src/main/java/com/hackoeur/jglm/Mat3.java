@@ -33,21 +33,21 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * COLUMN MAJOR LAYOUT: The first index indicates the COLUMN NUMBER.
 //	 * The second is the ROW NUMBER.
 //	 *
-//	 * | A D G |   | m00 m10 m20 |
-//	 * | B E H | = | m01 m11 m21 |
-//	 * | C F I |   | m02 m12 m22 |
+//	 * | A D G |   | m00f m10f m20f |
+//	 * | B E H | = | m01f m11f m21f |
+//	 * | C F I |   | m02f m12f m22f |
 //	 */
-//	final float m00, m10, m20;
-//	final float m01, m11, m21;
-//	final float m02, m12, m22;
+//	final float m00f, m10f, m20f;
+//	final float m01f, m11f, m21f;
+//	final float m02f, m12f, m22f;
 //
 //	/**
 //	 * Creates a matrix with all elements equal to ZERO.
 //	 */
 //	public Mat3() {
-//		m00 = m10 = m20 = 0f;
-//		m01 = m11 = m21 = 0f;
-//		m02 = m12 = m22 = 0f;
+//		m00f = m10f = m20f = 0f;
+//		m01f = m11f = m21f = 0f;
+//		m02f = m12f = m22f = 0f;
 //	}
 //
 //	/**
@@ -56,10 +56,10 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param diagonalValue
 //	 */
 //	public Mat3(final float diagonalValue) {
-//		m00 = m11 = m22 = diagonalValue;
-//		m10 = m20 = 0f;
-//		m01 = m21 = 0f;
-//		m02 = m12 = 0f;
+//		m00f = m11f = m22f = diagonalValue;
+//		m10f = m20f = 0f;
+//		m01f = m21f = 0f;
+//		m02f = m12f = 0f;
 //	}
 //
 //	/**
@@ -83,9 +83,9 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param col2 vector for the third column
 //	 */
 //	public Mat3(final Vec3f col0, final Vec3f col1, final Vec3f col2) {
-//		this.m00 = col0.xi; this.m10 = col1.xi; this.m20 = col2.xi;
-//		this.m01 = col0.yi; this.m11 = col1.yi; this.m21 = col2.yi;
-//		this.m02 = col0.zf; this.m12 = col1.zf; this.m22 = col2.zf;
+//		this.m00f = col0.xi; this.m10f = col1.xi; this.m20f = col2.xi;
+//		this.m01f = col0.yi; this.m11f = col1.yi; this.m21f = col2.yi;
+//		this.m02f = col0.zf; this.m12f = col1.zf; this.m22f = col2.zf;
 //	}
 //
 //	/**
@@ -119,19 +119,19 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //			final float x10, final float x11, final float x12,
 //			final float x20, final float x21, final float x22) {
 //		// Col 1
-//		this.m00 = x00;
-//		this.m01 = x01;
-//		this.m02 = x02;
+//		this.m00f = x00;
+//		this.m01f = x01;
+//		this.m02f = x02;
 //
 //		// Col 2
-//		this.m10 = x10;
-//		this.m11 = x11;
-//		this.m12 = x12;
+//		this.m10f = x10;
+//		this.m11f = x11;
+//		this.m12f = x12;
 //
 //		// Col 3
-//		this.m20 = x20;
-//		this.m21 = x21;
-//		this.m22 = x22;
+//		this.m20f = x20;
+//		this.m21f = x21;
+//		this.m22f = x22;
 //	}
 //
 //	/**
@@ -159,19 +159,19 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		int i = 0;
 //
 //		// Col 1
-//		m00 = mat[i++];
-//		m01 = mat[i++];
-//		m02 = mat[i++];
+//		m00f = mat[i++];
+//		m01f = mat[i++];
+//		m02f = mat[i++];
 //
 //		// Col 2
-//		m10 = mat[i++];
-//		m11 = mat[i++];
-//		m12 = mat[i++];
+//		m10f = mat[i++];
+//		m11f = mat[i++];
+//		m12f = mat[i++];
 //
 //		// Col 3
-//		m20 = mat[i++];
-//		m21 = mat[i++];
-//		m22 = mat[i++];
+//		m20f = mat[i++];
+//		m21f = mat[i++];
+//		m22f = mat[i++];
 //	}
 //
 //	/**
@@ -185,17 +185,17 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //		final int startPos = buffer.position();
 //
-//		m00 = buffer.get();
-//		m01 = buffer.get();
-//		m02 = buffer.get();
+//		m00f = buffer.get();
+//		m01f = buffer.get();
+//		m02f = buffer.get();
 //
-//		m10 = buffer.get();
-//		m11 = buffer.get();
-//		m12 = buffer.get();
+//		m10f = buffer.get();
+//		m11f = buffer.get();
+//		m12f = buffer.get();
 //
-//		m20 = buffer.get();
-//		m21 = buffer.get();
-//		m22 = buffer.get();
+//		m20f = buffer.get();
+//		m21f = buffer.get();
+//		m22f = buffer.get();
 //
 //		buffer.position(startPos);
 //	}
@@ -206,17 +206,17 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param mat matrix to copy
 //	 */
 //	public Mat3(final Mat3 mat) {
-//		this.m00 = mat.m00;
-//		this.m01 = mat.m01;
-//		this.m02 = mat.m02;
+//		this.m00f = mat.m00f;
+//		this.m01f = mat.m01f;
+//		this.m02f = mat.m02f;
 //
-//		this.m10 = mat.m10;
-//		this.m11 = mat.m11;
-//		this.m12 = mat.m12;
+//		this.m10f = mat.m10f;
+//		this.m11f = mat.m11f;
+//		this.m12f = mat.m12f;
 //
-//		this.m20 = mat.m20;
-//		this.m21 = mat.m21;
-//		this.m22 = mat.m22;
+//		this.m20f = mat.m20f;
+//		this.m21f = mat.m21f;
+//		this.m22f = mat.m22f;
 //	}
 //
 //	@Override
@@ -236,11 +236,11 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //		switch (columnIndex) {
 //		case 0:
-//			return (T) new Vec3f(m00, m01, m02);
+//			return (T) new Vec3f(m00f, m01f, m02f);
 //		case 1:
-//			return (T) new Vec3f(m10, m11, m12);
+//			return (T) new Vec3f(m10f, m11f, m12f);
 //		case 2:
-//			return (T) new Vec3f(m20, m21, m22);
+//			return (T) new Vec3f(m20f, m21f, m22f);
 //		default:
 //			throw new IllegalArgumentException("Invalid column index = " + columnIndex);
 //		}
@@ -251,9 +251,9 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	public <T extends Vec> Iterable<T> getColumns() {
 //		List<Vec3f> cols = new ArrayList<Vec3f>(3);
 //
-//		cols.add(new Vec3f(m00, m01, m02));
-//		cols.add(new Vec3f(m10, m11, m12));
-//		cols.add(new Vec3f(m20, m21, m22));
+//		cols.add(new Vec3f(m00f, m01f, m02f));
+//		cols.add(new Vec3f(m10f, m11f, m12f));
+//		cols.add(new Vec3f(m20f, m21f, m22f));
 //
 //		return (Iterable<T>) cols;
 //	}
@@ -264,19 +264,19 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		final int startPos = buffer.position();
 //
 //		// Col 1
-//		buffer.put(m00)
-//			.put(m01)
-//			.put(m02);
+//		buffer.put(m00f)
+//			.put(m01f)
+//			.put(m02f);
 //
 //		// Col 2
-//		buffer.put(m10)
-//			.put(m11)
-//			.put(m12);
+//		buffer.put(m10f)
+//			.put(m11f)
+//			.put(m12f);
 //
 //		// Col 3
-//		buffer.put(m20)
-//			.put(m21)
-//			.put(m22);
+//		buffer.put(m20f)
+//			.put(m21f)
+//			.put(m22f);
 //
 //		buffer.position(startPos);
 //
@@ -285,56 +285,56 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //	@Override
 //	public boolean isIdentity() {
-//		return Compare.equals(m00, 1f, Compare.MAT_EPSILON)
-//				&& Compare.equals(m11, 1f, Compare.MAT_EPSILON)
-//				&& Compare.equals(m22, 1f, Compare.MAT_EPSILON)
+//		return Compare.equals(m00f, 1f, Compare.MAT_EPSILON)
+//				&& Compare.equals(m11f, 1f, Compare.MAT_EPSILON)
+//				&& Compare.equals(m22f, 1f, Compare.MAT_EPSILON)
 //
-//				&& Compare.equalsZero(m01)
-//				&& Compare.equalsZero(m02)
+//				&& Compare.equalsZero(m01f)
+//				&& Compare.equalsZero(m02f)
 //
-//				&& Compare.equalsZero(m10)
-//				&& Compare.equalsZero(m12)
+//				&& Compare.equalsZero(m10f)
+//				&& Compare.equalsZero(m12f)
 //
-//				&& Compare.equalsZero(m20)
-//				&& Compare.equalsZero(m21);
+//				&& Compare.equalsZero(m20f)
+//				&& Compare.equalsZero(m21f);
 //	}
 //
 //	@Override
 //	public boolean isZero() {
-//		return Compare.equalsZero(m00)
-//				&& Compare.equalsZero(m01)
-//				&& Compare.equalsZero(m02)
+//		return Compare.equalsZero(m00f)
+//				&& Compare.equalsZero(m01f)
+//				&& Compare.equalsZero(m02f)
 //
-//				&& Compare.equalsZero(m10)
-//				&& Compare.equalsZero(m11)
-//				&& Compare.equalsZero(m12)
+//				&& Compare.equalsZero(m10f)
+//				&& Compare.equalsZero(m11f)
+//				&& Compare.equalsZero(m12f)
 //
-//				&& Compare.equalsZero(m20)
-//				&& Compare.equalsZero(m21)
-//				&& Compare.equalsZero(m22);
+//				&& Compare.equalsZero(m20f)
+//				&& Compare.equalsZero(m21f)
+//				&& Compare.equalsZero(m22f);
 //	}
 //
 //	public Mat3 multiply(final float a) {
 //		return new Mat3(
-//				m00*a, m01*a, m02*a,
-//				m10*a, m11*a, m12*a,
-//				m20*a, m21*a, m22*a
+//				m00f*a, m01f*a, m02f*a,
+//				m10f*a, m11f*a, m12f*a,
+//				m20f*a, m21f*a, m22f*a
 //		);
 //	}
 //
 //	public Mat3 multiply(final Mat3 mat) {
 //		return new Mat3(
-//				this.m00 * mat.m00 + this.m10 * mat.m01 + this.m20 * mat.m02, // m00
-//				this.m01 * mat.m00 + this.m11 * mat.m01 + this.m21 * mat.m02, // m01
-//				this.m02 * mat.m00 + this.m12 * mat.m01 + this.m22 * mat.m02, // m02
+//				this.m00f * mat.m00f + this.m10f * mat.m01f + this.m20f * mat.m02f, // m00f
+//				this.m01f * mat.m00f + this.m11f * mat.m01f + this.m21f * mat.m02f, // m01f
+//				this.m02f * mat.m00f + this.m12f * mat.m01f + this.m22f * mat.m02f, // m02f
 //
-//				this.m00 * mat.m10 + this.m10 * mat.m11 + this.m20 * mat.m12, // m10
-//				this.m01 * mat.m10 + this.m11 * mat.m11 + this.m21 * mat.m12, // m11
-//				this.m02 * mat.m10 + this.m12 * mat.m11 + this.m22 * mat.m12, // m12
+//				this.m00f * mat.m10f + this.m10f * mat.m11f + this.m20f * mat.m12f, // m10f
+//				this.m01f * mat.m10f + this.m11f * mat.m11f + this.m21f * mat.m12f, // m11f
+//				this.m02f * mat.m10f + this.m12f * mat.m11f + this.m22f * mat.m12f, // m12f
 //
-//				this.m00 * mat.m20 + this.m10 * mat.m21 + this.m20 * mat.m22, // m20
-//				this.m01 * mat.m20 + this.m11 * mat.m21 + this.m21 * mat.m22, // m21
-//				this.m02 * mat.m20 + this.m12 * mat.m21 + this.m22 * mat.m22  // m22
+//				this.m00f * mat.m20f + this.m10f * mat.m21f + this.m20f * mat.m22f, // m20f
+//				this.m01f * mat.m20f + this.m11f * mat.m21f + this.m21f * mat.m22f, // m21f
+//				this.m02f * mat.m20f + this.m12f * mat.m21f + this.m22f * mat.m22f  // m22f
 //		);
 //	}
 //
@@ -348,37 +348,37 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 */
 //	public Vec3f multiply(final Vec3f vec) {
 //		return new Vec3f(
-//				m00 * vec.xi + m10 * vec.yi + m20 * vec.zf,
-//				m01 * vec.xi + m11 * vec.yi + m21 * vec.zf,
-//				m02 * vec.xi + m12 * vec.yi + m22 * vec.zf
+//				m00f * vec.xi + m10f * vec.yi + m20f * vec.zf,
+//				m01f * vec.xi + m11f * vec.yi + m21f * vec.zf,
+//				m02f * vec.xi + m12f * vec.yi + m22f * vec.zf
 //		);
 //	}
 //
 //	public Mat3 transpose() {
 //		return new Mat3(
-//				m00, m10, m20,
-//				m01, m11, m21,
-//				m02, m12, m22
+//				m00f, m10f, m20f,
+//				m01f, m11f, m21f,
+//				m02f, m12f, m22f
 //		);
 //	}
 //
-//	public float determinant() {
-//		return m00 * (m11 * m22 - m12 * m21) - m01 * (m10 * m22 - m12 * m20) + m02 * (m10 * m21 - m11 * m20);
+//	public float determinantF() {
+//		return m00f * (m11f * m22f - m12f * m21f) - m01f * (m10f * m22f - m12f * m20f) + m02f * (m10f * m21f - m11f * m20f);
 //	}
 //
 //	@Override
 //	public int hashCode() {
 //		final int prime = 31;
 //		int result = 1;
-//		result = prime * result + Float.floatToIntBits(m00);
-//		result = prime * result + Float.floatToIntBits(m01);
-//		result = prime * result + Float.floatToIntBits(m02);
-//		result = prime * result + Float.floatToIntBits(m10);
-//		result = prime * result + Float.floatToIntBits(m11);
-//		result = prime * result + Float.floatToIntBits(m12);
-//		result = prime * result + Float.floatToIntBits(m20);
-//		result = prime * result + Float.floatToIntBits(m21);
-//		result = prime * result + Float.floatToIntBits(m22);
+//		result = prime * result + Float.floatToIntBits(m00f);
+//		result = prime * result + Float.floatToIntBits(m01f);
+//		result = prime * result + Float.floatToIntBits(m02f);
+//		result = prime * result + Float.floatToIntBits(m10f);
+//		result = prime * result + Float.floatToIntBits(m11f);
+//		result = prime * result + Float.floatToIntBits(m12f);
+//		result = prime * result + Float.floatToIntBits(m20f);
+//		result = prime * result + Float.floatToIntBits(m21f);
+//		result = prime * result + Float.floatToIntBits(m22f);
 //		return result;
 //	}
 //
@@ -394,31 +394,31 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //			return false;
 //		}
 //		Mat3 other = (Mat3) obj;
-//		if (Float.floatToIntBits(m00) != Float.floatToIntBits(other.m00)) {
+//		if (Float.floatToIntBits(m00f) != Float.floatToIntBits(other.m00f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m01) != Float.floatToIntBits(other.m01)) {
+//		if (Float.floatToIntBits(m01f) != Float.floatToIntBits(other.m01f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m02) != Float.floatToIntBits(other.m02)) {
+//		if (Float.floatToIntBits(m02f) != Float.floatToIntBits(other.m02f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m10) != Float.floatToIntBits(other.m10)) {
+//		if (Float.floatToIntBits(m10f) != Float.floatToIntBits(other.m10f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m11) != Float.floatToIntBits(other.m11)) {
+//		if (Float.floatToIntBits(m11f) != Float.floatToIntBits(other.m11f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m12) != Float.floatToIntBits(other.m12)) {
+//		if (Float.floatToIntBits(m12f) != Float.floatToIntBits(other.m12f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m20) != Float.floatToIntBits(other.m20)) {
+//		if (Float.floatToIntBits(m20f) != Float.floatToIntBits(other.m20f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m21) != Float.floatToIntBits(other.m21)) {
+//		if (Float.floatToIntBits(m21f) != Float.floatToIntBits(other.m21f)) {
 //			return false;
 //		}
-//		if (Float.floatToIntBits(m22) != Float.floatToIntBits(other.m22)) {
+//		if (Float.floatToIntBits(m22f) != Float.floatToIntBits(other.m22f)) {
 //			return false;
 //		}
 //		return true;
@@ -440,26 +440,26 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //		final Mat3 other = (Mat3) obj;
 //
-//		return Compare.equals(m00, other.m00, epsilon)
-//				&& Compare.equals(m01, other.m01, epsilon)
-//				&& Compare.equals(m02, other.m02, epsilon)
+//		return Compare.equals(m00f, other.m00f, epsilon)
+//				&& Compare.equals(m01f, other.m01f, epsilon)
+//				&& Compare.equals(m02f, other.m02f, epsilon)
 //
-//				&& Compare.equals(m10, other.m10, epsilon)
-//				&& Compare.equals(m11, other.m11, epsilon)
-//				&& Compare.equals(m12, other.m12, epsilon)
+//				&& Compare.equals(m10f, other.m10f, epsilon)
+//				&& Compare.equals(m11f, other.m11f, epsilon)
+//				&& Compare.equals(m12f, other.m12f, epsilon)
 //
-//				&& Compare.equals(m20, other.m20, epsilon)
-//				&& Compare.equals(m21, other.m21, epsilon)
-//				&& Compare.equals(m22, other.m22, epsilon);
+//				&& Compare.equals(m20f, other.m20f, epsilon)
+//				&& Compare.equals(m21f, other.m21f, epsilon)
+//				&& Compare.equals(m22f, other.m22f, epsilon);
 //	}
 //
 //	public String toString() {
 //		return new StringBuilder()
 //			.append(getClass().getSimpleName())
 //			.append("{")
-//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f", m00, m10, m20))
-//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f", m01, m11, m21))
-//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f", m02, m12, m22))
+//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f", m00f, m10f, m20f))
+//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f", m01f, m11f, m21f))
+//			.append("\n ").append(String.format("%8.5f %8.5f %8.5f", m02f, m12f, m22f))
 //			.append("\n}")
 //			.toString();
 //	}

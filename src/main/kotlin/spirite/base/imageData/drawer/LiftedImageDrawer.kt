@@ -7,13 +7,13 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.util.Color
-import spirite.base.util.MathUtil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import rb.vectrix.linear.Vec2f
-import spirite.base.util.RectangleUtil
+import rb.vectrix.mathUtil.RectangleUtil
+import spirite.base.util.linear.ImmutableTransformF
 
 class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         IClearModule,
@@ -42,7 +42,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         return true
     }
 
-    override fun transform(trans: Transform) {
+    override fun transform(trans: ITransformF) {
         val mask = workspace.selectionEngine.selection ?: return
         val rect = when {
             mask.transform == null -> Rect(mask.width, mask.height)
@@ -52,9 +52,9 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         val cx = rect.x + rect.width /2f
         val cy = rect.y + rect.height /2f
 
-        val effectiveTrans = Transform.TranslationMatrix(cx,cy) * trans * Transform.TranslationMatrix(-cx,-cy)
+        val effectiveTrans = ImmutableTransformF.Translation(cx,cy) * trans * ImmutableTransformF.Translation(-cx,-cy)
 
-        workspace.undoEngine.doAsAggregateAction("Lift and Transform") {
+        workspace.undoEngine.doAsAggregateAction("Lift and ITransformF") {
             workspace.selectionEngine.transformSelection(effectiveTrans, true)
             workspace.selectionEngine.bakeTranslationIntoLifted()
         }
@@ -77,8 +77,8 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         val cx = lifted.width / 2f
         val cy = lifted.height / 2f
 
-        workspace.selectionEngine.proposingTransform = Transform.TranslationMatrix(cx,cy) *
-                workspace.toolset.Reshape.transform * Transform.TranslationMatrix(-cx,-cy)
+        workspace.selectionEngine.proposingTransform = ImmutableTransformF.Translation(cx,cy) *
+                workspace.toolset.Reshape.transform * ImmutableTransformF.Translation(-cx,-cy)
     }
 
     override fun endManipulatingTransform() {
@@ -100,7 +100,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
     }
 
     // Replaces the Lifted Image with one that is (presumably) modified by the lambda
-    private inline fun doToUnderlyingWithTrans(lambda: (RawImage, Transform?)->Any?) {
+    private inline fun doToUnderlyingWithTrans(lambda: (RawImage, ITransformF?)->Any?) {
         val selection = workspace.selectionEngine.selection ?: return
         val lifted = workspace.selectionEngine.liftedData as? LiftedImageData ?: return
 

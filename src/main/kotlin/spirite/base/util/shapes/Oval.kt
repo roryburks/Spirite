@@ -2,7 +2,7 @@ package spirite.base.util.shapes
 
 import com.hackoeur.jglm.support.FastMath
 import spirite.base.graphics.gl.GLPrimitive
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import spirite.base.util.compaction.FloatCompactor
 import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC

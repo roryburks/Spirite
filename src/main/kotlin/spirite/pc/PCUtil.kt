@@ -3,8 +3,8 @@ package spirite.pc
 import spirite.base.graphics.gl.IGLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.glu.GLC
-import spirite.base.util.linear.MutableTransform
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.MutableTransformF
+import spirite.base.util.linear.ITransformF
 import spirite.pc.JOGL.JOGL.JOGLInt32Source
 import spirite.pc.util.RasterHelper
 import java.awt.geom.AffineTransform
@@ -51,15 +51,15 @@ fun IGLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int) : Buff
 }
 
 /** Converts a MatTrans to an AffineTransform  */
-fun Transform.toAT(): AffineTransform {
+fun ITransformF.toAT(): AffineTransform {
     return AffineTransform(
-            this.m00, this.m10, this.m01,
-            this.m11, this.m02, this.m12)
+            this.m00f, this.m10f, this.m01f,
+            this.m11f, this.m02f, this.m12f)
 }
 
 /** Converts an AffineTransform to a MatTrans  */
-fun AffineTransform.toMT( ): MutableTransform {
-    return MutableTransform(
+fun AffineTransform.toMT( ): MutableTransformF {
+    return MutableTransformF(
             this.scaleX.toFloat(), this.shearX.toFloat(), this.translateX.toFloat(),
             this.shearY.toFloat(), this.scaleY.toFloat(), this.translateY.toFloat())
 }

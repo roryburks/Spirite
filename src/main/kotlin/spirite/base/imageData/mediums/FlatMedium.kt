@@ -8,7 +8,8 @@ import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import rb.extendo.dataStructures.SinglyList
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 
 /***
  * A FlatMedium is a thin wrapper for a RawImage, exposing its functionality to the program.
@@ -39,8 +40,8 @@ class FlatMedium(
         override val width: Int get() = image.width
         override val height: Int get() = image.height
 
-        override val tMediumToComposite: Transform get() = Transform.IdentityMatrix
-        override val tWorkspaceToComposite: Transform by lazy { arranged.tMediumToWorkspace.invert() }
+        override val tMediumToComposite: ITransformF get() = ImmutableTransformF.Identity
+        override val tWorkspaceToComposite: ITransformF by lazy { arranged.tMediumToWorkspace.invert() ?: ImmutableTransformF.Identity }
 
         override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {
             val gc = image.graphics

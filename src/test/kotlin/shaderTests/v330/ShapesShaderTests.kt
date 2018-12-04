@@ -88,7 +88,7 @@ class ShapesShaderTests
             gl.uniform3f(ShaderTests.getAndVerifyLocation(program,"u_color"),1f, 0f, 0f)
             gl.uniform1f(ShaderTests.getAndVerifyLocation(program,"u_alpha"), 1f)
 
-            val mat = Mat4(MatrixBuilder.wrapTransformAs4x4(Transform.IdentityMatrix)).transpose()
+            val mat = Mat4f(MatrixBuilder.wrapTransformAs4x4(ImmutableTransformF.Identity)).transpose()
             gl.uniformMatrix4fv(ShaderTests.getAndVerifyLocation(program, "worldMatrix"), mat.toIFloat32Source(gl))
         }
 

@@ -36,7 +36,7 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param zFar far plane distance from the viewer to the far clipping plane (always positive)
 //	 * @return
 //	 */
-//	public static final Mat4 perspective(final float fovy, final float aspect, final float zNear, final float zFar) {
+//	public static final Mat4f perspective(final float fovy, final float aspect, final float zNear, final float zFar) {
 //		final float halfFovyRadians = (float) FastMath.toRadians( (fovy / 2.0f) );
 //		final float range = (float) FastMath.tan(halfFovyRadians) * zNear;
 //		final float left = -range * aspect;
@@ -44,7 +44,7 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		final float bottom = -range;
 //		final float top = range;
 //
-//		return new Mat4(
+//		return new Mat4f(
 //				(2f * zNear) / (right - left), 0f, 0f, 0f,
 //				0f, (2f * zNear) / (top - bottom), 0f, 0f,
 //				0f, 0f, -(zFar + zNear) / (zFar - zNear), -1f,
@@ -65,20 +65,20 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param farVal distance to the far drawDepth clipping plane (must be positive)
 //	 * @return
 //	 */
-//	public static final Mat4 frustum(final float left, final float right, final float bottom, final float top, final float nearVal, final float farVal) {
-//		final float m00 = (2f * nearVal) / (right - left);
-//		final float m11 = (2f * nearVal) / (top - bottom);
-//		final float m20 = (right + left) / (right - left);
-//		final float m21 = (top + bottom) / (top - bottom);
-//		final float m22 = -(farVal + nearVal) / (farVal - nearVal);
-//		final float m23 = -1f;
-//		final float m32 = -(2f * farVal * nearVal) / (farVal - nearVal);
+//	public static final Mat4f frustum(final float left, final float right, final float bottom, final float top, final float nearVal, final float farVal) {
+//		final float m00f = (2f * nearVal) / (right - left);
+//		final float m11f = (2f * nearVal) / (top - bottom);
+//		final float m20f = (right + left) / (right - left);
+//		final float m21f = (top + bottom) / (top - bottom);
+//		final float m22f = -(farVal + nearVal) / (farVal - nearVal);
+//		final float m23f = -1f;
+//		final float m32f = -(2f * farVal * nearVal) / (farVal - nearVal);
 //
-//		return new Mat4(
-//				m00, 0f, 0f, 0f,
-//				0f, m11, 0f, 0f,
-//				m20, m21, m22, m23,
-//				0f, 0f, m32, 0f
+//		return new Mat4f(
+//				m00f, 0f, 0f, 0f,
+//				0f, m11f, 0f, 0f,
+//				m20f, m21f, m22f, m23f,
+//				0f, 0f, m32f, 0f
 //		);
 //	}
 //
@@ -91,13 +91,13 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param up direction of the up vector
 //	 * @return
 //	 */
-//	public static final Mat4 lookAt(final Vec3f eye, final Vec3f center, final Vec3f up) {
+//	public static final Mat4f lookAt(final Vec3f eye, final Vec3f center, final Vec3f up) {
 //		final Vec3f f = center.subtract(eye).getUnitVector();
 //		Vec3f u = up.getUnitVector();
 //		final Vec3f s = f.cross(u).getUnitVector();
 //		u = s.cross(f);
 //
-//		return new Mat4(
+//		return new Mat4f(
 //				s.xi, u.xi, -f.xi, 0f,
 //				s.yi, u.yi, -f.yi, 0f,
 //				s.zf, u.zf, -f.zf, 0f,
@@ -117,19 +117,19 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param zFar distance to farther drawDepth clipping plane (negative if the plane is to be behind the viewer)
 //	 * @return
 //	 */
-//	public static final Mat4 ortho(final float left, final float right, final float bottom, final float top, final float zNear, final float zFar) {
-//		final float m00 = 2f / (right - left);
-//		final float m11 = 2f / (top - bottom);
-//		final float m22 = -2f / (zFar - zNear);
-//		final float m30 = - (right + left) / (right - left);
-//		final float m31 = - (top + bottom) / (top - bottom);
-//		final float m32 = - (zFar + zNear) / (zFar - zNear);
+//	public static final Mat4f ortho(final float left, final float right, final float bottom, final float top, final float zNear, final float zFar) {
+//		final float m00f = 2f / (right - left);
+//		final float m11f = 2f / (top - bottom);
+//		final float m22f = -2f / (zFar - zNear);
+//		final float m30f = - (right + left) / (right - left);
+//		final float m31f = - (top + bottom) / (top - bottom);
+//		final float m32f = - (zFar + zNear) / (zFar - zNear);
 //
-//		return new Mat4(
-//				m00, 0f, 0f, 0f,
-//				0f, m11, 0f, 0f,
-//				0f, 0f, m22, 0f,
-//				m30, m31, m32, 1f
+//		return new Mat4f(
+//				m00f, 0f, 0f, 0f,
+//				0f, m11f, 0f, 0f,
+//				0f, 0f, m22f, 0f,
+//				m30f, m31f, m32f, 1f
 //		);
 //	}
 //
@@ -143,18 +143,18 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param top top horizontal clipping plane
 //	 * @return
 //	 */
-//	public static final Mat4 ortho2d(final float left, final float right, final float bottom, final float top) {
-//		final float m00 = 2f / (right - left);
-//		final float m11 = 2f / (top - bottom);
-//		final float m22 = -1f;
-//		final float m30 = - (right + left) / (right - left);
-//		final float m31 = - (top + bottom) / (top - bottom);
+//	public static final Mat4f ortho2d(final float left, final float right, final float bottom, final float top) {
+//		final float m00f = 2f / (right - left);
+//		final float m11f = 2f / (top - bottom);
+//		final float m22f = -1f;
+//		final float m30f = - (right + left) / (right - left);
+//		final float m31f = - (top + bottom) / (top - bottom);
 //
-//		return new Mat4(
-//				m00, 0f, 0f, 0f,
-//				0f, m11, 0f, 0f,
-//				0f, 0f, m22, 0f,
-//				m30, m31, 0f, 1f
+//		return new Mat4f(
+//				m00f, 0f, 0f, 0f,
+//				0f, m11f, 0f, 0f,
+//				0f, 0f, m22f, 0f,
+//				m30f, m31f, 0f, 1f
 //		);
 //	}
 //
@@ -166,7 +166,7 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param axis The axis to rotate around. Must be a unit-axis.
 //	 * @return This matrix, rotated around the given axis.
 //	 */
-//	public static Mat4 rotate(final float phi, final Vec3f axis) {
+//	public static Mat4f rotate(final float phi, final Vec3f axis) {
 //		double rcos = FastMath.cos(phi);
 //		double rsin = FastMath.sin(phi);
 //		float xi = axis.xi;
@@ -176,19 +176,19 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		Vec4f v2 = new Vec4f((float) (-zf * rsin + xi * yi * (1 - rcos)), (float) (rcos + yi * yi * (1 - rcos)), (float) (xi * rsin + zf * yi * (1 - rcos)), 0);
 //		Vec4f v3 = new Vec4f((float) (yi * rsin + xi * zf * (1 - rcos)), (float) (-xi * rsin + yi * zf * (1 - rcos)), (float) (rcos + zf * zf * (1 - rcos)), 0);
 //		Vec4f v4 = new Vec4f(0, 0, 0, 1);
-//		return new Mat4(v1, v2, v3, v4);
+//		return new Mat4f(v1, v2, v3, v4);
 //	}
 //
-//	public static Mat4 invert(final Mat4 matrix){
+//	public static Mat4f invert(final Mat4f matrix){
 //
-//		final float a[][] = new float[][]{{matrix.m00, matrix.m10, matrix.m20, matrix.m30},
-//				{matrix.m01, matrix.m11, matrix.m21, matrix.m31},
-//				{matrix.m02, matrix.m12, matrix.m22, matrix.m32},
-//				{matrix.m03, matrix.m13, matrix.m23, matrix.m33}};
+//		final float a[][] = new float[][]{{matrix.m00f, matrix.m10f, matrix.m20f, matrix.m30f},
+//				{matrix.m01f, matrix.m11f, matrix.m21f, matrix.m31f},
+//				{matrix.m02f, matrix.m12f, matrix.m22f, matrix.m32f},
+//				{matrix.m03f, matrix.m13f, matrix.m23f, matrix.m33f}};
 //		final int n = 4;
 //		float[][] inverted = invert(a,
 //				n);
-//		return new Mat4(inverted[0][0], inverted[1][0], inverted[2][0], inverted[3][0],
+//		return new Mat4f(inverted[0][0], inverted[1][0], inverted[2][0], inverted[3][0],
 //				inverted[0][1], inverted[1][1], inverted[2][1], inverted[3][1],
 //				inverted[0][2], inverted[1][2], inverted[2][2], inverted[3][2],
 //				inverted[0][3], inverted[1][3], inverted[2][3], inverted[3][3]);
@@ -196,9 +196,9 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //
 //	public static Mat3 invert(final Mat3 matrix){
 //
-//		final float a[][] = new float[][]{{matrix.m00, matrix.m10, matrix.m20},
-//				{matrix.m01, matrix.m11, matrix.m21},
-//				{matrix.m02, matrix.m12, matrix.m22}};
+//		final float a[][] = new float[][]{{matrix.m00f, matrix.m10f, matrix.m20f},
+//				{matrix.m01f, matrix.m11f, matrix.m21f},
+//				{matrix.m02f, matrix.m12f, matrix.m22f}};
 //		final int n = 3;
 //		float[][] inverted = invert(a,
 //				n);
@@ -216,7 +216,7 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //		for (int i = 0; i < n; ++i) {
 //			b[i][i] = 1;
 //		}
-//		// Transform the a into an upper triangle
+//		// ITransformF the a into an upper triangle
 //		gaussian(a, index);
 //		// Update the a b[i][j] with the ratios stored
 //		for (int i = 0; i < n - 1; ++i){

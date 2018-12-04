@@ -1,18 +1,17 @@
 package spirite.base.graphics
 
 import rb.extendo.dataStructures.SinglyList
-import spirite.base.util.linear.Transform
-
-
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 
 
 data class RenderRubric constructor(
-        val transform: Transform,
+        val transform: ITransformF,
         val alpha: Float,
         val methods: List<RenderMethod>)
 {
     constructor(
-            transform: Transform = Transform.IdentityMatrix,
+            transform: ITransformF = ImmutableTransformF.Identity,
             alpha: Float = 1f,
             method: RenderMethod? = null)
             : this(transform, alpha, if( method == null) emptyList() else SinglyList(method))
@@ -22,7 +21,7 @@ data class RenderRubric constructor(
                 top.alpha * alpha,
                 methods + top.methods)
 
-    fun stack( transform: Transform) = RenderRubric(
+    fun stack( transform: ITransformF) = RenderRubric(
                 transform * this.transform,
                 alpha,
                 methods)

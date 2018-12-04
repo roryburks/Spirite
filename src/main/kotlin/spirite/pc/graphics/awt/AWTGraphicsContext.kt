@@ -5,7 +5,7 @@
 //import spirite.base.graphics.LineAttributes
 //import spirite.base.graphics.RenderRubric
 //import spirite.base.util.Color
-//import spirite.base.util.linear.Transform
+//import spirite.base.util.linear.ITransformF
 //import java.awt.Graphics
 //import java.awt.Graphics2D
 //import java.awt.Shape
@@ -37,7 +37,7 @@
 //        g2 = bi.graphics as Graphics2D
 //    }
 //
-//    override var transform: Transform
+//    override var transform: ITransformF
 //        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 //        set(scroll) {}
 //    override var lineAttributes: LineAttributes
@@ -60,11 +60,11 @@
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //
-//    override fun preTransform(trans: Transform) {
+//    override fun preTransform(trans: ITransformF) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //
-//    override fun transform(trans: Transform) {
+//    override fun transform(trans: ITransformF) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 //

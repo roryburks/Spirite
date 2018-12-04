@@ -3,7 +3,6 @@ package sjunit.spirite.base.graphics.rendering
 import org.junit.Test
 import sjunit.TestConfig
 import sjunit.TestHelper
-import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -13,12 +12,10 @@ import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.util.Colors
-import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.MutableTransformF
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
-import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.graphics.ImageBI
-import spirite.pc.resources.JClassScriptService
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.test.assertEquals
@@ -42,7 +39,7 @@ class CompositingTests {
         gc.color = Colors.GREEN
         gc.fillRect(0,0,20,20)
 
-        val tMediumToWS = MutableTransform.TranslationMatrix(10f,10f)
+        val tMediumToWS = MutableTransformF.TranslationMatrix(10f,10f)
         workspace.compositor.compositeSource = CompositeSource(
                 ArrangedMediumData(mediumHandle, tMediumToWS))
                 {it.color = Colors.RED
@@ -85,7 +82,7 @@ class CompositingTests {
         }, 20, 20)
 
 
-        val tMediumToWS = MutableTransform.TranslationMatrix(10f,10f)
+        val tMediumToWS = MutableTransformF.TranslationMatrix(10f,10f)
         workspace.compositor.compositeSource = CompositeSource(
                 ArrangedMediumData(mediumHandle, tMediumToWS))
                 {it.color = Colors.RED

@@ -1,7 +1,7 @@
 package spirite.base.imageData.animationSpaces.FFASpace
 
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import rb.extendo.extensions.then

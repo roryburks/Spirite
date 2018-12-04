@@ -1,9 +1,8 @@
 package spirite.base.graphics.fill
 
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.linear.Vec2i
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.TimeUnit.MILLISECONDS
 
 private val DELAY = 10L
 

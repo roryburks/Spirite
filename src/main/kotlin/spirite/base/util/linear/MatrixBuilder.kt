@@ -20,21 +20,21 @@ object MatrixBuilder {
 
     /** Converts a 3x3 AffineTransform into a Quaternion Transformation Matrix
      * which can be fed into OpenGL to behave in the expected way. */
-    fun wrapTransformAs4x4(transform: Transform): FloatArray {
+    fun wrapTransformAs4x4(transform: ITransformF): FloatArray {
         return floatArrayOf(
-                transform.m00, transform.m01, 0f, transform.m02,
-                transform.m10, transform.m11, 0f, transform.m12,
+                transform.m00f, transform.m01f, 0f, transform.m02f,
+                transform.m10f, transform.m11f, 0f, transform.m12f,
                 0f, 0f, 1f, 0f,
                 0f, 0f, 0f, 1f)
     }
 
 }
 
-fun Mat4.toIFloat32Source(gl: IGL): IFloat32Source {
+fun Mat4f.toIFloat32Source(gl: IGL): IFloat32Source {
     val source = gl.makeFloat32Source(16)
-    source[0] = this.m00; source[1] = this.m01; source[2] = this.m02; source[3] = this.m03
-    source[4] = this.m10; source[5] = this.m11; source[6] = this.m12; source[7] = this.m13
-    source[8] = this.m20; source[9] = this.m21; source[10] = this.m22; source[11] = this.m23
-    source[12] = this.m30; source[13] = this.m31; source[14] = this.m32; source[15] = this.m33
+    source[0] = this.m00f; source[1] = this.m01f; source[2] = this.m02f; source[3] = this.m03f
+    source[4] = this.m10f; source[5] = this.m11f; source[6] = this.m12f; source[7] = this.m13f
+    source[8] = this.m20f; source[9] = this.m21f; source[10] = this.m22f; source[11] = this.m23f
+    source[12] = this.m30f; source[13] = this.m31f; source[14] = this.m32f; source[15] = this.m33f
     return source
 }

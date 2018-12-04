@@ -5,7 +5,6 @@ import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
 import spirite.base.file.workspaceFromImage
 import spirite.base.graphics.Composite.SRC_IN
-import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
@@ -18,11 +17,11 @@ import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.Colors
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
@@ -169,7 +168,7 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                                 val img2 = using( master.renderEngine.pullImage(RenderTarget(source))) {img->
                                     // Flushed by the end of the function
                                     // NOTE: Might cause faint edges with rotated.  Not sure how rasterizer
-                                    val transform = Transform.TranslationMatrix(-x.f,-y.f) * (selection.transform?.invert() ?: Transform.IdentityMatrix)
+                                    val transform = ImmutableTransformF.Translation(-x.f,-y.f) * (selection.transform?.invert() ?: ImmutableTransformF.Identity)
 
                                     val img2 = Hybrid.imageCreator.createImage(selection.mask.width, selection.mask.height)
                                     val gc = img2.graphics
@@ -177,7 +176,7 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                                     gc.transform = transform
                                     gc.fillRect(0, 0, img.width, img.height)
                                     gc.composite = SRC_IN
-                                    gc.transform = Transform.IdentityMatrix
+                                    gc.transform = ImmutableTransformF.Identity
                                     gc.renderImage(selection.mask, 0, 0)
 
                                     gc.transform = transform

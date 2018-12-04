@@ -9,10 +9,12 @@ import spirite.base.pen.Penner
 import spirite.base.pen.behaviors.TransformBehavior.TransformStates.*
 import spirite.base.util.Colors
 import rb.vectrix.mathUtil.f
-import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.MutableTransformF
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import rb.vectrix.linear.Vec2f
+import spirite.base.util.linear.ImmutableTransformF
+import spirite.base.util.linear.MutableTransformF.Companion
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.base.util.shapes.Rectangle
@@ -28,16 +30,16 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         READY, ROTATE, RESIZE, MOVING, INACTIVE
     }
 
-    // The Calculation Transform is a snapshot, taken when switching states:
+    // The Calculation ITransformF is a snapshot, taken when switching states:
     // The snapshot is of the transformation from image space to a space where -1,-1 is the lower-left corner of the
     //  transformed [region] Rect using the workingTransform and 1,1 is the upper-right
-    private var calcTrans: Transform = Transform.IdentityMatrix
+    private var calcTrans: ITransformF = ImmutableTransformF.Identity
     private fun updateCalcTrans() {
         val region = region ?: return
-        val trans = MutableTransform.TranslationMatrix(-region.width/2f, -region.height/2f)
+        val trans = MutableTransformF.Translation(-region.width/2f, -region.height/2f)
         trans.preConcatenate(workingTransform)
         trans.preTranslate(region.width/2f + region.x, region.height/2f + region.y)
-        val trans2 = trans.invertM()
+        val trans2 = trans.invert()?.toMutable() ?: MutableTransformF.Identity
         trans2.preScale(1/region.width.f, 1f / region.height.f)
         trans2.preTranslate(-0.5f,-0.5f)
         trans2.preScale(2f,2f)
@@ -82,16 +84,16 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
 
     var region : Rect? = null
 
-    val workingTransform : Transform get() {
-        val trans = MutableTransform.ScaleMatrix(scale.xf, scale.yf)
+    val workingTransform : ITransformF get() {
+        val trans = MutableTransformF.Scale(scale.xf, scale.yf)
         trans.preRotate(rotation)
         trans.preTranslate(translation.xf, translation.yf)
         return trans
     }
 
-    fun calcDisplayTransform( view : WorkSectionView) : Transform {
+    fun calcDisplayTransform( view : WorkSectionView) : ITransformF {
         val region = region ?: return workingTransform
-        val trans = MutableTransform.TranslationMatrix(-region.width/2f, -region.height/2f)
+        val trans = MutableTransformF.Translation(-region.width/2f, -region.height/2f)
         trans.preConcatenate(workingTransform)
         trans.preTranslate(region.width/2f + region.x, region.height/2f + region.y)
         trans.preScale( view.zoom, view.zoom)
@@ -124,7 +126,7 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         gc.color = Colors.GRAY
 //			gc.setStroke(defStroke);
 
-        val p = relTrans.invert().apply(Vec2f(penner.rawX.f, penner.rawY.f))
+        val p = relTrans.invert()?.apply(Vec2f(penner.rawX.f, penner.rawY.f)) ?: Vec2f(0f,0f)
 
         val sw = w*0.3f // Width of corner Rect
         val sh = h*0.3f // Height "

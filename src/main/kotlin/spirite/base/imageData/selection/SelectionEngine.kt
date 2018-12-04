@@ -12,22 +12,22 @@ import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
-import spirite.base.util.MathUtil
 import spirite.base.util.delegates.DerivedLazy
 import rb.vectrix.mathUtil.f
-import spirite.base.util.RectangleUtil
+import rb.vectrix.mathUtil.RectangleUtil
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
+import spirite.base.util.linear.ImmutableTransformF
 import spirite.hybrid.Hybrid
 import java.io.File
 
 interface ISelectionEngine {
     val selectionChangeObserver: IObservable<(SelectionChangeEvent)->Any?>
     val selection : Selection?
-    val selectionTransform: Transform?
+    val selectionTransform: ITransformF?
     fun setSelection(newSelection: Selection?)
     fun mergeSelection(newSelection: Selection, mode: BuildMode)
-    fun transformSelection( transform: Transform, liftIfEmpty: Boolean = false)
+    fun transformSelection(transform: ITransformF, liftIfEmpty: Boolean = false)
     fun bakeTranslationIntoLifted()
 
     val liftedData: ILiftedData?
@@ -35,9 +35,9 @@ interface ISelectionEngine {
     fun clearLifted()
     fun attemptLiftData( drawer: IImageDrawer)
     fun setSelectionWithLifted(newSelection: Selection, lifted: ILiftedData)
-    fun imageToSelection( image: IImage, transform: Transform?)
+    fun imageToSelection( image: IImage, transform: ITransformF?)
 
-    var proposingTransform: Transform?
+    var proposingTransform: ITransformF?
     fun applyProposingTransform()
 
     class SelectionChangeEvent(
@@ -58,7 +58,7 @@ class SelectionEngine(
     override val selection by selectionDerived
 
     // region Base Selection Stuff
-    override var selectionTransform : Transform? = null
+    override var selectionTransform : ITransformF? = null
         private set(value) {
             field = value
             selectionDerived.reset()
@@ -81,7 +81,7 @@ class SelectionEngine(
                 val proposingTransform = proposingTransform
                 val anchorTransform = when( proposingTransform ) {
                     null -> selectionTransform
-                    else -> proposingTransform * (selectionTransform ?: Transform.IdentityMatrix)
+                    else -> proposingTransform * (selectionTransform ?: ImmutableTransformF.Identity)
                 }
                 (drawer as? IAnchorLiftModule)?.apply { if( acceptsLifted(liftedData)) anchorLifted(liftedData, anchorTransform)}
 
@@ -125,7 +125,7 @@ class SelectionEngine(
         }
     }
 
-    override fun transformSelection(transform: Transform, liftIfEmpty: Boolean) {
+    override fun transformSelection(transform: ITransformF, liftIfEmpty: Boolean) {
         val selection = selection ?: return
 
         val liftedData = liftedData
@@ -133,7 +133,7 @@ class SelectionEngine(
         if( !liftIfEmpty || liftedData != null || drawer !is ILiftSelectionModule)
             workspace.undoEngine.performAndStore(TransformSelectionAction(transform))
         else {
-            workspace.undoEngine.doAsAggregateAction("Transform", true){
+            workspace.undoEngine.doAsAggregateAction("ITransformF", true){
                 liftData(drawer, selection)
                 workspace.undoEngine.performAndStore(TransformSelectionAction(transform))
             }
@@ -141,14 +141,14 @@ class SelectionEngine(
     }
 
     inner class TransformSelectionAction(
-            var transform: Transform) : NullAction(), StackableAction
+            var transform: ITransformF) : NullAction(), StackableAction
     {
         val originalTransform = selectionTransform
 
         override val description: String get() = "Moved Selection"
 
         override fun performAction() {
-            selectionTransform = transform * (originalTransform ?: Transform.IdentityMatrix)
+            selectionTransform = transform * (originalTransform ?: ImmutableTransformF.Identity)
             workspace.activeData?.handle?.refresh()
         }
         override fun undoAction() {
@@ -179,7 +179,7 @@ class SelectionEngine(
         gc.renderImage(selectionMask, 0, 0)
         Hybrid.imageIO.saveImage(selectionMask, File("C:/Bucket/t1.png"))
         Hybrid.imageIO.saveImage(newImage, File("C:/Bucket/t2.png"))
-        val newSelection = Selection(newImage, Transform.TranslationMatrix(bakedArea.x.f, bakedArea.y.f) , false)
+        val newSelection = Selection(newImage, ImmutableTransformF.Translation(bakedArea.x.f, bakedArea.y.f) , false)
 
         workspace.undoEngine.doAsAggregateAction("Bake Lifted") {
             workspace.undoEngine.performAndStore(ChangeSelectionAction(newSelection))
@@ -243,11 +243,11 @@ class SelectionEngine(
         }
     }
 
-    override fun imageToSelection(image: IImage, transform: Transform?) {
+    override fun imageToSelection(image: IImage, transform: ITransformF?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override var proposingTransform: Transform? = null
+    override var proposingTransform: ITransformF? = null
         set(value) {
             field = value
             selectionDerived.reset()

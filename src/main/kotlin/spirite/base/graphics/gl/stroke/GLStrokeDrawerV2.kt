@@ -7,7 +7,7 @@ import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.glu.GLC
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 
@@ -31,7 +31,7 @@ class GLStrokeDrawerV2(
         else -> DEFAULT
     }
 
-    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: Transform? = null) {
+    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: ITransformF? = null) {
         val vb = composeVBuffer( states, lineWidth)
 
         if( true /* 330 */ ) {

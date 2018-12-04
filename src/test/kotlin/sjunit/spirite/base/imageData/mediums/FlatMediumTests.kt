@@ -2,13 +2,12 @@ package sjunit.spirite.base.imageData.mediums
 
 import io.mockk.mockk
 import sjunit.TestConfig
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.util.Colors
-import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.MutableTransformF
 import spirite.hybrid.EngineLaunchpoint
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
@@ -44,7 +43,7 @@ class FlatMediumTests {
 
     @test fun buildsTransformedDataCorrectly() {
         val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20),mockWorkspace.mediumRepository)
-        val transform = MutableTransform.TranslationMatrix(-10f,-10f)
+        val transform = MutableTransformF.TranslationMatrix(-10f,-10f)
 
         // Note: because we are using a non-standard coordinate setup (yi down) and we aren't using helper functions that
         //  make rotation behave in a more intuitive way for the coordinate system, positive rotation rotates clockwise
@@ -71,7 +70,7 @@ class FlatMediumTests {
     @test fun buildsTransformedDataCorrectlyThenDisplaysCorrectly() {
         val workspaceImage = Hybrid.imageCreator.createImage( 50, 50)
         val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20),mockWorkspace.mediumRepository)
-        val transform = MutableTransform.TranslationMatrix(-10f,-10f)
+        val transform = MutableTransformF.TranslationMatrix(-10f,-10f)
 
         // Note: because we are using a non-standard coordinate setup (yi down) and we aren't using helper functions that
         //  make rotation behave in a more intuitive way for the coordinate system, positive rotation rotates clockwise

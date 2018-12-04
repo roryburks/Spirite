@@ -3,7 +3,7 @@ package spirite.base.graphics
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.util.Color
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import spirite.base.util.shapes.IShape
 import java.util.*
 
@@ -19,7 +19,7 @@ abstract class GraphicsContext {
     abstract val height: Int
 
     /** Setting to null produces undefined behavior.  */
-    abstract var transform: Transform
+    abstract var transform: ITransformF
     abstract var alpha: Float
     abstract var composite: Composite
     abstract var color: Color
@@ -33,8 +33,8 @@ abstract class GraphicsContext {
     abstract fun clear( color: Color? = null)
     abstract fun preTranslate(offsetX: Float, offsetY: Float)
     abstract fun translate(offsetX: Float, offsetY: Float)
-    abstract fun preTransform(trans: Transform)
-    abstract fun transform(trans: Transform)
+    abstract fun preTransform(trans: ITransformF)
+    abstract fun transform(trans: ITransformF)
     abstract fun preScale(sx: Float, sy: Float)
     abstract fun scale(sx: Float, sy: Float)
 
@@ -74,7 +74,7 @@ abstract class GraphicsContext {
     abstract fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRubric? = null)
 
 
-    private val transformStack = Stack<Transform>()
+    private val transformStack = Stack<ITransformF>()
 
     fun pushTransform() {transformStack.push(transform.toMutable())}
     fun popTransform() {transform = transformStack.pop()}
@@ -111,7 +111,7 @@ class LineAttributes (
         val dashes: FloatArray? = null)
 
 data class GraphicalState(
-        val trans: Transform,
+        val trans: ITransformF,
         val composite: Composite,
         val alpha: Float,
         val color: Color)

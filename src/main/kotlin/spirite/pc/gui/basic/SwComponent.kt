@@ -1,7 +1,5 @@
 package spirite.pc.gui.basic
 
-import spirite.base.util.MathUtil
-import rb.vectrix.mathUtil.f
 import spirite.gui.SUIPoint
 import spirite.gui.UIPoint
 import spirite.gui.components.basic.IComponent

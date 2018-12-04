@@ -4,7 +4,7 @@ import spirite.base.util.binding.Bindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
-import spirite.base.util.MathUtil
+import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round

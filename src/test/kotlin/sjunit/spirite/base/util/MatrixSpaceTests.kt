@@ -2,7 +2,7 @@ package sjunit.spirite.base.util
 
 
 import spirite.base.util.linear.MatrixSpace
-import spirite.base.util.linear.Transform
+import spirite.base.util.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import org.junit.Test as test
 
@@ -10,9 +10,9 @@ class MatrixSpaceTests {
 
     @test fun TestConnectedness() {
         val map = mapOf(
-                Pair("S1","S2") to Transform.TranslationMatrix(50f,50f),
-                Pair("S2", "S3") to Transform.TranslationMatrix(25f, 25f),
-                Pair("S1", "S4") to Transform.TranslationMatrix(100f, 100f)
+                Pair("S1","S2") to ImmutableTransformF.Translation(50f,50f),
+                Pair("S2", "S3") to ImmutableTransformF.Translation(25f, 25f),
+                Pair("S1", "S4") to ImmutableTransformF.Translation(100f, 100f)
         )
 
         val space = MatrixSpace(map)
