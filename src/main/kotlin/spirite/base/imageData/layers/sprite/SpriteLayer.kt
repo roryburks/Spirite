@@ -19,8 +19,10 @@ import rb.vectrix.mathUtil.ceil
 import spirite.base.util.delegates.UndoableDelegate
 import rb.vectrix.mathUtil.floor
 import rb.extendo.dataStructures.SinglyList
+import rb.extendo.dataStructures.SinglySequence
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
+import spirite.base.imageData.groupTree.traverse
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
 
@@ -82,6 +84,12 @@ class SpriteLayer : Layer {
         cScaleXBind.field = new?.scaleX ?: 1f
         cScaleYBind.field = new?.scaleY ?: 1f
         cRotBind.field = new?.rot ?: 0f
+
+        val name = new?.partName
+        if( name != null) {
+            getAllLinkedLayers()
+                    .forEach { sprite -> sprite.activePart = sprite.parts.firstOrNull { it.partName == name }  ?: sprite.activePart}
+        }
     }
     var activePart : SpritePart? by activePartBind
 
@@ -160,7 +168,7 @@ class SpriteLayer : Layer {
     fun addPartLinked(partName: String, depth: Int? = null)
     {
         val linked = getAllLinkedLayers()
-        val names = linked.flatMap { it.parts.map { it.partName } }.distinct()
+        val names = linked.flatMap { sprite -> sprite.parts.asSequence().map { it.partName } }.distinct().toSet()
         val realName = StringUtil.getNonDuplicateName(names, partName)
 
         val aPart = activePart
@@ -306,21 +314,12 @@ class SpriteLayer : Layer {
     val cScaleYBind = Bindable(1f) { new, _ -> activePart?.scaleY = new }
     val cRotBind = Bindable(0f) { new, _ -> activePart?.rot = new }
 
-
-    /** Returns the first highest-drawDepth part that is visible and has
-     * non-transparent data at xi, yi (in Layer-space)*/
-    fun grabPart( x: Int, y: Int, select: Boolean) {
-        _parts.asReversed().forEach {
-            // TODO
-        }
-    }
-
-    fun getAllLinkedLayers() : List<SpriteLayer> {
-        return workspace.groupTree.root
-                .getAllNodesSuchThat({ (it as? LayerNode)?.layer == this@SpriteLayer}).firstOrNull()
-                ?.parent?.children
+    private fun getAllLinkedLayers() : Sequence<SpriteLayer> {
+        return workspace.groupTree.root.traverse()
+                .firstOrNull { (it as? LayerNode)?.layer == this@SpriteLayer }
+                ?.parent?.children?.asSequence()
                 ?.mapNotNull { ((it as? LayerNode)?.layer as? SpriteLayer) }
-                ?: SinglyList(this)
+                ?: SinglySequence(this)
     }
 
     inner class SpritePart(
@@ -350,13 +349,8 @@ class SpriteLayer : Layer {
 
         private fun replaceStructure( newStructure: SpritePartStructure, structureCode: Int) {
             if( structure != newStructure) {
-                val parent = workspace.groupTree.root
-                        .getAllNodesSuchThat({ (it as? LayerNode)?.layer == this@SpriteLayer}).firstOrNull()
-                        ?.parent
-                val linked = parent?.children
-                        ?.mapNotNull { ((it as? LayerNode)?.layer as? SpriteLayer) }
-                        ?.mapNotNull { sprite -> sprite.parts.firstOrNull{it.partName == partName} }
-                        ?: SinglyList(this)
+                val linked = getAllLinkedLayers()
+                        .mapNotNull { sprite -> sprite.parts.firstOrNull { it.partName == partName } }
 
                 undoEngine.doAsAggregateAction("Change Sprite Part Structure") {
                     linked.forEach { undoEngine.performAndStore(it.SpriteStructureAction(newStructure, structureCode)) }
