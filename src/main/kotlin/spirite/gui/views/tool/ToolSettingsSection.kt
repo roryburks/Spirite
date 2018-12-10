@@ -27,6 +27,8 @@ private class DDPAdapter<T>(values: Array<T>, bind: Bindable<T>, imp : IComboBox
     :IComponent by imp
 {
     init {
+        imp.selectedItem = bind.field
+
         imp.ref = this
         imp.selectedItemBind.addRootListener { new, _ -> if(new != null) bind.field = new }
     }
