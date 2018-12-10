@@ -1,8 +1,10 @@
 package spirite.base.brains.commands
 
+import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
-import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand.*
+import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Rect
 import spirite.hybrid.MDebug
@@ -11,32 +13,59 @@ class SelectionCommandExecuter( val workspaceSet: IWorkspaceSet) : ICommandExecu
 {
     val workspace get() = workspaceSet.currentWorkspace
 
-    enum class SelectCommand( val string: String) : ICommand {
-        ALL("all"),
-        NONE("none"),
-        INVERT("invert")
-        ;
-
-        override val commandString: String get() = "select.$string"
-        override val keyCommand: KeyCommand get() = KeyCommand(commandString)
-    }
-
-    override val validCommands: List<String> get() = SelectCommand.values().map { it.string }
+    override val validCommands: List<String> get() = executers.map { "$domain.${it.name}" }
     override val domain: String get() = "select"
 
     override fun executeCommand(string: String, extra: Any?): Boolean {
         val workspace = workspace ?: return validCommands.contains(string)
-        val selectionEngine = workspace.selectionEngine
-
-        when( string) {
-            ALL.string -> selectionEngine.setSelection(Selection.RectangleSelection(Rect(workspace.width, workspace.height)) )
-            NONE.string -> selectionEngine.setSelection(null)
-            INVERT.string -> selectionEngine.setSelection(
-                    selectionEngine.selection?.invert(workspace.width, workspace.height)
-                            ?: Selection.RectangleSelection(Rect(workspace.width, workspace.height)))
-
-            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: select.$string")
-        }
+        executers.asSequence()
+                .firstOrNull { it.name == string }
+                ?.execute(workspace)
         return true
+    }
+}
+
+private val executers = mutableListOf<SelectionCommand>()
+abstract class SelectionCommand : ICommand {
+    // Note: this is somewhat of a hacky way to make sure each AnimationCommand added gets added to the list
+    init {executers.add(this)}
+
+    abstract val name: String
+    abstract fun execute(workspace: IImageWorkspace)
+
+    override val commandString: String get() = "select.$name"
+    override val keyCommand: KeyCommand
+        get() = KeyCommand(commandString) {it.workspaceSet.currentWorkspace?.animationManager?.currentAnimation}
+}
+
+object SelectCommand {
+    object All : SelectionCommand() {
+        override val name: String get() = "all"
+        override fun execute(workspace: IImageWorkspace) {
+            workspace.selectionEngine.setSelection(Selection.RectangleSelection(Rect(workspace.width, workspace.height)))
+        }
+    }
+
+    object None : SelectionCommand() {
+        override val name: String get() = "none"
+        override fun execute(workspace: IImageWorkspace) {
+            workspace.selectionEngine.setSelection(null)
+        }
+    }
+
+    object Invert : SelectionCommand() {
+        override val name: String get() = "invert"
+        override fun execute(workspace: IImageWorkspace) {
+            workspace.selectionEngine.setSelection(
+                    workspace.selectionEngine.selection?.invert(workspace.width, workspace.height)
+                            ?: Selection.RectangleSelection(Rect(workspace.width, workspace.height)))
+        }
+    }
+
+    object LiftInPlace : SelectionCommand() {
+        override val name: String get() = "lift"
+        override fun execute(workspace: IImageWorkspace) {
+            workspace.selectionEngine.attemptLiftData(workspace.activeDrawer)
+        }
     }
 }

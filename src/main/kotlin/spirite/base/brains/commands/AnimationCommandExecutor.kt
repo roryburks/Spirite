@@ -24,7 +24,7 @@ class AnimationCommandExecutor (val master: IMasterControl)
 
 }
 
-internal val executers = mutableListOf<AnimationCommand>()
+private val executers = mutableListOf<AnimationCommand>()
 
 abstract class AnimationCommand : ICommand
 {

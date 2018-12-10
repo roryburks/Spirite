@@ -5,11 +5,11 @@ import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
 import spirite.base.brains.commands.IsolationCommandExecuter.IsolationCommand
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand
 import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand
-import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand
 import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand
 import spirite.base.brains.commands.WorkspaceCommandExecuter.ViewCommand
 import spirite.base.brains.settings.IPreferences
 import rb.extendo.dataStructures.MutableOneToManyMap
+import spirite.base.brains.commands.SelectCommand
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 
@@ -91,9 +91,10 @@ private val defaultHotkeys = mapOf(
         DrawCommand.SHIFT_DOWN.keyCommand to (Hotkey( KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
         DrawCommand.SHIFT_UP.keyCommand to (Hotkey( KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
 
-        SelectCommand.ALL.keyCommand to (Hotkey( KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK)),
-        SelectCommand.NONE.keyCommand to (Hotkey( KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
-        SelectCommand.INVERT.keyCommand to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+        SelectCommand.All.keyCommand to (Hotkey( KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK)),
+        SelectCommand.None.keyCommand to (Hotkey( KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+        SelectCommand.Invert.keyCommand to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+        SelectCommand.LiftInPlace.keyCommand to (Hotkey( KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK)),
 
         GlobalCommand.SAVE_WORKSPACE.keyCommand to (Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)),
         GlobalCommand.COPY.keyCommand to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),

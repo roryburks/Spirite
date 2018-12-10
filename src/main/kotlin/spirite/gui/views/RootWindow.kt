@@ -5,7 +5,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.FrameCommandExecuter.FrameCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
-import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand
+import spirite.base.brains.commands.SelectCommand
 import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
 import spirite.gui.components.advanced.omniContainer.OmniTab
@@ -58,9 +58,9 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem(".Layer to &Image Size"),
 
                 MenuItem("&Select"),
-                MenuItem(".&All", SelectCommand.ALL),
-                MenuItem(".&None", SelectCommand.NONE),
-                MenuItem(".&Invert Selection", SelectCommand.INVERT),
+                MenuItem(".&All", SelectCommand.All),
+                MenuItem(".&None", SelectCommand.None),
+                MenuItem(".&Invert Selection", SelectCommand.Invert),
 
                 MenuItem("&Image"),
                 MenuItem(".&Invert", DrawCommand.INVERT),
