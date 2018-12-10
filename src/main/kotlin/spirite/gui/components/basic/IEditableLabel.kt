@@ -62,7 +62,7 @@ private constructor(
         textArea = null
         label = SwELabel(text)
         imp.removeAll()
-        imp.requestFocus()
+        //imp.requestFocus()
 
 
         imp.layout = GroupLayout(imp).also {

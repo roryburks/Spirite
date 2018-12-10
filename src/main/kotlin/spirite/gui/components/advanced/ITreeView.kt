@@ -24,7 +24,11 @@ import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.*
+import java.awt.event.ActionEvent
+import java.awt.event.KeyEvent
+import javax.swing.AbstractAction
 import javax.swing.JPanel
+import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 import kotlin.math.max
 
@@ -85,6 +89,8 @@ interface ITreeViewNonUI<T>{
         val isLeaf : Boolean get() = false
     }
 
+    var onEdit : ((t: T)->Unit)?
+
 
     class BasicTreeNodeAttributes<T> : TreeNodeAttributes<T>
 }
@@ -136,6 +142,8 @@ private constructor(private val imp : SwTreeViewImp<T>)
 
     override var gapSize by OnChangeDelegate( 12) {rebuildTree()}
     override var leftSize by OnChangeDelegate(0) {rebuildTree()}
+
+    override var onEdit: ((t: T) -> Unit)? = null
     //fun nodeAtPoint( p: Vec2i)
 
     init {
@@ -143,6 +151,13 @@ private constructor(private val imp : SwTreeViewImp<T>)
             getNodeFromY(it.point.y)?.also { selectedNode = it }
             requestFocus()
         }
+
+        imp.inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "rename")
+        imp.actionMap.put("rename", object : AbstractAction(){
+            override fun actionPerformed(e: ActionEvent?) {
+                selected?.also { onEdit?.invoke(it) }
+            }
+        })
     }
 
     override val selectedBind = Bindable<T?>(null)
@@ -190,6 +205,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
 
             component.onMouseClick += {
                 selectedNode = node
+                this@SwTreeView.requestFocus()
             }
 
             initializer += {
@@ -491,6 +507,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
             background = JColor(0,0,0,0)
             addMouseListener( SimpleMouseListener { evt ->
                 context?.apply {
+                    print("selortct")
                     selectedNode = getNodeFromY(evt.y) ?: selectedNode
                 }
 

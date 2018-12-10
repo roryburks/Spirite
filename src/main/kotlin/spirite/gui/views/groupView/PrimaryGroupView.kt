@@ -13,6 +13,7 @@ import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.basic.IEditableLabel
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.resources.SwIcons
 import spirite.gui.resources.Transferables.NodeTransferable
@@ -48,13 +49,17 @@ private constructor(
         //  changing.
         tree.selectedBind.addListener { new, old ->  workspace?.groupTree?.selectedNode = new}
         master.centralObservatory.selectedNode.addListener { new, old -> tree.selected = new }
+
+        tree.onEdit = { editMap[it]?.startEditing()}
     }
 
     val workspace get() = master.workspaceSet.currentWorkspace
+    private val editMap = mutableMapOf<Node,IEditableLabel>() // hacky, but eh
 
     private fun rebuild() {
         tree.buildingPaused = true
         tree.clearRoots()
+        editMap.clear()
         val pTree = workspace?.groupTree ?: return
 
         fun makeConstructor(group: GroupNode) : ITreeElementConstructor<Node>.()->Unit  {
@@ -152,7 +157,7 @@ private constructor(
         }
     }
 
-    class NodeLayerPanel
+    private inner class NodeLayerPanel
     private constructor(
             val node: Node,
             master: IMasterControl,
@@ -177,6 +182,7 @@ private constructor(
             //editableLabel.opaque = false
             editableLabel.textBind.addRootListener { new, old -> node.name = new }
 
+            editMap[node] = editableLabel
 
             imp.setLayout {
                 rows += {
