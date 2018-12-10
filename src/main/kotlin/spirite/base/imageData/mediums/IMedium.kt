@@ -12,6 +12,8 @@ import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import spirite.base.util.Colors
+import spirite.pc.gui.SColor
 
 
 /**
@@ -33,6 +35,8 @@ interface IMedium : IFlushable {
     val width: Int
     val height: Int
     val type: MediumType
+
+    fun getColor(x: Int, y: Int) : SColor
     fun build(arranged: ArrangedMediumData): BuiltMediumData
     fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer
 
@@ -88,6 +92,7 @@ object NilMedium : IMedium {
     override val type: MediumType get() = FLAT
 
     override fun build(arranged: ArrangedMediumData) = NilBuiltMedium(arranged)
+    override fun getColor(x: Int, y: Int) = Colors.TRANSPARENT
 
     override fun dupe() = this
     override fun flush() {}

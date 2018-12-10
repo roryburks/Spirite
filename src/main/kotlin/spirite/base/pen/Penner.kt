@@ -178,6 +178,7 @@ class Penner(
                         else Hybrid.beep()
                     }
                     tool is ColorPicker -> behavior = PickBehavior( this, button == LEFT)
+                    tool is Rigger -> behavior = RigSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
                 }
             }
         }

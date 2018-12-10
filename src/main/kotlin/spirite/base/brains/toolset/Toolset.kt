@@ -21,7 +21,7 @@ class Toolset( internal val manager: ToolsetManager) {
 
 
     private val defaultTools = listOf(
-            Pen, Eraser, Fill, ShapeSelection, FreeSelection, Move, Pixel, Crop, Flip, Reshape, ColorChanger, ColorPicker)
+            Pen, Eraser, Fill, ShapeSelection, FreeSelection, Rigger, Move, Pixel, Crop, Flip, Reshape, ColorChanger, ColorPicker)
     fun toolsForDrawer(drawer: IImageDrawer) : List<Tool> {
         return when( drawer) {
             is NillImageDrawer -> listOf(Pen)

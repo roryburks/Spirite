@@ -37,6 +37,11 @@ class Dequeue<T> : Iterable<T> {
         val previousFront = frontNode
         return when (previousFront) {
             null -> null
+            backNode -> {
+                frontNode = null
+                backNode = null
+                previousFront.t
+            }
             else -> {
                 frontNode = previousFront.next
                 frontNode?.previous = null
@@ -49,6 +54,11 @@ class Dequeue<T> : Iterable<T> {
         val previousBack = backNode
         return when (previousBack) {
             null -> null
+            frontNode -> {
+                frontNode = null
+                backNode = null
+                previousBack.t
+            }
             else -> {
                 backNode = previousBack.previous
                 backNode?.next = null
@@ -58,7 +68,7 @@ class Dequeue<T> : Iterable<T> {
     }
 
     private class DequeueIterator<T>(var node: Node<T>?) : Iterator<T> {
-        override fun hasNext() = node == null
+        override fun hasNext() = node != null
 
         override fun next(): T {
             val currentNode = node
@@ -73,7 +83,7 @@ class Dequeue<T> : Iterable<T> {
     }
 
     private class BackwardsDequeueIterator<T>(var node: Node<T>?) : Iterator<T> {
-        override fun hasNext() = node == null
+        override fun hasNext() = node != null
 
         override fun next(): T {
             val currentNode = node

@@ -10,6 +10,8 @@ import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import rb.extendo.dataStructures.SinglyList
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import spirite.base.util.Colors
+import spirite.pc.gui.SColor
 
 
 /***
@@ -29,6 +31,11 @@ class DynamicMedium(
     override val x: Int get() = image.xOffset
     override val y: Int get() = image.yOffset
     override val type: MediumType get() = DYNAMIC
+
+    override fun getColor(x: Int, y: Int): SColor {
+        return if( x < this.x || y < this.y || x >= this.x + width || y >= this.y + height) return Colors.TRANSPARENT
+            else image.base?.getColor(x-this.x,y-this.y) ?: Colors.TRANSPARENT
+    }
 
     override fun build(arranged: ArrangedMediumData) = DynamicBuiltImageData(arranged)
 

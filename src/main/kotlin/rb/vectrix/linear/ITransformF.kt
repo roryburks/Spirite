@@ -37,6 +37,8 @@ interface ITransform
     fun toMutable() : MutableTransform
 }
 
+fun ITransformF.invertN() : ImmutableTransformF = invert() ?: ImmutableTransformF.Identity
+
 sealed class ImmutableTrasform : ITransform
 sealed class MutableTransform : ITransform
 {

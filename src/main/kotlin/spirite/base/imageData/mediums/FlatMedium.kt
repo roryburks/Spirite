@@ -10,6 +10,8 @@ import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import rb.extendo.dataStructures.SinglyList
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import spirite.base.util.Colors
+import spirite.pc.gui.SColor
 
 /***
  * A FlatMedium is a thin wrapper for a RawImage, exposing its functionality to the program.
@@ -24,6 +26,10 @@ class FlatMedium(
     override val height: Int get() = image.height
     override val type: MediumType get() = FLAT
 
+    override fun getColor(x: Int, y: Int): SColor {
+        return if( x < 0 || y < 0 || x >= width || y >= width) return Colors.TRANSPARENT
+        else image.getColor(x,y)
+    }
 
     override fun getImageDrawer(arranged: ArrangedMediumData) = DefaultImageDrawer(arranged)
 

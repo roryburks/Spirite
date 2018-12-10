@@ -1,5 +1,6 @@
 package spirite.base.imageData.groupTree
 
+import rb.extendo.dataStructures.Dequeue
 import spirite.base.util.binding.Bindable
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
@@ -13,6 +14,9 @@ import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.delegates.UndoableDelegate
 import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.MutableTransformF
+import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -70,6 +74,10 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         val isVisible : Boolean get() = visible && alpha > 0f
 
         val tNodeToContext get() = ImmutableTransformF.Translation(x+0f, y+0f)
+        val tNodeToRoot : MutableTransformF get() =
+            ancestors.foldRight(tNodeToContext.toMutable()) {node,trans->
+                trans.also { it.preConcatenate(node.tNodeToContext) }
+            }
 
         // region Delegates
         private inner class NodePosition {
@@ -383,4 +391,64 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             return layer.getDrawList().map { it.stack(transform) }
         }
     }
+}
+
+fun GroupNode.traverse() : Sequence<Node> = GroupNodeTraversalSequence(this)
+fun GroupNode.traverse(filter: (Node) -> Boolean) : Sequence<Node> = GroupNodeTraversalSequence(this, filter)
+
+private class GroupNodeTraversalSequence(
+        val groupNode: GroupNode,
+        val filter: ((Node)->Boolean)? = null) : Sequence<Node> {
+    override fun iterator() = Imp()
+
+    private inner class Imp() : Iterator<Node> {
+        val iteratorDequeue = Dequeue<Iterator<Node>>()
+        var childrenIterator : Iterator<Node>
+        var next: Node? = null
+
+        init {
+            val firstIterator = groupNode.children.iterator()
+            iteratorDequeue.addBack(firstIterator)
+            childrenIterator = firstIterator
+        }
+
+        override fun hasNext(): Boolean {
+            if( next != null) return true
+
+            while (iteratorDequeue.any()) {
+                spin()
+                if( next != null) return true
+            }
+            return false
+        }
+
+        private fun spin() {
+            if( childrenIterator.hasNext()) {
+                val node = childrenIterator.next()
+                if( filter?.invoke(node) ?: true) {
+                    next = node
+                    if( node is GroupNode) {
+                        val newIter = node.children.iterator()
+                        iteratorDequeue.addBack(newIter)
+                        childrenIterator = newIter
+                    }
+                }
+            }
+            else {
+                iteratorDequeue.popBack()
+                childrenIterator = iteratorDequeue.peekBack() ?: childrenIterator
+            }
+        }
+
+        override fun next(): Node {
+            var node = next
+            while (node == null) {
+                if(!hasNext()) throw IndexOutOfBoundsException()
+                node = next
+            }
+            next = null
+            return node
+        }
+    }
+
 }

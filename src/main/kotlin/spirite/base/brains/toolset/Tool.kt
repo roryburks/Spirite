@@ -134,10 +134,19 @@ class Crop( toolset: Toolset) : Tool(toolset){
     val shrinkOnlyBind by scheme.Property(CheckBoxProperty("Shrink-only Crop", false))
     var shrinkOnly by shrinkOnlyBind
 }
+
+enum class WorkspaceScope {
+    Node,
+    Group,
+    Workspace
+}
 class Rigger( toolset: Toolset) : Tool(toolset){
     override val iconX = 0
     override val iconY = 2
     override val description = "Rig"
+
+    val scopeBind by scheme.Property(DropDownProperty("Scope", WorkspaceScope.Group, WorkspaceScope.values()))
+    var scope by scopeBind
 }
 
 enum class FlipMode( val hrName : String) {
