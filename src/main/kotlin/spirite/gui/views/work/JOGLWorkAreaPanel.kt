@@ -18,6 +18,7 @@ import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
+import java.awt.event.MouseAdapter
 import javax.swing.SwingUtilities
 
 class JOGLWorkAreaPanel
@@ -36,6 +37,13 @@ private constructor(
     override val scomponent: ISwComponent get() = this
 
     init {
+        this.canvas.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: java.awt.event.MouseEvent?) {
+                requestFocus()
+                super.mousePressed(e)
+            }
+        })
+
         canvas.skipGLOrientationVerticalFlip = true
         Hybrid.timing.createTimer(50, true){redraw()}
 
