@@ -447,7 +447,7 @@ private class GroupNodeTraversalSequence(
                 node = next
             }
             next = null
-            return node
+            return node!!
         }
     }
 

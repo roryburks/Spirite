@@ -46,7 +46,7 @@ object FFALexicalLayerLoader : IFFALayerLoader {
         val ra = context.ra
         val nodes = context.nodes
 
-        val group = nodes[ra.readInt()] as GroupNode
+        val group = nodes.getOrNull(ra.readInt()) as? GroupNode
         val lexicon = ra.readNullTerminatedStringUTF8()
 
         val explicitCount = ra.readUnsignedByte()
@@ -56,7 +56,8 @@ object FFALexicalLayerLoader : IFFALayerLoader {
                         .map { Pair(ra.readByte().toChar(), nodes[ra.readInt()]) }
                         .toMap()
 
-        ffa.addLexicalLayer(group, lexicon, map)
+        if( group != null)
+            ffa.addLexicalLayer(group, lexicon, map)
     }
 }
 
