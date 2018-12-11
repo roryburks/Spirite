@@ -1,5 +1,6 @@
 package spirite.base.brains.commands
 
+import rb.vectrix.linear.ITransformF
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
@@ -21,6 +22,8 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import spirite.base.util.linear.Rect
 import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.floor
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
@@ -101,8 +104,11 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                     when( selected) {
                         null, is GroupNode -> workspace.groupTree.addSimpleLayerFromImage(selected, "Pasted", image)
                         else -> {
-                            val x = MathUtil.clip(0, master.frameManager.workView!!.offsetX, workspace.width - image.width)
-                            val y = MathUtil.clip(0, master.frameManager.workView!!.offsetY, workspace.height - image.height)
+                            val workview = master.frameManager.workView?.tScreenToWorkspace ?: ImmutableTransformF.Identity
+                            val pt = workview.apply(Vec2f.Zero)
+                            println("$pt")
+                            val x = MathUtil.clip(0, pt.x.floor, workspace.width - image.width)
+                            val y = MathUtil.clip(0, pt.y.floor, workspace.height - image.height)
                             workspace.selectionEngine.setSelectionWithLifted(
                                     Selection.RectangleSelection(Rect(x, y, image.width, image.height)),
                                     LiftedImageData(image))
