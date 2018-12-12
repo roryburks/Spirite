@@ -38,7 +38,7 @@ class SpriteLayer : Layer {
         this.workspace = workspace
         this.mediumRepo = mediumRepo
         _parts.add(SpritePart(SpritePartStructure(0, "base"), mediumRepo.addMedium(DynamicMedium(workspace, mediumRepo = mediumRepo)), workingId++))
-        activePart = _parts.firstOrNull()
+        activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
     }
 
     constructor(
@@ -50,7 +50,7 @@ class SpriteLayer : Layer {
         this.mediumRepo = mediumRepo
         toImport.forEach {_parts.add(SpritePart(it.second, it.first, workingId++))}
         _sort()
-        activePart = _parts.firstOrNull()
+        activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
     }
 
     constructor(
@@ -64,7 +64,7 @@ class SpriteLayer : Layer {
             _parts.add(SpritePart(it, mediumRepo.addMedium(DynamicMedium(workspace, mediumRepo = mediumRepo)), workingId++))
         }
         _sort()
-        activePart = _parts.firstOrNull()
+        activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
     }
 
     val workspace: IImageWorkspace
@@ -74,7 +74,8 @@ class SpriteLayer : Layer {
     private val _parts = mutableListOf<SpritePart>()
     private var workingId = 0
 
-    var activePartBind = Bindable<SpritePart?>(null) { new, _ ->
+    var activePartBind = Bindable<SpritePart?>(null)
+    { new, _ ->
         cAlphaBind.field = new?.alpha ?: 1f
         cDepthBind.field = new?.depth ?: 0
         cVisibleBind.field = new?.visible ?: true
@@ -351,6 +352,7 @@ class SpriteLayer : Layer {
             if( structure != newStructure) {
                 val linked = getAllLinkedLayers()
                         .mapNotNull { sprite -> sprite.parts.firstOrNull { it.partName == partName } }
+                        .toList()
 
                 undoEngine.doAsAggregateAction("Change Sprite Part Structure") {
                     linked.forEach { undoEngine.performAndStore(it.SpriteStructureAction(newStructure, structureCode)) }

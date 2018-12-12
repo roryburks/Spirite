@@ -103,26 +103,26 @@ class AafExporter(
             }
             return true
         }
-        for( e in imagesByDimension) {
-            if( e.value.size <= 1) continue
-            val toRemove = mutableListOf<ShiftedImage>()
-            val byHash = e.value
-                    .toLookup { hasher.getHash(it.image.byteStream) }
-
-            for( hashed in  byHash) {
-                var knownUnique = 1
-                val list = hashed.value
-
-                while (list.size > knownUnique) {
-                    list
-                            .subList(knownUnique+1,list.lastIndex)
-                            .removeIf {check -> checkImagesIdentical(list[knownUnique].image, check.image)
-                                    .also { if( it) toRemove.add(check) }}
-                    knownUnique++
-                }
-            }
-            e.value.removeAll(toRemove)
-        }
+//        for( e in imagesByDimension) {
+//            if( e.value.size <= 1) continue
+//            val toRemove = mutableListOf<ShiftedImage>()
+//            val byHash = e.value
+//                    .toLookup { hasher.getHash(it.image.byteStream) }
+//
+//            for( hashed in  byHash) {
+//                var knownUnique = 1
+//                val list = hashed.value
+//
+//                while (list.size > knownUnique) {
+//                    list
+//                            .subList(knownUnique+1,list.lastIndex)
+//                            .removeIf {check -> checkImagesIdentical(list[knownUnique].image, check.image)
+//                                    .also { if( it) toRemove.add(check) }}
+//                    knownUnique++
+//                }
+//            }
+//            e.value.removeAll(toRemove)
+//        }
 
         imagesByDimension.values.removeIf { it.none() }
         return imagesByDimension

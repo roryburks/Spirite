@@ -40,6 +40,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     private val ifZoom = Hybrid.ui.IntField(allowsNegative = true).also { it.valueBind.addRootListener { new, old -> viewPanel.redraw()} }
     private val zoomP = Hybrid.ui.Button("+").also { it.action = {++ifZoom.value} }
     private val zoomM = Hybrid.ui.Button("-").also { it.action = {--ifZoom.value} }
+    private val ifMet = Hybrid.ui.IntField(allowsNegative =  false)
 
     val bgColor by bgColorBox.colorBind
 
@@ -70,6 +71,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         }
         rows += {
             add(sliderMet, width = 184)
+            add(ifMet, width = 64, height = 24)
         }
         rows.padding = 3
 
@@ -103,6 +105,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         sliderMet.onMouseDrag += {  metBind.field = sliderMet.value / 100f }
         sliderMet.onMouseRelease +=  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
         btnPlay.checkBind.addRootListener { new, _ -> if(!new) metBind.field = floor(metBind.field) }
+        metBind.addRootListener { new, old ->  ifMet.value = new.floor}
     }
 
     private fun unbind() {
