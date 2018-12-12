@@ -177,7 +177,7 @@ class Reshaper(toolset: Toolset) : Tool(toolset){
         return t
     }
 
-    val applyTransformBind by scheme.Property(ButtonProperty("Apply ITransformF", DrawCommand.APPLY_TRANFORM))
+    val applyTransformBind by scheme.Property(ButtonProperty("Apply Transform", DrawCommand.APPLY_TRANFORM))
     var applyTransform by applyTransformBind
     val scaleBind by scheme.Property(DualFloatBoxProperty("Scale", "xi","yi", Vec2f(1f,1f)))
     var scale by scaleBind

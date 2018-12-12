@@ -185,7 +185,11 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
                 val sx = if (overlap == 0 || overlap == 2) scale.xf else pn.xf / ps.xf * oldScaleX
                 val sy = if (overlap == 1 || overlap == 3) scale.yf else pn.yf / ps.yf * oldScaleY
 
-                scale = Vec2f(sx,sy)
+                // Preserve Ratio
+                scale = when {
+                    penner.holdingShift -> scalePreservingRatio(scale, sx, sy)
+                    else -> Vec2f(sx,sy)
+                }
             }
             ROTATE -> {
                 val pn = calcTrans.apply(Vec2f(penner.x.f, penner.y.f))
@@ -196,6 +200,25 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
                 rotation = end - start + oldRot
             }
             else ->{}
+        }
+    }
+
+    fun scalePreservingRatio(old: Vec2f, sx: Float, sy: Float) : Vec2f {
+        val moveX = when {
+            sx == 0f && old.xf == 0f -> 0f
+            sx < old.xf -> old.xf / sx
+            else -> sx / old.xf
+        }
+        val moveY = when {
+            sy == 0f && old.yf == 0f -> 0f
+            sy < old.yf -> old.yf / sy
+            else -> sy / old.yf
+        }
+
+        // Scale
+        return when {
+            moveX > moveY -> Vec2f(sx, old.yf * sx / old.xf)
+            else -> Vec2f(old.xf * sy / old.yf, sy)
         }
     }
 }

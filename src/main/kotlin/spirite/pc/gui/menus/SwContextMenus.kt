@@ -18,6 +18,8 @@ class SwContextMenus(commandExecuter: ICentralCommandExecutor) : ContextMenus(co
 
         constructMenu(cmenu, scheme.toList(), extra)
         cmenu.show( (point as? SUIPoint)?.component, point.x, point.y)
+
+        SwingUtilities.invokeLater { cmenu.requestFocus() } // Meh
     }
 
     fun constructMenu(root: JComponent, menuScheme: List<MenuItem>, extra: Any? = null) {
