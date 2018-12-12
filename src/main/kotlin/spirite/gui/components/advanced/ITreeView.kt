@@ -1,6 +1,7 @@
 package spirite.gui.components.advanced
 
 import CrossLayout
+import rb.vectrix.mathUtil.MathUtil
 import spirite.base.util.binding.Bindable
 import spirite.base.util.binding.IBindable
 import spirite.base.graphics.IImage
@@ -71,12 +72,11 @@ interface ITreeViewNonUI<T>{
     }
 
     interface TreeNodeAttributes<T> : TreeDragInterpreter<T> {
-        fun makeComponent( t: T) : IComponent = when( t) {
-            is IComponent -> t
-            else -> Hybrid.ui.Label(t.toString())
+        fun makeComponent( t: T) : ITreeComponent = when( t) {
+            is IComponent -> SimpleTreeComponent(t)
+            else -> SimpleTreeComponent(Hybrid.ui.Label(t.toString()))
         }
 
-        fun makeLeftComponent( t: T) : IComponent? = null
         fun canDrag() : Boolean = false
         fun makeCursor( t: T) : IImage = NillImage
         fun makeTransferable( t: T) : Transferable = StringSelection(toString())
@@ -89,7 +89,12 @@ interface ITreeViewNonUI<T>{
         val isLeaf : Boolean get() = false
     }
 
-    var onEdit : ((t: T)->Unit)?
+    interface ITreeComponent {
+        val component: IComponent
+        val leftComponent: IComponent? get() = null
+        fun onRename() {}
+    }
+    class SimpleTreeComponent(override val component: IComponent) : ITreeComponent
 
 
     class BasicTreeNodeAttributes<T> : TreeNodeAttributes<T>
@@ -143,7 +148,6 @@ private constructor(private val imp : SwTreeViewImp<T>)
     override var gapSize by OnChangeDelegate( 12) {rebuildTree()}
     override var leftSize by OnChangeDelegate(0) {rebuildTree()}
 
-    override var onEdit: ((t: T) -> Unit)? = null
     //fun nodeAtPoint( p: Vec2i)
 
     init {
@@ -155,7 +159,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
         imp.inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "rename")
         imp.actionMap.put("rename", object : AbstractAction(){
             override fun actionPerformed(e: ActionEvent?) {
-                selected?.also { onEdit?.invoke(it) }
+                nodesAsList.firstOrNull { it == selectedNode }?.also { it.component?.onRename() }
             }
         })
     }
@@ -190,29 +194,26 @@ private constructor(private val imp : SwTreeViewImp<T>)
     private fun rebuildTree() {
         if( buildingPaused) return
         compToNodeMap.clear()
-        lCompToNodeMap.clear()
 
         fun buildCrossForNode( node: TreeNode<T>, existingGap: Int, initializer: CrossColInitializer)
         {
-            val leftComponent = node.attributes.makeLeftComponent(node.value)
-            val component = node.attributes.makeComponent(node.value)
-            if( leftComponent!= null) lCompToNodeMap[leftComponent] = node
-            compToNodeMap[component] = node
-            node.component = component
-            node.lComponent = leftComponent
+            val treeComponent = node.attributes.makeComponent(node.value)
+            compToNodeMap[treeComponent.component] = node
+            treeComponent.leftComponent?.also { compToNodeMap[it] = node}
+            node.component = treeComponent
 
-            dnd.addDropSource(component.jcomponent)
+            dnd.addDropSource(treeComponent.component.jcomponent)
 
-            component.onMouseClick += {
+            treeComponent.component.onMouseClick += {
                 selectedNode = node
                 this@SwTreeView.requestFocus()
             }
 
             initializer += {
                 if( leftSize != 0) {
-                    when(leftComponent) {
+                    when(val lc = treeComponent.leftComponent) {
                         null -> addGap(leftSize)
-                        else -> add(leftComponent, width = leftSize)
+                        else -> add(lc, width = leftSize)
                     }
                 }
                 if( existingGap != 0) addGap(existingGap)
@@ -224,7 +225,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
                     }
                     else ->addGap(gapSize)
                 }
-                add(component)
+                add(treeComponent.component)
             }
             if( node.expanded)
                 node.children.forEach { buildCrossForNode(it, existingGap + gapSize, initializer) }
@@ -241,19 +242,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
     override fun getNodeFromY(y: Int) : TreeNode<T>? {
         if( y < 0) return null
 
-        compToNodeMap.values
-                .sortedBy { it.component?.y ?: Int.MAX_VALUE }
-                .forEach {
-                    val y1 = it.component?.y ?: Int.MIN_VALUE
-                    val y2 = max(
-                            it.component?.run { this.y + this.height } ?: Int.MIN_VALUE,
-                            it.lComponent ?.run { this.y + this.height} ?: Int.MIN_VALUE
-                    )
-                    if( y < y1) return it
-                    if( y < y2) return it
-                }
-
-        return null
+        return compToNodeMap.entries
+                .sortedBy { it.key.y }.asSequence()
+                .firstOrNull { (comp, _)-> y < comp.y || y < comp.y + comp.height}
+                ?.value
     }
 
     // region Root Manipulation
@@ -312,7 +304,6 @@ private constructor(private val imp : SwTreeViewImp<T>)
     // endregion
 
 
-    private val lCompToNodeMap = mutableMapOf<IComponent,TreeNode<T>>()
     private val compToNodeMap = mutableMapOf<IComponent,TreeNode<T>>()
 
     // region TreeNode
@@ -328,11 +319,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
         override val children: List<TreeNode<T>> get() = _children
         private val _children = mutableListOf<TreeNode<T>>()
 
-        internal var lComponent : IComponent? = null
-        internal var component : IComponent? = null
+        internal var component: ITreeComponent? = null
 
-        internal val y get() = listOfNotNull(lComponent?.y, component?.y).min()?: 0
-        internal val height get() = listOfNotNull(lComponent?.run { height }, component?.run { height }).max() ?: 0
+        internal val y get() = MathUtil.minOrNull(component?.leftComponent?.y, component?.component?.y) ?: 0
+        internal val height get() = MathUtil.minOrNull(component?.leftComponent?.height, component?.component?.height) ?: 0
 
         init {
             // I never love InvokeLaters.  This exists so that the batch Construct can exist without forcing this to
@@ -341,15 +331,13 @@ private constructor(private val imp : SwTreeViewImp<T>)
                 valueBind.addListener { new, old ->
                     // Note: this prevents this Listener and thus the rebuildTree called N times when
                     if( old != new) {
+                        val comp = attributes.makeComponent(new)
 
-                        val newLComp = attributes.makeLeftComponent(new)
-                        val newComp = attributes.makeComponent(new)
-
-                        if (newLComp != lComponent || newComp != component)
+                        if (component != comp)
                             rebuildTree()
                         else {
-                            newLComp?.redraw()
-                            newComp.redraw()
+                            comp.component.redraw()
+                            comp.leftComponent?.redraw()
                         }
                     }
                 }
@@ -418,8 +406,8 @@ private constructor(private val imp : SwTreeViewImp<T>)
                 node == null && e_y < 0 -> ABOVE
                 node == null -> BELOW
                 else -> {
-                    val n_y = node.component?.y ?: return
-                    val n_h = node.component?.height ?: return
+                    val n_y = node.y
+                    val n_h = node.height
                     when {
                         !node.attributes.isLeaf &&
                                 e_y > n_y + n_h/4 &&
@@ -507,11 +495,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
             background = JColor(0,0,0,0)
             addMouseListener( SimpleMouseListener { evt ->
                 context?.apply {
-                    print("selortct")
                     selectedNode = getNodeFromY(evt.y) ?: selectedNode
                 }
 
-                requestFocus()
+                this@SwTreeViewImp.requestFocus()
             })
         }
 
@@ -545,7 +532,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
             }
             if( color != null) {
                 g2.color = color
-                val h = max(it.key.height, it.value.lComponent?.height?:0)
+                val h = max(it.key.height, it.value.component?.leftComponent?.height?:0)
                 g2.fillRect(0, it.key.y, width, h)
             }
         }
@@ -562,7 +549,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
         when( draggingRelativeTo) {
             null -> {
                 val dy = when( draggingDirection) {
-                    ABOVE -> rootNodes.firstOrNull()?.component?.y ?: 0
+                    ABOVE -> rootNodes.firstOrNull()?.y ?: 0
                     else -> {
                         val lowest = lowestChild
                         when( lowest) {

@@ -50,7 +50,7 @@ private constructor(
 
         setLayout()
 
-        //markAsPassThrough()
+        markAsPassThrough()
     }
 
     var partContracts: List<IThumbnailAccessContract>? = null

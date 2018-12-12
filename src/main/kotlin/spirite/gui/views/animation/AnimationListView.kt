@@ -8,7 +8,7 @@ import spirite.base.brains.commands.RenameAnimationCommand
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.gui.components.advanced.ITreeViewNonUI.TreeNodeAttributes
+import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
@@ -37,18 +37,20 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
     }
 
     private val attributes = object : TreeNodeAttributes<Animation> {
-        override fun makeComponent(t: Animation): IComponent {
-            return Hybrid.ui.Label(t.name).also {
-                t.nameBind.addWeakListener { new, old -> it.text = new }
-                it.onMouseRelease += rightclick
-                dnd.addListener(it, t)
+        override fun makeComponent(t: Animation): ITreeComponent {
+            return object : ITreeComponent {
+                override val component = Hybrid.ui.Label(t.name).also {
+                    t.nameBind.addWeakListener { new, old -> it.text = new }
+                    it.onMouseRelease += rightclick
+                    dnd.addListener(it, t)
+                }
             }
         }
     }
     private val detailAttributes = object : TreeNodeAttributes<Animation> {
-        override fun makeComponent(t: Animation): IComponent {
-            return Hybrid.ui.Button(t.name).also {
-                dnd.addListener(it, t)
+        override fun makeComponent(t: Animation): ITreeComponent {
+            return object : ITreeComponent {
+                override val component: IComponent = Hybrid.ui.Button(t.name).also{dnd.addListener(it, t)}
             }
         }
     }

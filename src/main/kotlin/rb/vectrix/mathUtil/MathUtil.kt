@@ -49,6 +49,14 @@ object MathUtil {
     fun lerpyDerp(min: Double, max:Double, lowT: Double, highT: Double, t: Double) = min + (max-min)*(t-lowT)/(highT-lowT)
 
     //region minOrNull
+    fun minOrNull(a: Int?, b: Int?) = when {
+        a == null -> when {
+            b == null -> null
+            else -> b
+        }
+        b == null -> a
+        else -> min(a, b)
+    }
     fun minOrNull(a: Float?, b: Float?) = when {
         a == null -> when {
             b == null -> null

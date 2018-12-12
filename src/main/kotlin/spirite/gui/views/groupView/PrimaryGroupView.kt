@@ -49,17 +49,13 @@ private constructor(
         //  changing.
         tree.selectedBind.addListener { new, old ->  workspace?.groupTree?.selectedNode = new}
         master.centralObservatory.selectedNode.addListener { new, old -> tree.selected = new }
-
-        tree.onEdit = { editMap[it]?.startEditing()}
     }
 
     val workspace get() = master.workspaceSet.currentWorkspace
-    private val editMap = mutableMapOf<Node,IEditableLabel>() // hacky, but eh
 
     private fun rebuild() {
         tree.buildingPaused = true
         tree.clearRoots()
-        editMap.clear()
         val pTree = workspace?.groupTree ?: return
 
         fun makeConstructor(group: GroupNode) : ITreeElementConstructor<Node>.()->Unit  {
@@ -88,9 +84,8 @@ private constructor(
     private val nongroupAttributes = NormalLaterNodeAttributes()
     private val spriteLayerAttributes = SpriteLayerNodeAttributes()
 
-    private open inner class BaseNodeAttributes : TreeNodeAttributes<Node> {
-        override fun makeLeftComponent(t: Node) : IComponent{
-            val comp = Hybrid.ui.CrossPanel()
+    private abstract inner class BaseNodeTreeComponent(val t: Node) : ITreeComponent {
+        override val leftComponent: IComponent = Hybrid.ui.CrossPanel().also { comp ->
             comp.background = Colors.TRANSPARENT
             comp.opaque = false
 
@@ -107,19 +102,24 @@ private constructor(
                 }
                 rows.addGap(4)
             }
-            return comp
         }
+    }
 
-        override fun makeComponent(t: Node): IComponent  {
-            val comp = NodeLayerPanel(t,master)
-            comp.onMouseRelease += { evt ->
-                if( evt.button == RIGHT )
+    private inner class NormalNodeComponent( t: Node) : BaseNodeTreeComponent(t) {
+        override val component = NodeLayerPanel(t,master).also {
+            onMouseRelease += { evt ->
+                if (evt.button == RIGHT)
                     workspace?.apply {
                         master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, t), t)
                     }
             }
-            return comp
         }
+
+        override fun onRename() {component.triggerRename()}
+    }
+
+    private open inner class BaseNodeAttributes : TreeNodeAttributes<Node> {
+        override fun makeComponent(t: Node) : ITreeComponent = NormalNodeComponent(t)
 
         override fun makeTransferable(t: Node): Transferable {return NodeTransferable(t)}
 
@@ -145,15 +145,20 @@ private constructor(
     }
 
     private inner class SpriteLayerNodeAttributes: BaseNodeAttributes() {
-        override fun makeComponent(t: Node): IComponent {
-            val comp = SpriteLayerNodePanel(t, (t as LayerNode).layer as SpriteLayer, master)
-            comp.onMouseRelease += { evt ->
-                if( evt.button == RIGHT )
-                    workspace?.apply {
-                        master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, t), t)
+        override fun makeComponent(t: Node) = TreeComponent(t)
+        private inner class TreeComponent(t:Node) : BaseNodeTreeComponent(t) {
+            override val component = SpriteLayerNodePanel(t, (t as LayerNode).layer as SpriteLayer, master)
+                    .also {comp ->
+                        comp.onMouseRelease += { evt ->
+                            if( evt.button == RIGHT )
+                                workspace?.apply {
+                                    master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, t), t)
+                                }
+                        }
                     }
-            }
-            return comp
+
+            override fun onRename() {component.editableLabel.startEditing()}
+
         }
     }
 
@@ -168,6 +173,7 @@ private constructor(
 
         private val thumbnail = Hybrid.ui.ImageBox()
         private val thumbnailContract : IThumbnailAccessContract?
+        private val editableLabel =  Hybrid.ui.EditableLabel(node.name)
 
         init {
             thumbnailContract =  master.workspaceSet.currentWorkspace?.run {
@@ -178,11 +184,8 @@ private constructor(
             opaque = false
             background = Colors.TRANSPARENT
 
-            val editableLabel = Hybrid.ui.EditableLabel(node.name)
             //editableLabel.opaque = false
             editableLabel.textBind.addRootListener { new, old -> node.name = new }
-
-            editMap[node] = editableLabel
 
             imp.setLayout {
                 rows += {
@@ -193,7 +196,10 @@ private constructor(
                 }
             }
         }
+
+        fun triggerRename() { editableLabel.startEditing()}
     }
+
 
     private val wsl = object: WorkspaceObserver {
         override fun workspaceCreated(newWorkspace: IImageWorkspace) {}

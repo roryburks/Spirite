@@ -1,6 +1,7 @@
 package spirite.pc
 
 import spirite.base.brains.MasterControl
+import spirite.base.brains.commands.ICommand
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.hybrid.EngineLaunchpoint
 import spirite.hybrid.MDebug
