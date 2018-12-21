@@ -12,24 +12,24 @@ class AnimationCommandExecutor (val master: IMasterControl)
     : ICommandExecuter
 {
     override val domain: String get() = "anim"
-    override val validCommands: List<String> get() = executers.map { "anim.${it.name}" }
+    override val validCommands: List<String> get() = executors.map { "anim.${it.name}" }
 
     override fun executeCommand(string: String, extra: Any?): Boolean {
         val workspace = master.workspaceSet.currentMWorkspace ?: return false
         val animation = workspace.animationManager.currentAnimation
-        return executers.asSequence()
+        return executors.asSequence()
                 .filter { it.name == string }
                 .any { it.execute(master, workspace, animation) }
     }
 
 }
 
-private val executers = mutableListOf<AnimationCommand>()
+private val executors = mutableListOf<AnimationCommand>()
 
 abstract class AnimationCommand : ICommand
 {
     // Note: this is somewhat of a hacky way to make sure each AnimationCommand added gets added to the list
-    init {executers.add(this)}
+    init {executors.add(this)}
 
     abstract val name: String
     abstract fun execute( master: IMasterControl, workspace: IImageWorkspace, animation: Animation?) : Boolean
@@ -43,7 +43,7 @@ object ExportAafCommand : AnimationCommand()
 {
     override val name: String get() = "exportAsAaf"
     override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
-        animation as? FixedFrameAnimation ?: return false
+        if (animation !is FixedFrameAnimation) return false
         val file = master.dialog.pickFile(AAF) ?: return false
 
         defaultAafExporter.export(animation, file.absolutePath)

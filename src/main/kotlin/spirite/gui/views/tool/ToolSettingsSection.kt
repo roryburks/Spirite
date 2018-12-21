@@ -1,6 +1,6 @@
 package spirite.gui.views.tool
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.base.util.Colors
@@ -23,7 +23,7 @@ fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {
     rows.add(Hybrid.ui.Label("$hrName: "))
     rows.add( DDPAdapter(values, valueBind), height = 24)
 }
-private class DDPAdapter<T>(values: Array<T>, bind: Bindable<T>, imp : IComboBox<T> = Hybrid.ui.ComboBox(values))
+private class DDPAdapter<T>(values: Array<T>, bind: CruddyBindable<T>, imp : IComboBox<T> = Hybrid.ui.ComboBox(values))
     :IComponent by imp
 {
     init {

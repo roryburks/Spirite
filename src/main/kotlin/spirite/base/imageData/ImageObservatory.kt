@@ -1,7 +1,7 @@
 package spirite.base.imageData
 
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
+import spirite.base.brains.ICruddyOldObservable
+import spirite.base.brains.CruddyOldObservable
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.groupTree.GroupTree.Node
@@ -17,13 +17,13 @@ interface IImageObservatory {
         fun imageChanged( evt: ImageChangeEvent)
     }
 
-    val imageObservable : IObservable<ImageObserver>
+    val imageObservable : ICruddyOldObservable<ImageObserver>
 
     fun triggerRefresh( evt: ImageChangeEvent)
 }
 
 class ImageObservatory : IImageObservatory {
-    override val imageObservable = Observable<ImageObserver>()
+    override val imageObservable = CruddyOldObservable<ImageObserver>()
 
     override fun triggerRefresh(evt: ImageChangeEvent) {
         imageObservable.trigger { it.imageChanged(evt) }

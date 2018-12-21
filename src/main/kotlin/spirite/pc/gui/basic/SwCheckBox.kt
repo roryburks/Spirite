@@ -1,6 +1,6 @@
 package spirite.pc.gui.basic
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import spirite.gui.components.basic.ICheckBox
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IRadioButton
@@ -14,7 +14,7 @@ private constructor(val imp : SwCheckBoxImp)
 {
     constructor() : this(SwCheckBoxImp())
 
-    override val checkBind = Bindable(imp.isSelected)
+    override val checkBind = CruddyBindable(imp.isSelected)
     override var check by checkBind
 
     init {
@@ -35,7 +35,7 @@ private constructor(val imp : SwRadioButtonImp)
 {
     constructor(label: String = "", selected: Boolean = false) : this(SwRadioButtonImp(label, selected))
 
-    override val checkBind = Bindable(imp.isSelected)
+    override val checkBind = CruddyBindable(imp.isSelected)
     override var check by checkBind
     override var label: String
         get() = imp.text

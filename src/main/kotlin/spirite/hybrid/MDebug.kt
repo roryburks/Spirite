@@ -1,7 +1,7 @@
 package spirite.hybrid
 
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
+import spirite.base.brains.ICruddyOldObservable
+import spirite.base.brains.CruddyOldObservable
 import javax.swing.JOptionPane
 
 object MDebug {
@@ -84,7 +84,7 @@ object MDebug {
     interface  DebugObserver {
         fun logChanged()
     }
-    val debugObservable: IObservable<DebugObserver> get() = _debugObservable
-    private val _debugObservable = Observable<DebugObserver>()
+    val debugObservable: ICruddyOldObservable<DebugObserver> get() = _debugObservable
+    private val _debugObservable = CruddyOldObservable<DebugObserver>()
     private fun trigger() = _debugObservable.trigger { it.logChanged() }
 }

@@ -1,6 +1,6 @@
 package spirite.base.imageData.animation
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import rb.vectrix.mathUtil.f
 
 class AnimationState(
@@ -8,13 +8,13 @@ class AnimationState(
     zoom: Int = 2,
     speed: Float = 8f)
 {
-    val metBind = Bindable(met)
+    val metBind = CruddyBindable(met)
     var met by metBind
 
-    val zoomBind = Bindable(zoom)
+    val zoomBind = CruddyBindable(zoom)
     var zoom by zoomBind
     val zoomF : Float get() = if( zoom > 0) zoom.f else 1.f / (2.f-zoom.f)
 
-    val speedBind = Bindable(speed)
+    val speedBind = CruddyBindable(speed)
     var speed by speedBind
 }

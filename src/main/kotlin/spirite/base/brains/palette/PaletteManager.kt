@@ -3,14 +3,14 @@ package spirite.base.brains.palette
 import spirite.base.brains.*
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.settings.ISettingsManager
-import spirite.base.util.binding.Bindable
-import spirite.base.util.binding.IBindable
+import spirite.base.util.binding.CruddyBindable
+import spirite.base.util.binding.ICruddyOldBindable
 import spirite.gui.components.dialogs.IDialog
 
 interface IPaletteManager {
     val activeBelt : PaletteBelt
 
-    val currentPaletteBind : IBindable<Palette>
+    val currentPaletteBind : ICruddyOldBindable<Palette>
     val currentPalette: Palette
     val globalPalette: Palette
 
@@ -24,7 +24,7 @@ interface IPaletteManager {
     data class PaletteChangeEvent(val palette: Palette)
     data class PaletteSetChangeEvent(val paletteSet: PaletteSet)
 
-    val paletteObservable : IObservable<PaletteObserver>
+    val paletteObservable : ICruddyOldObservable<PaletteObserver>
 }
 
 class PaletteManager(
@@ -34,13 +34,13 @@ class PaletteManager(
 
     override val activeBelt: PaletteBelt = PaletteBelt()
 
-    override val paletteObservable = Observable<PaletteObserver>()
+    override val paletteObservable = CruddyOldObservable<PaletteObserver>()
 
     override val globalPalette = object : Palette("Global") {
         override val onChangeTrigger: (Palette) -> Unit = {triggerPaletteChange(PaletteChangeEvent(this))}
     }
 
-    override val currentPaletteBind = Bindable(globalPalette)
+    override val currentPaletteBind = CruddyBindable(globalPalette)
     override val currentPalette: Palette by currentPaletteBind
 
     override fun makePaletteSet(): PaletteSet {

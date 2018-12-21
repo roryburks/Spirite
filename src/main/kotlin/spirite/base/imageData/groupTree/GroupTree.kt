@@ -1,9 +1,9 @@
 package spirite.base.imageData.groupTree
 
 import rb.extendo.dataStructures.Dequeue
-import spirite.base.util.binding.Bindable
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
+import spirite.base.util.binding.CruddyBindable
+import spirite.base.brains.ICruddyOldObservable
+import spirite.base.brains.CruddyOldObservable
 import spirite.base.graphics.RenderMethod
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.MediumHandle
@@ -31,7 +31,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
     val root = GroupNode(null, "ROOT")
     open val treeDescription = "Abstract Group Tree"
 
-    var selectedNodeBind = Bindable<Node?>(null)
+    var selectedNodeBind = CruddyBindable<Node?>(null)
     var selectedNode
         get() = selectedNodeBind.field
         set(value) {
@@ -48,8 +48,8 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         fun nodePropertiesChanged( node: Node, renderChanged: Boolean)
     }
     class TreeChangeEvent( val changedNodes : Set<Node>)
-    val treeObservable : IObservable<TreeObserver> get() = _treeObs
-    private val _treeObs = Observable<TreeObserver>()
+    val treeObservable : ICruddyOldObservable<TreeObserver> get() = _treeObs
+    private val _treeObs = CruddyOldObservable<TreeObserver>()
 
     protected fun triggerChange(evt : TreeChangeEvent) {_treeObs.trigger { it.treeStructureChanged(evt) }}
     protected fun triggerNodeAttributeChanged( node:  Node, renderChanged: Boolean) {_treeObs.trigger { it.nodePropertiesChanged(node, renderChanged) }}

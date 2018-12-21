@@ -1,5 +1,11 @@
 package spirite.base.brains
 
+import rb.owl.IContract
+import rb.owl.IObservable
+import rb.owl.IObserver
+import rb.owl.bindable.IBindable
+import rb.owl.bindable.OnChangeEvent
+import rb.owl.observer
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
@@ -11,27 +17,27 @@ import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
-import spirite.base.util.binding.IBindable
-import spirite.base.util.binding.IBoundListener
-import spirite.base.util.binding.OnChangeEvent
+import spirite.base.util.binding.ICruddyOldBindable
+import spirite.base.util.binding.ICruddyBoundListener
+import spirite.base.util.binding.CruddyOldOnChangeEvent
 import java.lang.ref.WeakReference
 
 /** The CentralObservatory is a place where things (primarily GUI components) which need to watch for certain changes
  * regardless of which Workspace is active should get their Observables from.  It automatically adds and removes ovservers
  * as the currentWorkspace is changed.*/
 interface ICentralObservatory {
-    val omniImageObserver : IObservable<ImageObserver>
+    val omniImageObserver : ICruddyOldObservable<ImageObserver>
 
-    val trackingUndoHistoryObserver : IObservable<(UndoHistoryChangeEvent)->Any?>
-    val trackingImageObserver : IObservable<ImageObserver>
-    val trackingPrimaryTreeObserver : IObservable<TreeObserver>
-    val trackingAnimationObservable : IObservable<AnimationObserver>
-    val trackingAnimationStateObserver: IObservable<AnimationStructureChangeObserver>
+    val trackingUndoHistoryObserver : ICruddyOldObservable<(UndoHistoryChangeEvent)->Any?>
+    val trackingImageObserver : ICruddyOldObservable<ImageObserver>
+    val trackingPrimaryTreeObserver : ICruddyOldObservable<TreeObserver>
+    val trackingAnimationObservable : ICruddyOldObservable<AnimationObserver>
+    val trackingAnimationStateObserver: ICruddyOldObservable<AnimationStructureChangeObserver>
 
-    val activeDataBind : IBindable<MediumHandle?>
-    val selectedNode : IBindable<Node?>
-    val currentAnimationBind : IBindable<Animation?>
-    val currentAnimationSpaceBind : IBindable<AnimationSpace?>
+    val activeDataBind : ICruddyOldBindable<MediumHandle?>
+    val selectedNode : ICruddyOldBindable<Node?>
+    val currentAnimationBind : ICruddyOldBindable<Animation?>
+    val currentAnimationSpaceBind : ICruddyOldBindable<AnimationSpace?>
 }
 
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
@@ -40,18 +46,18 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     private val trackingObservers  = mutableListOf<TrackingObserver<*>>()
     private val omniObserver  = mutableListOf<OmniObserver<*>>()
 
-    override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservable }
+    override val omniImageObserver: ICruddyOldObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservable }
 
-    override val trackingUndoHistoryObserver: IObservable<(UndoHistoryChangeEvent) -> Any?> = TrackingObserver { it.undoEngine.undoHistoryObserver }
+    override val trackingUndoHistoryObserver: ICruddyOldObservable<(UndoHistoryChangeEvent) -> Any?> = TrackingObserver { it.undoEngine.undoHistoryObserver }
     override val trackingImageObserver = TrackingObserver {it.imageObservatory.imageObservable}
-    override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObservable }
-    override val trackingAnimationObservable: IObservable<AnimationObserver> = TrackingObserver { it.animationManager.animationObservable }
-    override val trackingAnimationStateObserver: IObservable<AnimationStructureChangeObserver> = TrackingObserver { it.animationManager.animationStructureChangeObservable }
+    override val trackingPrimaryTreeObserver: ICruddyOldObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObservable }
+    override val trackingAnimationObservable: ICruddyOldObservable<AnimationObserver> = TrackingObserver { it.animationManager.animationObservable }
+    override val trackingAnimationStateObserver: ICruddyOldObservable<AnimationStructureChangeObserver> = TrackingObserver { it.animationManager.animationStructureChangeObservable }
 
-    override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
-    override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
-    override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind}
-    override val currentAnimationSpaceBind: IBindable<AnimationSpace?> = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
+    override val activeDataBind: ICruddyOldBindable<MediumHandle?> = CruddyOldTrackingBinder { it.activeMediumBind }
+    override val selectedNode : ICruddyOldBindable<Node?> = CruddyOldTrackingBinder { it.groupTree.selectedNodeBind }
+    override val currentAnimationBind : ICruddyOldBindable<Animation?> = CruddyOldTrackingBinder { it.animationManager.currentAnimationBind}
+    override val currentAnimationSpaceBind: ICruddyOldBindable<AnimationSpace?> = CruddyOldTrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
 
     init {
         // Note: In order to cut down on code which could easily be forgotten/broken, TrackingObservers automatically
@@ -60,26 +66,37 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
         //      1) [trackingObservers' Initialization]
         //      2) [each individual TrackingObserver's initialization]
         //      3) [this init block]
-        trackingObservers.forEach { workspaceSet.workspaceObserver.addObserver(it) }
+        trackingObservers.forEach { workspaceSet.workspaceObserver.addObserver(it.observer()) }
     }
 
-    // region Implementation
-    inner class TrackingBinder<T>(val finder: (IImageWorkspace) -> IBindable<T>) : IBindable<T?>
+    private inner class TrackingBinder<T>(val finder: (IImageWorkspace) -> IBindable<T>) : IBindable<T?>
     {
-        private val listeners = mutableListOf<OnChangeEvent<T?>>()
-        private val weakListeners = mutableListOf<WeakReference<OnChangeEvent<T?>>>()
+        override val field: T? get() = workspaceSet.currentWorkspace?.run { finder(this).field }
+        var currentContract: IContract? = null
+
+        override fun addObserver(observer: IObserver<OnChangeEvent<T?>>, trigger: Boolean): IContract {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+    }
+
+    // region CruddyOldImplementation
+    inner class CruddyOldTrackingBinder<T>(val finder: (IImageWorkspace) -> ICruddyOldBindable<T>) : ICruddyOldBindable<T?>
+    {
+        private val listeners = mutableListOf<CruddyOldOnChangeEvent<T?>>()
+        private val weakListeners = mutableListOf<WeakReference<CruddyOldOnChangeEvent<T?>>>()
         override val field: T? get() = workspaceSet.currentWorkspace?.run { finder.invoke(this).field }
 
-        override fun addListener(listener: OnChangeEvent<T?>) : IBoundListener<T?> {
+        override fun addListener(listener: CruddyOldOnChangeEvent<T?>) : ICruddyBoundListener<T?> {
             return TrackingBound(listener.apply { listeners.add( this) })
         }
 
-        override fun addWeakListener(listener: OnChangeEvent<T?>) : IBoundListener<T?> {
+        override fun addWeakListener(listener: CruddyOldOnChangeEvent<T?>) : ICruddyBoundListener<T?> {
             return TrackingBound(listener.apply { weakListeners.add( WeakReference(this)) })
         }
 
         init {
-            var currentBind : IBoundListener<T>? = null
+            var currentBind : ICruddyBoundListener<T>? = null
             val onChange : (T,T)->Unit = {new, old ->
                 listeners.forEach { it.invoke(new, old) }
                 weakListeners.removeIf { it.get()?.invoke(new,old) == null }
@@ -97,7 +114,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
         }
 
         // Todo: this could potentially do weird things if someone binds the same oce multiple times
-        inner class TrackingBound<T>( private val oce: OnChangeEvent<T?>) : IBoundListener<T> {
+        inner class TrackingBound<T>( private val oce: CruddyOldOnChangeEvent<T?>) : ICruddyBoundListener<T> {
             override fun unbind() {
                 listeners.removeIf { it == oce }
                 weakListeners.removeIf { (it.get()?: oce) == oce }
@@ -106,8 +123,8 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     }
 
     inner class OmniObserver<T>(
-            val observerFinder : (IImageWorkspace) -> IObservable<T>)
-        : IObservable<T>, WorkspaceObserver
+            val observerFinder : (IImageWorkspace) -> ICruddyOldObservable<T>)
+        : ICruddyOldObservable<T>, WorkspaceObserver
     {
         init {
             omniObserver.add(this)
@@ -134,8 +151,8 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     }
 
     inner class TrackingObserver<T>(
-            val observerFinder : (IImageWorkspace) -> IObservable<T>)
-        : IObservable<T>, WorkspaceObserver
+            val observerFinder : (IImageWorkspace) -> ICruddyOldObservable<T>)
+        : ICruddyOldObservable<T>, WorkspaceObserver
     {
         init {
             trackingObservers.add(this)

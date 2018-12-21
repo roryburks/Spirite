@@ -77,9 +77,9 @@ class CompositingTests {
         val mediumHandle = (layer1.layer as SimpleLayer).medium
         val dynamicImage = (mediumHandle.medium as DynamicMedium).image
 
-        dynamicImage.drawToImage({
+        dynamicImage.drawToImage(20, 20, drawer = {
             it.graphics.fillRect(0,0,20,20)
-        }, 20, 20)
+        })
 
 
         val tMediumToWS = MutableTransformF.TranslationMatrix(10f,10f)

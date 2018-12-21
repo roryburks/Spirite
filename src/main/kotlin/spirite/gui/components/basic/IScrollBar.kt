@@ -1,21 +1,21 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import rb.vectrix.mathUtil.MathUtil
 import spirite.gui.Orientation
 
 interface IScrollBarNonUI {
     var scroll: Int
-    val scrollBind: Bindable<Int>
+    val scrollBind: CruddyBindable<Int>
     var minScroll: Int
     var maxScroll: Int
     var scrollWidth: Int
 }
 
 interface IScrollBarNonUIImp : IScrollBarNonUI{
-    val minScrollBind : Bindable<Int>
-    val maxScrollBind : Bindable<Int>
-    var scrollWidthBind : Bindable<Int>
+    val minScrollBind : CruddyBindable<Int>
+    val maxScrollBind : CruddyBindable<Int>
+    var scrollWidthBind : CruddyBindable<Int>
 }
 
 interface IScrollBar  : IScrollBarNonUI, IComponent{
@@ -28,10 +28,10 @@ class ScrollBarNonUI(
         value: Int,
         width: Int
 ) : IScrollBarNonUIImp {
-    override val scrollBind = Bindable(value)
-    override val minScrollBind = Bindable(min)
-    override val maxScrollBind = Bindable(max)
-    override var scrollWidthBind = Bindable(width)
+    override val scrollBind = CruddyBindable(value)
+    override val minScrollBind = CruddyBindable(min)
+    override val maxScrollBind = CruddyBindable(max)
+    override var scrollWidthBind = CruddyBindable(width)
 
     override var scroll: Int
         get() = scrollBind.field

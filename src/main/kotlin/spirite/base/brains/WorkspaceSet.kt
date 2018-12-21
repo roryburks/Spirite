@@ -1,9 +1,11 @@
 package spirite.base.brains
 
+import rb.owl.IObservable
+import rb.owl.Observable
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import kotlin.math.max
 
 interface IWorkspaceSet {
@@ -16,7 +18,7 @@ interface IWorkspaceSet {
     val workspaceObserver : IObservable<WorkspaceObserver>
     val workspaces: List<IImageWorkspace>
 
-    val currentWorkspaceBind : Bindable<IImageWorkspace?>
+    val currentWorkspaceBind : CruddyBindable<IImageWorkspace?>
     var currentWorkspace : IImageWorkspace?
 }
 interface MWorkspaceSet : IWorkspaceSet {
@@ -44,7 +46,7 @@ class WorkspaceSet : MWorkspaceSet{
         }
     }
 
-    override val currentWorkspaceBind = Bindable<IImageWorkspace?>(null) { new, old ->
+    override val currentWorkspaceBind = CruddyBindable<IImageWorkspace?>(null) { new, old ->
         workspaceObserver.trigger { it.workspaceChanged(new, old) }
     }
     override var currentWorkspace: IImageWorkspace? by currentWorkspaceBind

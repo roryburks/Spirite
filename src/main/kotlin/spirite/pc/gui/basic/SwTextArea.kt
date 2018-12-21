@@ -1,6 +1,6 @@
 package spirite.pc.gui.basic
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import spirite.gui.components.basic.ITextArea
 import spirite.gui.resources.Skin.BevelBorder.Dark
 import spirite.gui.resources.Skin.BevelBorder.Light
@@ -19,7 +19,7 @@ private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComp
     // TODO: Re-implement TextBind -> UI binding
     constructor() : this(SwTextAreaImp())
 
-    override val textBind = Bindable("")
+    override val textBind = CruddyBindable("")
     override var text by textBind
 
     private var textToBeSetToDocument : String? = null

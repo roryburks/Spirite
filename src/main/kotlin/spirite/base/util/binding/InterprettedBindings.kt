@@ -3,7 +3,7 @@ package spirite.base.util.binding
 import rb.vectrix.linear.Vec2f
 
 
-class InterprettedFloatBind(val baseBind : Bindable<Vec2f>, val x : Boolean) : MutableBindableStub<Float>() {
+class InterprettedFloatBind(val baseBind : CruddyBindable<Vec2f>, val x : Boolean) : MutableBindableStub<Float>() {
     override var field: Float
         get() {
             return if (x) baseBind.field.xf else baseBind.field.yf
@@ -20,5 +20,5 @@ class InterprettedFloatBind(val baseBind : Bindable<Vec2f>, val x : Boolean) : M
         }
 }
 
-val Bindable<Vec2f>.xBind : MBindable<Float> get() = InterprettedFloatBind(this, true)
-val Bindable<Vec2f>.yBind : MBindable<Float> get() = InterprettedFloatBind(this, false)
+val CruddyBindable<Vec2f>.xBind : MCruddyOldBindable<Float> get() = InterprettedFloatBind(this, true)
+val CruddyBindable<Vec2f>.yBind : MCruddyOldBindable<Float> get() = InterprettedFloatBind(this, false)

@@ -1,6 +1,6 @@
 package spirite.gui.views.animation
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
@@ -97,7 +97,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     }.also { masterControl.centralObservatory.trackingAnimationStateObserver.addObserver(it) }
     var animation : Animation? = null
 
-    private val metBind = Bindable(0f) { new, _ ->
+    private val metBind = CruddyBindable(0f) { new, _ ->
         sliderMet.value = (new * 100).floor
         viewPanel.redraw()
     }

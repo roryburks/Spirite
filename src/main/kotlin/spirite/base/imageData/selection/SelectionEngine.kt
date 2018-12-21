@@ -1,7 +1,7 @@
 package spirite.base.imageData.selection
 
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
+import spirite.base.brains.ICruddyOldObservable
+import spirite.base.brains.CruddyOldObservable
 import spirite.base.graphics.IImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
@@ -22,7 +22,7 @@ import spirite.hybrid.Hybrid
 import java.io.File
 
 interface ISelectionEngine {
-    val selectionChangeObserver: IObservable<(SelectionChangeEvent)->Any?>
+    val selectionChangeObserver: ICruddyOldObservable<(SelectionChangeEvent)->Any?>
     val selection : Selection?
     val selectionTransform: ITransformF?
     fun setSelection(newSelection: Selection?)
@@ -264,5 +264,5 @@ class SelectionEngine(
         bakeTranslationIntoLifted()
     }
 
-    override val selectionChangeObserver = Observable<(SelectionChangeEvent)->Any?>()
+    override val selectionChangeObserver = CruddyOldObservable<(SelectionChangeEvent)->Any?>()
 }

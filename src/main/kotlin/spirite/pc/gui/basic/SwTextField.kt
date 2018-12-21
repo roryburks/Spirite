@@ -1,6 +1,6 @@
 package spirite.pc.gui.basic
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import spirite.gui.components.basic.*
 import spirite.gui.resources.Skin.BevelBorder.Dark
 import spirite.gui.resources.Skin.BevelBorder.Light
@@ -21,7 +21,7 @@ private constructor(val imp : SwTextFieldImp) : ITextField, ISwComponent by SwCo
 {
     constructor() : this(SwTextFieldImp())
 
-    override val textBind = Bindable("")
+    override val textBind = CruddyBindable("")
     override var text by textBind
 
     init {
@@ -63,7 +63,7 @@ private constructor(
 
     constructor( allowsNegatives: Boolean = true, allowsFloats: Boolean = false) :this(allowsNegatives, allowsFloats, SwNumberFieldImp())
 
-    val textBind = Bindable("")
+    val textBind = CruddyBindable("")
     var text by textBind
 
     abstract fun isOob(str: String) : Boolean

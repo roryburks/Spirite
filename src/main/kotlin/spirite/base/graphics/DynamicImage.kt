@@ -32,9 +32,10 @@ class DynamicImage(
     val height get() = base?.height ?: 0
 
 
-    fun drawToImage(drawer: (RawImage) -> Unit,
-                    compositionWidth: Int, compositionHeight: Int,
-                    tImageToComposition: ITransformF = ImmutableTransformF.Identity)
+    fun drawToImage(compositionWidth: Int,
+                    compositionHeight: Int,
+                    tImageToComposition: ITransformF = ImmutableTransformF.Identity,
+                    drawer: (RawImage) -> Unit)
     {
         val checkoutContext = checkoutRaw(compositionWidth, compositionHeight, tImageToComposition)
         drawer.invoke(checkoutContext.buffer)

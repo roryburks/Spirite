@@ -1,6 +1,6 @@
 package spirite.gui.components.advanced
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import rb.vectrix.mathUtil.MathUtil
 import rb.extendo.extensions.then
 import spirite.gui.Orientation
@@ -124,7 +124,7 @@ private constructor(
         override var minSize by LayoutDelegate(minSize)
         override var resizeComponent by LayoutDelegate(component)
 
-        private var componentVisibleBindable = Bindable(visible) { _, _ -> resetLayout() }
+        private var componentVisibleBindable = CruddyBindable(visible) { _, _ -> resetLayout() }
         var componentVisible by componentVisibleBindable
 
         init {

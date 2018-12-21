@@ -1,6 +1,6 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import spirite.gui.resources.Skin
 import spirite.pc.gui.SColor
 import spirite.pc.gui.basic.SwComponent
@@ -30,7 +30,7 @@ private constructor(
 
     constructor(defaultText: String) : this(defaultText, SwELabelImp())
 
-    override val textBind: Bindable<String> = Bindable(defaultText) { new, _ ->
+    override val textBind: CruddyBindable<String> = CruddyBindable(defaultText) { new, _ ->
         label?.text = new
         textArea?.text = new
     }

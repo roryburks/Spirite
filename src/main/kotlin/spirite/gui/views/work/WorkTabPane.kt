@@ -1,5 +1,6 @@
 package spirite.gui.views.work
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
@@ -37,33 +38,35 @@ constructor(val master: IMasterControl, private val tabPane: ITabbedPane)
 
     var i = 0
 
-    val workspaceObserver = object : WorkspaceObserver {
-        override fun workspaceCreated(newWorkspace: IImageWorkspace) {
-            val title = "TODO${i++}"
+    val workspaceObserverContract = master.workspaceSet.workspaceObserver.addWeakObserver(
+            object : WorkspaceObserver {
+                override fun workspaceCreated(newWorkspace: IImageWorkspace) {
+                    val title = "TODO${i++}"
 
-            workspaces.add(newWorkspace)
-            val newContainer = Hybrid.ui.CrossPanel()
-            containers.add(newContainer)
-            tabPane.addTab(title, newContainer)
+                    workspaces.add(newWorkspace)
+                    val newContainer = Hybrid.ui.CrossPanel()
+                    containers.add(newContainer)
+                    tabPane.addTab(title, newContainer)
 
-            newWorkspace.displayedFilenameBind.addListener { new, _ ->
-                val ind = tabPane.components.indexOf(newContainer)
-                tabPane.setTitleAt(ind, new)
+                    newWorkspace.displayedFilenameBind.addListener { new, _ ->
+                        val ind = tabPane.components.indexOf(newContainer)
+                        tabPane.setTitleAt(ind, new)
+                    }
+                }
+
+                override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {
+                    val index = workspaces.indexOf(removedWorkspace)
+                    if( index != -1) {
+                        tabPane.removeTabAt(index)
+                        containers.removeAt(index)
+                        workspaces.removeAt(index)
+                    }
+                }
+
+                override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
+                    val newIndex = workspaces.indexOf(selectedWorkspace)
+                    tabPane.selectedIndex = newIndex
+                }
             }
-        }
-
-        override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {
-            val index = workspaces.indexOf(removedWorkspace)
-            if( index != -1) {
-                tabPane.removeTabAt(index)
-                containers.removeAt(index)
-                workspaces.removeAt(index)
-            }
-        }
-
-        override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
-            val newIndex = workspaces.indexOf(selectedWorkspace)
-            tabPane.selectedIndex = newIndex
-        }
-    }.apply { master.workspaceSet.workspaceObserver.addObserver(this) }
+    )
 }

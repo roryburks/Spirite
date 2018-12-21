@@ -1,6 +1,6 @@
 package spirite.base.brains.toolset
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.ICommand
 import rb.vectrix.linear.MutableTransformF
@@ -35,7 +35,7 @@ abstract class Tool(
 sealed class ToolProperty<T>( default: T) {
     abstract val hrName: String
 
-    val valueBind = Bindable(default)
+    val valueBind = CruddyBindable(default)
     var value by valueBind
 }
 
@@ -57,8 +57,8 @@ enum class PenDrawMode( val hrName: String) {
 }
 
 class Pen( toolset: Toolset) : Tool(toolset){
-    override val iconX = 0
-    override val iconY = 0
+    override val iconX get() = 0
+    override val iconY get() = 0
     override val description = "Pen"
 
     val alphaBind by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
@@ -71,8 +71,8 @@ class Pen( toolset: Toolset) : Tool(toolset){
     var mode by modeBind
 }
 class Eraser( toolset: Toolset) : Tool(toolset){
-    override val iconX = 1
-    override val iconY = 0
+    override val iconX get() = 1
+    override val iconY get() = 0
     override val description = "Eraser"
 
     val alphaBind by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
@@ -83,8 +83,8 @@ class Eraser( toolset: Toolset) : Tool(toolset){
     var hard by hardBind
 }
 class Fill( toolset: Toolset) : Tool(toolset){
-    override val iconX = 2
-    override val iconY = 0
+    override val iconX get() = 2
+    override val iconY get() = 0
     override val description = "Fill"
 }
 
@@ -95,26 +95,26 @@ enum class BoxSelectionShape( val hrName : String) {
     override fun toString() = hrName
 }
 class ShapeSelection( toolset: Toolset) : Tool(toolset){
-    override val iconX = 3
-    override val iconY = 0
+    override val iconX get() = 3
+    override val iconY get() = 0
     override val description = "Shape Selection"
 
     val shapeBind by scheme.Property(DropDownProperty("Shape", BoxSelectionShape.RECTANGLE, BoxSelectionShape.values()))
     var shape by shapeBind
 }
 class FreeSelection( toolset: Toolset) : Tool(toolset){
-    override val iconX = 0
-    override val iconY = 1
+    override val iconX get() = 0
+    override val iconY get() = 1
     override val description = "Free Selection"
 }
 class Move( toolset: Toolset) : Tool(toolset){
-    override val iconX = 1
-    override val iconY = 1
+    override val iconX get() = 1
+    override val iconY get() = 1
     override val description = "Move"
 }
 class Pixel( toolset: Toolset) : Tool(toolset){
-    override val iconX = 2
-    override val iconY = 1
+    override val iconX get() = 2
+    override val iconY get() = 1
     override val description = "Pixel"
 
     val alphaBind by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
@@ -123,8 +123,8 @@ class Pixel( toolset: Toolset) : Tool(toolset){
     var mode by modeBind
 }
 class Crop( toolset: Toolset) : Tool(toolset){
-    override val iconX = 3
-    override val iconY = 1
+    override val iconX get() = 3
+    override val iconY get() = 1
     override val description = "Cropper"
 
     val buttonBind by scheme.Property(ButtonProperty("Crop Selection", DrawCommand.CROP_SELECTION))
@@ -141,8 +141,8 @@ enum class WorkspaceScope {
     Workspace
 }
 class Rigger( toolset: Toolset) : Tool(toolset){
-    override val iconX = 0
-    override val iconY = 2
+    override val iconX get() = 0
+    override val iconY get() = 2
     override val description = "Rig"
 
     val scopeBind by scheme.Property(DropDownProperty("Scope", WorkspaceScope.Group, WorkspaceScope.values()))
@@ -157,16 +157,16 @@ enum class FlipMode( val hrName : String) {
     override fun toString() = hrName
 }
 class Flip( toolset: Toolset) : Tool(toolset){
-    override val iconX = 1
-    override val iconY = 2
+    override val iconX get() = 1
+    override val iconY get() = 2
     override val description = "Flipper"
 
     val flipModeBind by scheme.Property(RadioButtonProperty("Flip Mode", FlipMode.BY_MOVEMENT, FlipMode.values()))
     var flipMode by flipModeBind
 }
 class Reshaper(toolset: Toolset) : Tool(toolset){
-    override val iconX = 2
-    override val iconY = 2
+    override val iconX get() = 2
+    override val iconY get() = 2
     override val description = "Reshaper"
 
     val transform : MutableTransformF
@@ -203,8 +203,8 @@ enum class ColorChangeMode( val hrName: String) {
     override fun toString() = hrName
 }
 class ColorChanger( toolset: Toolset) : Tool(toolset){
-    override val iconX = 3
-    override val iconY = 2
+    override val iconX get() = 3
+    override val iconY get() = 2
     override val description = "Color Changer"
 
     val scopeBind by scheme.Property(DropDownProperty("Scope", ColorChangeScopes.LOCAL, ColorChangeScopes.values()))
@@ -213,7 +213,16 @@ class ColorChanger( toolset: Toolset) : Tool(toolset){
     var mode by modeBind
 }
 class ColorPicker( toolset: Toolset) : Tool(toolset){
-    override val iconX = 0
-    override val iconY = 3
+    override val iconX get() = 0
+    override val iconY get() = 3
     override val description = "Color Picker"
+}
+
+class StencilTool(toolset: Toolset) : Tool(toolset) {
+    override val iconX: Int get() = 3
+    override val iconY: Int get() = 3
+    override val description: String get() = "Stencil Tool"
+
+    val clearStencilBind by scheme.Property(ButtonProperty("Clear Stencil", DrawCommand.APPLY_TRANFORM))
+
 }

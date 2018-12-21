@@ -1,7 +1,7 @@
 package spirite.base.imageData
 
-import spirite.base.util.binding.Bindable
-import spirite.base.util.binding.IBindable
+import spirite.base.util.binding.CruddyBindable
+import spirite.base.util.binding.ICruddyOldBindable
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.brains.settings.ISettingsManager
@@ -38,7 +38,7 @@ interface IImageWorkspace {
     val file: File?
     val filename get() = file?.name ?: "Untitled Image"
     val hasChanged: Boolean
-    val displayedFilenameBind : IBindable<String>
+    val displayedFilenameBind : ICruddyOldBindable<String>
 
 
 
@@ -49,6 +49,7 @@ interface IImageWorkspace {
     val referenceManager : IReferenceManager
     val isolationManager: IIsolationManager
     val animationSpaceManager : IAnimationSpaceManager
+    val filterManager : IFilterManager
 
     val undoEngine : IUndoEngine
     val selectionEngine : ISelectionEngine
@@ -62,7 +63,7 @@ interface IImageWorkspace {
     val strokeProvider : IStrokeDrawerProvider
     val toolset : Toolset
 
-    val activeMediumBind : IBindable<MediumHandle?>
+    val activeMediumBind : ICruddyOldBindable<MediumHandle?>
     val activeData : ArrangedMediumData?
     fun arrangeActiveDataForNode( node: LayerNode) : ArrangedMediumData
 
@@ -100,6 +101,7 @@ class ImageWorkspace(
     override val paletteSet: PaletteSet = paletteManager.makePaletteSet()
     override val isolationManager: IIsolationManager = IsolationManager(this)
     override val animationSpaceManager: IAnimationSpaceManager = AnimationSpaceManager(this)
+    override val filterManager: IFilterManager = FilterManager()
 
     override val compositor = Compositor()
 
@@ -136,7 +138,7 @@ class ImageWorkspace(
         else
             displayedFilenameBind.field = (file?.name ?: "<New Worspace>")
     }
-    override val displayedFilenameBind = Bindable("<New Worspace>")
+    override val displayedFilenameBind = CruddyBindable("<New Worspace>")
 
     // endregion
 
@@ -146,7 +148,7 @@ class ImageWorkspace(
     private val currentNode get() = groupTree.selectedNode
 
 
-    override val activeMediumBind = Bindable<MediumHandle?>(null)
+    override val activeMediumBind = CruddyBindable<MediumHandle?>(null)
     override val activeData: ArrangedMediumData? get() = (currentNode as? LayerNode)?.let { arrangeActiveDataForNode(it) }
     override fun arrangeActiveDataForNode(node: LayerNode): ArrangedMediumData {
         val layerData = node.layer.activeData

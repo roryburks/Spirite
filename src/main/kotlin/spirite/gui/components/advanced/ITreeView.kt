@@ -2,8 +2,8 @@ package spirite.gui.components.advanced
 
 import CrossLayout
 import rb.vectrix.mathUtil.MathUtil
-import spirite.base.util.binding.Bindable
-import spirite.base.util.binding.IBindable
+import spirite.base.util.binding.CruddyBindable
+import spirite.base.util.binding.ICruddyOldBindable
 import spirite.base.graphics.IImage
 import spirite.base.graphics.NillImage
 import spirite.base.util.delegates.OnChangeDelegate
@@ -40,9 +40,9 @@ interface ITreeViewNonUI<T>{
     val rootNodes: List<ITreeNode<T>>
     var treeRootInterpreter : TreeDragInterpreter<T>?
 
-    val selectedNodeBind: IBindable<ITreeNode<T>?>
+    val selectedNodeBind: ICruddyOldBindable<ITreeNode<T>?>
     val selectedNode : ITreeNode<T>?
-    val selectedBind : IBindable<T?>
+    val selectedBind : ICruddyOldBindable<T?>
     var selected : T?
 
     fun addRoot( value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes()) : ITreeNode<T>
@@ -55,9 +55,9 @@ interface ITreeViewNonUI<T>{
     interface ITreeNode<T> {
         val children: List<ITreeNode<T>>
         var value : T
-        val valueBind : Bindable<T>
+        val valueBind : CruddyBindable<T>
         var expanded : Boolean
-        val expandedBind : Bindable<Boolean>
+        val expandedBind : CruddyBindable<Boolean>
 
         fun addChild( value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes(), expanded: Boolean = true): ITreeNode<T>
         fun removeChild( toRemove: ITreeNode<T>)
@@ -164,7 +164,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
         })
     }
 
-    override val selectedBind = Bindable<T?>(null)
+    override val selectedBind = CruddyBindable<T?>(null)
     override var selected: T?
         get() = selectedBind.field
         set(value) {
@@ -173,7 +173,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
             selectedNode = node
         }
 
-    override val selectedNodeBind = Bindable<ITreeNode<T>?>(null) { new, _ ->
+    override val selectedNodeBind = CruddyBindable<ITreeNode<T>?>(null) { new, _ ->
         selectedBind.field = new?.value
         redraw()
     }
@@ -311,10 +311,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
     internal constructor( defaultValue: T, val attributes: TreeNodeAttributes<T>, expanded: Boolean = true)
         :ITreeNode<T>
     {
-        override val expandedBind = Bindable(expanded) { new, old -> rebuildTree() }
+        override val expandedBind = CruddyBindable(expanded) { new, old -> rebuildTree() }
         override var expanded by expandedBind
 
-        override val valueBind = Bindable(defaultValue) { new, old -> rebuildTree() }
+        override val valueBind = CruddyBindable(defaultValue) { new, old -> rebuildTree() }
         override var value by valueBind
         override val children: List<TreeNode<T>> get() = _children
         private val _children = mutableListOf<TreeNode<T>>()

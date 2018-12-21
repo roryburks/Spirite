@@ -12,9 +12,9 @@ class SpriteLayerTests {
 
     @test fun makesSpriteLayer() {
         val spriteLayer = SpriteLayer(workspace, workspace.mediumRepository)
-        (spriteLayer.parts[0].handle.medium as DynamicMedium).image.drawToImage({
+        (spriteLayer.parts[0].handle.medium as DynamicMedium).image.drawToImage(100, 100, drawer = {
             it.graphics.drawLine(0f,0f,10f,10f)
-        }, 100, 100)
+        })
 
         assertEquals(10, spriteLayer.width)
         assertEquals(10, spriteLayer.height)

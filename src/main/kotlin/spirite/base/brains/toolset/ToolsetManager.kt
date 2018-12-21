@@ -1,27 +1,27 @@
 package spirite.base.brains.toolset
 
-import spirite.base.util.binding.Bindable
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
+import spirite.base.util.binding.CruddyBindable
+import spirite.base.brains.ICruddyOldObservable
+import spirite.base.brains.CruddyOldObservable
 import spirite.base.brains.toolset.IToolsetManager.ToolsetPropertyObserver
 
 interface IToolsetManager {
     val toolset: Toolset
 
-    val selectedToolBinding: Bindable<Tool>
+    val selectedToolBinding: CruddyBindable<Tool>
     var selectedTool: Tool
 
     interface ToolsetPropertyObserver {
         fun onToolPropertyChanged( tool: Tool, property: ToolProperty<*>)
     }
-    val toolsetObserver : IObservable<ToolsetPropertyObserver>
+    val toolsetObserver : ICruddyOldObservable<ToolsetPropertyObserver>
 }
 
 class ToolsetManager : IToolsetManager{
-    override val toolsetObserver = Observable<ToolsetPropertyObserver>()
+    override val toolsetObserver = CruddyOldObservable<ToolsetPropertyObserver>()
     override val toolset = Toolset(this)
 
-    override val selectedToolBinding = Bindable<Tool>(toolset.Pen)
+    override val selectedToolBinding = CruddyBindable<Tool>(toolset.Pen)
     override var selectedTool by selectedToolBinding
 
     internal fun triggerToolsetChanged(tool: Tool, property: ToolProperty<*>) {

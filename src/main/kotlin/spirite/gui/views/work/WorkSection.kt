@@ -1,9 +1,10 @@
 package spirite.gui.views.work
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.IObservable
+import spirite.base.brains.ICruddyOldObservable
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
-import spirite.base.brains.Observable
+import spirite.base.brains.CruddyOldObservable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.pen.Penner
 import rb.vectrix.mathUtil.f
@@ -179,43 +180,45 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
 //        }
 //    }.apply { master.centralObservatory.trackingImageObserver.addObserver(this) }
 
-    val workspaceObserver = object: WorkspaceObserver {
-        override fun workspaceCreated(newWorkspace: IImageWorkspace) {
-            val newView = WorkSectionView(newWorkspace)
-            views.put(newWorkspace, newView)
+    val workspaceObserverContract =  master.workspaceSet.workspaceObserver.addWeakObserver(
+            object: WorkspaceObserver {
+                override fun workspaceCreated(newWorkspace: IImageWorkspace) {
+                    val newView = WorkSectionView(newWorkspace)
+                    views.put(newWorkspace, newView)
 
-            // By default centered
-            newView.offsetX = (newWorkspace.width/2 - workAreaContainer.width/2)
-            newView.offsetY = (newWorkspace.height/2 - workAreaContainer.height/2)
-        }
+                    // By default centered
+                    newView.offsetX = (newWorkspace.width/2 - workAreaContainer.width/2)
+                    newView.offsetY = (newWorkspace.height/2 - workAreaContainer.height/2)
+                }
 
-        override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {
-            views.remove(removedWorkspace)
-        }
+                override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {
+                    views.remove(removedWorkspace)
+                }
 
-        override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
-            _viewObservable.trigger { it.invoke() }
-            currentWorkspace = selectedWorkspace
+                override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
+                    _viewObservable.trigger { it.invoke() }
+                    currentWorkspace = selectedWorkspace
 
-            SwingUtilities.invokeLater {    // TODO: Bad.  There should be a better solution.
-                when (selectedWorkspace) {
-                    null -> {
-                        hScroll.enabled = false
-                        vScroll.enabled = false
-                    }
-                    else -> {
-                        hScroll.enabled = true
-                        vScroll.enabled = true
-                        val view = views.get(selectedWorkspace)!!
-                        calibrateScrolls(view.offsetX / scrollRatio, view.offsetY / scrollRatio)
+                    SwingUtilities.invokeLater {    // TODO: Bad.  There should be a better solution.
+                        when (selectedWorkspace) {
+                            null -> {
+                                hScroll.enabled = false
+                                vScroll.enabled = false
+                            }
+                            else -> {
+                                hScroll.enabled = true
+                                vScroll.enabled = true
+                                val view = views.get(selectedWorkspace)!!
+                                calibrateScrolls(view.offsetX / scrollRatio, view.offsetY / scrollRatio)
+                            }
+                        }
                     }
                 }
             }
-        }
-    }.apply { master.workspaceSet.workspaceObserver.addObserver(this) }
+    )
 
-    val viewObservable : IObservable<()->Unit> get() = _viewObservable
-    private val _viewObservable = Observable<()->Unit>()
+    val viewObservable : ICruddyOldObservable<()->Unit> get() = _viewObservable
+    private val _viewObservable = CruddyOldObservable<()->Unit>()
 
     init {
     }

@@ -1,6 +1,6 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
@@ -19,7 +19,7 @@ interface IBoxList<T> : IComponent
     val entries : List<T>
     var movementContract : IMovementContract?
 
-    val selectedIndexBind : Bindable<Int>
+    val selectedIndexBind : CruddyBindable<Int>
     var selectedIndex: Int
     var selected : T?
 
@@ -55,7 +55,7 @@ abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Co
     var boxWidth by OnChangeDelegate(boxWidth, {rebuild()})
     var boxHeight by OnChangeDelegate(boxHeight, {rebuild()})
 
-    override val selectedIndexBind = Bindable(0) { new, old ->
+    override val selectedIndexBind = CruddyBindable(0) { new, old ->
         _entries.getOrNull(old)?.component?.setSelected(false)
         _entries.getOrNull(new)?.component?.setSelected(true)
     }

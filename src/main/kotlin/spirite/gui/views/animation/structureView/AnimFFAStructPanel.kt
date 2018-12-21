@@ -2,7 +2,7 @@ package spirite.gui.views.animation.structureView
 
 import rb.extendo.extensions.append
 import rb.extendo.extensions.lookup
-import spirite.base.util.binding.IBoundListener
+import spirite.base.util.binding.ICruddyBoundListener
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
@@ -523,7 +523,7 @@ private constructor(
         }
     }.also {anim.workspace.animationManager.animationStructureChangeObservable.addObserver( it)}
 
-    private  var apb : IBoundListener<SpritePart?>? = null
+    private  var apb : ICruddyBoundListener<SpritePart?>? = null
     val listener = master.centralObservatory.selectedNode.addWeakListener { new, old ->
         apb?.unbind()
         if( old != null) {

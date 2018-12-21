@@ -3,14 +3,14 @@ package spirite.base.imageData.animation
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 
 abstract class Animation(
         name : String,
         var workspace : IImageWorkspace,
         val state: AnimationState)
 {
-    val nameBind = Bindable(name)
+    val nameBind = CruddyBindable(name)
     var name by nameBind
     abstract val startFrame : Float
     abstract val endFrame : Float

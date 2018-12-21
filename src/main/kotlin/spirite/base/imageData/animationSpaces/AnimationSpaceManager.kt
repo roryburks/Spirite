@@ -1,9 +1,9 @@
 package spirite.base.imageData.animationSpaces
 
-import spirite.base.util.binding.Bindable
-import spirite.base.util.binding.IBindable
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
+import spirite.base.util.binding.CruddyBindable
+import spirite.base.util.binding.ICruddyOldBindable
+import spirite.base.brains.ICruddyOldObservable
+import spirite.base.brains.CruddyOldObservable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSpaceObserver
 import spirite.base.imageData.undo.NullAction
@@ -15,7 +15,7 @@ interface  IAnimationSpaceManager
     val workspace: IImageWorkspace
 
     var currentAnimationSpace : AnimationSpace?
-    val currentAnimationSpaceBind: IBindable<AnimationSpace?>
+    val currentAnimationSpaceBind: ICruddyOldBindable<AnimationSpace?>
     val animationSpaces : List<AnimationSpace>
 
     fun addAnimationSpace(space: AnimationSpace, select: Boolean = false)
@@ -25,13 +25,13 @@ interface  IAnimationSpaceManager
         fun spaceAdded(space: AnimationSpace)
         fun spaceRemoved( space: AnimationSpace)
     }
-    val animationSpaceObservable: IObservable<AnimationSpaceObserver>
+    val animationSpaceObservable: ICruddyOldObservable<AnimationSpaceObserver>
 }
 
 class AnimationSpaceManager(override val workspace: IImageWorkspace) : IAnimationSpaceManager
 {
 
-    override val currentAnimationSpaceBind = Bindable<AnimationSpace?>(null)
+    override val currentAnimationSpaceBind = CruddyBindable<AnimationSpace?>(null)
     override var currentAnimationSpace: AnimationSpace?
             get() = currentAnimationSpaceBind.field
             set(value) {
@@ -84,5 +84,5 @@ class AnimationSpaceManager(override val workspace: IImageWorkspace) : IAnimatio
     override val animationSpaces: List<AnimationSpace> get() = _animationSpaces
     private val _animationSpaces = mutableListOf<AnimationSpace>()
 
-    override val animationSpaceObservable = Observable<AnimationSpaceObserver>()
+    override val animationSpaceObservable = CruddyOldObservable<AnimationSpaceObserver>()
 }

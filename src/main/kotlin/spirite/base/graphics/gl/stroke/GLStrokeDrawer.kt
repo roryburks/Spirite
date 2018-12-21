@@ -42,17 +42,14 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
         return true
     }
 
-    override fun step(): Boolean {
-        val ctx = context
-        return when( ctx) {
-            null -> {
-                MDebug.handleError(STRUCTURAL, "Tried to continue Stroke that isn't started.")
-                false
-            }
-            else -> {
-                doStep(ctx)
-                true
-            }
+    override fun step() = when( val ctx = context) {
+        null -> {
+            MDebug.handleError(STRUCTURAL, "Tried to continue Stroke that isn't started.")
+            false
+        }
+        else -> {
+            doStep(ctx)
+            true
         }
     }
 

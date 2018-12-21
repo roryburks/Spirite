@@ -1,5 +1,7 @@
 package spirite.gui.views.groupView
 
+import rb.jvm.owl.addWeakObserver
+import rb.owl.IContract
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
@@ -201,11 +203,16 @@ private constructor(
     }
 
 
-    private val wsl = object: WorkspaceObserver {
-        override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
-        override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {}
-        override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
-            rebuild()
-        }
-    }.apply { master.workspaceSet.workspaceObserver.addObserver(this) }
+    val wslContract : IContract
+    init {
+        wslContract =
+        master.workspaceSet.workspaceObserver.addWeakObserver(
+                object : WorkspaceObserver {
+                    override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
+                    override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {}
+                    override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
+                        rebuild()
+                    }
+                })
+    }
 }

@@ -1,6 +1,6 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import spirite.pc.gui.SColor
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
@@ -11,12 +11,12 @@ import javax.swing.JColorChooser
 import javax.swing.JPanel
 
 interface IColorSquareNonUI {
-    val colorBind : Bindable<SColor>
+    val colorBind : CruddyBindable<SColor>
     var color : SColor
     var active : Boolean
 }
 class ColorSquareNonUI( color: SColor) : IColorSquareNonUI {
-    override val colorBind = Bindable(color)
+    override val colorBind = CruddyBindable(color)
     override var color: SColor by colorBind
     override var active: Boolean = true
 }

@@ -1,6 +1,6 @@
 package spirite.gui.views.layerProperties
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
@@ -61,7 +61,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
         }
     }
 
-    private val activePartBind = Bindable<SpritePart?>(null)
+    private val activePartBind = CruddyBindable<SpritePart?>(null)
     private var activePart: SpritePart? by activePartBind
 
     private val boxList = Hybrid.ui.BoxList<SpritePart>(32, 32)

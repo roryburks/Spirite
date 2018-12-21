@@ -1,6 +1,6 @@
 package spirite.base.brains.palette
 
-import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.palette.IPaletteManager.PaletteChangeEvent
 import spirite.base.brains.palette.IPaletteManager.PaletteSetChangeEvent
 import spirite.base.util.StringUtil
@@ -14,7 +14,7 @@ abstract class PaletteSet {
     val palettes : List<Palette> get() = _palettes
     private val _palettes = mutableListOf<Palette>(PSPalette("Default"))
 
-    val currentPaletteBind = Bindable<Palette?>(_palettes.first())
+    val currentPaletteBind = CruddyBindable<Palette?>(_palettes.first())
     var currentPalette
         get() = currentPaletteBind.field
         set(value) {

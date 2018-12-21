@@ -84,7 +84,7 @@ class NodeRenderer(
 
         // Go through the node's children (in reverse), drawing any visible group
         //	found recursively and drawing any Layer found plainly.
-        node.children.asReversed()
+        node.children.asReversed().asSequence()
                 // Note: The second half is needed to attempts to render children at max_depth+1 when it's already been
                 //  determined that there are no children  there (hence why the max_depth was set lower)
                 .filter { it.isVisible && !(depth == buffer.size-1 && it is GroupNode) }

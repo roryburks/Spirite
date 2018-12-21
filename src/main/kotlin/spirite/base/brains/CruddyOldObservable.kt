@@ -3,15 +3,15 @@ package spirite.base.brains
 import java.lang.ref.WeakReference
 
 /**
- * Note: the IObservable interface shields users of the Add and Remove features from being able to trigger observed events
+ * Note: the ICruddyOldObservable interface shields users of the Add and Remove features from being able to trigger observed events
  * and other internal functionality.
  */
-interface IObservable<T> {
+interface ICruddyOldObservable<T> {
     fun addObserver( toAdd: T) : T
     fun removeObserver( toRemove: T)
 }
 
-class Observable<T> : IObservable<T>
+class CruddyOldObservable<T> : ICruddyOldObservable<T>
 {
     private val observers = mutableListOf<WeakReference<T>>()
 

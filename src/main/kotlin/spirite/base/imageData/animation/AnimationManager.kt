@@ -1,9 +1,9 @@
 package spirite.base.imageData.animation
 
-import spirite.base.util.binding.Bindable
-import spirite.base.util.binding.IBindable
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
+import spirite.base.util.binding.CruddyBindable
+import spirite.base.util.binding.ICruddyOldBindable
+import spirite.base.brains.ICruddyOldObservable
+import spirite.base.brains.CruddyOldObservable
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
@@ -15,7 +15,7 @@ import spirite.base.imageData.undo.NullAction
 interface IAnimationManager {
     val animations : List<Animation>
 
-    val currentAnimationBind : IBindable<Animation?>
+    val currentAnimationBind : ICruddyOldBindable<Animation?>
     var currentAnimation : Animation?
 
     fun addAnimation( animation: Animation, select: Boolean = true)
@@ -25,12 +25,12 @@ interface IAnimationManager {
         fun animationCreated( animation: Animation)
         fun animationRemoved( animation: Animation)
     }
-    val animationObservable : IObservable<AnimationObserver>
+    val animationObservable : ICruddyOldObservable<AnimationObserver>
 
     interface AnimationStructureChangeObserver {
         fun animationStructureChanged( animation: Animation)
     }
-    val animationStructureChangeObservable : IObservable<AnimationStructureChangeObserver>
+    val animationStructureChangeObservable : ICruddyOldObservable<AnimationStructureChangeObserver>
     fun triggerStructureChange(animation: Animation)
 }
 
@@ -39,7 +39,7 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
     private val _animations = mutableListOf<Animation>()
     override val animations: List<Animation> get() = _animations
 
-    override val currentAnimationBind = Bindable<Animation?>(FakeAnimation(workspace))
+    override val currentAnimationBind = CruddyBindable<Animation?>(FakeAnimation(workspace))
     override var currentAnimation by currentAnimationBind
 
 
@@ -78,8 +78,8 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
     }
     // endregion
 
-    override val animationObservable = Observable<AnimationObserver>()
-    override val animationStructureChangeObservable = Observable<AnimationStructureChangeObserver>()
+    override val animationObservable = CruddyOldObservable<AnimationObserver>()
+    override val animationStructureChangeObservable = CruddyOldObservable<AnimationStructureChangeObserver>()
 
     override fun triggerStructureChange(animation: Animation) {
         animationStructureChangeObservable.trigger { it.animationStructureChanged(animation)}

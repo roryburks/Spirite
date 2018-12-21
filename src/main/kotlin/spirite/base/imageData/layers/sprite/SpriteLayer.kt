@@ -1,8 +1,8 @@
 package spirite.base.imageData.layers.sprite
 
-import spirite.base.util.binding.Bindable
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
+import spirite.base.util.binding.CruddyBindable
+import spirite.base.brains.ICruddyOldObservable
+import spirite.base.brains.CruddyOldObservable
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.*
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
@@ -74,7 +74,7 @@ class SpriteLayer : Layer {
     private val _parts = mutableListOf<SpritePart>()
     private var workingId = 0
 
-    var activePartBind = Bindable<SpritePart?>(null)
+    var activePartBind = CruddyBindable<SpritePart?>(null)
     { new, _ ->
         cAlphaBind.field = new?.alpha ?: 1f
         cDepthBind.field = new?.depth ?: 0
@@ -94,8 +94,8 @@ class SpriteLayer : Layer {
     }
     var activePart : SpritePart? by activePartBind
 
-    private var _layerChangeObserver = Observable<()->Any?>()
-    val layerChangeObserver : IObservable<()->Any?> get() = _layerChangeObserver
+    private var _layerChangeObserver = CruddyOldObservable<()->Any?>()
+    val layerChangeObserver : ICruddyOldObservable<()->Any?> get() = _layerChangeObserver
     private fun triggerChange() {
         _layerChangeObserver.trigger { it() }
         workspace.imageObservatory.triggerRefresh(
@@ -305,15 +305,15 @@ class SpriteLayer : Layer {
     // endregion
 
 
-    val cDepthBind = Bindable(0) { new, _ -> activePart?.depth = new }
-    val cVisibleBind = Bindable(true) { new, _ -> activePart?.visible = new }
-    val cPartNameBind = Bindable("") { new, _ -> activePart?.partName = new }
-    val cAlphaBind = Bindable(1f) { new, _ -> activePart?.alpha = new }
-    val cTransXBind = Bindable(0f) { new, _ -> activePart?.transX = new }
-    val cTransYBind = Bindable(0f) { new, _ -> activePart?.transY = new }
-    val cScaleXBind = Bindable(1f) { new, _ -> activePart?.scaleX = new }
-    val cScaleYBind = Bindable(1f) { new, _ -> activePart?.scaleY = new }
-    val cRotBind = Bindable(0f) { new, _ -> activePart?.rot = new }
+    val cDepthBind = CruddyBindable(0) { new, _ -> activePart?.depth = new }
+    val cVisibleBind = CruddyBindable(true) { new, _ -> activePart?.visible = new }
+    val cPartNameBind = CruddyBindable("") { new, _ -> activePart?.partName = new }
+    val cAlphaBind = CruddyBindable(1f) { new, _ -> activePart?.alpha = new }
+    val cTransXBind = CruddyBindable(0f) { new, _ -> activePart?.transX = new }
+    val cTransYBind = CruddyBindable(0f) { new, _ -> activePart?.transY = new }
+    val cScaleXBind = CruddyBindable(1f) { new, _ -> activePart?.scaleX = new }
+    val cScaleYBind = CruddyBindable(1f) { new, _ -> activePart?.scaleY = new }
+    val cRotBind = CruddyBindable(0f) { new, _ -> activePart?.rot = new }
 
     private fun getAllLinkedLayers() : Sequence<SpriteLayer> {
         return workspace.groupTree.root.traverse()

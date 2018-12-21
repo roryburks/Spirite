@@ -1,8 +1,8 @@
 package spirite.base.imageData.animationSpaces.FFASpace
 
-import spirite.base.util.binding.Bindable
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
+import spirite.base.util.binding.CruddyBindable
+import spirite.base.brains.ICruddyOldObservable
+import spirite.base.brains.CruddyOldObservable
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -17,7 +17,7 @@ class FFASpaceViewState(val space: FFAAnimationSpace)
     // region Playback / timing
     var zoomLevel = 0
 
-    var fpsBind = Bindable(8f)
+    var fpsBind = CruddyBindable(8f)
     var fps by fpsBind
     var met = 0f
         set(value) {field = value; triggerPlayChange(animation, met)}
@@ -91,8 +91,8 @@ class FFASpaceViewState(val space: FFAAnimationSpace)
         _animationSpaceObservable.trigger { it.animationSpaceChanged(structural) }
     }
 
-    override val animationSpaceObservable : IObservable<InternalAnimationSpaceObserver> get() = _animationSpaceObservable
-    private val _animationSpaceObservable= Observable<InternalAnimationSpaceObserver>()
+    override val animationSpaceObservable : ICruddyOldObservable<InternalAnimationSpaceObserver> get() = _animationSpaceObservable
+    private val _animationSpaceObservable= CruddyOldObservable<InternalAnimationSpaceObserver>()
 
     private val __animationStructureObs = space.workspace.animationManager.animationStructureChangeObservable.addObserver(object : AnimationStructureChangeObserver {
         override fun animationStructureChanged(animation: Animation) {
@@ -101,8 +101,8 @@ class FFASpaceViewState(val space: FFAAnimationSpace)
         }
     })
 
-    override val animationPlayObservable: IObservable<InternalAnimationPlayObserver> get() = _animationPlayObservable
-    private val _animationPlayObservable = Observable<InternalAnimationPlayObserver>()
+    override val animationPlayObservable: ICruddyOldObservable<InternalAnimationPlayObserver> get() = _animationPlayObservable
+    private val _animationPlayObservable = CruddyOldObservable<InternalAnimationPlayObserver>()
     private fun triggerPlayChange( anim: Animation?, frame: Float) {
         _animationPlayObservable.trigger { it.playStateChanged(anim, frame) }
     }
