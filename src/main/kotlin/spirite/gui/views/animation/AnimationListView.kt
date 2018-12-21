@@ -1,5 +1,6 @@
 package spirite.gui.views.animation
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DeleteAnimationCommand
 import spirite.base.brains.commands.DuplicateAnimationCommand
@@ -94,11 +95,11 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
         override fun animationRemoved(animation: Animation) = rebuild()
     }.also { master.centralObservatory.trackingAnimationObservable.addObserver(it)}
 
-    private val _wsObs = master.workspaceSet.currentWorkspaceBind.addListener { _, _ ->  rebuild()}
+    private val _wsObsK = master.workspaceSet.currentWorkspaceBind.addWeakObserver {  _, _ ->  rebuild()}
 
     override fun close() {
         master.centralObservatory.trackingAnimationObservable.removeObserver(_animObs)
-        _wsObs.unbind()
+        _wsObsK.void()
     }
 
     init {

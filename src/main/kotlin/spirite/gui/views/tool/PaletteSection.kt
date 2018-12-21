@@ -1,5 +1,6 @@
 package spirite.gui.views.tool
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.palette.Palette
@@ -268,7 +269,7 @@ constructor(
     }
 
     // region Observers
-    private val _workspaceListener = master.workspaceSet.currentWorkspaceBind.addListener { new, old ->
+    private val _workspaceListenerK = master.workspaceSet.currentWorkspaceBind.addWeakObserver {  new, old ->
         rebuild()
     }
     private val _paletteManaager = object : PaletteObserver {
@@ -278,7 +279,7 @@ constructor(
         }
     }.also { master.paletteManager.paletteObservable.addObserver(it)}
     fun onClose() {
-        _workspaceListener.unbind()
+        _workspaceListenerK.void()
     }
     //endregion
 }

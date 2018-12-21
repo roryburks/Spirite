@@ -1,5 +1,6 @@
 package spirite.gui.views.animation.animationSpaceView
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
@@ -110,7 +111,7 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
         }
 
     }
-    val __worspaceListener = master.workspaceSet.currentWorkspaceBind.addWeakListener { new, old ->
+    val __worspaceListenerK = master.workspaceSet.currentWorkspaceBind.addWeakObserver { new, old ->
         old?.animationSpaceManager?.animationSpaceObservable?.removeObserver(animationSpaceObserver)
         new?.animationSpaceManager?.animationSpaceObservable?.addObserver(animationSpaceObserver)
         rebuildDropDown(new)

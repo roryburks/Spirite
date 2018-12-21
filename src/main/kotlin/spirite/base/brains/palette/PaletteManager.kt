@@ -1,5 +1,6 @@
 package spirite.base.brains.palette
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.*
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.settings.ISettingsManager
@@ -70,7 +71,7 @@ class PaletteManager(
     }
 
     // region Observer Bindings
-    private val wsObs = workspaceSet.currentWorkspaceBind.addListener { new, _ ->
+    private val wsObsK = workspaceSet.currentWorkspaceBind.addWeakObserver {new, _ ->
         currentPaletteBind.field = new?.paletteSet?.currentPalette ?: globalPalette
     }
 

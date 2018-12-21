@@ -3,8 +3,10 @@ package spirite.base.brains
 import rb.owl.IContract
 import rb.owl.IObservable
 import rb.owl.IObserver
+import rb.owl.bindable.IBindObserver
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.OnChangeEvent
+import rb.owl.bindable.addObserver
 import rb.owl.observer
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageObservatory.ImageObserver
@@ -71,13 +73,30 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
 
     private inner class TrackingBinder<T>(val finder: (IImageWorkspace) -> IBindable<T>) : IBindable<T?>
     {
-        override val field: T? get() = workspaceSet.currentWorkspace?.run { finder(this).field }
+        override val field: T? get() = workspaceSet.currentWorkspace?.run(finder)?.field
         var currentContract: IContract? = null
 
-        override fun addObserver(observer: IObserver<OnChangeEvent<T?>>, trigger: Boolean): IContract {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        override fun addObserver(observer: IObserver<OnChangeEvent<T?>>, trigger: Boolean): IContract = ObserverContract(observer)
+        private val binds = mutableListOf<ObserverContract>()
+        private inner class ObserverContract( val observer: IBindObserver<T?>) : IContract {
+            init {binds.add(this)}
+            override fun void() { binds.remove(this)}
         }
 
+        private val workspaceObsContract = workspaceSet.currentWorkspaceBind.addObserver { new, old ->
+            currentContract?.void()
+            val oldF = old?.run(finder)?.field
+            when(new) {
+                null -> {
+                    currentContract = null
+                    binds.removeIf { it.observer.trigger?.invoke(null, oldF) == null }
+                }
+                else -> {
+                    val newBind = finder(new)
+                    currentContract = newBind.addObserver(true){ newT: T, oldT: T ->  }
+                }
+            }
+        }
     }
 
     // region CruddyOldImplementation
@@ -102,7 +121,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
                 weakListeners.removeIf { it.get()?.invoke(new,old) == null }
             }
 
-            workspaceSet.currentWorkspaceBind.addListener { selectedWS, previousSelected ->
+            workspaceSet.currentWorkspaceBind.addObserver { selectedWS, previousSelected ->
                 currentBind?.unbind()
                 currentBind = selectedWS?.run { finder.invoke(this).addListener(onChange) }
 
@@ -110,6 +129,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
                 val old = previousSelected?.run(finder)?.field
                 listeners.forEach { it.invoke(new, old) }
                 weakListeners.removeIf { it.get()?.invoke(new, old) == null }
+
             }
         }
 

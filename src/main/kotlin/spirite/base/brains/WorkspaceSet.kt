@@ -2,6 +2,9 @@ package spirite.base.brains
 
 import rb.owl.IObservable
 import rb.owl.Observable
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.IBindable
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
@@ -18,7 +21,7 @@ interface IWorkspaceSet {
     val workspaceObserver : IObservable<WorkspaceObserver>
     val workspaces: List<IImageWorkspace>
 
-    val currentWorkspaceBind : CruddyBindable<IImageWorkspace?>
+    val currentWorkspaceBind : IBindable<IImageWorkspace?>
     var currentWorkspace : IImageWorkspace?
 }
 interface MWorkspaceSet : IWorkspaceSet {
@@ -46,9 +49,9 @@ class WorkspaceSet : MWorkspaceSet{
         }
     }
 
-    override val currentWorkspaceBind = CruddyBindable<IImageWorkspace?>(null) { new, old ->
-        workspaceObserver.trigger { it.workspaceChanged(new, old) }
-    }
+    override val currentWorkspaceBind = Bindable<IImageWorkspace?>(null)
+            .also { bind -> bind.addObserver(false) { new, old ->  workspaceObserver.trigger { it.workspaceChanged(new, old) }} }
+
     override var currentWorkspace: IImageWorkspace? by currentWorkspaceBind
 
     override val currentMWorkspace: MImageWorkspace? get() = currentWorkspaceBind.field as? MImageWorkspace // Badish
