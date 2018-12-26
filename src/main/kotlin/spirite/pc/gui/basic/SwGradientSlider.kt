@@ -1,5 +1,6 @@
 package spirite.pc.gui.basic
 
+import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.UIUtil
@@ -70,7 +71,7 @@ private constructor(minValue: Float, maxValue: Float, label: String, val imp : S
     }
 
     init {
-        valueBind.addRootListener { new, old -> redraw()}
+        valueBind.addObserver { _, _ ->  redraw()}
 
         val trigger : (MouseEvent) -> Unit = {
             if( imp.isEnabled)

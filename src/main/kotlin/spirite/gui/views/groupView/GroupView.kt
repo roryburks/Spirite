@@ -1,6 +1,7 @@
 package spirite.gui.views.groupView
 
 import rb.jvm.owl.addWeakObserver
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.util.ColorARGB32Normal
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
@@ -57,7 +58,7 @@ private constructor(
     val colorBox = Hybrid.ui.ColorSquare()
 
     init {
-        slider.valueBind.addRootListener { new, _ ->  master.centralObservatory.selectedNode.field?.alpha = new}
+        slider.valueBind.addObserver { new, _ ->  master.centralObservatory.selectedNode.field?.alpha = new}
 
         comboBox.selectedItemBind.addRootListener { new, old ->
             new ?: return@addRootListener

@@ -57,12 +57,12 @@ private class CompContractUnion(imp: IComponent, private val cont: IContract) : 
 fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolProperty<*>) = when( toolProperty) {
     is SliderProperty -> Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(toolProperty.min, toolProperty.max, toolProperty.hrName).apply {
-//            toolProperty.valueBind.bindWeakly(valueBind)
+            valueBind.bindWeaklyTo(toolProperty.valueBind)
         }, height = 24)
     }
     is SizeProperty ->  Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(0f, 1000f, toolProperty.hrName).apply {
-//            toolProperty.valueBind.bindWeakly(valueBind)
+            valueBind.bindWeaklyTo(toolProperty.valueBind)
             mutatorPositionToValue = object : InvertibleFunction<Float>{
                 override fun perform(x: Float): Float = when {
                     x < 0.25f   -> x * 10f * 4f

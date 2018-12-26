@@ -18,6 +18,7 @@ import spirite.pc.gui.jcolor
 
 class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
+    private var _opacitySliderK : IContract? = null
     private var _btnVisibilityK : IContract? = null
 
     var linkedSprite : SpriteLayer? = null
@@ -35,7 +36,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                 tfScaleX.valueBind.unbind()
                 tfScaleY.valueBind.unbind()
                 tfRot.valueBind.unbind()
-                opacitySlider.valueBind.unbind()
+                _opacitySliderK?.void()
                 _btnVisibilityK?.void()
 
                 if( value != null) {
@@ -45,12 +46,12 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
                     value.cPartNameBind.bindWeakly(tfType.textBind)
                     value.cDepthBind.bindWeakly(tfDepth.valueBind)
-                    value.cAlphaBind.bindWeakly(opacitySlider.valueBind)
                     value.cTransXBind.bindWeakly(tfTransX.valueBind)
                     value.cTransYBind.bindWeakly(tfTransY.valueBind)
                     value.cScaleXBind.bindWeakly(tfScaleX.valueBind)
                     value.cScaleYBind.bindWeakly(tfScaleY.valueBind)
                     value.cRotBind.bindWeakly(tfRot.valueBind)
+                    _opacitySliderK = opacitySlider.valueBind.bindWeaklyTo(value.cAlphaBind)
                     _btnVisibilityK = btnVisibility.checkBind.bindWeaklyTo(value.cVisibleBind)
                 }
                 else boxList.clear()

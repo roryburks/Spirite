@@ -308,10 +308,9 @@ class SpriteLayer : Layer {
 
 
     val cDepthBind = CruddyBindable(0) { new, _ -> activePart?.depth = new }
-    val cVisibleBind = Bindable(true)
-            .also{it.addObserver { new, _ -> activePart?.visible = new }}
+    val cVisibleBind = Bindable(true) .also{it.addObserver { new, _ -> activePart?.visible = new }}
     val cPartNameBind = CruddyBindable("") { new, _ -> activePart?.partName = new }
-    val cAlphaBind = CruddyBindable(1f) { new, _ -> activePart?.alpha = new }
+    val cAlphaBind = Bindable(1f) .also { it.addObserver { new, _ -> activePart?.alpha = new  } }
     val cTransXBind = CruddyBindable(0f) { new, _ -> activePart?.transX = new }
     val cTransYBind = CruddyBindable(0f) { new, _ -> activePart?.transY = new }
     val cScaleXBind = CruddyBindable(1f) { new, _ -> activePart?.scaleX = new }

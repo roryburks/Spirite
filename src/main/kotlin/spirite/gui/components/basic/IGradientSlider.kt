@@ -1,6 +1,7 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.binding.CruddyBindable
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import spirite.base.util.InvertibleFunction
 import rb.vectrix.mathUtil.MathUtil
 import java.awt.Color
@@ -8,7 +9,7 @@ import java.awt.Color
 
 interface IGradientSliderNonUI {
     var value: Float
-    val valueBind: CruddyBindable<Float>
+    val valueBind: Bindable<Float>
     var mutatorPositionToValue: InvertibleFunction<Float>?
     var minValue: Float
     var maxValue: Float
@@ -41,7 +42,9 @@ class GradientSliderNonUI(
             val to = MathUtil.clip( minValue, to, maxValue)
             underlying = mutatorPositionToValue?.invert(to) ?: to
         }
-    override val valueBind = CruddyBindable(maxValue, { new, old -> _underlying = mutatorPositionToValue?.invert(new) ?: new })
+    override val valueBind = Bindable(maxValue)
+            .also { it.addObserver { new, _ -> _underlying = mutatorPositionToValue?.invert(new) ?: new } }
+
     override var mutatorPositionToValue: InvertibleFunction<Float>? = null
         set(to) {
             field = to
