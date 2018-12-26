@@ -1,5 +1,6 @@
 package spirite.gui.views.animation.structureView
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
@@ -31,7 +32,7 @@ class AnimationStructureView(val master: IMasterControl) : IOmniComponent {
 
     private var currentPanel : IComponent? = null
 
-    private val _animationBind = master.centralObservatory.currentAnimationBind.addListener { new, old ->
+    private val _curAnimK = master.centralObservatory.currentAnimationBind.addWeakObserver { new, old ->
         when(new){
             old -> {}
             is FixedFrameAnimation -> {
@@ -54,6 +55,6 @@ class AnimationStructureView(val master: IMasterControl) : IOmniComponent {
     }
 
     override fun close() {
-        _animationBind.unbind()
+        _curAnimK.void()
     }
 }

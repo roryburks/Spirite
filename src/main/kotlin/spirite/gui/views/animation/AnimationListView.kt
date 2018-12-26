@@ -96,20 +96,22 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
     }.also { master.centralObservatory.trackingAnimationObservable.addObserver(it)}
 
     private val _wsObsK = master.workspaceSet.currentWorkspaceBind.addWeakObserver {  _, _ ->  rebuild()}
+    private val _curAnimK = master.centralObservatory.currentAnimationBind.addWeakObserver { new, old ->  list.selected = new}
 
     override fun close() {
         master.centralObservatory.trackingAnimationObservable.removeObserver(_animObs)
         _wsObsK.void()
+        _curAnimK.void()
     }
 
     init {
         rebuild()
 
-        master.centralObservatory.currentAnimationBind.addWeakListener { new, old ->  list.selected = new}
         list.selectedBind.addListener { new, old ->  workspace?.animationManager?.currentAnimation = new }
 
         list.onMouseRelease += rightclick
     }
+
 
     //region Dnd
     private val dnd = DndManager()

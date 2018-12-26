@@ -38,8 +38,8 @@ interface ICentralObservatory {
 
     val activeDataBind : IBindable<MediumHandle?>
     val selectedNode : IBindable<Node?>
-    val currentAnimationBind : ICruddyOldBindable<Animation?>
-    val currentAnimationSpaceBind : ICruddyOldBindable<AnimationSpace?>
+    val currentAnimationBind : IBindable<Animation?>
+    val currentAnimationSpaceBind : IBindable<AnimationSpace?>
 }
 
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
@@ -58,8 +58,8 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
 
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
     override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
-    override val currentAnimationBind : ICruddyOldBindable<Animation?> = CruddyOldTrackingBinder { it.animationManager.currentAnimationBind}
-    override val currentAnimationSpaceBind: ICruddyOldBindable<AnimationSpace?> = CruddyOldTrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
+    override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind}
+    override val currentAnimationSpaceBind: IBindable<AnimationSpace?> = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
 
     init {
         // Note: In order to cut down on code which could easily be forgotten/broken, TrackingObservers automatically
@@ -103,48 +103,6 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     }
 
     // region CruddyOldImplementation
-    inner class CruddyOldTrackingBinder<T>(val finder: (IImageWorkspace) -> ICruddyOldBindable<T>) : ICruddyOldBindable<T?>
-    {
-        private val listeners = mutableListOf<CruddyOldOnChangeEvent<T?>>()
-        private val weakListeners = mutableListOf<WeakReference<CruddyOldOnChangeEvent<T?>>>()
-        override val field: T? get() = workspaceSet.currentWorkspace?.run { finder.invoke(this).field }
-
-        override fun addListener(listener: CruddyOldOnChangeEvent<T?>) : ICruddyBoundListener<T?> {
-            return TrackingBound(listener.apply { listeners.add( this) })
-        }
-
-        override fun addWeakListener(listener: CruddyOldOnChangeEvent<T?>) : ICruddyBoundListener<T?> {
-            return TrackingBound(listener.apply { weakListeners.add( WeakReference(this)) })
-        }
-
-        init {
-            var currentBind : ICruddyBoundListener<T>? = null
-            val onChange : (T,T)->Unit = {new, old ->
-                listeners.forEach { it.invoke(new, old) }
-                weakListeners.removeIf { it.get()?.invoke(new,old) == null }
-            }
-
-            workspaceSet.currentWorkspaceBind.addObserver { selectedWS, previousSelected ->
-                currentBind?.unbind()
-                currentBind = selectedWS?.run { finder.invoke(this).addListener(onChange) }
-
-                val new = selectedWS?.run(finder)?.field
-                val old = previousSelected?.run(finder)?.field
-                listeners.forEach { it.invoke(new, old) }
-                weakListeners.removeIf { it.get()?.invoke(new, old) == null }
-
-            }
-        }
-
-        // Todo: this could potentially do weird things if someone binds the same oce multiple times
-        inner class TrackingBound<T>( private val oce: CruddyOldOnChangeEvent<T?>) : ICruddyBoundListener<T> {
-            override fun unbind() {
-                listeners.removeIf { it == oce }
-                weakListeners.removeIf { (it.get()?: oce) == oce }
-            }
-        }
-    }
-
     inner class OmniObserver<T>(
             val observerFinder : (IImageWorkspace) -> ICruddyOldObservable<T>)
         : ICruddyOldObservable<T>, WorkspaceObserver

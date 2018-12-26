@@ -1,5 +1,6 @@
 package spirite.gui.views.animation
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
@@ -87,7 +88,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
 
     // region Bindings
-    private val _curAnimBind = masterControl.centralObservatory.currentAnimationBind.addListener { new, old ->buildFromAnim(new); viewPanel.redraw()}
+    private val _curAnimK = masterControl.centralObservatory.currentAnimationBind.addWeakObserver { new, old ->buildFromAnim(new); viewPanel.redraw()}
     private val _animstructureObs = object : AnimationStructureChangeObserver {
         override fun animationStructureChanged(animation: Animation) {
             if( animation == this@AnimationPreviewView.animation) {
@@ -162,7 +163,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
     override fun close() {
         unbind()
-        _curAnimBind.unbind()
+        _curAnimK.void()
         timer.stop()
     }
 }

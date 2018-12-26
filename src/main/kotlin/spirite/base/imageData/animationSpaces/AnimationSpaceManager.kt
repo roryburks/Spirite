@@ -1,5 +1,7 @@
 package spirite.base.imageData.animationSpaces
 
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.IBindable
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.util.binding.ICruddyOldBindable
 import spirite.base.brains.ICruddyOldObservable
@@ -15,7 +17,7 @@ interface  IAnimationSpaceManager
     val workspace: IImageWorkspace
 
     var currentAnimationSpace : AnimationSpace?
-    val currentAnimationSpaceBind: ICruddyOldBindable<AnimationSpace?>
+    val currentAnimationSpaceBind: IBindable<AnimationSpace?>
     val animationSpaces : List<AnimationSpace>
 
     fun addAnimationSpace(space: AnimationSpace, select: Boolean = false)
@@ -31,7 +33,7 @@ interface  IAnimationSpaceManager
 class AnimationSpaceManager(override val workspace: IImageWorkspace) : IAnimationSpaceManager
 {
 
-    override val currentAnimationSpaceBind = CruddyBindable<AnimationSpace?>(null)
+    override val currentAnimationSpaceBind = Bindable<AnimationSpace?>(null)
     override var currentAnimationSpace: AnimationSpace?
             get() = currentAnimationSpaceBind.field
             set(value) {

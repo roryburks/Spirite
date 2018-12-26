@@ -1,5 +1,6 @@
 package spirite.gui.views
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
@@ -144,12 +145,12 @@ class RootWindow( val master: IMasterControl) : JFrame() {
 
             false
         }
+    }
 
-        master.centralObservatory.currentAnimationBind.addListener { new, old ->
-            if( new == null && old != null) {
-                omni
-            }
-
+    private val currentAnimationK = master.centralObservatory.currentAnimationBind.addWeakObserver { new, old ->
+        // TODO: Was clearly incomplete before, not sure what is/was supposed to go here.
+        if( new == null && old != null) {
+            omni
         }
     }
 }

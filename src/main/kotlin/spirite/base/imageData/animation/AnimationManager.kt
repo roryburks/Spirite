@@ -1,5 +1,7 @@
 package spirite.base.imageData.animation
 
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.IBindable
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.util.binding.ICruddyOldBindable
 import spirite.base.brains.ICruddyOldObservable
@@ -15,7 +17,7 @@ import spirite.base.imageData.undo.NullAction
 interface IAnimationManager {
     val animations : List<Animation>
 
-    val currentAnimationBind : ICruddyOldBindable<Animation?>
+    val currentAnimationBind : IBindable<Animation?>
     var currentAnimation : Animation?
 
     fun addAnimation( animation: Animation, select: Boolean = true)
@@ -39,7 +41,7 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
     private val _animations = mutableListOf<Animation>()
     override val animations: List<Animation> get() = _animations
 
-    override val currentAnimationBind = CruddyBindable<Animation?>(FakeAnimation(workspace))
+    override val currentAnimationBind = Bindable<Animation?>(FakeAnimation(workspace))
     override var currentAnimation by currentAnimationBind
 
 
