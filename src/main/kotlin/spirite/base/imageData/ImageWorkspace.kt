@@ -26,6 +26,8 @@ import spirite.base.imageData.undo.UndoEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.delegates.UndoableDelegate
 import rb.extendo.dataStructures.SinglyList
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.IBindable
 import java.io.File
 
 interface IImageWorkspace {
@@ -63,7 +65,7 @@ interface IImageWorkspace {
     val strokeProvider : IStrokeDrawerProvider
     val toolset : Toolset
 
-    val activeMediumBind : ICruddyOldBindable<MediumHandle?>
+    val activeMediumBind : IBindable<MediumHandle?>
     val activeData : ArrangedMediumData?
     fun arrangeActiveDataForNode( node: LayerNode) : ArrangedMediumData
 
@@ -148,7 +150,7 @@ class ImageWorkspace(
     private val currentNode get() = groupTree.selectedNode
 
 
-    override val activeMediumBind = CruddyBindable<MediumHandle?>(null)
+    override val activeMediumBind = Bindable<MediumHandle?>(null)
     override val activeData: ArrangedMediumData? get() = (currentNode as? LayerNode)?.let { arrangeActiveDataForNode(it) }
     override fun arrangeActiveDataForNode(node: LayerNode): ArrangedMediumData {
         val layerData = node.layer.activeData

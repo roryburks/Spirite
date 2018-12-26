@@ -1,5 +1,6 @@
 package spirite.gui.views.tool
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.Tool
 import spirite.base.imageData.drawer.NillImageDrawer
@@ -37,13 +38,13 @@ class ToolSection (
     val toolset get() = master.toolsetManager.toolset
     val workspace get() = master.workspaceSet.currentWorkspace
 
-    init {
-        master.centralObservatory.activeDataBind.addListener { new, old ->
-            imp.clear()
-            imp.addAll(toolset.toolsForDrawer(workspace?.run { activeDrawer } ?: NillImageDrawer))
-            imp.selected = currentTool
-        }
+    val activeDataBindK = master.centralObservatory.activeDataBind.addWeakObserver { _, _ ->
+        imp.clear()
+        imp.addAll(toolset.toolsForDrawer(workspace?.run { activeDrawer } ?: NillImageDrawer))
+        imp.selected = currentTool
+    }
 
+    init {
         imp.enabled = false
         imp.renderer = { tool ->
             object : IBoxComponent {
@@ -55,11 +56,9 @@ class ToolSection (
                     component.checked = selected
                 }
             }
-
         }
-
     }
-    private val wl = master.toolsetManager.selectedToolBinding.addListener { new, old -> imp.selected = new }
+    private val wl = master.toolsetManager.selectedToolBinding.addListener { new, _ -> imp.selected = new }
 
     override fun close() {
         wl.unbind()

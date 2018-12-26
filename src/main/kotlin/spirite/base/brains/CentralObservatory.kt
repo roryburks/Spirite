@@ -36,7 +36,7 @@ interface ICentralObservatory {
     val trackingAnimationObservable : ICruddyOldObservable<AnimationObserver>
     val trackingAnimationStateObserver: ICruddyOldObservable<AnimationStructureChangeObserver>
 
-    val activeDataBind : ICruddyOldBindable<MediumHandle?>
+    val activeDataBind : IBindable<MediumHandle?>
     val selectedNode : ICruddyOldBindable<Node?>
     val currentAnimationBind : ICruddyOldBindable<Animation?>
     val currentAnimationSpaceBind : ICruddyOldBindable<AnimationSpace?>
@@ -56,7 +56,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     override val trackingAnimationObservable: ICruddyOldObservable<AnimationObserver> = TrackingObserver { it.animationManager.animationObservable }
     override val trackingAnimationStateObserver: ICruddyOldObservable<AnimationStructureChangeObserver> = TrackingObserver { it.animationManager.animationStructureChangeObservable }
 
-    override val activeDataBind: ICruddyOldBindable<MediumHandle?> = CruddyOldTrackingBinder { it.activeMediumBind }
+    override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
     override val selectedNode : ICruddyOldBindable<Node?> = CruddyOldTrackingBinder { it.groupTree.selectedNodeBind }
     override val currentAnimationBind : ICruddyOldBindable<Animation?> = CruddyOldTrackingBinder { it.animationManager.currentAnimationBind}
     override val currentAnimationSpaceBind: ICruddyOldBindable<AnimationSpace?> = CruddyOldTrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
@@ -93,7 +93,10 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
                 }
                 else -> {
                     val newBind = finder(new)
-                    currentContract = newBind.addObserver(true){ newT: T, oldT: T ->  }
+                    val newF = newBind.field
+                    currentContract = newBind.addObserver(newF != oldF){ newT: T, oldT: T ->
+                        binds.removeIf { it.observer.trigger?.invoke(newT, oldT) == null }
+                    }
                 }
             }
         }
