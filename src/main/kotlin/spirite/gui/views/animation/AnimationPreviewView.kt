@@ -162,7 +162,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         viewPanel.imp.context = this
         buildFromAnim(masterControl.workspaceSet.currentWorkspace?.animationManager?.currentAnimation)
 
-        bgColorBox.colorBind.addRootListener { new, old -> viewPanel.redraw() }
+        bgColorBox.colorBind.addObserver { _, _ -> viewPanel.redraw() }
         btnNext.action = {animation?.also {it.state.met = MathUtil.cycle(it.startFrame, it.endFrame, it.state.met + 1f)  }}
         btnPrev.action = {animation?.also {it.state.met = MathUtil.cycle(it.startFrame, it.endFrame, it.state.met - 1f)  }}
     }

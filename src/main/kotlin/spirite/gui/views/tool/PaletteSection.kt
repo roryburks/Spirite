@@ -1,6 +1,7 @@
 package spirite.gui.views.tool
 
 import rb.jvm.owl.addWeakObserver
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.palette.Palette
@@ -47,16 +48,16 @@ class PaletteSection(
 
     private val paletteManager get() = master.paletteManager
 
+    val _cBind0 = primaryColorSquare.colorBind.bindTo(master.paletteManager.activeBelt.getColorBind(0))
+    val _cBind1 = secondaryColorSquare.colorBind.bindTo(master.paletteManager.activeBelt.getColorBind(1))
     init {
-        master.paletteManager.activeBelt.getColorBind(0).bind(primaryColorSquare.colorBind)
-        master.paletteManager.activeBelt.getColorBind(1).bind(secondaryColorSquare.colorBind)
         primaryColorSquare.setBasicBorder(BEVELED_LOWERED)
         primaryColorSquare.enabled = false
         secondaryColorSquare.setBasicBorder(BEVELED_LOWERED)
         secondaryColorSquare.enabled = false
 
-        primaryColorSquare.colorBind.addRootListener { _, _ -> paletteView.redraw() }
-        secondaryColorSquare.colorBind.addRootListener { _, _ -> paletteView.redraw() }
+        primaryColorSquare.colorBind.addObserver { _, _ -> paletteView.redraw() }
+        secondaryColorSquare.colorBind.addObserver { _, _ -> paletteView.redraw() }
 
         imp.setLayout {
             rows += {
@@ -161,6 +162,8 @@ class PaletteSection(
         paletteView.onClose()
         paletteChooserView.onClose()
         _curPlttK.void()
+        _cBind0.void()
+        _cBind1.void()
     }
 }
 
@@ -202,7 +205,7 @@ constructor(
     }
 
     init { // Bindings
-        cbPaletteSelector.selectedItemBind.addRootListener { new, old ->
+        cbPaletteSelector.selectedItemBind.addObserver { new, _ ->
             if( new != null) {
                 currentWorkspace?.paletteSet?.currentPalette = when( new) {
                     master.paletteManager.globalPalette -> null

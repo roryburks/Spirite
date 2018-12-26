@@ -1,6 +1,7 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.binding.CruddyBindable
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
@@ -11,7 +12,7 @@ import javax.swing.plaf.basic.BasicTabbedPaneUI
 
 interface ITabbedPane : IComponent
 {
-    val selectedIndexBind : CruddyBindable<Int>
+    val selectedIndexBind : Bindable<Int>
     var selectedIndex: Int
 
     val tabCount : Int
@@ -30,7 +31,7 @@ abstract class TabbedPanePartial : ITabbedPane {
             var component: IComponent?)
     protected val tabs = mutableListOf<Tab>()
 
-    override val selectedIndexBind = CruddyBindable(-1)
+    override val selectedIndexBind = Bindable(-1)
     override var selectedIndex: Int
         get() = selectedIndexBind.field
         set(value) {selectedIndexBind.field = if( value < -1  || value >= tabs.size) -1 else value}
@@ -50,7 +51,7 @@ private constructor(
     constructor() : this(SwTabbedPaneImp())
 
     init {
-        selectedIndexBind.addListener { new, old ->imp.selectedIndex = new }
+        selectedIndexBind.addObserver { new, _ -> imp.selectedIndex = new }
         imp.addChangeListener { selectedIndex = imp.selectedIndex }
     }
 

@@ -60,19 +60,16 @@ private constructor(
     init {
         slider.valueBind.addObserver { new, _ ->  master.centralObservatory.selectedNode.field?.alpha = new}
 
-        comboBox.selectedItemBind.addRootListener { new, old ->
-            new ?: return@addRootListener
-            val node =  master.centralObservatory.selectedNode.field
-            if( node != null) {
-                node.method = node.method.copy(methodType = new)
-            }
+        comboBox.selectedItemBind.addObserver { new, old ->
+            new ?: return@addObserver
+            val node =  master.centralObservatory.selectedNode.field ?: return@addObserver
+            node.method = node.method.copy(methodType = new)
         }
 
-        colorBox.colorBind.addRootListener { new, old ->
+        colorBox.colorBind.addObserver { new, _ ->
             val node =  master.centralObservatory.selectedNode.field
-            if( node != null) {
+            if( node != null)
                 node.method = node.method.copy(renderValue = new.argb32)
-            }
         }
 
 

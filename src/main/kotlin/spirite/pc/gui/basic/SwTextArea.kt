@@ -1,5 +1,7 @@
 package spirite.pc.gui.basic
 
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import spirite.base.util.binding.CruddyBindable
 import spirite.gui.components.basic.ITextArea
 import spirite.gui.resources.Skin.BevelBorder.Dark
@@ -19,7 +21,7 @@ private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComp
     // TODO: Re-implement TextBind -> UI binding
     constructor() : this(SwTextAreaImp())
 
-    override val textBind = CruddyBindable("")
+    override val textBind = Bindable("")
     override var text by textBind
 
     private var textToBeSetToDocument : String? = null
@@ -34,7 +36,7 @@ private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComp
             override fun insertUpdate(e: DocumentEvent?) {update()}
             override fun removeUpdate(e: DocumentEvent?) {update()}
         })
-        textBind.addListener { new, old ->
+        textBind.addObserver { _, _ ->
                 //imp.textArea.text = new
         }
     }

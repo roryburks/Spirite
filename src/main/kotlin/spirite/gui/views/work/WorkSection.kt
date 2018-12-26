@@ -1,6 +1,7 @@
 package spirite.gui.views.work
 
 import rb.jvm.owl.addWeakObserver
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.ICruddyOldObservable
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
@@ -130,8 +131,8 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
         val glWorkArea = JOGLWorkAreaPanel(this, penner)
         workAreaContainer.setLayout { rows.add(glWorkArea) }
 
-        hScroll.scrollBind.addListener {new, old ->currentView?.offsetX = new * scrollRatio}
-        vScroll.scrollBind.addListener {new, old ->currentView?.offsetY = new * scrollRatio}
+        hScroll.scrollBind.addObserver { new, _ -> currentView?.offsetX = new * scrollRatio}
+        vScroll.scrollBind.addObserver { new, _ -> currentView?.offsetY = new * scrollRatio}
         workAreaContainer.onMouseWheelMoved = {
             doPreservingMousePoint(Vec2f(it.point.x.f, it.point.y.f)) {
                 if( it.moveAmount > 0) currentView?.zoomOut()

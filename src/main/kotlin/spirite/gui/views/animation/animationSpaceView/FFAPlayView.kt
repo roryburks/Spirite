@@ -1,5 +1,6 @@
 package spirite.gui.views.animation.animationSpaceView
 
+import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
@@ -63,7 +64,7 @@ class  FFAPlayView(
     private val fpsK = tfFPS.valueBind.bindWeaklyTo(space.stateView.fpsBind)
 
     init /* Bindings */ {
-        bgColorBox.colorBind.addRootListener { new, old -> drawView.bgColor = new }
+        bgColorBox.colorBind.addWeakObserver { new, _ -> drawView.bgColor = new }
 
         Hybrid.timing.createTimer(50, true) {
             if( btnPlayPause.checked) {

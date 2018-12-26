@@ -28,7 +28,7 @@ constructor(val master: IMasterControl, private val tabPane: ITabbedPane)
     private val containers = mutableListOf<ICrossPanel>()
 
     init {
-        tabPane.selectedIndexBind.addListener {new, old ->
+        tabPane.selectedIndexBind.addObserver { new, old ->
             if( old != -1) {
                 master.workspaceSet.currentWorkspace = workspaces.getOrNull(new)
             }

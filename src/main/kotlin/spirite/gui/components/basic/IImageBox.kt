@@ -2,9 +2,7 @@ package spirite.gui.components.basic
 
 import spirite.base.graphics.IImage
 import spirite.base.util.Colors
-import rb.vectrix.mathUtil.ceil
 import spirite.base.util.delegates.OnChangeDelegate
-import rb.vectrix.mathUtil.f
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.basic.SwComponent

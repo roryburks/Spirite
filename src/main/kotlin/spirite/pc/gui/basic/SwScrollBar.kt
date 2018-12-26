@@ -1,5 +1,6 @@
 package spirite.pc.gui.basic
 
+import rb.owl.bindable.addObserver
 import spirite.pc.gui.basic.SScrollPane.ModernScrollBarUI
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONTAL
@@ -35,10 +36,10 @@ private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidt
         set(value) { imp.orientation = if( value == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL}
 
     init {
-        scrollBind.addListener { new, old ->imp.value = new }
-        scrollWidthBind.addListener { new, old ->imp.visibleAmount = new }
-        minScrollBind.addListener { new, old ->imp.minimum = new}
-        maxScrollBind.addListener { new, old ->imp.maximum = new }
+        scrollBind.addObserver { new, _ -> imp.value = new }
+        scrollWidthBind.addObserver { new, _ ->imp.visibleAmount = new }
+        minScrollBind.addObserver { new, _ ->imp.minimum = new}
+        maxScrollBind.addObserver { new, _ ->imp.maximum = new }
         imp.addAdjustmentListener {scroll = imp.value}
     }
 

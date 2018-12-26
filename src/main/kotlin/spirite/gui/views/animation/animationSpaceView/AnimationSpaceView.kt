@@ -2,6 +2,7 @@ package spirite.gui.views.animation.animationSpaceView
 
 import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
@@ -75,7 +76,7 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
     }
 
     init {
-        spaceDropdown.selectedItemBind.addRootListener { new, _ ->
+        spaceDropdown.selectedItemBind.addObserver { new, _ ->
             when( new) {
                 is FFAAnimationSpace -> {
                     subRightPanel.setLayout {

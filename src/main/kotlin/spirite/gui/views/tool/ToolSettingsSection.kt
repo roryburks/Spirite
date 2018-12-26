@@ -4,6 +4,7 @@ import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
 import rb.owl.IContract
 import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import rb.owl.interprettedBindings.bindToX
 import rb.owl.interprettedBindings.bindToY
 import spirite.base.util.binding.CruddyBindable
@@ -34,7 +35,7 @@ private class DDPAdapter<T>(values: Array<T>, bind: Bindable<T>, imp : IComboBox
         imp.selectedItem = bind.field
 
         imp.ref = this
-        imp.selectedItemBind.addRootListener { new, _ -> if(new != null) bind.field = new }
+        imp.selectedItemBind.addObserver { new, _ -> if(new != null) bind.field = new }
     }
     val _valueK = bind.addWeakObserver { new, _ -> imp.selectedItem = new }
 }

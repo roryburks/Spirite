@@ -1,7 +1,7 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.binding.CruddyBindable
-import spirite.base.util.binding.ICruddyOldBindable
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import spirite.gui.resources.Skin
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwComponent
@@ -15,7 +15,7 @@ interface ISlider : IComponent {
     var min : Int
     var max : Int
 
-    val valueBind : ICruddyOldBindable<Int>
+    val valueBind : Bindable<Int>
     var value : Int
 
     var tickSpacing: Int
@@ -38,11 +38,12 @@ private constructor(private val imp : SwSliderImp)
     override var max: Int
         get() = imp.maximum
         set(value) {imp.maximum = value}
-    override val valueBind = CruddyBindable(imp.value) { new, _ ->
-        if (!locked) {
-            locked = true; imp.value = new; locked = false
-        }
-    }
+    override val valueBind = Bindable(imp.value)
+            .also { it.addObserver { new, _ ->
+                if (!locked) {
+                    locked = true; imp.value = new; locked = false
+                }
+            }}
     override var value by valueBind
 
     // region UI Piping

@@ -1,5 +1,7 @@
 package spirite.gui.components.basic
 
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import spirite.base.util.binding.CruddyBindable
 import rb.vectrix.mathUtil.MathUtil
 import spirite.gui.resources.Skin
@@ -13,7 +15,7 @@ import javax.swing.ListCellRenderer
 interface IComboBox<T> : IComponent
 {
     var selectedItem : T?
-    val selectedItemBind : CruddyBindable<T?>
+    val selectedItemBind : Bindable<T?>
 
     var selectedIndex: Int
 
@@ -25,7 +27,7 @@ interface IComboBox<T> : IComponent
 
 abstract class ComboBox<T>(initialValues: List<T>)  :IComboBox<T>
 {
-    override val selectedItemBind = CruddyBindable<T?>(initialValues.firstOrNull())
+    override val selectedItemBind = Bindable<T?>(initialValues.firstOrNull())
 
     override var selectedItem: T?
         get() = selectedItemBind.field
@@ -82,7 +84,7 @@ private constructor(
     constructor(things: Array<T>) : this( things, SwComboBoxImp<T>( things))
 
     init {
-        selectedItemBind.addListener { new, old ->  imp.selectedIndex = selectedIndex}
+        selectedItemBind.addObserver { _, _ -> imp.selectedIndex = selectedIndex}
         imp.addActionListener(_listener)
     }
 

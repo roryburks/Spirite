@@ -1,8 +1,8 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.binding.CruddyBindable
+import rb.owl.bindable.Bindable
 
 interface ITextArea : IComponent{
-    val textBind : CruddyBindable<String>
+    val textBind : Bindable<String>
     var text: String
 }
