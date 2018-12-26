@@ -3,7 +3,6 @@ package spirite.gui
 import spirite.gui.components.basic.IComponent
 import spirite.pc.gui.basic.jcomponent
 import java.awt.Component
-import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
 abstract class UIPoint(

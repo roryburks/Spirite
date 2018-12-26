@@ -1,5 +1,6 @@
 package spirite.base.file.load
 
+import rb.vectrix.mathUtil.i
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readNullTerminatedStringUTF8
 import spirite.base.imageData.animation.ffa.FFAFrameStructure
@@ -7,7 +8,6 @@ import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
-import rb.vectrix.mathUtil.i
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED

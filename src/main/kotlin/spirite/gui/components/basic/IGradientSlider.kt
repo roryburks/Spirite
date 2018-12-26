@@ -2,8 +2,8 @@ package spirite.gui.components.basic
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import spirite.base.util.InvertibleFunction
 import rb.vectrix.mathUtil.MathUtil
+import spirite.base.util.InvertibleFunction
 import java.awt.Color
 
 

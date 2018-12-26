@@ -1,12 +1,21 @@
 package spirite.base.imageData.layers.sprite
 
-import spirite.base.brains.ICruddyOldObservable
-import spirite.base.brains.CruddyOldObservable
+import rb.extendo.dataStructures.SinglyList
+import rb.extendo.dataStructures.SinglySequence
+import rb.owl.IObservable
+import rb.owl.Observable
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
+import rb.vectrix.linear.MutableTransformF
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.ceil
+import rb.vectrix.mathUtil.floor
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.*
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.base.imageData.groupTree.traverse
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
@@ -14,16 +23,7 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.StringUtil
-import rb.vectrix.mathUtil.ceil
 import spirite.base.util.delegates.UndoableDelegate
-import rb.vectrix.mathUtil.floor
-import rb.extendo.dataStructures.SinglyList
-import rb.extendo.dataStructures.SinglySequence
-import rb.owl.bindable.Bindable
-import rb.owl.bindable.addObserver
-import rb.vectrix.linear.MutableTransformF
-import rb.vectrix.linear.Vec2f
-import spirite.base.imageData.groupTree.traverse
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
 
@@ -95,8 +95,8 @@ class SpriteLayer : Layer {
             } }
     var activePart : SpritePart? by activePartBind
 
-    private var _layerChangeObserver = CruddyOldObservable<()->Any?>()
-    val layerChangeObserver : ICruddyOldObservable<()->Any?> get() = _layerChangeObserver
+    private var _layerChangeObserver = Observable<()->Any?>()
+    val layerChangeObserver : IObservable<()->Any?> get() = _layerChangeObserver
     private fun triggerChange() {
         _layerChangeObserver.trigger { it() }
         workspace.imageObservatory.triggerRefresh(

@@ -1,10 +1,12 @@
 package spirite.gui.views.animation.structureView
 
+import CrossLayout
 import rb.extendo.extensions.append
 import rb.extendo.extensions.lookup
 import rb.jvm.owl.addWeakObserver
 import rb.owl.IContract
-import spirite.base.util.binding.ICruddyBoundListener
+import rb.vectrix.mathUtil.i
+import rb.vectrix.mathUtil.round
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
@@ -19,9 +21,7 @@ import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
-import rb.vectrix.mathUtil.i
 import spirite.base.util.linear.Rect
-import rb.vectrix.mathUtil.round
 import spirite.gui.Direction
 import spirite.gui.Direction.*
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
@@ -34,16 +34,19 @@ import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.IScrollContainer
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
-import spirite.gui.views.animation.structureView.AnimDragStateManager.ResizingFrameBehavior
-import spirite.gui.views.animation.structureView.RememberedStates.RememberedState
 import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.resources.Skin
 import spirite.gui.resources.SwIcons
+import spirite.gui.views.animation.structureView.AnimDragStateManager.ResizingFrameBehavior
+import spirite.gui.views.animation.structureView.RememberedStates.RememberedState
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.JColor
 import spirite.pc.gui.basic.SwComponent
-import java.awt.*
+import java.awt.BasicStroke
+import java.awt.Color
+import java.awt.Graphics
+import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.lang.ref.WeakReference
 import javax.swing.JPanel
@@ -518,12 +521,14 @@ private constructor(
     // endregion
 
     // region Listener/Observer Bindings
-    private val _animationStructureObserver = object : AnimationStructureChangeObserver {
-        override fun animationStructureChanged(animation: Animation) {
-            if( animation == anim)
-                rebuild()
+    private val _animationStructureObserverK = anim.workspace.animationManager.animationStructureChangeObservable.addWeakObserver(
+        object : AnimationStructureChangeObserver {
+            override fun animationStructureChanged(animation: Animation) {
+                if( animation == anim)
+                    rebuild()
+            }
         }
-    }.also {anim.workspace.animationManager.animationStructureChangeObservable.addObserver( it)}
+    )
 
     private  var _activePartContract : IContract? = null
     private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, old ->

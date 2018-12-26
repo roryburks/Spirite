@@ -3,7 +3,6 @@ package spirite.base.brains.commands
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.IsolationCommandExecuter.IsolationCommand.*
-import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.hybrid.MDebug
 
 class IsolationCommandExecuter(private val workspaceSet: IWorkspaceSet) : ICommandExecuter

@@ -1,6 +1,7 @@
 package rb.owl.bindableMList
 
-import rb.owl.*
+import rb.owl.IObservable
+import rb.owl.IObserver
 
 class ListPermuation(
     val startIndex: Int,

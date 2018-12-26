@@ -1,7 +1,6 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.MWorkspaceSet
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.MDebug

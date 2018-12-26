@@ -1,15 +1,17 @@
 package spirite.base.file.aaf
 
 import rb.extendo.extensions.toLookup
+import rb.vectrix.linear.Vec2i
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.mediums.IImageMedium
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
-import spirite.base.util.*
+import spirite.base.util.CyclicRedundancyChecker
+import spirite.base.util.IDataStreamHasher
 import spirite.base.util.linear.Rect
-import rb.vectrix.linear.Vec2i
+import spirite.base.util.pop
 import spirite.base.util.rectanglePacking.ModifiedSleatorAlgorithm2
 import spirite.base.util.rectanglePacking.PackedRectangle
 import spirite.hybrid.Hybrid

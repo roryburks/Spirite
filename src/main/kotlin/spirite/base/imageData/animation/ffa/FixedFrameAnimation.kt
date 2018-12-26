@@ -1,14 +1,14 @@
 package spirite.base.imageData.animation.ffa
 
+import rb.vectrix.mathUtil.MathUtil
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.MediumBasedAnimation
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.groupTree.GroupTree.*
-import rb.vectrix.mathUtil.MathUtil
-import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.floor
 
 class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     : MediumBasedAnimation(name, workspace)

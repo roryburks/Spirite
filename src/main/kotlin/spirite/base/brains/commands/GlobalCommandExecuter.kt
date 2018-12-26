@@ -1,6 +1,10 @@
 package spirite.base.brains.commands
 
-import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.MathUtil
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
@@ -18,12 +22,7 @@ import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.Colors
-import rb.vectrix.mathUtil.MathUtil
-import rb.vectrix.mathUtil.f
 import spirite.base.util.linear.Rect
-import rb.vectrix.linear.ImmutableTransformF
-import rb.vectrix.linear.Vec2f
-import rb.vectrix.mathUtil.floor
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid

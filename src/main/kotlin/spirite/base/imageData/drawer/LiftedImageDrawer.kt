@@ -1,5 +1,10 @@
 package spirite.base.imageData.drawer
 
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.graphics.Composite.DST_IN
 import spirite.base.graphics.RawImage
@@ -7,13 +12,8 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.util.Color
-import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.floor
 import spirite.base.util.linear.Rect
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.Vec2f
 import spirite.base.util.linear.RectangleUtil
-import rb.vectrix.linear.ImmutableTransformF
 
 class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         IClearModule,

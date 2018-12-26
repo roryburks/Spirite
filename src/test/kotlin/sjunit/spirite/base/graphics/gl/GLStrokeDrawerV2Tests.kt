@@ -2,7 +2,6 @@ package sjunit.spirite.base.graphics.gl
 
 import org.junit.Test
 import sjunit.TestConfig
-import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
 import spirite.base.pen.stroke.DrawPoints
@@ -10,8 +9,6 @@ import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
 import spirite.base.util.Colors
 import spirite.hybrid.Hybrid
-import spirite.pc.JOGL.JOGLProvider
-import spirite.pc.resources.JClassScriptService
 import spirite.pc.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO

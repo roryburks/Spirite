@@ -1,9 +1,10 @@
 package spirite.base.imageData.animation
 
+import rb.owl.IObservable
+import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
-import spirite.base.brains.ICruddyOldObservable
-import spirite.base.brains.CruddyOldObservable
+import rb.owl.observer
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
@@ -25,12 +26,12 @@ interface IAnimationManager {
         fun animationCreated( animation: Animation)
         fun animationRemoved( animation: Animation)
     }
-    val animationObservable : ICruddyOldObservable<AnimationObserver>
+    val animationObservable : IObservable<AnimationObserver>
 
     interface AnimationStructureChangeObserver {
         fun animationStructureChanged( animation: Animation)
     }
-    val animationStructureChangeObservable : ICruddyOldObservable<AnimationStructureChangeObserver>
+    val animationStructureChangeObservable : IObservable<AnimationStructureChangeObserver>
     fun triggerStructureChange(animation: Animation)
 }
 
@@ -78,14 +79,14 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
     }
     // endregion
 
-    override val animationObservable = CruddyOldObservable<AnimationObserver>()
-    override val animationStructureChangeObservable = CruddyOldObservable<AnimationStructureChangeObserver>()
+    override val animationObservable = Observable<AnimationObserver>()
+    override val animationStructureChangeObservable = Observable<AnimationStructureChangeObserver>()
 
     override fun triggerStructureChange(animation: Animation) {
         animationStructureChangeObservable.trigger { it.animationStructureChanged(animation)}
     }
 
-    private val __treeObserver = workspace.groupTree.treeObservable.addObserver(object : TreeObserver {
+    private val _treeObsK = workspace.groupTree.treeObservable.addObserver(object : TreeObserver {
         override fun treeStructureChanged(evt: TreeChangeEvent) {
             val fixedFrameAnimations = _animations.filterIsInstance<FixedFrameAnimation>()
 
@@ -101,5 +102,5 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
         }
 
         override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {}
-    })
+    }.observer())
 }

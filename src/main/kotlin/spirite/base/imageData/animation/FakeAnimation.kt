@@ -1,10 +1,10 @@
 package spirite.base.imageData.animation
 
+import rb.vectrix.mathUtil.MathUtil
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.LineAttributes
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.Colors
-import rb.vectrix.mathUtil.MathUtil
 
 class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace,
         AnimationState(11.1f, 3, 5.53f))

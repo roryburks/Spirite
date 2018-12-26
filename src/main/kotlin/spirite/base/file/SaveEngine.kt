@@ -1,5 +1,6 @@
 package spirite.base.file
 
+import rb.vectrix.linear.Vec2i
 import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
 import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
 import spirite.base.imageData.IImageWorkspace
@@ -12,7 +13,6 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import rb.vectrix.linear.Vec2i
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType

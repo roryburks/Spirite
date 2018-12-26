@@ -1,5 +1,7 @@
 package spirite.base.imageData
 
+import rb.extendo.extensions.then
+import rb.jvm.owl.addWeakObserver
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IIsolationManager.IsolationState
@@ -7,8 +9,6 @@ import spirite.base.imageData.IsolationManager.SpriteIsolationStruct
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import rb.extendo.extensions.then
-import rb.jvm.owl.addWeakObserver
 
 /**
  *

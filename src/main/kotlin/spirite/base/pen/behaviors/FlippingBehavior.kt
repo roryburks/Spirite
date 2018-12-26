@@ -1,9 +1,9 @@
 package spirite.base.pen.behaviors
 
-import spirite.base.imageData.drawer.IImageDrawer.IFlipModule
-import spirite.base.pen.Penner
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
+import spirite.base.imageData.drawer.IImageDrawer.IFlipModule
+import spirite.base.pen.Penner
 import kotlin.math.abs
 
 

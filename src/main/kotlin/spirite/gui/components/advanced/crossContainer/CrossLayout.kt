@@ -10,7 +10,6 @@ import java.awt.Component
 import java.awt.Container
 import javax.swing.GroupLayout
 import javax.swing.GroupLayout.ParallelGroup
-import javax.swing.JComponent
 
 object CrossLayout {
     fun buildCrossLayout(container: Container, componentRecord: MutableList<IComponent>? = null, constructor: CrossInitializer.()->Unit) : GroupLayout {

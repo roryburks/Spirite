@@ -2,7 +2,6 @@ package demonstration
 
 import com.jogamp.opengl.*
 import com.jogamp.opengl.awt.GLJPanel
-import spirite.pc.JOGL.JOGLProvider
 import java.nio.FloatBuffer
 import javax.swing.JFrame
 import javax.swing.UIManager

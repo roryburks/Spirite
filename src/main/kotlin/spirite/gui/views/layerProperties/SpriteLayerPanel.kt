@@ -1,5 +1,6 @@
 package spirite.gui.views.layerProperties
 
+import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
 import rb.owl.IContract
 import rb.owl.bindable.Bindable
@@ -19,6 +20,7 @@ import spirite.pc.gui.jcolor
 class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
     private var _activePartK : IContract? = null
+    private var _layerChangeObsK : IContract? = null
 
     private var _opacitySliderK : IContract? = null
     private var _btnVisibilityK : IContract? = null
@@ -35,8 +37,8 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             val old = field
             if( value != old) {
                 field = value
-                old?.layerChangeObserver?.removeObserver(onPartChange)
 
+                _layerChangeObsK?.void()
                 _activePartK?.void()
                 _tfTypeK?.void()
                 _tfDepthK?.void()
@@ -51,7 +53,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                 if( value != null) {
                     _activePartK = activePartBind.bindWeaklyTo(value.activePartBind)
                     boxList.resetAllWithSelected(value.parts, value.activePart)
-                    value.layerChangeObserver.addObserver(onPartChange)
+                    _layerChangeObsK = value.layerChangeObserver.addWeakObserver(onPartChange)
 
                     _tfTypeK = tfType.textBind.bindWeaklyTo(value.cPartNameBind)
                     _tfDepthK = tfDepth.valueBind.bindWeaklyTo(value.cDepthBind)

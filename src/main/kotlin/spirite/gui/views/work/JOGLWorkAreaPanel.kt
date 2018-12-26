@@ -9,9 +9,9 @@ import jpen.*
 import jpen.PButton.Type.*
 import jpen.event.PenListener
 import jpen.owner.multiAwt.AwtPenToolkit
+import rb.vectrix.mathUtil.round
 import spirite.base.graphics.gl.GLGraphicsContext
 import spirite.base.pen.Penner
-import rb.vectrix.mathUtil.round
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.hybrid.Hybrid

@@ -1,22 +1,22 @@
 package spirite.base.imageData.groupTree
 
 import rb.extendo.dataStructures.Dequeue
+import rb.owl.IObservable
+import rb.owl.Observable
 import rb.owl.bindable.Bindable
-import spirite.base.brains.ICruddyOldObservable
-import spirite.base.brains.CruddyOldObservable
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.MutableTransformF
 import spirite.base.graphics.RenderMethod
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.delegates.UndoableDelegate
-import rb.vectrix.linear.ImmutableTransformF
-import rb.vectrix.linear.MutableTransformF
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -48,8 +48,8 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         fun nodePropertiesChanged( node: Node, renderChanged: Boolean)
     }
     class TreeChangeEvent( val changedNodes : Set<Node>)
-    val treeObservable : ICruddyOldObservable<TreeObserver> get() = _treeObs
-    private val _treeObs = CruddyOldObservable<TreeObserver>()
+    val treeObservable : IObservable<TreeObserver> get() = _treeObs
+    private val _treeObs = Observable<TreeObserver>()
 
     protected fun triggerChange(evt : TreeChangeEvent) {_treeObs.trigger { it.treeStructureChanged(evt) }}
     protected fun triggerNodeAttributeChanged( node:  Node, renderChanged: Boolean) {_treeObs.trigger { it.nodePropertiesChanged(node, renderChanged) }}

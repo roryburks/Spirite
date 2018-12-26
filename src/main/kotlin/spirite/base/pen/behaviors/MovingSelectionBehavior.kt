@@ -1,8 +1,8 @@
 package spirite.base.pen.behaviors
 
-import spirite.base.pen.Penner
-import rb.vectrix.mathUtil.f
 import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.mathUtil.f
+import spirite.base.pen.Penner
 
 
 class MovingSelectionBehavior(penner: Penner) : PennerBehavior(penner)

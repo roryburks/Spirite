@@ -1,7 +1,7 @@
 package demonstration
 
 import spirite.base.brains.MasterControl
-import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
+import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.SAVE_WORKSPACE
 import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.pc.gui.basic.SwMenuBar
 import spirite.pc.gui.menus.SwContextMenus

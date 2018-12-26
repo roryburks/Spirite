@@ -1,7 +1,7 @@
 package spirite.base.graphics.fill
 
-import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.linear.Vec2i
+import rb.vectrix.mathUtil.MathUtil
 import java.util.concurrent.ConcurrentLinkedQueue
 
 private val DELAY = 10L

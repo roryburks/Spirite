@@ -4,8 +4,7 @@ import sjunit.TestConfig
 import sjunit.TestHelper
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderMethod
-import spirite.base.graphics.RenderMethodType.*
-import spirite.base.graphics.gl.GLEngine
+import spirite.base.graphics.RenderMethodType.MULTIPLY
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
@@ -14,9 +13,7 @@ import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.util.Colors
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
-import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.graphics.ImageBI
-import spirite.pc.resources.JClassScriptService
 import java.io.File
 import javax.imageio.ImageIO
 import org.junit.Test as test

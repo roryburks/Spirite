@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
-import spirite.base.pen.Penner
 import rb.vectrix.mathUtil.f
+import spirite.base.pen.Penner
 
 class MovingReferenceBehavior(penner: Penner) : PennerBehavior(penner) {
     override fun onStart() {}

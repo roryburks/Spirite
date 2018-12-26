@@ -1,5 +1,7 @@
 package spirite.base.graphics.rendering
 
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.ceil
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
@@ -9,8 +11,6 @@ import spirite.base.imageData.IIsolator
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.mediums.IComplexMedium
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL

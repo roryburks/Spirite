@@ -1,7 +1,7 @@
 package spirite.base.util.interpolation
 
-import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.MathUtil
 
 /**
  * CubicSplineInterpolator uses Cubic Hermite Spline Interpolation to

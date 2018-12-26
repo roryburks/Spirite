@@ -1,11 +1,11 @@
 package spirite.base.file.load
 
+import rb.vectrix.linear.Vec2i
 import spirite.base.file.SaveLoadUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.SpacialLink
-import rb.vectrix.linear.Vec2i
 
 
 interface IAnimationSpaceLoader

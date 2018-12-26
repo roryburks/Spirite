@@ -4,7 +4,8 @@ import rb.vectrix.linear.Mat4f
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
-import spirite.base.util.linear.*
+import spirite.base.util.linear.Rect
+import spirite.base.util.linear.toIFloat32Source
 
 data class GLParameters(
         var width : Int,

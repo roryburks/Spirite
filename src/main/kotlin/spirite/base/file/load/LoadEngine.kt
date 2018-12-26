@@ -1,13 +1,14 @@
 package spirite.base.file.load
 
+import rb.vectrix.mathUtil.i
 import spirite.base.brains.IMasterControl
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readNullTerminatedStringUTF8
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.mediums.IMedium
-import rb.vectrix.mathUtil.i
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile

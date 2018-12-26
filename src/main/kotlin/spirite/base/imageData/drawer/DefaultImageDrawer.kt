@@ -1,5 +1,10 @@
 package spirite.base.imageData.drawer
 
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.graphics.Composite.DST_OUT
 import spirite.base.graphics.Composite.SRC
@@ -18,13 +23,8 @@ import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.Color
-import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.floor
 import spirite.base.util.linear.Rect
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.Vec2f
 import spirite.base.util.linear.RectangleUtil
-import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.Hybrid
 
 class DefaultImageDrawer(

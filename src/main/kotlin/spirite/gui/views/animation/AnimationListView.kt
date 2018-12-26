@@ -2,6 +2,7 @@ package spirite.gui.views.animation
 
 import rb.jvm.owl.addWeakObserver
 import rb.owl.bindable.addObserver
+import rb.owl.observer
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DeleteAnimationCommand
 import spirite.base.brains.commands.DuplicateAnimationCommand
@@ -10,7 +11,8 @@ import spirite.base.brains.commands.RenameAnimationCommand
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.gui.components.advanced.ITreeViewNonUI.*
+import spirite.gui.components.advanced.ITreeViewNonUI.ITreeComponent
+import spirite.gui.components.advanced.ITreeViewNonUI.TreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
@@ -19,10 +21,12 @@ import spirite.gui.resources.IIcon
 import spirite.gui.resources.SwIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
 import spirite.hybrid.Hybrid
-import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.basic.jcomponent
 import java.awt.Point
-import java.awt.dnd.*
+import java.awt.dnd.DnDConstants
+import java.awt.dnd.DragGestureEvent
+import java.awt.dnd.DragGestureListener
+import java.awt.dnd.DragSource
 
 class AnimationListView(val master: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
@@ -91,16 +95,18 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
             }
     }
 
-    private val _animObs = object : AnimationObserver {
-        override fun animationCreated(animation: Animation) = rebuild()
-        override fun animationRemoved(animation: Animation) = rebuild()
-    }.also { master.centralObservatory.trackingAnimationObservable.addObserver(it)}
+    private val _animObsK = master.centralObservatory.trackingAnimationObservable.addObserver(
+        object : AnimationObserver {
+            override fun animationCreated(animation: Animation) = rebuild()
+            override fun animationRemoved(animation: Animation) = rebuild()
+        }.observer()
+    )
 
     private val _wsObsK = master.workspaceSet.currentWorkspaceBind.addWeakObserver {  _, _ ->  rebuild()}
     private val _curAnimK = master.centralObservatory.currentAnimationBind.addWeakObserver { new, old ->  list.selected = new}
 
     override fun close() {
-        master.centralObservatory.trackingAnimationObservable.removeObserver(_animObs)
+        _animObsK.void()
         _wsObsK.void()
         _curAnimK.void()
     }

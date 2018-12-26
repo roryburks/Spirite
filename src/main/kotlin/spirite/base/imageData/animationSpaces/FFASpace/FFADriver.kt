@@ -1,10 +1,10 @@
 package spirite.base.imageData.animationSpaces.FFASpace
 
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import rb.extendo.extensions.then
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
-import rb.extendo.extensions.then
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 
 interface IFFAPlayback {
     fun advance( miliseconds: Float)

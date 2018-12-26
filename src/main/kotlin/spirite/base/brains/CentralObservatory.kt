@@ -7,8 +7,6 @@ import rb.owl.bindable.IBindObserver
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.OnChangeEvent
 import rb.owl.bindable.addObserver
-import rb.owl.observer
-import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -19,19 +17,18 @@ import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
-import java.lang.ref.WeakReference
 
 /** The CentralObservatory is a place where things (primarily GUI components) which need to watch for certain changes
  * regardless of which Workspace is active should get their Observables from.  It automatically adds and removes ovservers
  * as the currentWorkspace is changed.*/
 interface ICentralObservatory {
-    val omniImageObserver : ICruddyOldObservable<ImageObserver>
+    //val omniImageObserver : ICruddyOldObservable<ImageObserver>
 
-    val trackingUndoHistoryObserver : ICruddyOldObservable<(UndoHistoryChangeEvent)->Any?>
-    val trackingImageObserver : ICruddyOldObservable<ImageObserver>
-    val trackingPrimaryTreeObserver : ICruddyOldObservable<TreeObserver>
-    val trackingAnimationObservable : ICruddyOldObservable<AnimationObserver>
-    val trackingAnimationStateObserver: ICruddyOldObservable<AnimationStructureChangeObserver>
+    val trackingUndoHistoryObserver : IObservable<(UndoHistoryChangeEvent)->Any?>
+    val trackingImageObserver : IObservable<ImageObserver>
+    val trackingPrimaryTreeObserver : IObservable<TreeObserver>
+    val trackingAnimationObservable : IObservable<AnimationObserver>
+    val trackingAnimationStateObserver: IObservable<AnimationStructureChangeObserver>
 
     val activeDataBind : IBindable<MediumHandle?>
     val selectedNode : IBindable<Node?>
@@ -42,38 +39,25 @@ interface ICentralObservatory {
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     : ICentralObservatory
 {
-    private val trackingObservers  = mutableListOf<TrackingObserver<*>>()
-    private val omniObserver  = mutableListOf<OmniObserver<*>>()
+    //override val omniImageObserver: ICruddyOldObservable<ImageObserver> = CruddyOldOmniObserver { it.imageObservatory.imageObservable }
 
-    override val omniImageObserver: ICruddyOldObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservable }
-
-    override val trackingUndoHistoryObserver: ICruddyOldObservable<(UndoHistoryChangeEvent) -> Any?> = TrackingObserver { it.undoEngine.undoHistoryObserver }
-    override val trackingImageObserver = TrackingObserver {it.imageObservatory.imageObservable}
-    override val trackingPrimaryTreeObserver: ICruddyOldObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObservable }
-    override val trackingAnimationObservable: ICruddyOldObservable<AnimationObserver> = TrackingObserver { it.animationManager.animationObservable }
-    override val trackingAnimationStateObserver: ICruddyOldObservable<AnimationStructureChangeObserver> = TrackingObserver { it.animationManager.animationStructureChangeObservable }
+    override val trackingUndoHistoryObserver: IObservable<(UndoHistoryChangeEvent) -> Any?> = TrackingObserver { it.undoEngine.undoHistoryObserver }
+    override val trackingImageObserver : IObservable<ImageObserver> = TrackingObserver {it.imageObservatory.imageObservable}
+    override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObservable }
+    override val trackingAnimationObservable: IObservable<AnimationObserver> = TrackingObserver { it.animationManager.animationObservable }
+    override val trackingAnimationStateObserver: IObservable<AnimationStructureChangeObserver> = TrackingObserver { it.animationManager.animationStructureChangeObservable }
 
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
     override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
     override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind}
     override val currentAnimationSpaceBind: IBindable<AnimationSpace?> = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
 
-    init {
-        // Note: In order to cut down on code which could easily be forgotten/broken, TrackingObservers automatically
-        //  add themselves to an internal list which is then linked to the workspace observer automaticlaly.  But this
-        //  means order is important.  In particular
-        //      1) [trackingObservers' Initialization]
-        //      2) [each individual TrackingObserver's initialization]
-        //      3) [this init block]
-        trackingObservers.forEach { workspaceSet.workspaceObserver.addObserver(it.observer()) }
-    }
-
     private inner class TrackingBinder<T>(val finder: (IImageWorkspace) -> IBindable<T>) : IBindable<T?>
     {
         override val field: T? get() = workspaceSet.currentWorkspace?.run(finder)?.field
-        var currentContract: IContract? = null
-
         override fun addObserver(observer: IObserver<OnChangeEvent<T?>>, trigger: Boolean): IContract = ObserverContract(observer)
+
+        private var currentContract: IContract? = null
         private val binds = mutableListOf<ObserverContract>()
         private inner class ObserverContract( val observer: IBindObserver<T?>) : IContract {
             init {binds.add(this)}
@@ -99,68 +83,32 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
         }
     }
 
-    // region CruddyOldImplementation
-    inner class OmniObserver<T>(
-            val observerFinder : (IImageWorkspace) -> ICruddyOldObservable<T>)
-        : ICruddyOldObservable<T>, WorkspaceObserver
+    private inner class TrackingObserver<T>(val finder : (IImageWorkspace) -> IObservable<T>) : IObservable<T>
     {
-        init {
-            omniObserver.add(this)
-        }
-        private val observers = mutableListOf<WeakReference<T>>()
-
-        override fun addObserver(toAdd: T) : T {
-            observers.add( WeakReference(toAdd))
-            return toAdd
-        }
-        override fun removeObserver(toRemove: T) {
-            observers.removeIf { (it.get() ?: toRemove) == toRemove}
+        override fun addObserver(observer: IObserver<T>, trigger: Boolean) : IContract{
+            current?.also { currentContracts.add(it.addObserver(observer, trigger)) }
+            return ObserverContract(observer)
         }
 
-        override fun workspaceCreated(newWorkspace: IImageWorkspace) {
-            val observable = observerFinder.invoke(newWorkspace)
-            observers.removeIf { it.get()?.apply { observable.addObserver(this) } == null }
+        private var currentContracts = mutableListOf<IContract>()
+        private val binds = mutableListOf<ObserverContract>()
+        private inner class ObserverContract( val observer: IObserver<T>) : IContract {
+            init { binds.add(this)}
+            override fun void() {binds.remove(this)}
         }
-        override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {
-            val observable = observerFinder.invoke(removedWorkspace)
-            observers.removeIf { it.get()?.apply { observable.removeObserver(this) } == null }
-        }
-        override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {}
-    }
+        private var current: IObservable<T>? = null
 
-    inner class TrackingObserver<T>(
-            val observerFinder : (IImageWorkspace) -> ICruddyOldObservable<T>)
-        : ICruddyOldObservable<T>, WorkspaceObserver
-    {
-        init {
-            trackingObservers.add(this)
-        }
-        private val observers = mutableListOf<WeakReference<T>>()
-
-        override fun addObserver(toAdd: T) : T{
-            val workspace = workspaceSet.currentWorkspace
-            if( workspace != null) observerFinder.invoke(workspace).addObserver(toAdd)
-            observers.add( WeakReference(toAdd))
-            return toAdd
-        }
-        override fun removeObserver(toRemove: T) {
-            val workspace = workspaceSet.currentWorkspace
-            if( workspace != null) observerFinder.invoke(workspace).removeObserver(toRemove)
-            observers.removeIf { (it.get() ?: toRemove) == toRemove}
-        }
-
-        override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
-        override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {}
-        override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
-            if( previousSelected != null) {
-                val observable = observerFinder.invoke(previousSelected)
-                observers.removeIf { it.get()?.apply { observable.removeObserver(this) } == null }
+        private val workspaceObsContract = workspaceSet.currentWorkspaceBind.addObserver { new, old ->
+            currentContracts.forEach{it.void()}
+            if( new != null) {
+                val newT = finder(new)
+                current = newT
+                binds.asSequence()
+                        .map { it.observer }
+                        .forEach { newT.addObserver(it, false) }    // TODO Should trigger be saved, defaulted to false, or removed?
             }
-            if( selectedWorkspace != null) {
-                val observable = observerFinder.invoke(selectedWorkspace)
-                observers.removeIf { it.get()?.apply { observable.addObserver(this) } == null }
-            }
+            else current = null
         }
+
     }
-    // endregion
 }

@@ -1,6 +1,9 @@
 package spirite.base.pen
 
 import rb.owl.bindable.addObserver
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
@@ -10,9 +13,6 @@ import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
 import spirite.base.util.Colors
-import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.floor
-import rb.vectrix.linear.Vec2f
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.views.work.WorkSection

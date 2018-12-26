@@ -3,7 +3,8 @@ package rb.owl.bindableMList
 import rb.extendo.dataStructures.SinglyCollection
 import rb.extendo.dataStructures.SinglySet
 import rb.extendo.extensions.asHashSet
-import rb.owl.*
+import rb.owl.IContract
+import rb.owl.IObserver
 
 
 class ObservableMList<T>

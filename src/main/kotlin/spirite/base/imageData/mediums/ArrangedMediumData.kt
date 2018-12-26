@@ -1,9 +1,9 @@
 package spirite.base.imageData.mediums
 
-import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.selection.Selection
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.selection.Selection
 
 /***
  * ArrangedMediumData serves as a context upon which things are done.  Since most drawing actions and many other actions

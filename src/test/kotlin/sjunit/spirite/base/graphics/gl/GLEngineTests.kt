@@ -1,6 +1,8 @@
 package sjunit.spirite.base.graphics.gl
 
 
+import rb.vectrix.linear.Vec3f
+import rb.vectrix.linear.Vec4f
 import sjunit.TestConfig
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.graphics.CapMethod.NONE
@@ -11,8 +13,6 @@ import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.graphics.gl.SquareGradientCall.GradientType
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.util.Colors
-import rb.vectrix.linear.Vec3f
-import rb.vectrix.linear.Vec4f
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File

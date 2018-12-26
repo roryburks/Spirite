@@ -1,8 +1,8 @@
 package spirite.base.brains.toolset
 
+import rb.owl.IObservable
+import rb.owl.Observable
 import rb.owl.bindable.Bindable
-import spirite.base.brains.ICruddyOldObservable
-import spirite.base.brains.CruddyOldObservable
 import spirite.base.brains.toolset.IToolsetManager.ToolsetPropertyObserver
 
 interface IToolsetManager {
@@ -14,17 +14,17 @@ interface IToolsetManager {
     interface ToolsetPropertyObserver {
         fun onToolPropertyChanged( tool: Tool, property: ToolProperty<*>)
     }
-    val toolsetObserver : ICruddyOldObservable<ToolsetPropertyObserver>
+    val toolsetObservable : IObservable<ToolsetPropertyObserver>
 }
 
 class ToolsetManager : IToolsetManager{
-    override val toolsetObserver = CruddyOldObservable<ToolsetPropertyObserver>()
+    override val toolsetObservable = Observable<ToolsetPropertyObserver>()
     override val toolset = Toolset(this)
 
     override val selectedToolBinding = Bindable<Tool>(toolset.Pen)
     override var selectedTool by selectedToolBinding
 
     internal fun triggerToolsetChanged(tool: Tool, property: ToolProperty<*>) {
-        toolsetObserver.trigger { it.onToolPropertyChanged(tool, property) }
+        toolsetObservable.trigger { it.onToolPropertyChanged(tool, property) }
     }
 }

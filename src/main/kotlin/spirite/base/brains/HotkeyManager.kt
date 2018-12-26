@@ -1,15 +1,15 @@
 package spirite.base.brains
 
+import rb.extendo.dataStructures.MutableOneToManyMap
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
 import spirite.base.brains.commands.IsolationCommandExecuter.IsolationCommand
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand
 import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand
+import spirite.base.brains.commands.SelectCommand
 import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand
 import spirite.base.brains.commands.WorkspaceCommandExecuter.ViewCommand
 import spirite.base.brains.settings.IPreferences
-import rb.extendo.dataStructures.MutableOneToManyMap
-import spirite.base.brains.commands.SelectCommand
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 

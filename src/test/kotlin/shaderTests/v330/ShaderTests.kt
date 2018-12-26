@@ -1,10 +1,10 @@
 package shaderTests.v330
 
+import rb.vectrix.linear.Mat4f
+import rb.vectrix.mathUtil.f
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.shader.GL330ShaderLoader
-import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
-import rb.vectrix.linear.Mat4f
 import spirite.base.util.linear.MatrixBuilder
 import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGL.JOGLUniformLocation

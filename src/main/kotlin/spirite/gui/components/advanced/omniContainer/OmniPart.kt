@@ -1,8 +1,6 @@
 package spirite.gui.components.advanced.omniContainer
 
-import rb.extendo.extensions.then
 import spirite.gui.Orientation
-import spirite.gui.components.basic.IComponent
 
 sealed class OmniPart {
     abstract val components: List<IOmniComponent>

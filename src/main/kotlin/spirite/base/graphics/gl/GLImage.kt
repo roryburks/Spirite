@@ -4,8 +4,6 @@ import spirite.base.graphics.GLDrawer
 import spirite.base.graphics.IDrawer
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption
-import spirite.base.util.ColorARGB32Normal
-import spirite.base.util.ColorARGB32Premultiplied
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Rect
 import spirite.base.util.toColor

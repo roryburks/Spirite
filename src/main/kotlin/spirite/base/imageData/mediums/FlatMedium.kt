@@ -1,5 +1,8 @@
 package spirite.base.imageData.mediums
 
+import rb.extendo.dataStructures.SinglyList
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.MMediumRepository
@@ -7,9 +10,6 @@ import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-import rb.extendo.dataStructures.SinglyList
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.util.Colors
 import spirite.pc.gui.SColor
 

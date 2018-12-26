@@ -7,12 +7,12 @@ import sjunit.TestConfig
 import sjunit.TestHelper
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
 import spirite.base.graphics.rendering.NodeRenderer
+import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams

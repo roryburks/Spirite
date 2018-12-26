@@ -1,5 +1,13 @@
 package spirite.gui.views.animation.animationSpaceView
 
+import CrossLayout
+import rb.jvm.owl.addWeakObserver
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.linear.Vec2i
+import rb.vectrix.mathUtil.MathUtil
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
+import rb.vectrix.mathUtil.round
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
@@ -7,12 +15,6 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.Spacial
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationPlayObserver
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
 import spirite.base.util.linear.Rect
-import rb.vectrix.linear.Vec2f
-import rb.vectrix.linear.Vec2i
-import rb.vectrix.mathUtil.MathUtil
-import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.floor
-import rb.vectrix.mathUtil.round
 import spirite.gui.UIPoint
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IComponent
@@ -304,12 +306,12 @@ private constructor(
 
 
 
-    private val __listener =animationSpace.stateView.animationSpaceObservable.addObserver( object : InternalAnimationSpaceObserver {
+    private val __listenerK =animationSpace.stateView.animationSpaceObservable.addWeakObserver( object : InternalAnimationSpaceObserver {
         override fun animationSpaceChanged(structureChange: Boolean) {
             rebuild()
         }
     })
-    private val __listener2 =animationSpace.stateView.animationPlayObservable.addObserver( object : InternalAnimationPlayObserver {
+    private val __listenerK2 =animationSpace.stateView.animationPlayObservable.addWeakObserver( object : InternalAnimationPlayObserver {
         override fun playStateChanged(animation: Animation?, frame: Float) {
             val ffa = animation as? FixedFrameAnimation ?: return
             val met = MathUtil.cycle(ffa.start, ffa.end, frame.floor)

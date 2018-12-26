@@ -2,8 +2,8 @@ package demonstration
 
 import spirite.base.util.InvertibleFunction
 import spirite.gui.Orientation.HORIZONTAL
-import spirite.gui.components.basic.IButton
 import spirite.gui.components.advanced.ResizeContainerPanel
+import spirite.gui.components.basic.IButton
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.jcomponent
 import java.awt.Color

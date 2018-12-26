@@ -1,7 +1,6 @@
 package spirite.gui.components.advanced
 
 import CrossLayout
-import rb.jvm.owl.bindWeaklyTo
 import rb.owl.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable

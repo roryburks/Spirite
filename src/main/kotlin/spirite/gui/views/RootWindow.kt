@@ -11,6 +11,7 @@ import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
 import spirite.gui.components.advanced.omniContainer.OmniTab
 import spirite.gui.components.advanced.omniContainer.SubContainer
+import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.views.animation.AnimationListView
 import spirite.gui.views.animation.structureView.AnimationStructureView
 import spirite.gui.views.groupView.GroupView
@@ -20,7 +21,6 @@ import spirite.gui.views.tool.PaletteSection
 import spirite.gui.views.tool.ToolSection
 import spirite.gui.views.tool.ToolSettingsSection
 import spirite.gui.views.work.WorkTabPane
-import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwMenuBar
 import spirite.pc.gui.basic.jcomponent

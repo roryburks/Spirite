@@ -1,10 +1,10 @@
 package spirite.pc
 
-import spirite.base.graphics.gl.IGLEngine
-import spirite.base.graphics.gl.GLImage
-import spirite.base.util.glu.GLC
-import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.MutableTransformF
+import spirite.base.graphics.gl.GLImage
+import spirite.base.graphics.gl.IGLEngine
+import spirite.base.util.glu.GLC
 import spirite.pc.JOGL.JOGL.JOGLInt32Source
 import spirite.pc.util.RasterHelper
 import java.awt.geom.AffineTransform

@@ -2,8 +2,9 @@ package spirite.base.imageData.selection
 
 import rb.owl.IObservable
 import rb.owl.Observable
-import spirite.base.brains.ICruddyOldObservable
-import spirite.base.brains.CruddyOldObservable
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.mathUtil.f
 import spirite.base.graphics.IImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
@@ -15,11 +16,8 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.delegates.DerivedLazy
-import rb.vectrix.mathUtil.f
-import spirite.base.util.linear.RectangleUtil
 import spirite.base.util.linear.Rect
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.ImmutableTransformF
+import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.Hybrid
 import java.io.File
 

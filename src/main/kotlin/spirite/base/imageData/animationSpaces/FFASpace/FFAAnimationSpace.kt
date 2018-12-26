@@ -1,5 +1,6 @@
 package spirite.base.imageData.animationSpaces.FFASpace
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
@@ -62,15 +63,15 @@ class FFAAnimationSpace(
         _links.remove(link)
     }
 
-    private val animationObserver = object: AnimationObserver {
+    private val _animObsK = workspace.animationManager.animationObservable.addWeakObserver(object: AnimationObserver {
         override fun animationCreated(animation: Animation) {}
         override fun animationRemoved(animation: Animation) {
-            animation as? FixedFrameAnimation ?: return
+            if (animation !is FixedFrameAnimation) return
             removeAnimation(animation)
         }
-    }.also { workspace.animationManager.animationObservable.addObserver(it)}
+    })
 
-    private val __animationStrucuteObserver = workspace.animationManager.animationStructureChangeObservable.addObserver( object : AnimationStructureChangeObserver {
+    private val _animStructObsK = workspace.animationManager.animationStructureChangeObservable.addWeakObserver( object : AnimationStructureChangeObserver {
         override fun animationStructureChanged(animation: Animation) {
             if( animations.contains(animation))
             {

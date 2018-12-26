@@ -1,6 +1,5 @@
 package demonstration
 
-import spirite.base.brains.MasterControl
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
 import javax.swing.JFrame

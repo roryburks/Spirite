@@ -1,8 +1,8 @@
 package sjunit
 
 import io.mockk.mockk
-import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
+import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.ImageWorkspace

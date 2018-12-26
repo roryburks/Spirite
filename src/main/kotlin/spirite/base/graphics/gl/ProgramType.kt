@@ -1,5 +1,8 @@
 package spirite.base.graphics.gl
 
+import rb.vectrix.linear.Vec3f
+import rb.vectrix.linear.Vec4f
+import rb.vectrix.mathUtil.f
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.ColorChangeMode.*
 import spirite.base.graphics.JoinMethod
@@ -7,9 +10,6 @@ import spirite.base.graphics.JoinMethod.*
 import spirite.base.graphics.gl.IGLEngine.BlendMethod
 import spirite.base.graphics.gl.IGLEngine.BlendMethod.*
 import spirite.base.graphics.gl.ProgramType.*
-import rb.vectrix.mathUtil.f
-import rb.vectrix.linear.Vec3f
-import rb.vectrix.linear.Vec4f
 
 internal enum class ProgramType(
         internal val method: BlendMethod

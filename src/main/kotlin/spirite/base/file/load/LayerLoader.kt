@@ -1,12 +1,12 @@
 package spirite.base.file.load
 
+import rb.vectrix.mathUtil.i
 import spirite.base.file.SaveLoadUtil
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
-import rb.vectrix.mathUtil.i
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 

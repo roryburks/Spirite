@@ -4,7 +4,6 @@ import spirite.gui.components.basic.IButton
 import spirite.gui.components.basic.IButton.ButtonActionEvent
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.Skin
-import java.awt.Font
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.swing.BorderFactory

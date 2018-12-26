@@ -1,12 +1,12 @@
 package spirite.base.graphics.gl.fill
 
+import rb.vectrix.linear.Vec4f
+import rb.vectrix.mathUtil.f
 import spirite.base.graphics.fill.IFillArrayAlgorithm
 import spirite.base.graphics.gl.FillAfterpassCall
 import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.GLParameters
-import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
-import rb.vectrix.linear.Vec4f
 import spirite.pc.JOGL.JOGL.JOGLTextureSource
 import spirite.pc.gui.SColor
 import java.nio.IntBuffer

@@ -1,6 +1,8 @@
 package spirite.base.graphics.rendering
 
-import spirite.base.brains.*
+import rb.owl.observer
+import spirite.base.brains.ICentralObservatory
+import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.settings.ISettingsManager
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
@@ -309,5 +311,5 @@ class ThumbnailStore(
                 }
             }
         }
-    }.also { centralObservatory.trackingImageObserver.addObserver(it)}
+    }.also { centralObservatory.trackingImageObserver.addObserver(it.observer())}
 }

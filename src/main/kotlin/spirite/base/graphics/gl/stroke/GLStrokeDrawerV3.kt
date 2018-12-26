@@ -1,17 +1,17 @@
 package spirite.base.graphics.gl.stroke
 
 import com.hackoeur.jglm.support.FastMath
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.Vec3f
+import rb.vectrix.mathUtil.d
+import rb.vectrix.mathUtil.f
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
-import rb.vectrix.mathUtil.d
-import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.Vec3f
 import kotlin.math.PI
 
 // Dot

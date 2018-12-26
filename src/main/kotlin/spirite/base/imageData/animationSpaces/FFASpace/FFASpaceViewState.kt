@@ -1,15 +1,16 @@
 package spirite.base.imageData.animationSpaces.FFASpace
 
+import rb.jvm.owl.addWeakObserver
+import rb.owl.IObservable
+import rb.owl.Observable
 import rb.owl.bindable.Bindable
-import spirite.base.brains.ICruddyOldObservable
-import spirite.base.brains.CruddyOldObservable
+import rb.vectrix.linear.Vec2i
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationPlayObserver
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
-import rb.vectrix.linear.Vec2i
 
 class FFASpaceViewState(val space: FFAAnimationSpace)
     : IAnimationSpaceView
@@ -91,18 +92,18 @@ class FFASpaceViewState(val space: FFAAnimationSpace)
         _animationSpaceObservable.trigger { it.animationSpaceChanged(structural) }
     }
 
-    override val animationSpaceObservable : ICruddyOldObservable<InternalAnimationSpaceObserver> get() = _animationSpaceObservable
-    private val _animationSpaceObservable= CruddyOldObservable<InternalAnimationSpaceObserver>()
+    override val animationSpaceObservable : IObservable<InternalAnimationSpaceObserver> get() = _animationSpaceObservable
+    private val _animationSpaceObservable= Observable<InternalAnimationSpaceObserver>()
 
-    private val __animationStructureObs = space.workspace.animationManager.animationStructureChangeObservable.addObserver(object : AnimationStructureChangeObserver {
+    private val __animationStructureObs = space.workspace.animationManager.animationStructureChangeObservable.addWeakObserver(object : AnimationStructureChangeObserver {
         override fun animationStructureChanged(animation: Animation) {
             if( space.animations.contains(animation))
                 triggerOtherChange(true)
         }
     })
 
-    override val animationPlayObservable: ICruddyOldObservable<InternalAnimationPlayObserver> get() = _animationPlayObservable
-    private val _animationPlayObservable = CruddyOldObservable<InternalAnimationPlayObserver>()
+    override val animationPlayObservable: IObservable<InternalAnimationPlayObserver> get() = _animationPlayObservable
+    private val _animationPlayObservable = Observable<InternalAnimationPlayObserver>()
     private fun triggerPlayChange( anim: Animation?, frame: Float) {
         _animationPlayObservable.trigger { it.playStateChanged(anim, frame) }
     }

@@ -1,17 +1,17 @@
 package spirite.gui.views.animation
 
-import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
 import rb.owl.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import spirite.base.brains.IMasterControl
-import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
+import rb.owl.observer
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
+import spirite.base.brains.IMasterControl
+import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_RAISED
@@ -91,14 +91,16 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
 
     // region Bindings
-    private val _curAnimK = masterControl.centralObservatory.currentAnimationBind.addWeakObserver { new, old ->buildFromAnim(new); viewPanel.redraw()}
-    private val _animstructureObs = object : AnimationStructureChangeObserver {
-        override fun animationStructureChanged(animation: Animation) {
-            if( animation == this@AnimationPreviewView.animation) {
-                updateSlider()
+    private val _curAnimK = masterControl.centralObservatory.currentAnimationBind.addObserver { new, old ->buildFromAnim(new); viewPanel.redraw()}
+    private val _animStructObsK = masterControl.centralObservatory.trackingAnimationStateObserver.addObserver(
+        object : AnimationStructureChangeObserver {
+            override fun animationStructureChanged(animation: Animation) {
+                if( animation == this@AnimationPreviewView.animation) {
+                    updateSlider()
+                }
             }
-        }
-    }.also { masterControl.centralObservatory.trackingAnimationStateObserver.addObserver(it) }
+        }.observer()
+    )
     var animation : Animation? = null
 
     private val metBind = Bindable(0f)
@@ -171,6 +173,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     override fun close() {
         unbind()
         _curAnimK.void()
+        _animStructObsK.void()
         timer.stop()
     }
 }

@@ -2,8 +2,8 @@ package demonstration
 
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
-import spirite.gui.components.advanced.crossContainer.CrossContainer
 import spirite.gui.components.advanced.ResizeContainerPanel
+import spirite.gui.components.advanced.crossContainer.CrossContainer
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.jcomponent
 import java.awt.GridLayout

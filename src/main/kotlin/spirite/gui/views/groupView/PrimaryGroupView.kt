@@ -16,7 +16,6 @@ import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
-import spirite.gui.components.basic.IEditableLabel
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.resources.SwIcons
 import spirite.gui.resources.Transferables.NodeTransferable
@@ -36,7 +35,6 @@ private constructor(
     override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {}
 
     init {
-        master.centralObservatory.trackingPrimaryTreeObserver.addObserver(this)
 
         tree.leftSize = 40
 

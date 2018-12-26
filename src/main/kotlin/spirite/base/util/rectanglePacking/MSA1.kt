@@ -1,7 +1,7 @@
 package spirite.base.util.rectanglePacking
 
-import spirite.base.util.linear.Rect
 import rb.vectrix.linear.Vec2i
+import spirite.base.util.linear.Rect
 import java.lang.Math.max
 import java.lang.Math.round
 

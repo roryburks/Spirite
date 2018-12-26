@@ -1,7 +1,6 @@
 package spirite.gui.components.basic.events
 
 import spirite.gui.UIPoint
-import spirite.gui.components.basic.IComponent
 
 data class MouseEvent(
         val point: UIPoint,

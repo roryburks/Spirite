@@ -1,5 +1,6 @@
 package spirite.base.graphics.rendering
 
+import rb.owl.observer
 import spirite.base.brains.ICentralObservatory
 import spirite.base.graphics.IFlushable
 import spirite.base.graphics.IImage
@@ -54,7 +55,7 @@ class RenderEngine(
 {
 
     init {
-        centralObservatory.trackingImageObserver.addObserver(this)
+        centralObservatory.trackingImageObserver.addObserver(this.observer())
     }
 
     override fun pullImage(target: RenderTarget): RawImage {

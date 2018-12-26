@@ -1,7 +1,7 @@
 package spirite.hybrid
 
-import spirite.base.graphics.gl.IGLEngine
 import spirite.base.graphics.gl.IGL
+import spirite.base.graphics.gl.IGLEngine
 import spirite.gui.components.basic.IComponentProvider
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.gui.SwingComponentProvider

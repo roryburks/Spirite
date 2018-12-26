@@ -1,5 +1,6 @@
 package spirite.gui.views.info
 
+import rb.owl.observer
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import spirite.base.imageData.undo.UndoIndex
@@ -29,16 +30,18 @@ class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
 
     private val tree = Hybrid.ui.TreeView<UndoIndex>()
 
-    private val uhobs = { evt : UndoHistoryChangeEvent ->
-        val history = evt.history
-        if( history != null) {
-            tree.clearRoots()
-            tree.constructTree {
-                history.forEach {Node(it, attributes)}
+    private val _undoHistoryK = master.centralObservatory.trackingUndoHistoryObserver.addObserver(
+        { evt : UndoHistoryChangeEvent ->
+            val history = evt.history
+            if( history != null) {
+                tree.clearRoots()
+                tree.constructTree {
+                    history.forEach {Node(it, attributes)}
+                }
             }
-        }
-        tree.selected = evt.position
-    }.apply { master.centralObservatory.trackingUndoHistoryObserver.addObserver(this)}
+            tree.selected = evt.position
+        }.observer()
+    )
 
 //    private val wsobs = {new : IImageWorkspace?, old : IImageWorkspace?->
 //        val history = new?.undoEngine?.undoHistory
@@ -51,7 +54,7 @@ class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
 //    }.run { master.workspaceSet.currentWorkspaceBind.addListener(this) }
 
     override fun close() {
-        master.centralObservatory.trackingUndoHistoryObserver.removeObserver(uhobs)
+        _undoHistoryK.void()
         //wsobs.unbind()
     }
 

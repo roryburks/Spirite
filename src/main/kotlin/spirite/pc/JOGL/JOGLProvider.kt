@@ -1,7 +1,6 @@
 package spirite.pc.JOGL
 
 import com.jogamp.opengl.*
-import com.jogamp.opengl.Threading.isSingleThreaded
 import spirite.base.graphics.gl.IGL
 
 object JOGLProvider {

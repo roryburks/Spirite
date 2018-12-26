@@ -1,10 +1,10 @@
 package spirite.base.imageData.undo
 
+import rb.extendo.dataStructures.SinglySet
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
-import rb.extendo.dataStructures.SinglySet
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR

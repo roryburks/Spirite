@@ -1,13 +1,13 @@
 package spirite.base.imageData.undo
 
-import spirite.base.brains.ICruddyOldObservable
-import spirite.base.brains.CruddyOldObservable
+import rb.extendo.dataStructures.SinglyList
+import rb.extendo.extensions.then
+import rb.owl.IObservable
+import rb.owl.Observable
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
-import rb.extendo.dataStructures.SinglyList
-import rb.extendo.extensions.then
 
 interface IUndoEngine {
     /** Cleans the slate, removing all undoable actions and reinitializing the base contexts*/
@@ -39,7 +39,7 @@ interface IUndoEngine {
             val history: List<UndoIndex>?,  // Null if not a History Change Event
             val undoEngine: IUndoEngine,
             val position: UndoIndex)
-    val undoHistoryObserver : ICruddyOldObservable<(UndoHistoryChangeEvent)->Any?>
+    val undoHistoryObserver : IObservable<(UndoHistoryChangeEvent)->Any?>
 }
 
 class UndoIndex(
@@ -224,5 +224,5 @@ class UndoEngine(
         undoHistoryObserver.trigger { it.invoke(UndoHistoryChangeEvent(null, this, undoHistory[_queuePosition-1]))}
     }
 
-    override val undoHistoryObserver = CruddyOldObservable<(UndoHistoryChangeEvent)->Any?>()
+    override val undoHistoryObserver = Observable<(UndoHistoryChangeEvent)->Any?>()
 }

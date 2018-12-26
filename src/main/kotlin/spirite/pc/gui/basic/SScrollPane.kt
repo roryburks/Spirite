@@ -1,10 +1,9 @@
 package spirite.pc.gui.basic
 
 import spirite.gui.resources.Skin.Global
-
+import java.awt.*
 import javax.swing.*
 import javax.swing.plaf.basic.BasicScrollBarUI
-import java.awt.*
 
 /**
  * This is an implementation of a JScrollPane with a modern UI

@@ -1,5 +1,8 @@
 package spirite.base.brains.commands
 
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.f
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand.*
@@ -7,9 +10,6 @@ import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree.Node
-import rb.vectrix.mathUtil.f
-import rb.vectrix.linear.Vec2f
-import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.MDebug
 
 class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: IToolsetManager) : ICommandExecuter

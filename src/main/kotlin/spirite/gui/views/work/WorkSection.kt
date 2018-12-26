@@ -1,17 +1,17 @@
 package spirite.gui.views.work
 
 import rb.jvm.owl.addWeakObserver
+import rb.owl.IObservable
+import rb.owl.Observable
 import rb.owl.bindable.addObserver
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.round
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.ICruddyOldObservable
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
-import spirite.base.brains.CruddyOldObservable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.pen.Penner
-import rb.vectrix.mathUtil.f
 import spirite.base.util.linear.Rect
-import rb.vectrix.linear.Vec2f
-import rb.vectrix.mathUtil.round
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.basic.IComponent
@@ -218,8 +218,8 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
             }
     )
 
-    val viewObservable : ICruddyOldObservable<()->Unit> get() = _viewObservable
-    private val _viewObservable = CruddyOldObservable<()->Unit>()
+    val viewObservable : IObservable<()->Unit> get() = _viewObservable
+    private val _viewObservable = Observable<()->Unit>()
 
     init {
     }

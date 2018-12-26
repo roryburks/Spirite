@@ -1,6 +1,5 @@
 package rb.owl.bindable
 
-import rb.owl.IContract
 import rb.owl.IObservable
 import rb.owl.IObserver
 

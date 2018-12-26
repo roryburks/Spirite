@@ -2,13 +2,14 @@ package spirite.gui.views.animation.animationSpaceView
 
 import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
+import rb.owl.IContract
 import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.AnimationSpace
+import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSpaceObserver
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.components.advanced.ResizeContainerPanel
@@ -101,7 +102,7 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
     }
 
     // region Observers
-    val animationSpaceObserver = object : AnimationSpaceObserver {
+    private val animationSpaceObserver = object : AnimationSpaceObserver {
         override fun spaceAdded(space: AnimationSpace) {
             if( space.workspace == currentWorkspace)
             rebuildDropDown(currentWorkspace)
@@ -111,14 +112,15 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
             if( space.workspace == currentWorkspace)
             rebuildDropDown(currentWorkspace)
         }
-
     }
-    val __worspaceListenerK = master.workspaceSet.currentWorkspaceBind.addWeakObserver { new, old ->
-        old?.animationSpaceManager?.animationSpaceObservable?.removeObserver(animationSpaceObserver)
-        new?.animationSpaceManager?.animationSpaceObservable?.addObserver(animationSpaceObserver)
+
+    private var animationSpaceObsK : IContract? = null
+    private val _workspaceListenerK = master.workspaceSet.currentWorkspaceBind.addWeakObserver { new, old ->
+        animationSpaceObsK?.void()
+        animationSpaceObsK = new?.animationSpaceManager?.animationSpaceObservable?.addWeakObserver(animationSpaceObserver)
         rebuildDropDown(new)
     }
-    val _curAnimK = master.centralObservatory.currentAnimationSpaceBind.addWeakObserver { new, _ ->
+    private val _curAnimK = master.centralObservatory.currentAnimationSpaceBind.addWeakObserver { new, _ ->
         new?.also { spaceDropdown.selectedItem = it}
     }
     //endregion

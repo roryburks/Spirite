@@ -1,7 +1,7 @@
 package spirite.base.imageData.animationSpaces
 
+import rb.owl.IObservable
 import rb.owl.bindable.Bindable
-import spirite.base.brains.ICruddyOldObservable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 
@@ -13,8 +13,8 @@ interface IAnimationSpaceView
     interface InternalAnimationPlayObserver {
         fun playStateChanged( animation: Animation?, frame: Float)
     }
-    val animationSpaceObservable : ICruddyOldObservable<InternalAnimationSpaceObserver>
-    val animationPlayObservable : ICruddyOldObservable<InternalAnimationPlayObserver>
+    val animationSpaceObservable : IObservable<InternalAnimationSpaceObserver>
+    val animationPlayObservable : IObservable<InternalAnimationPlayObserver>
 }
 
 abstract class AnimationSpace(

@@ -2,6 +2,7 @@ package spirite.gui.views.tool
 
 import rb.jvm.owl.addWeakObserver
 import rb.owl.bindable.addObserver
+import rb.owl.observer
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.palette.Palette
@@ -17,7 +18,10 @@ import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
-import java.awt.*
+import java.awt.BasicStroke
+import java.awt.Color
+import java.awt.Graphics
+import java.awt.Graphics2D
 import java.awt.event.KeyEvent
 import javax.swing.JPanel
 
@@ -30,15 +34,6 @@ class PaletteSection(
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = null
     override val name: String get() = "Palette"
-
-    private val __ASDF134 = object : PaletteObserver {
-        override fun paletteChanged(evt: PaletteChangeEvent) {
-            paletteView.redraw()
-        }
-        override fun paletteSetChanged(evt: PaletteSetChangeEvent) {
-            paletteView.redraw()
-        }
-    }.also {paletteManager.paletteObservable.addObserver( it) }
 
     private val primaryColorSquare : IColorSquare = Hybrid.ui.ColorSquare()
     private val secondaryColorSquare : IColorSquare = Hybrid.ui.ColorSquare()
@@ -158,12 +153,25 @@ class PaletteSection(
 
     private val _curPlttK = master.paletteManager.currentPaletteBind.addWeakObserver { _, _ -> paletteView.redraw()}
 
+
+    private val _paletObsK =paletteManager.paletteObservable.addObserver(
+            object : PaletteObserver {
+                override fun paletteChanged(evt: PaletteChangeEvent) {
+                    paletteView.redraw()
+                }
+                override fun paletteSetChanged(evt: PaletteSetChangeEvent) {
+                    paletteView.redraw()
+                }
+            }.observer()
+    )
+
     override fun close() {
         paletteView.onClose()
         paletteChooserView.onClose()
         _curPlttK.void()
         _cBind0.void()
         _cBind1.void()
+        _paletObsK.void()
     }
 }
 
@@ -276,14 +284,17 @@ constructor(
     private val _workspaceListenerK = master.workspaceSet.currentWorkspaceBind.addWeakObserver {  new, old ->
         rebuild()
     }
-    private val _paletteManaager = object : PaletteObserver {
-        override fun paletteChanged(evt: PaletteChangeEvent) {}
-        override fun paletteSetChanged(evt: PaletteSetChangeEvent) {
-            rebuild()
-        }
-    }.also { master.paletteManager.paletteObservable.addObserver(it)}
+    private val _paletteObsK =master.paletteManager.paletteObservable.addObserver(
+        object : PaletteObserver {
+            override fun paletteChanged(evt: PaletteChangeEvent) {}
+            override fun paletteSetChanged(evt: PaletteSetChangeEvent) {
+                rebuild()
+            }
+        }.observer()
+    )
     fun onClose() {
         _workspaceListenerK.void()
+        _paletteObsK.void()
     }
     //endregion
 }

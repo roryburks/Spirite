@@ -1,9 +1,9 @@
 package spirite.base.graphics
 
+import rb.vectrix.linear.ITransformF
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.util.Color
-import rb.vectrix.linear.ITransformF
 import spirite.base.util.shapes.IShape
 import java.util.*
 

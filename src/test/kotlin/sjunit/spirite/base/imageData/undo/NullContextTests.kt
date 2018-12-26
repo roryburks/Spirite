@@ -2,11 +2,11 @@ package sjunit.spirite.base.imageData.undo
 
 
 import io.mockk.mockk
+import rb.extendo.dataStructures.SinglyList
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.NullContext
-import rb.extendo.dataStructures.SinglyList
 import kotlin.test.assertEquals
 import org.junit.Test as test
 

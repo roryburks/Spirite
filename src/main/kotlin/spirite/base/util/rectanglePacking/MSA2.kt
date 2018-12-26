@@ -1,7 +1,6 @@
 package spirite.base.util.rectanglePacking
 
 
-import rb.extendo.extensions.cross
 import rb.extendo.extensions.removeFirst
 import rb.extendo.extensions.removeToList
 import rb.vectrix.linear.Vec2i

@@ -2,18 +2,16 @@ package shaderTests.v330
 
 import io.mockk.every
 import io.mockk.mockk
+import rb.vectrix.mathUtil.f
 import sjunit.TestConfig
 import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.GLPrimitive
 import spirite.base.graphics.gl.IGLEngine
 import spirite.base.graphics.gl.PreparedPrimitive
-import rb.vectrix.mathUtil.f
 import spirite.base.util.glu.GLC
-import rb.vectrix.mathUtil.i
 import spirite.pc.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO
-import kotlin.test.assertEquals
 import org.junit.Test as test
 
 

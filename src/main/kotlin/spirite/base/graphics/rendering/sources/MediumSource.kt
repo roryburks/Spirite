@@ -1,12 +1,12 @@
 package spirite.base.graphics.rendering.sources
 
+import rb.extendo.dataStructures.SinglyList
+import rb.vectrix.mathUtil.f
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.Node
-import rb.vectrix.mathUtil.f
-import rb.extendo.dataStructures.SinglyList
 
 data class MediumSource(val medium: MediumHandle, override val workspace: IImageWorkspace) : RenderSource {
     override val defaultWidth: Int get() = medium.width

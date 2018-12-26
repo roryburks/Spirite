@@ -1,6 +1,7 @@
 package sjunit.spirite.base.graphics.rendering
 
 import org.junit.Test
+import rb.vectrix.linear.MutableTransformF
 import sjunit.TestConfig
 import sjunit.TestHelper
 import spirite.base.graphics.rendering.NodeRenderer
@@ -12,7 +13,6 @@ import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.util.Colors
-import rb.vectrix.linear.MutableTransformF
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
 import spirite.pc.graphics.ImageBI

@@ -1,8 +1,8 @@
 package spirite.base.util.shapes
 
+import rb.vectrix.mathUtil.d
 import spirite.base.graphics.gl.GLPrimitive
 import spirite.base.util.compaction.FloatCompactor
-import rb.vectrix.mathUtil.d
 import spirite.base.util.glu.GLC
 
 class Rectangle(

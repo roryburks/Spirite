@@ -1,13 +1,10 @@
 package spirite.base.brains.commands
 
-import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Rect
-import spirite.hybrid.MDebug
 
 class SelectionCommandExecuter( val workspaceSet: IWorkspaceSet) : ICommandExecuter
 {

@@ -1,9 +1,9 @@
 package spirite.gui.components.advanced
 
-import rb.vectrix.mathUtil.MathUtil
 import rb.extendo.extensions.then
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
+import rb.vectrix.mathUtil.MathUtil
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL

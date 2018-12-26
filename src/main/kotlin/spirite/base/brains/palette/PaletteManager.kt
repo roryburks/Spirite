@@ -1,9 +1,12 @@
 package spirite.base.brains.palette
 
 import rb.jvm.owl.addWeakObserver
+import rb.owl.IObservable
+import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
-import spirite.base.brains.*
+import rb.owl.bindable.addObserver
+import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.settings.ISettingsManager
 import spirite.gui.components.dialogs.IDialog
@@ -25,7 +28,7 @@ interface IPaletteManager {
     data class PaletteChangeEvent(val palette: Palette)
     data class PaletteSetChangeEvent(val paletteSet: PaletteSet)
 
-    val paletteObservable : ICruddyOldObservable<PaletteObserver>
+    val paletteObservable : IObservable<PaletteObserver>
 }
 
 class PaletteManager(
@@ -35,7 +38,7 @@ class PaletteManager(
 
     override val activeBelt: PaletteBelt = PaletteBelt()
 
-    override val paletteObservable = CruddyOldObservable<PaletteObserver>()
+    override val paletteObservable = Observable<PaletteObserver>()
 
     override val globalPalette = object : Palette("Global") {
         override val onChangeTrigger: (Palette) -> Unit = {triggerPaletteChange(PaletteChangeEvent(this))}
@@ -51,7 +54,7 @@ class PaletteManager(
         }
 
         // DuckTape way of getting PaletteManager.currentPalette to track CurrentWorkspace.PaletteSet.CurrentPalette
-        newPaletteSet.currentPaletteBind.addListener { new, old ->
+        newPaletteSet.currentPaletteBind.addObserver { new, old ->
             if( workspaceSet.currentWorkspace?.paletteSet == newPaletteSet)
                 currentPaletteBind.field = new ?: globalPalette
         }

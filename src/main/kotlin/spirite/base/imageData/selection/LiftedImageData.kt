@@ -1,14 +1,14 @@
 package spirite.base.imageData.selection
 
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.mathUtil.f
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.LiftedImageDrawer
-import rb.vectrix.mathUtil.f
-import spirite.base.util.linear.RectangleUtil
 import spirite.base.util.linear.Rect
-import rb.vectrix.linear.ITransformF
+import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.Hybrid
 
 class LiftedImageData(val image: IImage): ILiftedData {

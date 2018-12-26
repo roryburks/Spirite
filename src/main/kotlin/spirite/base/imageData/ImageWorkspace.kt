@@ -1,5 +1,10 @@
 package spirite.base.imageData
 
+import rb.extendo.dataStructures.SinglyList
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.IBindable
+import rb.owl.bindable.addObserver
+import rb.owl.observer
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.brains.settings.ISettingsManager
@@ -23,11 +28,6 @@ import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.delegates.UndoableDelegate
-import rb.extendo.dataStructures.SinglyList
-import rb.owl.bindable.Bindable
-import rb.owl.bindable.IBindable
-import rb.owl.bindable.addObserver
-import rb.owl.observer
 import java.io.File
 
 interface IImageWorkspace {
@@ -182,15 +182,17 @@ class ImageWorkspace(
         }
     }
 
-    private val treeListener = object : TreeObserver {
-        override fun treeStructureChanged(evt: TreeChangeEvent) {
-            imageObservatory.triggerRefresh(ImageChangeEvent(evt.changedNodes.flatMap { it.imageDependencies }, evt.changedNodes, this@ImageWorkspace))
-        }
+    private val _treeObsK = groupTree.treeObservable.addObserver(
+        object : TreeObserver {
+            override fun treeStructureChanged(evt: TreeChangeEvent) {
+                imageObservatory.triggerRefresh(ImageChangeEvent(evt.changedNodes.flatMap { it.imageDependencies }, evt.changedNodes, this@ImageWorkspace))
+            }
 
-        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {
-            imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), SinglyList(node), this@ImageWorkspace))
-        }
-    }.apply { groupTree.treeObservable.addObserver(this)}
+            override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {
+                imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), SinglyList(node), this@ImageWorkspace))
+            }
+        }.observer()
+    )
 
     private val _selectionK = selectionEngine.selectionChangeObserver.addObserver({ it: SelectionChangeEvent ->
         imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), emptySet(), this@ImageWorkspace, liftedChange = it.isLiftedChange))

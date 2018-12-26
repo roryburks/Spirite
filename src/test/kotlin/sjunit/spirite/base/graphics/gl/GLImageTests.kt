@@ -2,13 +2,10 @@ package sjunit.spirite.base.graphics.gl
 
 
 import sjunit.TestConfig
-import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
 import spirite.hybrid.Hybrid
-import spirite.pc.JOGL.JOGLProvider
-import spirite.pc.resources.JClassScriptService
 import spirite.pc.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO

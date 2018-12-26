@@ -1,15 +1,15 @@
 package spirite.base.graphics.gl.stroke
 
 import com.hackoeur.jglm.support.FastMath
-import spirite.base.graphics.gl.*
-import spirite.base.pen.stroke.DrawPoints
-import spirite.base.pen.stroke.StrokeParams
-import rb.vectrix.mathUtil.d
-import rb.vectrix.mathUtil.f
-import spirite.base.util.glu.GLC
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
+import rb.vectrix.mathUtil.d
+import rb.vectrix.mathUtil.f
+import spirite.base.graphics.gl.*
+import spirite.base.pen.stroke.DrawPoints
+import spirite.base.pen.stroke.StrokeParams
+import spirite.base.util.glu.GLC
 import kotlin.math.PI
 
 // Dot

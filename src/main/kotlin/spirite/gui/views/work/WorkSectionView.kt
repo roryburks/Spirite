@@ -1,13 +1,13 @@
 package spirite.gui.views.work
 
-import spirite.base.brains.ICruddyOldObservable
-import spirite.base.brains.CruddyOldObservable
+import rb.owl.IObservable
+import rb.owl.Observable
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.mathUtil.f
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.delegates.OnChangeDelegate
-import rb.vectrix.mathUtil.f
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.ImmutableTransformF
 
 /** The view describes which part of the image is currently being seen and
  * manages conversions between the screen space and the image space. */
@@ -51,8 +51,8 @@ class WorkSectionView(val workspace: IImageWorkspace) {
     }
     val tScreenToWorkspace : ITransformF by tScreenToWorkspaceDerived
 
-    val viewObserver : ICruddyOldObservable<()->Unit> get() = _viewObserver
-    private val _viewObserver = CruddyOldObservable<()->Unit>()
+    val viewObserver : IObservable<()->Unit> get() = _viewObserver
+    private val _viewObserver = Observable<()->Unit>()
 
     private inner class ViewChange<T>(defaultValue : T) : OnChangeDelegate<T>(defaultValue, {
         tWorkspaceToScreenDerived.reset()

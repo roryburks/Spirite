@@ -1,5 +1,6 @@
 package spirite.base.graphics.rendering.sources
 
+import rb.extendo.dataStructures.SinglyList
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
@@ -7,7 +8,6 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
-import rb.extendo.dataStructures.SinglyList
 
 data class GroupNodeSource( val group: GroupNode, override val workspace: IImageWorkspace) : RenderSource {
     override val defaultWidth: Int get() = workspace.width

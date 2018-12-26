@@ -1,9 +1,9 @@
 package spirite.base.imageData.animationSpaces
 
+import rb.owl.IObservable
+import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
-import spirite.base.brains.ICruddyOldObservable
-import spirite.base.brains.CruddyOldObservable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSpaceObserver
 import spirite.base.imageData.undo.NullAction
@@ -25,7 +25,7 @@ interface  IAnimationSpaceManager
         fun spaceAdded(space: AnimationSpace)
         fun spaceRemoved( space: AnimationSpace)
     }
-    val animationSpaceObservable: ICruddyOldObservable<AnimationSpaceObserver>
+    val animationSpaceObservable: IObservable<AnimationSpaceObserver>
 }
 
 class AnimationSpaceManager(override val workspace: IImageWorkspace) : IAnimationSpaceManager
@@ -84,5 +84,5 @@ class AnimationSpaceManager(override val workspace: IImageWorkspace) : IAnimatio
     override val animationSpaces: List<AnimationSpace> get() = _animationSpaces
     private val _animationSpaces = mutableListOf<AnimationSpace>()
 
-    override val animationSpaceObservable = CruddyOldObservable<AnimationSpaceObserver>()
+    override val animationSpaceObservable = Observable<AnimationSpaceObserver>()
 }

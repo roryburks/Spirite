@@ -1,5 +1,9 @@
 package spirite.base.graphics.gl
 
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Mat4f
+import rb.vectrix.linear.Vec3f
 import spirite.base.graphics.CapMethod
 import spirite.base.graphics.JoinMethod
 import spirite.base.graphics.gl.ProgramType.STROKE_V2_LINE_PASS
@@ -7,12 +11,8 @@ import spirite.base.graphics.gl.ProgramType.STROKE_V3_LINE_PASS
 import spirite.base.graphics.gl.shader.GL330ShaderLoader
 import spirite.base.resources.IScriptService
 import spirite.base.util.glu.GLC
-import rb.vectrix.linear.Mat4f
 import spirite.base.util.linear.MatrixBuilder.orthagonalProjectionMatrix
 import spirite.base.util.linear.MatrixBuilder.wrapTransformAs4x4
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.Vec3f
-import rb.vectrix.linear.ImmutableTransformF
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.pc.JOGL.JOGLProvider

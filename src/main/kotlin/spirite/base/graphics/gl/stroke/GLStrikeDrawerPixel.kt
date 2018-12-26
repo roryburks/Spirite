@@ -1,14 +1,14 @@
 package spirite.base.graphics.gl.stroke
 
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.linear.Vec3f
+import rb.vectrix.mathUtil.floor
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
-import rb.vectrix.mathUtil.floor
 import spirite.base.util.glu.GLC
-import rb.vectrix.linear.Vec2f
-import rb.vectrix.linear.Vec3f
 
 class GLStrikeDrawerPixel(gle: IGLEngine)
     : GLStrokeDrawer(gle)

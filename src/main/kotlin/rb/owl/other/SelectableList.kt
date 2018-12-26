@@ -1,6 +1,8 @@
 package rb.owl.other
 
-import rb.owl.*
+import rb.owl.IObservable
+import rb.owl.IObserver
+import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
