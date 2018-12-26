@@ -2,7 +2,6 @@ package spirite.pc.gui.basic
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import spirite.base.util.binding.CruddyBindable
 import spirite.gui.components.basic.ITextArea
 import spirite.gui.resources.Skin.BevelBorder.Dark
 import spirite.gui.resources.Skin.BevelBorder.Light

@@ -2,7 +2,6 @@ package spirite.pc.gui.basic
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import spirite.base.util.binding.CruddyBindable
 import spirite.gui.components.basic.*
 import spirite.gui.resources.Skin.BevelBorder.Dark
 import spirite.gui.resources.Skin.BevelBorder.Light
@@ -65,7 +64,7 @@ private constructor(
 
     constructor( allowsNegatives: Boolean = true, allowsFloats: Boolean = false) :this(allowsNegatives, allowsFloats, SwNumberFieldImp())
 
-    val textBind = CruddyBindable("")
+    val textBind = Bindable("")
     var text by textBind
 
     abstract fun isOob(str: String) : Boolean
@@ -85,7 +84,7 @@ private constructor(
             override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
             override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
         })
-        textBind.addListener {new, old ->
+        textBind.addObserver { new, _->
             if(!locked)
                 imp.text = new
         }
@@ -120,7 +119,7 @@ class SwIntField(min: Int, max: Int, allowsNegatives: Boolean = true) : SwNumber
     }
 
     init {
-        textBind.addRootListener { new, old ->value = new.toIntOrNull(10) ?: 0 }
+        textBind.addObserver { new, _ -> value = new.toIntOrNull(10) ?: 0 }
         valueBind.addObserver { new, _ -> text = new.toString() }
     }
 }
@@ -134,7 +133,7 @@ class SwFloatField(min: Float, max: Float, allowsNegatives: Boolean = true) : Sw
     }
 
     init {
-        textBind.addRootListener { new, old -> value = new.toFloatOrNull() ?: 0f }
+        textBind.addObserver { new, _ -> value = new.toFloatOrNull() ?: 0f }
         valueBind.addObserver { new, _ -> text = new.toString() }
     }
 }

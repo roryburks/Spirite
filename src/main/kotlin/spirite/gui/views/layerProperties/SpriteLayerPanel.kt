@@ -2,7 +2,7 @@ package spirite.gui.views.layerProperties
 
 import rb.jvm.owl.bindWeaklyTo
 import rb.owl.IContract
-import spirite.base.util.binding.CruddyBindable
+import rb.owl.bindable.Bindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
@@ -18,6 +18,8 @@ import spirite.pc.gui.jcolor
 
 class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
+    private var _activePartK : IContract? = null
+
     private var _opacitySliderK : IContract? = null
     private var _btnVisibilityK : IContract? = null
     private var _tfTypeK : IContract? = null
@@ -34,8 +36,8 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             if( value != old) {
                 field = value
                 old?.layerChangeObserver?.removeObserver(onPartChange)
-                activePartBind.unbind()
 
+                _activePartK?.void()
                 _tfTypeK?.void()
                 _tfDepthK?.void()
                 _tfTransXK?.void()
@@ -47,7 +49,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                 _btnVisibilityK?.void()
 
                 if( value != null) {
-                    value.activePartBind.bindWeakly(activePartBind)
+                    _activePartK = activePartBind.bindWeaklyTo(value.activePartBind)
                     boxList.resetAllWithSelected(value.parts, value.activePart)
                     value.layerChangeObserver.addObserver(onPartChange)
 
@@ -73,7 +75,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
         }
     }
 
-    private val activePartBind = CruddyBindable<SpritePart?>(null)
+    private val activePartBind = Bindable<SpritePart?>(null)
     private var activePart: SpritePart? by activePartBind
 
     private val boxList = Hybrid.ui.BoxList<SpritePart>(32, 32)

@@ -1,6 +1,5 @@
 package spirite.gui.components.advanced
 
-import spirite.base.util.binding.CruddyBindable
 import rb.vectrix.mathUtil.MathUtil
 import rb.extendo.extensions.then
 import rb.owl.bindable.Bindable

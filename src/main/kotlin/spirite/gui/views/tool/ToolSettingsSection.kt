@@ -7,7 +7,6 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.interprettedBindings.bindToX
 import rb.owl.interprettedBindings.bindToY
-import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.base.util.Colors
@@ -168,13 +167,13 @@ private constructor(val master : IMasterControl, val imp : ICrossPanel)
         }
     }
 
-    private val listener = master.toolsetManager.selectedToolBinding.addWeakListener { new, old ->
+    private val _selectedToolK = master.toolsetManager.selectedToolBinding.addWeakObserver { new, old ->
         toolLabel.text = new.description
         constructFromTool(new)
     }
 
     override fun close() {
         contractList.forEach { it.void() }
-        listener.unbind()
+        _selectedToolK.void()
     }
 }

@@ -3,8 +3,8 @@ package spirite.gui.views.animation
 import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
 import rb.owl.IContract
+import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
@@ -101,37 +101,38 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     }.also { masterControl.centralObservatory.trackingAnimationStateObserver.addObserver(it) }
     var animation : Animation? = null
 
-    private val metBind = CruddyBindable(0f) { new, _ ->
-        sliderMet.value = (new * 100).floor
-        viewPanel.redraw()
-    }
+    private val metBind = Bindable(0f)
+            .also { it.addObserver { new, _ ->
+                sliderMet.value = (new * 100).floor
+                viewPanel.redraw()
+            } }
     init {
         sliderMet.onMouseDrag += {  metBind.field = sliderMet.value / 100f }
         sliderMet.onMouseRelease +=  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
         btnPlay.checkBind.addObserver { new, _ -> if(!new) metBind.field = floor(metBind.field) }
-        metBind.addRootListener { new, _ ->  ifMet.value = new.floor}
+        metBind.addObserver { new, _ ->  ifMet.value = new.floor}
     }
 
     private var _fpsK : IContract? = null
     private var _zoomK : IContract? = null
+    private var _metK : IContract? = null
 
     private fun unbind() {
         _fpsK?.void()
-        metBind.unbind()
+        _metK?.void()
         _zoomK?.void()
     }
 
     private fun rebind(anim: Animation)
     {
         _fpsK = ffFps.valueBind.bindWeaklyTo(anim.state.speedBind)
-        anim.state.metBind.bind(metBind)
+        _metK = metBind.bindWeaklyTo(anim.state.metBind)
         _zoomK = ifZoom.valueBind.bindWeaklyTo(anim.state.zoomBind)
     }
     // endregion
 
     private fun buildFromAnim( anim: Animation?) {
         animation = anim
-
 
         unbind()
         updateSlider()

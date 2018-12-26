@@ -8,7 +8,6 @@ import rb.owl.bindable.addObserver
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
-import spirite.base.util.binding.CruddyBindable
 import kotlin.math.max
 
 interface IWorkspaceSet {

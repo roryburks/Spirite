@@ -5,7 +5,6 @@ import rb.jvm.owl.bindWeaklyTo
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer
-import spirite.base.util.binding.CruddyBindable
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent

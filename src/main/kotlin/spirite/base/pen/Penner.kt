@@ -1,5 +1,6 @@
 package spirite.base.pen
 
+import rb.owl.bindable.addObserver
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
@@ -228,5 +229,5 @@ class Penner(
         (behavior as? DrawnPennerBehavior)?.paintOverlay(gc,view)
     }
 
-    val __toolBinding = toolsetManager.selectedToolBinding.addListener { _, _ -> behavior = null }
+    val __toolBinding = toolsetManager.selectedToolBinding.addObserver { _, _ -> behavior = null }
 }

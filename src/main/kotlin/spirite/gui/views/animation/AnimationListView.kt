@@ -42,7 +42,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
         override fun makeComponent(t: Animation): ITreeComponent {
             return object : ITreeComponent {
                 override val component = Hybrid.ui.Label(t.name).also {
-                    t.nameBind.addWeakListener { new, old -> it.text = new }
+                    t.nameBind.addObserver { new, _ -> it.text = new }
                     it.onMouseRelease += rightclick
                     dnd.addListener(it, t)
                 }

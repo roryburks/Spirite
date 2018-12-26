@@ -1,6 +1,7 @@
 package spirite.gui.views.tool
 
 import rb.jvm.owl.addWeakObserver
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.Tool
 import spirite.base.imageData.drawer.NillImageDrawer
@@ -58,10 +59,10 @@ class ToolSection (
             }
         }
     }
-    private val wl = master.toolsetManager.selectedToolBinding.addListener { new, _ -> imp.selected = new }
+    private val _selectedToolK = master.toolsetManager.selectedToolBinding.addObserver { new, _ -> imp.selected = new }
 
     override fun close() {
-        wl.unbind()
+        _selectedToolK.void()
     }
 }
 

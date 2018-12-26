@@ -3,6 +3,7 @@ package spirite.gui.views.animation.structureView
 import rb.extendo.extensions.append
 import rb.extendo.extensions.lookup
 import rb.jvm.owl.addWeakObserver
+import rb.owl.IContract
 import spirite.base.util.binding.ICruddyBoundListener
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
@@ -524,12 +525,12 @@ private constructor(
         }
     }.also {anim.workspace.animationManager.animationStructureChangeObservable.addObserver( it)}
 
-    private  var apb : ICruddyBoundListener<SpritePart?>? = null
+    private  var _activePartContract : IContract? = null
     private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, old ->
-        apb?.unbind()
+        _activePartContract?.void()
         if( old != null) {
             frameLinks.lookup(old).forEach { it.setBasicBorder(null) }
-            partLinks.values.flatMap { it }.forEach { it.setBasicBorder(null) }
+            partLinks.values.flatten().forEach { it.setBasicBorder(null) }
         }
         if( new != null)
             setBordersForNode(new)
@@ -539,8 +540,8 @@ private constructor(
         frameLinks.lookup(node).forEach { it.setColoredBorder(Colors.BLACK, 2) }
         val spriteLayer = ((node as? LayerNode)?.layer as? SpriteLayer)
         if( spriteLayer != null) {
-            apb = spriteLayer.activePartBind.addWeakListener { new, old ->
-                partLinks.values.flatMap { it }.forEach { it.setBasicBorder(null) }
+            _activePartContract = spriteLayer.activePartBind.addWeakObserver { new, _ ->
+                partLinks.values.flatten().forEach { it.setBasicBorder(null) }
                 if( new != null)
                     partLinks.lookup(new).forEach { it.setColoredBorder(Colors.BLACK, 2) }
             }

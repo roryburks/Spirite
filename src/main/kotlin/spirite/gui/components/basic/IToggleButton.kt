@@ -1,7 +1,6 @@
 package spirite.gui.components.basic
 
 import rb.owl.bindable.Bindable
-import spirite.base.util.binding.CruddyBindable
 import spirite.gui.resources.IIcon
 
 interface IToggleButtonNonUI {

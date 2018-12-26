@@ -2,7 +2,6 @@ package spirite.gui.components.basic
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import spirite.base.util.binding.CruddyBindable
 import rb.vectrix.mathUtil.MathUtil
 import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent

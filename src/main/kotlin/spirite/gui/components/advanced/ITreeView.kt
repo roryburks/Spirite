@@ -7,8 +7,6 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
-import spirite.base.util.binding.CruddyBindable
-import spirite.base.util.binding.ICruddyOldBindable
 import spirite.base.graphics.IImage
 import spirite.base.graphics.NillImage
 import spirite.base.util.delegates.OnChangeDelegate

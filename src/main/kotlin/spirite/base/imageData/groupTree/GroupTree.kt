@@ -2,7 +2,6 @@ package spirite.base.imageData.groupTree
 
 import rb.extendo.dataStructures.Dequeue
 import rb.owl.bindable.Bindable
-import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.ICruddyOldObservable
 import spirite.base.brains.CruddyOldObservable
 import spirite.base.graphics.RenderMethod

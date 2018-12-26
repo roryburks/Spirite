@@ -2,7 +2,6 @@ package spirite.base.brains.toolset
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.ICommand
 import rb.vectrix.linear.MutableTransformF

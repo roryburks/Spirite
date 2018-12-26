@@ -1,7 +1,6 @@
 package spirite.base.imageData.animation
 
 import rb.owl.bindable.Bindable
-import spirite.base.util.binding.CruddyBindable
 import rb.vectrix.mathUtil.f
 
 class AnimationState(
@@ -9,7 +8,7 @@ class AnimationState(
     zoom: Int = 2,
     speed: Float = 8f)
 {
-    val metBind = CruddyBindable(met)
+    val metBind = Bindable(met)
     var met by metBind
 
     val zoomBind = Bindable(zoom)

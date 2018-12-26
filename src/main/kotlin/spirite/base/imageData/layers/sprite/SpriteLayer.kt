@@ -1,6 +1,5 @@
 package spirite.base.imageData.layers.sprite
 
-import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.ICruddyOldObservable
 import spirite.base.brains.CruddyOldObservable
 import spirite.base.graphics.rendering.TransformedHandle
@@ -76,24 +75,24 @@ class SpriteLayer : Layer {
     private val _parts = mutableListOf<SpritePart>()
     private var workingId = 0
 
-    var activePartBind = CruddyBindable<SpritePart?>(null)
-    { new, _ ->
-        cAlphaBind.field = new?.alpha ?: 1f
-        cDepthBind.field = new?.depth ?: 0
-        cVisibleBind.field = new?.visible ?: true
-        cPartNameBind.field = new?.partName ?: ""
-        cTransXBind.field = new?.transX ?: 0f
-        cTransYBind.field = new?.transY ?: 0f
-        cScaleXBind.field = new?.scaleX ?: 1f
-        cScaleYBind.field = new?.scaleY ?: 1f
-        cRotBind.field = new?.rot ?: 0f
+    var activePartBind = Bindable<SpritePart?>(null)
+            .also { it.addObserver { new, _ ->
+                cAlphaBind.field = new?.alpha ?: 1f
+                cDepthBind.field = new?.depth ?: 0
+                cVisibleBind.field = new?.visible ?: true
+                cPartNameBind.field = new?.partName ?: ""
+                cTransXBind.field = new?.transX ?: 0f
+                cTransYBind.field = new?.transY ?: 0f
+                cScaleXBind.field = new?.scaleX ?: 1f
+                cScaleYBind.field = new?.scaleY ?: 1f
+                cRotBind.field = new?.rot ?: 0f
 
-        val name = new?.partName
-        if( name != null) {
-            getAllLinkedLayers()
-                    .forEach { sprite -> sprite.activePart = sprite.parts.firstOrNull { it.partName == name }  ?: sprite.activePart}
-        }
-    }
+                val name = new?.partName
+                if( name != null) {
+                    getAllLinkedLayers()
+                            .forEach { sprite -> sprite.activePart = sprite.parts.firstOrNull { it.partName == name }  ?: sprite.activePart}
+                }
+            } }
     var activePart : SpritePart? by activePartBind
 
     private var _layerChangeObserver = CruddyOldObservable<()->Any?>()
