@@ -1,6 +1,10 @@
 package spirite.base.pen.behaviors
 
 import com.hackoeur.jglm.support.FastMath.max
+import rb.jvm.owl.bindWeaklyTo
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
+import rb.owl.observer
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
@@ -14,6 +18,7 @@ import spirite.base.util.linear.Rect
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.ImmutableTransformF
+import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.base.util.shapes.Rectangle
@@ -72,13 +77,13 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
     private var oldScaleY = 0f
     private var oldRot = 0f
 
-    protected val scaleBind = CruddyBindable(Vec2f(1f, 1f))
+    protected val scaleBind = Bindable(Vec2f(1f, 1f))
     protected var scale by scaleBind
 
-    val translationBind = CruddyBindable(Vec2f(0f, 0f))
+    val translationBind = Bindable(Vec2f(0f, 0f))
     var translation by translationBind
 
-    val rotationBind = CruddyBindable(0f)
+    val rotationBind = Bindable(0f)
     var rotation by rotationBind
 
     var region : Rect? = null
@@ -233,19 +238,17 @@ class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : Transfor
     val tool = penner.toolsetManager.toolset.Reshape
     val workspace = penner.workspace
 
-    init {
-        tool.scaleBind.bindWeakly(scaleBind)
-        tool.translationBind.bindWeakly(translationBind)
-        tool.rotationBind.bindWeakly(rotationBind)
-    }
+    private val _scaleK = scaleBind.bindWeaklyTo(tool.scaleBind)
+    private val _transK = translationBind.bindWeaklyTo(tool.translationBind)
+    private val _rotK = rotationBind.bindWeaklyTo(tool.rotationBind)
 
-    private val link1 = tool.scaleBind.addListener{_, _ -> onChange()}
-    private val link2 = tool.translationBind.addListener{_, _ -> onChange()}
-    private val link3 = tool.rotationBind.addListener{_, _ -> onChange()}
-    private val link4 = {it : SelectionChangeEvent ->
+    private val _link1 = tool.scaleBind.addObserver { _, _ -> onChange()}
+    private val _link2 = tool.translationBind.addObserver { _, _ -> onChange()}
+    private val _link3 = tool.rotationBind.addObserver { _, _ -> onChange()}
+    private val _link4 = penner.workspace?.selectionEngine?.selectionChangeObserver?.addObserver({ it: SelectionChangeEvent ->
         end()
-    }.apply { penner.workspace?.selectionEngine?.selectionChangeObserver?.addObserver { this }}
-    private val link5 = tool.applyTransformBind.addListener{ _,_ -> tryStart()}
+    }.observer())
+    private val _link5 = tool.applyTransformBind.addObserver { _, _ -> tryStart() }
 
 
     private fun onChange() {
@@ -269,11 +272,14 @@ class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : Transfor
     }
 
     override fun onEnd() {
-        link1.unbind()
-        link2.unbind()
-        link3.unbind()
-        workspace?.selectionEngine?.selectionChangeObserver?.removeObserver(link4)
-        link5.unbind()
+        _link1.void()
+        _link2.void()
+        _link3.void()
+        _link4?.void()
+        _link5.void()
+        _rotK.void()
+        _transK.void()
+        _scaleK.void()
 
         scale = Vec2f(1f,1f)
         translation = Vec2f(0f,0f)

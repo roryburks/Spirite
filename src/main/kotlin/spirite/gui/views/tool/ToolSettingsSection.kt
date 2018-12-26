@@ -1,5 +1,9 @@
 package spirite.gui.views.tool
 
+import rb.jvm.owl.addWeakObserver
+import rb.jvm.owl.bindWeaklyTo
+import rb.owl.IContract
+import rb.owl.bindable.Bindable
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
@@ -23,7 +27,7 @@ fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {
     rows.add(Hybrid.ui.Label("$hrName: "))
     rows.add( DDPAdapter(values, valueBind), height = 24)
 }
-private class DDPAdapter<T>(values: Array<T>, bind: CruddyBindable<T>, imp : IComboBox<T> = Hybrid.ui.ComboBox(values))
+private class DDPAdapter<T>(values: Array<T>, bind: Bindable<T>, imp : IComboBox<T> = Hybrid.ui.ComboBox(values))
     :IComponent by imp
 {
     init {
@@ -32,7 +36,7 @@ private class DDPAdapter<T>(values: Array<T>, bind: CruddyBindable<T>, imp : ICo
         imp.ref = this
         imp.selectedItemBind.addRootListener { new, _ -> if(new != null) bind.field = new }
     }
-    val __listener = bind.addWeakListener { new, _ -> imp.selectedItem = new }
+    val _valueK = bind.addWeakObserver { new, _ -> imp.selectedItem = new }
 }
 
 
@@ -40,24 +44,25 @@ private class DDPAdapter<T>(values: Array<T>, bind: CruddyBindable<T>, imp : ICo
 
 fun <T> RadioButtonProperty<T>.getComponent() :IComponent {
     val cluster = RadioButtonCluster(value, values.asList())
-    valueBind.bindWeakly(cluster.valueBind)
+    val valueK = cluster.valueBind.bindWeaklyTo(valueBind)
 
-    return Hybrid.ui.CrossPanel {
+    return CompContractUnion(Hybrid.ui.CrossPanel {
         cluster.radioButtons.forEach {
             rows.add(it)
         }
-    }
+    }, valueK)
 }
+private class CompContractUnion(imp: IComponent, private val cont: IContract) : IComponent by imp
 
 fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolProperty<*>) = when( toolProperty) {
     is SliderProperty -> Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(toolProperty.min, toolProperty.max, toolProperty.hrName).apply {
-            toolProperty.valueBind.bindWeakly(valueBind)
+//            toolProperty.valueBind.bindWeakly(valueBind)
         }, height = 24)
     }
     is SizeProperty ->  Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(0f, 1000f, toolProperty.hrName).apply {
-            toolProperty.valueBind.bindWeakly(valueBind)
+//            toolProperty.valueBind.bindWeakly(valueBind)
             mutatorPositionToValue = object : InvertibleFunction<Float>{
                 override fun perform(x: Float): Float = when {
                     x < 0.25f   -> x * 10f * 4f
@@ -79,7 +84,7 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
         rows += {
             add(Hybrid.ui.Label(toolProperty.hrName + ": "))
             add(Hybrid.ui.CheckBox().apply {
-                toolProperty.valueBind.bindWeakly(checkBind)
+                checkBind.bindWeaklyTo(toolProperty.valueBind);Unit
             })
         }
     }
@@ -95,7 +100,7 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
         rows += {
             add(Hybrid.ui.Label(toolProperty.hrName + ": "))
             add(Hybrid.ui.FloatField().apply {
-                toolProperty.valueBind.bindWeakly(valueBind)
+//                toolProperty.valueBind.bindWeakly(valueBind)
             }, height = 24)
         }
     }
@@ -103,9 +108,9 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
         rows.add(Hybrid.ui.Label(toolProperty.hrName + ": "))
         rows += {
             add(Hybrid.ui.Label(toolProperty.label1))
-            add(Hybrid.ui.FloatField().apply { toolProperty.valueBind.xBind.bindWeakly( valueBind) }, height = 24, flex = 50f)
+//            add(Hybrid.ui.FloatField().apply { toolProperty.valueBind.xBind.bindWeakly( valueBind) }, height = 24, flex = 50f)
             add(Hybrid.ui.Label(toolProperty.label2))
-            add(Hybrid.ui.FloatField().apply { toolProperty.valueBind.yBind.bindWeakly( valueBind) }, height = 24, flex = 50f)
+//            add(Hybrid.ui.FloatField().apply { toolProperty.valueBind.yBind.bindWeakly( valueBind) }, height = 24, flex = 50f)
         }
     }
 

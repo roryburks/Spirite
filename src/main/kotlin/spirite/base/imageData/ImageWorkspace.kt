@@ -27,6 +27,7 @@ import rb.extendo.dataStructures.SinglyList
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
+import rb.owl.observer
 import java.io.File
 
 interface IImageWorkspace {
@@ -191,8 +192,8 @@ class ImageWorkspace(
         }
     }.apply { groupTree.treeObservable.addObserver(this)}
 
-    private val selectionListener : (SelectionChangeEvent)->Unit = { it : SelectionChangeEvent ->
+    private val _selectionK = selectionEngine.selectionChangeObserver.addObserver({ it: SelectionChangeEvent ->
         imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), emptySet(), this@ImageWorkspace, liftedChange = it.isLiftedChange))
-    }.also { obs -> selectionEngine.selectionChangeObserver.addObserver(obs) }
+    }.observer())
     // endregion
 }

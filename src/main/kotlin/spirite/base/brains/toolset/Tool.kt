@@ -1,5 +1,7 @@
 package spirite.base.brains.toolset
 
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.ICommand
@@ -22,7 +24,7 @@ abstract class Tool(
 
         fun <T,R> Property( t: T) : ToolPropDelegate<R> where T : ToolProperty<R> {
             properties.add(t)
-            t.valueBind.addListener { new, old -> toolset.manager.triggerToolsetChanged(this@Tool, t) }
+            t.valueBind.addObserver { _, _ -> toolset.manager.triggerToolsetChanged(this@Tool, t) }
             return ToolPropDelegate(t)
         }
 
@@ -35,7 +37,7 @@ abstract class Tool(
 sealed class ToolProperty<T>( default: T) {
     abstract val hrName: String
 
-    val valueBind = CruddyBindable(default)
+    val valueBind = Bindable(default)
     var value by valueBind
 }
 

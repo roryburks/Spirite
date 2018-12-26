@@ -1,14 +1,14 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.binding.CruddyBindable
+import rb.owl.bindable.Bindable
 
 interface ICheckBox : IComponent {
-    val checkBind : CruddyBindable<Boolean>
+    val checkBind : Bindable<Boolean>
     var check : Boolean
 }
 
 interface IRadioButton : IComponent {
-    val checkBind : CruddyBindable<Boolean>
+    val checkBind : Bindable<Boolean>
     var check : Boolean
     var label : String
 }
