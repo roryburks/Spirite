@@ -28,6 +28,7 @@ import spirite.base.util.delegates.UndoableDelegate
 import rb.extendo.dataStructures.SinglyList
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
+import rb.owl.bindable.addObserver
 import java.io.File
 
 interface IImageWorkspace {
@@ -177,7 +178,7 @@ class ImageWorkspace(
 
     // region Internal Cross-Component Listeners
     init {
-        groupTree.selectedNodeBind.addListener { new, old ->
+        groupTree.selectedNodeBind.addObserver { new, old ->
             activeMediumBind.field = (new as? LayerNode)?.run { layer.activeData.handle }
         }
     }

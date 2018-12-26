@@ -37,7 +37,7 @@ interface ICentralObservatory {
     val trackingAnimationStateObserver: ICruddyOldObservable<AnimationStructureChangeObserver>
 
     val activeDataBind : IBindable<MediumHandle?>
-    val selectedNode : ICruddyOldBindable<Node?>
+    val selectedNode : IBindable<Node?>
     val currentAnimationBind : ICruddyOldBindable<Animation?>
     val currentAnimationSpaceBind : ICruddyOldBindable<AnimationSpace?>
 }
@@ -57,7 +57,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     override val trackingAnimationStateObserver: ICruddyOldObservable<AnimationStructureChangeObserver> = TrackingObserver { it.animationManager.animationStructureChangeObservable }
 
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
-    override val selectedNode : ICruddyOldBindable<Node?> = CruddyOldTrackingBinder { it.groupTree.selectedNodeBind }
+    override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
     override val currentAnimationBind : ICruddyOldBindable<Animation?> = CruddyOldTrackingBinder { it.animationManager.currentAnimationBind}
     override val currentAnimationSpaceBind: ICruddyOldBindable<AnimationSpace?> = CruddyOldTrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
 

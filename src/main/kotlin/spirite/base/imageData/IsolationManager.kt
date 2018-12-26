@@ -8,6 +8,7 @@ import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import rb.extendo.extensions.then
+import rb.jvm.owl.addWeakObserver
 
 /**
  *
@@ -82,9 +83,11 @@ class IsolationManager(
         imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), emptySet(), workspace, true))
     }
 
-    private val __ref1  = workspace.groupTree.selectedNodeBind.addWeakListener { new, _ ->
-        if( isolationIsActive && isolateCurrentNode && new != null) {
-            triggerIsolationChange()
+    init {
+        // No reason this would need to be weak, right?
+        workspace.groupTree.selectedNodeBind.addWeakObserver { new, _ ->
+            if( isolationIsActive && isolateCurrentNode && new != null)
+                triggerIsolationChange()
         }
     }
 

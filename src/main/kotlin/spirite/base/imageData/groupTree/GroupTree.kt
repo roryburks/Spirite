@@ -1,6 +1,7 @@
 package spirite.base.imageData.groupTree
 
 import rb.extendo.dataStructures.Dequeue
+import rb.owl.bindable.Bindable
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.ICruddyOldObservable
 import spirite.base.brains.CruddyOldObservable
@@ -31,7 +32,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
     val root = GroupNode(null, "ROOT")
     open val treeDescription = "Abstract Group Tree"
 
-    var selectedNodeBind = CruddyBindable<Node?>(null)
+    var selectedNodeBind = Bindable<Node?>(null)
     var selectedNode
         get() = selectedNodeBind.field
         set(value) {

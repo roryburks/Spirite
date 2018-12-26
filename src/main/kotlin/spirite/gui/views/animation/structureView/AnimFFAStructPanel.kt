@@ -2,6 +2,7 @@ package spirite.gui.views.animation.structureView
 
 import rb.extendo.extensions.append
 import rb.extendo.extensions.lookup
+import rb.jvm.owl.addWeakObserver
 import spirite.base.util.binding.ICruddyBoundListener
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
@@ -524,7 +525,7 @@ private constructor(
     }.also {anim.workspace.animationManager.animationStructureChangeObservable.addObserver( it)}
 
     private  var apb : ICruddyBoundListener<SpritePart?>? = null
-    val listener = master.centralObservatory.selectedNode.addWeakListener { new, old ->
+    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, old ->
         apb?.unbind()
         if( old != null) {
             frameLinks.lookup(old).forEach { it.setBasicBorder(null) }

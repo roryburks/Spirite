@@ -1,5 +1,6 @@
 package spirite.gui.views.layerProperties
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.GroupTree.Node
@@ -16,12 +17,12 @@ class LayerPropertiesPanel( val master: IMasterControl) : IOmniComponent
     override val icon: IIcon? get() = null
     override val name: String get() = "Layer Properties"
 
-    val imp = Hybrid.ui.CrossPanel()
+    private val imp = Hybrid.ui.CrossPanel()
     init {imp.ref = this}
 
-    val spriteProperties by lazy { SpriteLayerPanel(master) }
+    private val spriteProperties by lazy { SpriteLayerPanel(master) }
 
-    val listener = { new : Node?, old : Node? ->
+    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ ->
         spriteProperties.linkedSprite = null
 
         imp.setLayout {
@@ -35,6 +36,5 @@ class LayerPropertiesPanel( val master: IMasterControl) : IOmniComponent
                 else -> Hybrid.ui.Label("Unknown Node Type")
             })
         }
-    }.also { master.centralObservatory.selectedNode.addWeakListener(it) }
-
+    }
 }

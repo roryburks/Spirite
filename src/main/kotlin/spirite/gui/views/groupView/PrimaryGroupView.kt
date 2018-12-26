@@ -50,8 +50,9 @@ private constructor(
         // Note: this is only an abstract binding because workspace is changing, so that which it is "bound" to is constantly
         //  changing.
         tree.selectedBind.addListener { new, old ->  workspace?.groupTree?.selectedNode = new}
-        master.centralObservatory.selectedNode.addListener { new, old -> tree.selected = new }
     }
+
+    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ -> tree.selected = new }
 
     val workspace get() = master.workspaceSet.currentWorkspace
 

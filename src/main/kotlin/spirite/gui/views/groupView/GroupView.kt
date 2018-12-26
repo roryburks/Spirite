@@ -1,5 +1,6 @@
 package spirite.gui.views.groupView
 
+import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.util.ColorARGB32Normal
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
@@ -87,7 +88,7 @@ private constructor(
         }
     }
 
-    val listener = master.centralObservatory.selectedNode.addWeakListener { new, _ ->
+    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ ->
         if( new != null) {
             slider.value = new.alpha
             comboBox.selectedItem = new.method.methodType
