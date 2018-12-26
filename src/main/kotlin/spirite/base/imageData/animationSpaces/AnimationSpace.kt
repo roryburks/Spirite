@@ -1,5 +1,6 @@
 package spirite.base.imageData.animationSpaces
 
+import rb.owl.bindable.Bindable
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.ICruddyOldObservable
 import spirite.base.imageData.IImageWorkspace
@@ -21,7 +22,7 @@ abstract class AnimationSpace(
         name: String,
         val workspace: IImageWorkspace)
 {
-    var nameBind = CruddyBindable(name)
+    var nameBind = Bindable(name)
     var name by nameBind
 
     abstract val stateView : IAnimationSpaceView

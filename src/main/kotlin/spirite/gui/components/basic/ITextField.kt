@@ -1,15 +1,15 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.binding.CruddyBindable
+import rb.owl.bindable.Bindable
 import rb.vectrix.mathUtil.MathUtil
 import java.awt.Color
 
 interface ITextFieldNonUI {
-    val textBind : CruddyBindable<String>
+    val textBind : Bindable<String>
     var text: String
 }
 class TextFieldNonUI : ITextFieldNonUI {
-    override val textBind = CruddyBindable("")
+    override val textBind = Bindable("")
     override var text by textBind
 }
 interface ITextField : ITextFieldNonUI, IComponent {}
@@ -23,7 +23,7 @@ interface INumberFieldUI
 
 interface IIntFieldNonUI
 {
-    val valueBind : CruddyBindable<Int>
+    val valueBind : Bindable<Int>
     var value : Int
 
     var min : Int
@@ -31,7 +31,7 @@ interface IIntFieldNonUI
 }
 interface IIntField : IIntFieldNonUI, IComponent
 class IntFieldNonUI( min: Int, max: Int) : IIntFieldNonUI {
-    override val valueBind = CruddyBindable(0)
+    override val valueBind = Bindable(0)
     override var value: Int
         get() = valueBind.field
         set(new) {
@@ -55,7 +55,7 @@ class IntFieldNonUI( min: Int, max: Int) : IIntFieldNonUI {
 
 interface IFloatFieldNonUI
 {
-    val valueBind : CruddyBindable<Float>
+    val valueBind : Bindable<Float>
     var value : Float
 
     var min : Float
@@ -63,7 +63,7 @@ interface IFloatFieldNonUI
 }
 interface IFloatField : IFloatFieldNonUI, IComponent
 class FloatFieldNonUI( min: Float, max: Float) : IFloatFieldNonUI {
-    override val valueBind = CruddyBindable(0f)
+    override val valueBind = Bindable(0f)
     override var value: Float
         get() = valueBind.field
         set(new) {

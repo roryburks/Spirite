@@ -1,5 +1,6 @@
 package spirite.gui.views.animation.animationSpaceView
 
+import rb.jvm.owl.bindWeaklyTo
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.util.Colors
@@ -59,9 +60,9 @@ class  FFAPlayView(
         }
     }
 
-    init /* Bindings */ {
-        space.stateView.fpsBind.bindWeakly(tfFPS.valueBind)
+    private val fpsK = tfFPS.valueBind.bindWeaklyTo(space.stateView.fpsBind)
 
+    init /* Bindings */ {
         bgColorBox.colorBind.addRootListener { new, old -> drawView.bgColor = new }
 
         Hybrid.timing.createTimer(50, true) {

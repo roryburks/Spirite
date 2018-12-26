@@ -1,5 +1,7 @@
 package spirite.pc.gui.basic
 
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import spirite.base.util.binding.CruddyBindable
 import spirite.gui.components.basic.*
 import spirite.gui.resources.Skin.BevelBorder.Dark
@@ -21,7 +23,7 @@ private constructor(val imp : SwTextFieldImp) : ITextField, ISwComponent by SwCo
 {
     constructor() : this(SwTextFieldImp())
 
-    override val textBind = CruddyBindable("")
+    override val textBind = Bindable("")
     override var text by textBind
 
     init {
@@ -31,7 +33,7 @@ private constructor(val imp : SwTextFieldImp) : ITextField, ISwComponent by SwCo
             override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
             override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
         })
-        textBind.addRootListener { new, old -> if(!locked)imp.text = new }
+        textBind.addObserver { new, _ -> if(!locked)imp.text = new }
     }
 
     private class SwTextFieldImp() : JTextField()
@@ -119,7 +121,7 @@ class SwIntField(min: Int, max: Int, allowsNegatives: Boolean = true) : SwNumber
 
     init {
         textBind.addRootListener { new, old ->value = new.toIntOrNull(10) ?: 0 }
-        valueBind.addRootListener {new, old -> text = new.toString() }
+        valueBind.addObserver { new, _ -> text = new.toString() }
     }
 }
 
@@ -133,6 +135,6 @@ class SwFloatField(min: Float, max: Float, allowsNegatives: Boolean = true) : Sw
 
     init {
         textBind.addRootListener { new, old -> value = new.toFloatOrNull() ?: 0f }
-        valueBind.addRootListener { new, old -> text = new.toString() }
+        valueBind.addObserver { new, _ -> text = new.toString() }
     }
 }

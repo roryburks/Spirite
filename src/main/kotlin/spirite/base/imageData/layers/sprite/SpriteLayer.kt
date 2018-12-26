@@ -307,15 +307,15 @@ class SpriteLayer : Layer {
     // endregion
 
 
-    val cDepthBind = CruddyBindable(0) { new, _ -> activePart?.depth = new }
+    val cDepthBind = Bindable(0)  .also{it.addObserver { new, _ -> activePart?.depth = new }}
     val cVisibleBind = Bindable(true) .also{it.addObserver { new, _ -> activePart?.visible = new }}
-    val cPartNameBind = CruddyBindable("") { new, _ -> activePart?.partName = new }
+    val cPartNameBind = Bindable("") .also{it.addObserver { new, _ -> activePart?.partName = new }}
     val cAlphaBind = Bindable(1f) .also { it.addObserver { new, _ -> activePart?.alpha = new  } }
-    val cTransXBind = CruddyBindable(0f) { new, _ -> activePart?.transX = new }
-    val cTransYBind = CruddyBindable(0f) { new, _ -> activePart?.transY = new }
-    val cScaleXBind = CruddyBindable(1f) { new, _ -> activePart?.scaleX = new }
-    val cScaleYBind = CruddyBindable(1f) { new, _ -> activePart?.scaleY = new }
-    val cRotBind = CruddyBindable(0f) { new, _ -> activePart?.rot = new }
+    val cTransXBind = Bindable(0f) .also{it.addObserver { new, _ -> activePart?.transX = new }}
+    val cTransYBind = Bindable(0f).also{it.addObserver { new, _ -> activePart?.transY = new }}
+    val cScaleXBind = Bindable(1f).also{it.addObserver { new, _ -> activePart?.scaleX = new }}
+    val cScaleYBind = Bindable(1f).also{it.addObserver { new, _ -> activePart?.scaleY = new }}
+    val cRotBind = Bindable(0f).also{it.addObserver { new, _ -> activePart?.rot = new }}
 
     private fun getAllLinkedLayers() : Sequence<SpriteLayer> {
         return workspace.groupTree.root.traverse()

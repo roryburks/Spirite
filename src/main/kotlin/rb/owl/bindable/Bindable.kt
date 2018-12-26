@@ -20,6 +20,9 @@ class Bindable<T>(default: T) : IBindable<T>
         oldUnderlying.value = newUnderlying.value // Even though oldUnderlying will be discarded, this makes sure on-changes trigger
         bindList.add(root)
 
+        oldUnderlying.bindings.remove(this)
+        newUnderlying.bindings.add(this)
+
         val oldBinds = HashSet<Bindable<T>>()
         fun travelOld(current: Bindable<T>)
         {

@@ -1,6 +1,7 @@
 package spirite.gui.views.animation.animationSpaceView
 
 import rb.jvm.owl.addWeakObserver
+import rb.jvm.owl.bindWeaklyTo
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
@@ -44,7 +45,7 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
         spaceDropdown.renderer = {value: AnimationSpace?, index: Int, isSelected: Boolean, hasFocus: Boolean ->
             when(value) {
                 null -> Hybrid.ui.Label("---")
-                else -> Hybrid.ui.EditableLabel(value.name).also { value.nameBind.bindWeakly(it.textBind) }
+                else -> Hybrid.ui.EditableLabel(value.name).also { it.textBind.bindWeaklyTo(value.nameBind)}
             }
         }
     }

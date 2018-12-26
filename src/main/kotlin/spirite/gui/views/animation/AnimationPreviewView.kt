@@ -1,6 +1,8 @@
 package spirite.gui.views.animation
 
 import rb.jvm.owl.addWeakObserver
+import rb.jvm.owl.bindWeaklyTo
+import rb.owl.IContract
 import rb.owl.bindable.addObserver
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
@@ -39,7 +41,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     private val ffFps = Hybrid.ui.FloatField()
     private val sliderMet = Hybrid.ui.Slider(0,100,0).also { it.snapsToTick = false }
     private val bgColorBox = Hybrid.ui.ColorSquare(Skin.Global.Bg.scolor).also { it.setBasicBorder(BEVELED_RAISED) }
-    private val ifZoom = Hybrid.ui.IntField(allowsNegative = true).also { it.valueBind.addRootListener { new, old -> viewPanel.redraw()} }
+    private val ifZoom = Hybrid.ui.IntField(allowsNegative = true).also { it.valueBind.addObserver { _,_ -> viewPanel.redraw()} }
     private val zoomP = Hybrid.ui.Button("+").also { it.action = {++ifZoom.value} }
     private val zoomM = Hybrid.ui.Button("-").also { it.action = {--ifZoom.value} }
     private val ifMet = Hybrid.ui.IntField(allowsNegative =  false)
@@ -110,17 +112,20 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         metBind.addRootListener { new, _ ->  ifMet.value = new.floor}
     }
 
+    private var _fpsK : IContract? = null
+    private var _zoomK : IContract? = null
+
     private fun unbind() {
-        ffFps.valueBind.unbind()
+        _fpsK?.void()
         metBind.unbind()
-        ifZoom.valueBind.unbind()
+        _zoomK?.void()
     }
 
     private fun rebind(anim: Animation)
     {
-        anim.state.speedBind.bind(ffFps.valueBind)
+        _fpsK = ffFps.valueBind.bindWeaklyTo(anim.state.speedBind)
         anim.state.metBind.bind(metBind)
-        anim.state.zoomBind.bind(ifZoom.valueBind)
+        _zoomK = ifZoom.valueBind.bindWeaklyTo(anim.state.zoomBind)
     }
     // endregion
 

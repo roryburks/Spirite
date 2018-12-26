@@ -47,7 +47,7 @@ private constructor(
         toggleButton.checkBind.addObserver { _, _ ->  setLayout()}
 
         //editableLabel.opaque = false
-        editableLabel.textBind.addRootListener { new, old -> node.name = new }
+        editableLabel.textBind.addObserver { new, _-> node.name = new }
 
         setLayout()
 

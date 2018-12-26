@@ -1,6 +1,6 @@
 package spirite.base.imageData.animationSpaces.FFASpace
 
-import spirite.base.util.binding.CruddyBindable
+import rb.owl.bindable.Bindable
 import spirite.base.brains.ICruddyOldObservable
 import spirite.base.brains.CruddyOldObservable
 import spirite.base.imageData.animation.Animation
@@ -17,7 +17,7 @@ class FFASpaceViewState(val space: FFAAnimationSpace)
     // region Playback / timing
     var zoomLevel = 0
 
-    var fpsBind = CruddyBindable(8f)
+    var fpsBind = Bindable(8f)
     var fps by fpsBind
     var met = 0f
         set(value) {field = value; triggerPlayChange(animation, met)}

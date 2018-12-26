@@ -20,6 +20,13 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 {
     private var _opacitySliderK : IContract? = null
     private var _btnVisibilityK : IContract? = null
+    private var _tfTypeK : IContract? = null
+    private var _tfDepthK : IContract? = null
+    private var _tfTransXK : IContract? = null
+    private var _tfTransYK : IContract? = null
+    private var _tfScaleXK : IContract? = null
+    private var _tfScaleYK : IContract? = null
+    private var _tfRotK : IContract? = null
 
     var linkedSprite : SpriteLayer? = null
         set(value) {
@@ -29,13 +36,13 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                 old?.layerChangeObserver?.removeObserver(onPartChange)
                 activePartBind.unbind()
 
-                tfType.textBind.unbind()
-                tfDepth.valueBind.unbind()
-                tfTransX.valueBind.unbind()
-                tfTransY.valueBind.unbind()
-                tfScaleX.valueBind.unbind()
-                tfScaleY.valueBind.unbind()
-                tfRot.valueBind.unbind()
+                _tfTypeK?.void()
+                _tfDepthK?.void()
+                _tfTransXK?.void()
+                _tfTransYK?.void()
+                _tfScaleXK?.void()
+                _tfScaleYK?.void()
+                _tfRotK?.void()
                 _opacitySliderK?.void()
                 _btnVisibilityK?.void()
 
@@ -44,13 +51,13 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                     boxList.resetAllWithSelected(value.parts, value.activePart)
                     value.layerChangeObserver.addObserver(onPartChange)
 
-                    value.cPartNameBind.bindWeakly(tfType.textBind)
-                    value.cDepthBind.bindWeakly(tfDepth.valueBind)
-                    value.cTransXBind.bindWeakly(tfTransX.valueBind)
-                    value.cTransYBind.bindWeakly(tfTransY.valueBind)
-                    value.cScaleXBind.bindWeakly(tfScaleX.valueBind)
-                    value.cScaleYBind.bindWeakly(tfScaleY.valueBind)
-                    value.cRotBind.bindWeakly(tfRot.valueBind)
+                    _tfTypeK = tfType.textBind.bindWeaklyTo(value.cPartNameBind)
+                    _tfDepthK = tfDepth.valueBind.bindWeaklyTo(value.cDepthBind)
+                    _tfTransXK = tfTransX.valueBind.bindWeaklyTo(value.cTransXBind)
+                    _tfTransYK = tfTransY.valueBind.bindWeaklyTo(value.cTransYBind)
+                    _tfScaleXK = tfScaleX.valueBind.bindWeaklyTo(value.cScaleXBind)
+                    _tfScaleYK = tfScaleY.valueBind.bindWeaklyTo(value.cScaleYBind)
+                    _tfRotK = tfRot.valueBind.bindWeaklyTo(value.cRotBind)
                     _opacitySliderK = opacitySlider.valueBind.bindWeaklyTo(value.cAlphaBind)
                     _btnVisibilityK = btnVisibility.checkBind.bindWeaklyTo(value.cVisibleBind)
                 }

@@ -4,13 +4,13 @@ import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
 import rb.owl.IContract
 import rb.owl.bindable.Bindable
+import rb.owl.interprettedBindings.bindToX
+import rb.owl.interprettedBindings.bindToY
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.base.util.Colors
 import spirite.base.util.InvertibleFunction
-import spirite.base.util.binding.xBind
-import spirite.base.util.binding.yBind
 import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComboBox
@@ -54,15 +54,15 @@ fun <T> RadioButtonProperty<T>.getComponent() :IComponent {
 }
 private class CompContractUnion(imp: IComponent, private val cont: IContract) : IComponent by imp
 
-fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolProperty<*>) = when( toolProperty) {
+fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolProperty<*>, contractList: MutableList<IContract>) = when( toolProperty) {
     is SliderProperty -> Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(toolProperty.min, toolProperty.max, toolProperty.hrName).apply {
-            valueBind.bindWeaklyTo(toolProperty.valueBind)
+            contractList.add(valueBind.bindTo(toolProperty.valueBind))
         }, height = 24)
     }
     is SizeProperty ->  Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(0f, 1000f, toolProperty.hrName).apply {
-            valueBind.bindWeaklyTo(toolProperty.valueBind)
+            contractList.add(valueBind.bindTo(toolProperty.valueBind))
             mutatorPositionToValue = object : InvertibleFunction<Float>{
                 override fun perform(x: Float): Float = when {
                     x < 0.25f   -> x * 10f * 4f
@@ -84,7 +84,7 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
         rows += {
             add(Hybrid.ui.Label(toolProperty.hrName + ": "))
             add(Hybrid.ui.CheckBox().apply {
-                checkBind.bindWeaklyTo(toolProperty.valueBind);Unit
+                contractList.add(checkBind.bindTo(toolProperty.valueBind))
             })
         }
     }
@@ -100,7 +100,7 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
         rows += {
             add(Hybrid.ui.Label(toolProperty.hrName + ": "))
             add(Hybrid.ui.FloatField().apply {
-//                toolProperty.valueBind.bindWeakly(valueBind)
+                contractList.add(valueBind.bindTo(toolProperty.valueBind))
             }, height = 24)
         }
     }
@@ -108,9 +108,13 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
         rows.add(Hybrid.ui.Label(toolProperty.hrName + ": "))
         rows += {
             add(Hybrid.ui.Label(toolProperty.label1))
-//            add(Hybrid.ui.FloatField().apply { toolProperty.valueBind.xBind.bindWeakly( valueBind) }, height = 24, flex = 50f)
+            add(Hybrid.ui.FloatField().also {
+                contractList.add(it.valueBind.bindToX(toolProperty.valueBind))
+            }, height = 24, flex = 50f)
             add(Hybrid.ui.Label(toolProperty.label2))
-//            add(Hybrid.ui.FloatField().apply { toolProperty.valueBind.yBind.bindWeakly( valueBind) }, height = 24, flex = 50f)
+            add(Hybrid.ui.FloatField().also {
+                contractList.add(it.valueBind.bindToY(toolProperty.valueBind))
+            },  height = 24, flex = 50f)
         }
     }
 
@@ -129,6 +133,8 @@ private constructor(val master : IMasterControl, val imp : ICrossPanel)
 
     val toolLabel = Hybrid.ui.Label().apply { textColor = Colors.BLACK.jcolor }
     val toolPanel = Hybrid.ui.CrossPanel().apply { setBasicBorder(BEVELED_LOWERED) }
+
+    private val contractList = mutableListOf<IContract>()
 
     init {
         imp.background = Skin.Global.Fg.scolor
@@ -150,10 +156,13 @@ private constructor(val master : IMasterControl, val imp : ICrossPanel)
         }
     }
 
-    fun constructFromTool( tool: Tool) {
+    private fun constructFromTool(tool: Tool) {
+        contractList.forEach { it.void() }
+        contractList.clear()
+
         toolPanel.setLayout {
             tool.properties.forEach {
-                rows.add(componentFromToolProperty(master, it))
+                rows.add(componentFromToolProperty(master, it, contractList))
             }
         }
     }
@@ -164,6 +173,7 @@ private constructor(val master : IMasterControl, val imp : ICrossPanel)
     }
 
     override fun close() {
+        contractList.forEach { it.void() }
         listener.unbind()
     }
 }

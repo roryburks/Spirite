@@ -189,7 +189,7 @@ private constructor(
             background = Colors.TRANSPARENT
 
             //editableLabel.opaque = false
-            editableLabel.textBind.addRootListener { new, old -> node.name = new }
+            editableLabel.textBind.addObserver { new, _ -> node.name = new }
 
             imp.setLayout {
                 rows += {

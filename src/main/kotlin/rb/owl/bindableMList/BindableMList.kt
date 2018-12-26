@@ -29,6 +29,9 @@ class BindableMList<T>(col: Collection<T> = emptyList()) : IBindableMList<T>
         }
         bindList.add(root)
 
+        oldUnderlying.bindings.remove(this)
+        newUnderlying.bindings.add(this)
+
         val oldBinds = HashSet<BindableMList<T>>()
         fun travelOld(current: BindableMList<T>)
         {
