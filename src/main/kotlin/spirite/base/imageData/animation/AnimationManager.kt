@@ -2,8 +2,6 @@ package spirite.base.imageData.animation
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
-import spirite.base.util.binding.CruddyBindable
-import spirite.base.util.binding.ICruddyOldBindable
 import spirite.base.brains.ICruddyOldObservable
 import spirite.base.brains.CruddyOldObservable
 import spirite.base.imageData.MImageWorkspace

@@ -3,6 +3,8 @@ package spirite.gui.components.advanced
 import spirite.base.util.binding.CruddyBindable
 import rb.vectrix.mathUtil.MathUtil
 import rb.extendo.extensions.then
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
@@ -124,7 +126,8 @@ private constructor(
         override var minSize by LayoutDelegate(minSize)
         override var resizeComponent by LayoutDelegate(component)
 
-        private var componentVisibleBindable = CruddyBindable(visible) { _, _ -> resetLayout() }
+        private var componentVisibleBindable = Bindable(visible)
+                .also{it.addObserver{ _, _ -> resetLayout() }}
         var componentVisible by componentVisibleBindable
 
         init {
@@ -134,7 +137,7 @@ private constructor(
 
             val btnExpand =  Hybrid.ui.ToggleButton(true)
             btnExpand.plainStyle = true
-            componentVisibleBindable.bind(btnExpand.checkBind)
+            btnExpand.checkBind.bindTo(componentVisibleBindable)
 
             when( orientation) {
                 VERTICAL -> {

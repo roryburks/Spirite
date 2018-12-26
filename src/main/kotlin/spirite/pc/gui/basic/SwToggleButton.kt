@@ -1,5 +1,6 @@
 package spirite.pc.gui.basic
 
+import rb.owl.bindable.addObserver
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_RAISED
 import spirite.gui.components.basic.IToggleButton
@@ -40,13 +41,15 @@ protected constructor(startChecked: Boolean, private val imp: JToggleButton )
 
 
     init {
-        checkBind.addRootListener { new, old -> imp.isSelected = new }
+        checkBind.addObserver { new, _ -> imp.isSelected = new }
         setBasicBorder(BEVELED_RAISED)
         background = Skin.Global.BgDark.scolor
 
 
         imp.addMouseListener(object : MouseListener {
-            override fun mouseReleased(e: MouseEvent?) { if( enabled && e?.button == MouseEvent.BUTTON1) checked = !checked }
+            override fun mouseReleased(e: MouseEvent?) { if( enabled && e?.button == MouseEvent.BUTTON1)
+                checked = !checked
+            }
             override fun mouseEntered(e: MouseEvent?) {}
             override fun mouseClicked(e: MouseEvent?) {}
             override fun mouseExited(e: MouseEvent?) {}

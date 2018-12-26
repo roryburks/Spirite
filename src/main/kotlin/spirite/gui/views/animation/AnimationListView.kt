@@ -1,6 +1,7 @@
 package spirite.gui.views.animation
 
 import rb.jvm.owl.addWeakObserver
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DeleteAnimationCommand
 import spirite.base.brains.commands.DuplicateAnimationCommand
@@ -107,7 +108,8 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
     init {
         rebuild()
 
-        list.selectedBind.addListener { new, old ->  workspace?.animationManager?.currentAnimation = new }
+        // Note: Since life of list is same as AnimationListView, no need to be weak
+        list.selectedBind.addObserver { new, old ->  workspace?.animationManager?.currentAnimation = new }
 
         list.onMouseRelease += rightclick
     }

@@ -37,10 +37,23 @@ class WeakBindable<T>(default: T) : IObservable<OnChangeEvent<T>>
     override fun addObserver(observer: IBindObserver<T>, trigger: Boolean): IContract = ObserverContract(observer)
     fun bindTo( root: Bindable<T>) : IContract = BindContract(root)
 
+    private var externalTo: T = default
+    private var internalTo: T = default
+
     private inner class BindContract( val externalBind: Bindable<T>) : IContract {
         init {bind.field = externalBind.field}
-        val bindToWeakTrigger = externalBind.addWeakObserver { new, _ ->  bind.field = new}
-        val weakToBindTrigger = bind.addWeakObserver { new, _ ->  externalBind.field = new}
+        val bindToWeakTrigger = externalBind.addWeakObserver { new, _ ->
+            if( internalTo != new) {
+                internalTo = new
+                bind.field = new
+            }
+        }
+        val weakToBindTrigger = bind.addWeakObserver { new, _ ->
+            if( externalTo != new) {
+                externalTo = new
+                externalBind.field = new
+            }
+        }
         override fun void() {
             bindToWeakTrigger.void()
             weakToBindTrigger.void()
@@ -58,4 +71,19 @@ class WeakBindable<T>(default: T) : IObservable<OnChangeEvent<T>>
 
     operator fun getValue(thisRef: Any, prop: KProperty<*>): T = bind.field
     operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {bind.field = value}
+}
+
+fun <T> Bindable<T>.bindWeaklyTo(root: Bindable<T>) : IContract
+{
+    this.field = root.field
+    val weakBind = WeakBindable(root.field)
+    return DoubleContract(weakBind.bindTo(root), weakBind.bindTo(this))
+}
+
+private class DoubleContract(val contract1: IContract, val contract2: IContract) : IContract
+{
+    override fun void() {
+        contract1.void()
+        contract2.void()
+    }
 }

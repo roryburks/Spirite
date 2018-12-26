@@ -19,9 +19,6 @@ import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
-import spirite.base.util.binding.ICruddyOldBindable
-import spirite.base.util.binding.ICruddyBoundListener
-import spirite.base.util.binding.CruddyOldOnChangeEvent
 import java.lang.ref.WeakReference
 
 /** The CentralObservatory is a place where things (primarily GUI components) which need to watch for certain changes

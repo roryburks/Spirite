@@ -155,11 +155,12 @@ class PaletteSection(
     // endregion
 
 
-    private val _paletteBind = master.paletteManager.currentPaletteBind.addWeakListener { _, _ -> paletteView.redraw()}
+    private val _curPlttK = master.paletteManager.currentPaletteBind.addWeakObserver { _, _ -> paletteView.redraw()}
 
     override fun close() {
         paletteView.onClose()
         paletteChooserView.onClose()
+        _curPlttK.void()
     }
 }
 
@@ -295,10 +296,10 @@ private constructor(
     val w get() = Math.max(width/12,1)
     val palette get() = master.paletteManager.currentPalette
 
-    private val _paletteListener = master.paletteManager.currentPaletteBind.addListener { _, _ ->  imp.repaint() }
+    private val _curPlttK = master.paletteManager.currentPaletteBind.addWeakObserver { _, _ ->  imp.repaint() }
 
     fun onClose() {
-        _paletteListener.unbind()
+        _curPlttK.void()
     }
 
     // region Imp

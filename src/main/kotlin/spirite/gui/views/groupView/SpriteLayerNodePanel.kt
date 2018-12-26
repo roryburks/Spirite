@@ -1,5 +1,6 @@
 package spirite.gui.views.groupView
 
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.imageData.IIsolationManager.IsolationState
@@ -43,7 +44,7 @@ private constructor(
         toggleButton.plainStyle = true
         toggleButton.setOffIcon(Rig_New);
         toggleButton.setOnIcon(Rig_Remove);
-        toggleButton.checkBind.addRootListener { new, old ->  setLayout()}
+        toggleButton.checkBind.addObserver { _, _ ->  setLayout()}
 
         //editableLabel.opaque = false
         editableLabel.textBind.addRootListener { new, old -> node.name = new }

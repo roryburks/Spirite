@@ -1,5 +1,7 @@
 package spirite.gui.views.layerProperties
 
+import rb.jvm.owl.bindWeaklyTo
+import rb.owl.IContract
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.layers.sprite.SpriteLayer
@@ -16,6 +18,8 @@ import spirite.pc.gui.jcolor
 
 class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
+    private var _btnVisibilityK : IContract? = null
+
     var linkedSprite : SpriteLayer? = null
         set(value) {
             val old = field
@@ -32,7 +36,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                 tfScaleY.valueBind.unbind()
                 tfRot.valueBind.unbind()
                 opacitySlider.valueBind.unbind()
-                btnVisibility.checkBind.unbind()
+                _btnVisibilityK?.void()
 
                 if( value != null) {
                     value.activePartBind.bindWeakly(activePartBind)
@@ -47,7 +51,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                     value.cScaleXBind.bindWeakly(tfScaleX.valueBind)
                     value.cScaleYBind.bindWeakly(tfScaleY.valueBind)
                     value.cRotBind.bindWeakly(tfRot.valueBind)
-                    value.cVisibleBind.bindWeakly(btnVisibility.checkBind)
+                    _btnVisibilityK = btnVisibility.checkBind.bindWeaklyTo(value.cVisibleBind)
                 }
                 else boxList.clear()
             }

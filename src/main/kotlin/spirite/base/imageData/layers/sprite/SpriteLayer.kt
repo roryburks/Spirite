@@ -20,6 +20,8 @@ import spirite.base.util.delegates.UndoableDelegate
 import rb.vectrix.mathUtil.floor
 import rb.extendo.dataStructures.SinglyList
 import rb.extendo.dataStructures.SinglySequence
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
 import spirite.base.imageData.groupTree.traverse
@@ -306,7 +308,8 @@ class SpriteLayer : Layer {
 
 
     val cDepthBind = CruddyBindable(0) { new, _ -> activePart?.depth = new }
-    val cVisibleBind = CruddyBindable(true) { new, _ -> activePart?.visible = new }
+    val cVisibleBind = Bindable(true)
+            .also{it.addObserver { new, _ -> activePart?.visible = new }}
     val cPartNameBind = CruddyBindable("") { new, _ -> activePart?.partName = new }
     val cAlphaBind = CruddyBindable(1f) { new, _ -> activePart?.alpha = new }
     val cTransXBind = CruddyBindable(0f) { new, _ -> activePart?.transX = new }

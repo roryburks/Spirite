@@ -1,10 +1,11 @@
 package spirite.gui.components.basic
 
+import rb.owl.bindable.Bindable
 import spirite.base.util.binding.CruddyBindable
 import spirite.gui.resources.IIcon
 
 interface IToggleButtonNonUI {
-    val checkBind : CruddyBindable<Boolean>
+    val checkBind : Bindable<Boolean>
     var checked : Boolean
 
 }
@@ -20,6 +21,6 @@ interface IToggleButton : IToggleButtonNonUI, IComponent {
 }
 
 class ToggleButtonNonUI( startChecked: Boolean = false) : IToggleButtonNonUI{
-    override val checkBind = CruddyBindable(startChecked)
+    override val checkBind = Bindable(startChecked)
     override var checked by checkBind
 }

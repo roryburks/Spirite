@@ -1,7 +1,5 @@
 package spirite.base.imageData
 
-import spirite.base.util.binding.CruddyBindable
-import spirite.base.util.binding.ICruddyOldBindable
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.brains.settings.ISettingsManager
@@ -41,7 +39,7 @@ interface IImageWorkspace {
     val file: File?
     val filename get() = file?.name ?: "Untitled Image"
     val hasChanged: Boolean
-    val displayedFilenameBind : ICruddyOldBindable<String>
+    val displayedFilenameBind : IBindable<String>
 
 
 
@@ -141,7 +139,7 @@ class ImageWorkspace(
         else
             displayedFilenameBind.field = (file?.name ?: "<New Worspace>")
     }
-    override val displayedFilenameBind = CruddyBindable("<New Worspace>")
+    override val displayedFilenameBind = Bindable("<New Worspace>")
 
     // endregion
 

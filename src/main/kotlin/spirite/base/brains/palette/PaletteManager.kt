@@ -1,17 +1,17 @@
 package spirite.base.brains.palette
 
 import rb.jvm.owl.addWeakObserver
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.IBindable
 import spirite.base.brains.*
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.settings.ISettingsManager
-import spirite.base.util.binding.CruddyBindable
-import spirite.base.util.binding.ICruddyOldBindable
 import spirite.gui.components.dialogs.IDialog
 
 interface IPaletteManager {
     val activeBelt : PaletteBelt
 
-    val currentPaletteBind : ICruddyOldBindable<Palette>
+    val currentPaletteBind : IBindable<Palette>
     val currentPalette: Palette
     val globalPalette: Palette
 
@@ -41,7 +41,7 @@ class PaletteManager(
         override val onChangeTrigger: (Palette) -> Unit = {triggerPaletteChange(PaletteChangeEvent(this))}
     }
 
-    override val currentPaletteBind = CruddyBindable(globalPalette)
+    override val currentPaletteBind = Bindable(globalPalette)
     override val currentPalette: Palette by currentPaletteBind
 
     override fun makePaletteSet(): PaletteSet {

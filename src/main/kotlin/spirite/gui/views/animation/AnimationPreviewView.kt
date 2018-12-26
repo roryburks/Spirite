@@ -1,6 +1,7 @@
 package spirite.gui.views.animation
 
 import rb.jvm.owl.addWeakObserver
+import rb.owl.bindable.addObserver
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
@@ -105,8 +106,8 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     init {
         sliderMet.onMouseDrag += {  metBind.field = sliderMet.value / 100f }
         sliderMet.onMouseRelease +=  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
-        btnPlay.checkBind.addRootListener { new, _ -> if(!new) metBind.field = floor(metBind.field) }
-        metBind.addRootListener { new, old ->  ifMet.value = new.floor}
+        btnPlay.checkBind.addObserver { new, _ -> if(!new) metBind.field = floor(metBind.field) }
+        metBind.addRootListener { new, _ ->  ifMet.value = new.floor}
     }
 
     private fun unbind() {

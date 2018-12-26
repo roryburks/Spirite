@@ -1,6 +1,11 @@
 package spirite.gui.components.advanced
 
 import CrossLayout
+import rb.jvm.owl.bindWeaklyTo
+import rb.owl.IContract
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.IBindable
+import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.util.binding.CruddyBindable
 import spirite.base.util.binding.ICruddyOldBindable
@@ -40,9 +45,9 @@ interface ITreeViewNonUI<T>{
     val rootNodes: List<ITreeNode<T>>
     var treeRootInterpreter : TreeDragInterpreter<T>?
 
-    val selectedNodeBind: ICruddyOldBindable<ITreeNode<T>?>
+    val selectedNodeBind: IBindable<ITreeNode<T>?>
     val selectedNode : ITreeNode<T>?
-    val selectedBind : ICruddyOldBindable<T?>
+    val selectedBind : IBindable<T?>
     var selected : T?
 
     fun addRoot( value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes()) : ITreeNode<T>
@@ -55,9 +60,9 @@ interface ITreeViewNonUI<T>{
     interface ITreeNode<T> {
         val children: List<ITreeNode<T>>
         var value : T
-        val valueBind : CruddyBindable<T>
+        val valueBind : Bindable<T>
         var expanded : Boolean
-        val expandedBind : CruddyBindable<Boolean>
+        val expandedBind : Bindable<Boolean>
 
         fun addChild( value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes(), expanded: Boolean = true): ITreeNode<T>
         fun removeChild( toRemove: ITreeNode<T>)
@@ -164,7 +169,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
         })
     }
 
-    override val selectedBind = CruddyBindable<T?>(null)
+    override val selectedBind = Bindable<T?>(null)
     override var selected: T?
         get() = selectedBind.field
         set(value) {
@@ -173,10 +178,11 @@ private constructor(private val imp : SwTreeViewImp<T>)
             selectedNode = node
         }
 
-    override val selectedNodeBind = CruddyBindable<ITreeNode<T>?>(null) { new, _ ->
-        selectedBind.field = new?.value
-        redraw()
-    }
+    override val selectedNodeBind = Bindable<ITreeNode<T>?>(null)
+            .also { it.addObserver { new, _ ->
+                selectedBind.field = new?.value
+                redraw()
+            } }
     override var selectedNode: ITreeNode<T>? by selectedNodeBind
 
     // region Tree Construction
@@ -190,10 +196,13 @@ private constructor(private val imp : SwTreeViewImp<T>)
         return btn
     }
 
+    private val bindKs = mutableListOf<IContract>()
     override var buildingPaused = false
     private fun rebuildTree() {
         if( buildingPaused) return
         compToNodeMap.clear()
+        bindKs.forEach { it.void() }
+        bindKs.clear()
 
         fun buildCrossForNode( node: TreeNode<T>, existingGap: Int, initializer: CrossColInitializer)
         {
@@ -220,7 +229,8 @@ private constructor(private val imp : SwTreeViewImp<T>)
                 when {
                     node.children.any() -> {
                         val toggleButton = makeToggleButton(node.expanded)
-                        node.expandedBind.bindWeakly(toggleButton.checkBind)
+
+                        toggleButton.checkBind.bindTo(node.expandedBind)
                         add(toggleButton, width = gapSize)
                     }
                     else ->addGap(gapSize)
@@ -311,10 +321,14 @@ private constructor(private val imp : SwTreeViewImp<T>)
     internal constructor( defaultValue: T, val attributes: TreeNodeAttributes<T>, expanded: Boolean = true)
         :ITreeNode<T>
     {
-        override val expandedBind = CruddyBindable(expanded) { new, old -> rebuildTree() }
+        override val expandedBind = Bindable(expanded)
+                .also { it.addObserver(false) { _, _ ->
+                    rebuildTree()
+                } }
         override var expanded by expandedBind
 
-        override val valueBind = CruddyBindable(defaultValue) { new, old -> rebuildTree() }
+        override val valueBind = Bindable(defaultValue)
+                .also{it.addObserver { _, _ -> rebuildTree() }}
         override var value by valueBind
         override val children: List<TreeNode<T>> get() = _children
         private val _children = mutableListOf<TreeNode<T>>()
@@ -328,7 +342,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
             // I never love InvokeLaters.  This exists so that the batch Construct can exist without forcing this to
             //   be called before lComponent and component are built (which happens on buildTree)
             SwingUtilities.invokeLater {
-                valueBind.addListener { new, old ->
+                valueBind.addObserver { new, old ->
                     // Note: this prevents this Listener and thus the rebuildTree called N times when
                     if( old != new) {
                         val comp = attributes.makeComponent(new)

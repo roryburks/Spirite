@@ -1,6 +1,7 @@
 package spirite.gui.views.work
 
 import rb.jvm.owl.addWeakObserver
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
@@ -48,7 +49,9 @@ constructor(val master: IMasterControl, private val tabPane: ITabbedPane)
                     containers.add(newContainer)
                     tabPane.addTab(title, newContainer)
 
-                    newWorkspace.displayedFilenameBind.addListener { new, _ ->
+                    // TODO/Note: These are never-unbound strong-reference listeners, but WorkTabPane is probably a
+                    //  1-1 with the Proc.
+                    newWorkspace.displayedFilenameBind.addObserver { new, _ ->
                         val ind = tabPane.components.indexOf(newContainer)
                         tabPane.setTitleAt(ind, new)
                     }

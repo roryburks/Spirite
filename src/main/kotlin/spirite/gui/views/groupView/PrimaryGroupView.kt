@@ -2,6 +2,7 @@ package spirite.gui.views.groupView
 
 import rb.jvm.owl.addWeakObserver
 import rb.owl.IContract
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
@@ -49,7 +50,7 @@ private constructor(
 
         // Note: this is only an abstract binding because workspace is changing, so that which it is "bound" to is constantly
         //  changing.
-        tree.selectedBind.addListener { new, old ->  workspace?.groupTree?.selectedNode = new}
+        tree.selectedBind.addObserver { new, _ ->  workspace?.groupTree?.selectedNode = new}
     }
 
     private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ -> tree.selected = new }
@@ -69,7 +70,7 @@ private constructor(
                                 node,
                                 groupAttributes,
                                 node.expanded,
-                                {tree -> tree.expandedBind.addListener { new, _ -> node.expanded = new }},
+                                {tree -> tree.expandedBind.addObserver { new, _ -> node.expanded = new }},
                                 makeConstructor(node))
                         node is LayerNode && node.layer is SpriteLayer -> Node(node, spriteLayerAttributes)
                         else -> Node(node, nongroupAttributes)
@@ -93,7 +94,7 @@ private constructor(
             comp.opaque = false
 
             val visibilityButton = Hybrid.ui.ToggleButton( t.visible)
-            visibilityButton.checkBind.addListener { new, old ->  t.visible = new}
+            visibilityButton.checkBind.addObserver {new, _ ->  t.visible = new}
             visibilityButton.setOnIcon( SwIcons.BigIcons.VisibleOn)
             visibilityButton.setOffIcon( SwIcons.BigIcons.VisibleOff)
 

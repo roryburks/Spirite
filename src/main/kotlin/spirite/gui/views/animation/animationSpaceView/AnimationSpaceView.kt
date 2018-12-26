@@ -116,7 +116,7 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
         new?.animationSpaceManager?.animationSpaceObservable?.addObserver(animationSpaceObserver)
         rebuildDropDown(new)
     }
-    val __animBindListener = master.centralObservatory.currentAnimationSpaceBind.addWeakListener { new, _ ->
+    val _curAnimK = master.centralObservatory.currentAnimationSpaceBind.addWeakObserver { new, _ ->
         new?.also { spaceDropdown.selectedItem = it}
     }
     //endregion
