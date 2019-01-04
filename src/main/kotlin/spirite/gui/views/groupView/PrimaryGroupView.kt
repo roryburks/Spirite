@@ -3,6 +3,7 @@ package spirite.gui.views.groupView
 import rb.jvm.owl.addWeakObserver
 import rb.owl.IContract
 import rb.owl.bindable.addObserver
+import rb.owl.observer
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
@@ -26,13 +27,9 @@ class PrimaryGroupView
 private constructor(
         private val master: IMasterControl,
         val tree : ITreeView<Node>)
-    : IComponent by Hybrid.ui.ScrollContainer(tree),
-        TreeObserver
+    : IComponent by Hybrid.ui.ScrollContainer(tree)
 {
     constructor(master: IMasterControl) : this(master, Hybrid.ui.TreeView<Node>())
-
-    override fun treeStructureChanged(evt : TreeChangeEvent) {rebuild()}
-    override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {}
 
     init {
 
@@ -202,17 +199,21 @@ private constructor(
         fun triggerRename() { editableLabel.startEditing()}
     }
 
-
-    val wslContract : IContract
-    init {
-        wslContract =
-        master.workspaceSet.workspaceObserver.addWeakObserver(
-                object : WorkspaceObserver {
-                    override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
-                    override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {}
-                    override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
-                        rebuild()
-                    }
-                })
+    val groupTreeObserver = object: TreeObserver {
+        override fun treeStructureChanged(evt : TreeChangeEvent) {rebuild()}
+        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {}
     }
+
+    private var treeContract : IContract? = null
+    private val wslContract =
+            master.workspaceSet.workspaceObserver.addWeakObserver(
+                    object : WorkspaceObserver {
+                        override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
+                        override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {}
+                        override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
+                            treeContract?.void()
+                            rebuild()
+                            treeContract = selectedWorkspace?.groupTree?.treeObservable?.addWeakObserver(groupTreeObserver)
+                        }
+                    })
 }
