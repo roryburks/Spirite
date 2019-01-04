@@ -48,8 +48,6 @@ private constructor(
         tree.selectedBind.addObserver { new, _ ->  workspace?.groupTree?.selectedNode = new}
     }
 
-    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ -> tree.selected = new }
-
     val workspace get() = master.workspaceSet.currentWorkspace
 
     private fun rebuild() {
@@ -79,6 +77,7 @@ private constructor(
         tree.constructTree (constructor)
     }
 
+    // region SubComponents
     private val groupAttributes = BaseNodeAttributes()
     private val nongroupAttributes = NormalLaterNodeAttributes()
     private val spriteLayerAttributes = SpriteLayerNodeAttributes()
@@ -198,22 +197,26 @@ private constructor(
 
         fun triggerRename() { editableLabel.startEditing()}
     }
+    // endregion
 
-    val groupTreeObserver = object: TreeObserver {
+    // region Bindings
+    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ -> tree.selected = new }
+
+    private val groupTreeObserver = object: TreeObserver {
         override fun treeStructureChanged(evt : TreeChangeEvent) {rebuild()}
         override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {}
     }
 
-    private var treeContract : IContract? = null
-    private val wslContract =
-            master.workspaceSet.workspaceObserver.addWeakObserver(
-                    object : WorkspaceObserver {
-                        override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
-                        override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {}
-                        override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
-                            treeContract?.void()
-                            rebuild()
-                            treeContract = selectedWorkspace?.groupTree?.treeObservable?.addWeakObserver(groupTreeObserver)
-                        }
-                    })
+    private var treeObsK : IContract? = null
+    private val wsObsK = master.workspaceSet.workspaceObserver.addWeakObserver(
+        object : WorkspaceObserver {
+            override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
+            override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {}
+            override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
+                treeObsK?.void()
+                rebuild()
+                treeObsK = selectedWorkspace?.groupTree?.treeObservable?.addWeakObserver(groupTreeObserver)
+            }
+        })
+    // endregion
 }
