@@ -48,7 +48,8 @@ class Bindable<T>(default: T) : IBindable<T>
                 val prev = field
                 if( value != field) {
                     field = value
-                    triggers.forEach { it.invoke(value,prev)}
+                    val t = triggers.toList()
+                    t.forEach { it.invoke(value,prev)}
                 }
             }
 
@@ -93,6 +94,7 @@ class Bindable<T>(default: T) : IBindable<T>
                 val oldUnderlying = underlying
                 oldUnderlying.bindings.removeIf {derivedBinds.contains(it) }
                 newUnderlying.bindings.addAll(derivedBinds)
+                underlying = newUnderlying
             }
         }
     }
