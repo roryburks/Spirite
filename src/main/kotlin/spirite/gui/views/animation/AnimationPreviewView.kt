@@ -112,7 +112,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         sliderMet.onMouseDrag += {  metBind.field = sliderMet.value / 100f }
         sliderMet.onMouseRelease +=  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
         btnPlay.checkBind.addObserver { new, _ -> if(!new) metBind.field = floor(metBind.field) }
-        metBind.addObserver { new, _ ->  ifMet.value = new.floor}
+        metBind.addObserver { new, _ ->ifMet.value = new.floor}
     }
 
     private var _fpsK : IContract? = null
@@ -127,9 +127,9 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
     private fun rebind(anim: Animation)
     {
-        _fpsK = ffFps.valueBind.bindWeaklyTo(anim.state.speedBind)
-        _metK = metBind.bindWeaklyTo(anim.state.metBind)
-        _zoomK = ifZoom.valueBind.bindWeaklyTo(anim.state.zoomBind)
+        _fpsK = ffFps.valueBind.bindTo(anim.state.speedBind)
+        _metK = metBind.bindTo(anim.state.metBind)
+        _zoomK = ifZoom.valueBind.bindTo(anim.state.zoomBind)
     }
     // endregion
 
