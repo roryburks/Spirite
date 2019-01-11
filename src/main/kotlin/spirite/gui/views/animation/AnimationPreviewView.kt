@@ -91,7 +91,10 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
 
     // region Bindings
-    private val _curAnimK = masterControl.centralObservatory.currentAnimationBind.addObserver { new, old ->buildFromAnim(new); viewPanel.redraw()}
+    private val _curAnimK = masterControl.centralObservatory.currentAnimationBind.addObserver { new, _ ->
+        buildFromAnim(new)
+        viewPanel.redraw()
+    }
     private val _animStructObsK = masterControl.centralObservatory.trackingAnimationStateObserver.addObserver(
         object : AnimationStructureChangeObserver {
             override fun animationStructureChanged(animation: Animation) {
@@ -124,6 +127,8 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         _metK?.void()
         _zoomK?.void()
     }
+
+    var i = 1.0f
 
     private fun rebind(anim: Animation)
     {
