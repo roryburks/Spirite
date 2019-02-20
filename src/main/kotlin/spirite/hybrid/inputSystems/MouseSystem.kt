@@ -4,6 +4,8 @@ import rb.owl.IContract
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseEvent.MouseEventType.*
+import java.awt.Component
+import javax.swing.SwingUtilities
 
 /**
  * The MouseSystem gives components a semi-direct access to the Mouse Events broadcast by various components.  It gets
@@ -13,7 +15,7 @@ interface IMouseSystem
 {
     fun broadcastMouseEvent( mouseEvent: MouseEvent, root: Any)
 
-    fun attachHook(hook: IGlobalMouseHook, component: IComponent, root: Any) : IContract
+    fun attachHook(hook: IGlobalMouseHook, component: IComponent) : IContract
 }
 
 interface IGlobalMouseHook
@@ -26,10 +28,10 @@ class MouseSystem : IMouseSystem
     private inner class Contract
     constructor(
             val hook: IGlobalMouseHook,
-            val component: IComponent,
-            val root : Any)
+            val component: IComponent)
         : IContract
     {
+        lateinit var root : Any
         init {_hooks.add(this)}
         override fun void() {_hooks.remove(this)}
     }
@@ -60,6 +62,14 @@ class MouseSystem : IMouseSystem
             _grabbedComponents = null
     }
 
-    override fun attachHook(hook: IGlobalMouseHook, component: IComponent, root: Any) : IContract = Contract(hook, component, root)
+    override fun attachHook(hook: IGlobalMouseHook, component: IComponent) : IContract {
+        val contract = Contract(hook, component)
+
+        SwingUtilities.invokeLater {
+            contract.root = SwingUtilities.getRoot(component.component  as Component)
+        }
+
+        return contract
+    }
 
 }

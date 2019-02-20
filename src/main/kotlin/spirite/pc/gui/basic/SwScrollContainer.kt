@@ -36,12 +36,9 @@ private constructor( private val imp: SwScrollContainerImp)
             verticalBar.maxScroll = imp.verticalScrollBar.maximum
         }
 
-        SwingUtilities.invokeLater {
-            Hybrid.mouseSystem.attachHook(mouseHook, this, SwingUtilities.getRoot(imp))
-        }
     }
 
-    val mouseHook = object : IGlobalMouseHook {
+    val mouseHookK = Hybrid.mouseSystem.attachHook(object : IGlobalMouseHook {
         var currentX : Int? = null    // Note: if null, not scroll-dragging
         var currentY = 0
 
@@ -56,16 +53,15 @@ private constructor( private val imp: SwScrollContainerImp)
                 }
                 evt.type == DRAGGED && nowX != null && !Hybrid.keypressSystem.holdingSpace -> currentX = null
                 evt.type == DRAGGED && nowX != null -> {
-                    horizontalBar.scroll -= (evt.point.x - nowX )
-                    verticalBar.scroll -= (evt.point.y - currentY )
+                    horizontalBar.scroll -= ((evt.point.x - nowX )* scrollFactor).round
+                    verticalBar.scroll -= ((evt.point.y - currentY ) * scrollFactor).round
                     currentX = evt.point.x
                     currentY = evt.point.y
                 }
                 evt.type == RELEASED -> this.currentX = null
             }
-
         }
-    }
+    }, this)
 
     override fun makeAreaVisible(area: Rect) {
         val viewWidth = imp.view.width

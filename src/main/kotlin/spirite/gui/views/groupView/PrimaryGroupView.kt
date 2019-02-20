@@ -17,11 +17,17 @@ import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
+import spirite.gui.components.basic.events.MouseEvent.MouseEventType.RELEASED
 import spirite.gui.resources.SwIcons
 import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
+import spirite.hybrid.inputSystems.IGlobalMouseHook
+import java.awt.Component
 import java.awt.datatransfer.Transferable
+import javax.swing.SwingUtilities
 
 class PrimaryGroupView
 private constructor(
@@ -32,21 +38,9 @@ private constructor(
     constructor(master: IMasterControl) : this(master, Hybrid.ui.TreeView<Node>())
 
     init {
-
         tree.leftSize = 40
-
-        tree.onMouseClick += { evt ->
-            if( evt.button == RIGHT )
-                workspace?.apply {
-                    val node = tree.getNodeFromY(evt.point.y)?.value
-                    master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, node), node)
-                }
-        }
-
-        // Note: this is only an abstract binding because workspace is changing, so that which it is "bound" to is constantly
-        //  changing.
-        tree.selectedBind.addObserver { new, _ ->  workspace?.groupTree?.selectedNode = new}
     }
+
 
     val workspace get() = master.workspaceSet.currentWorkspace
 
@@ -104,14 +98,7 @@ private constructor(
     }
 
     private inner class NormalNodeComponent( t: Node) : BaseNodeTreeComponent(t) {
-        override val component = NodeLayerPanel(t,master).also {
-            onMouseRelease += { evt ->
-                if (evt.button == RIGHT)
-                    workspace?.apply {
-                        master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, t), t)
-                    }
-            }
-        }
+        override val component = NodeLayerPanel(t,master)
 
         override fun onRename() {component.triggerRename()}
     }
@@ -146,14 +133,6 @@ private constructor(
         override fun makeComponent(t: Node) = TreeComponent(t)
         private inner class TreeComponent(t:Node) : BaseNodeTreeComponent(t) {
             override val component = SpriteLayerNodePanel(t, (t as LayerNode).layer as SpriteLayer, master)
-                    .also {comp ->
-                        comp.onMouseRelease += { evt ->
-                            if( evt.button == RIGHT )
-                                workspace?.apply {
-                                    master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, t), t)
-                                }
-                        }
-                    }
 
             override fun onRename() {component.editableLabel.startEditing()}
 
@@ -200,6 +179,11 @@ private constructor(
     // endregion
 
     // region Bindings
+
+    // Note: this is only an abstract binding because workspace is changing, so that which it is "bound" to is constantly
+    //  changing.
+    private val treeSelectionK= tree.selectedBind.addObserver { new, _ ->  workspace?.groupTree?.selectedNode = new}
+
     private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ -> tree.selected = new }
 
     private val groupTreeObserver = object: TreeObserver {
@@ -218,5 +202,23 @@ private constructor(
                 treeObsK = selectedWorkspace?.groupTree?.treeObservable?.addWeakObserver(groupTreeObserver)
             }
         })
+
+
+    private val mouseHookK = Hybrid.mouseSystem.attachHook(object: IGlobalMouseHook {
+        override fun processMouseEvent(evt: MouseEvent) {
+            val point = evt.point.convert(tree)
+
+            if( evt.button == RIGHT && evt.type == RELEASED) {
+                val ws = workspace ?: return
+                val node = tree.getNodeFromY(point.y)?.value
+                master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(ws, node), node)
+            }
+            else if(evt.button == LEFT && evt.type == RELEASED) {
+                val node = tree.getNodeFromY(point.y)?.value
+                println("${evt.point.y}, ${point.y}, $node")
+                tree.selected = node ?: tree.selected
+            }
+        }
+    }, tree)
     // endregion
 }
