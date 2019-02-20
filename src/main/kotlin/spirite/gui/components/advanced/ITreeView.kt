@@ -21,6 +21,7 @@ import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.JColor
 import spirite.pc.gui.SimpleMouseListener
+import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.jcomponent
 import java.awt.*
@@ -501,7 +502,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
 
     // region Implementation (Drawing Mostly)
 
-    private class SwTreeViewImp<T> : JPanel() {
+    private class SwTreeViewImp<T> : SJPanel() {
         init {
             background = JColor(0,0,0,0)
             addMouseListener( SimpleMouseListener { evt ->

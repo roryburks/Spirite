@@ -2,6 +2,7 @@ package spirite.pc.gui.basic
 
 import spirite.gui.resources.Skin.BevelBorder.Dark
 import spirite.gui.resources.Skin.Global.*
+import spirite.pc.gui.adaptMouseSystem
 import java.awt.GradientPaint
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -11,6 +12,7 @@ import javax.swing.JMenuBar
 
 class SwMenuBar : JMenuBar() {
     init {
+        adaptMouseSystem()
         background = Fg.jcolor
         foreground = TextDark.jcolor
         border = BorderFactory.createMatteBorder(0, 0, 1, 0, Dark.jcolor)

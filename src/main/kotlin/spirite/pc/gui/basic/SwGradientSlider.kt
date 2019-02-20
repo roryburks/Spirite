@@ -9,6 +9,7 @@ import spirite.gui.components.basic.IGradientSlider
 import spirite.gui.components.basic.IGradientSliderNonUIImpl
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.resources.Skin
+import spirite.pc.gui.adaptMouseSystem
 import java.awt.Color
 import java.awt.GradientPaint
 import java.awt.Graphics
@@ -41,7 +42,8 @@ private constructor(minValue: Float, maxValue: Float, label: String, val imp : S
     override var disabledGradRight: Color by UI(Skin.GradientSlider.DisabledGradRight.jcolor)
     override var label : String by UI(label)
 
-    private class SwGradientSliderImp() : JPanel() {
+    private class SwGradientSliderImp() : SJPanel() {
+        init {adaptMouseSystem()}
         var context : SwGradientSlider? = null
 
         override fun paintComponent(g: Graphics) {

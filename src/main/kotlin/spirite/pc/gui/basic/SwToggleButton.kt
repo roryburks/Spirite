@@ -8,6 +8,7 @@ import spirite.gui.components.basic.IToggleButtonNonUI
 import spirite.gui.components.basic.ToggleButtonNonUI
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.Skin
+import spirite.pc.gui.adaptMouseSystem
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.swing.JToggleButton
@@ -19,6 +20,7 @@ protected constructor(startChecked: Boolean, private val imp: JToggleButton )
         IToggleButtonNonUI by ToggleButtonNonUI(startChecked), IComponent,
         ISwComponent by SwComponent(imp)
 {
+
     override fun setOnIcon(icon: IIcon) {imp.selectedIcon = icon.icon}
     override fun setOffIcon(icon: IIcon) {imp.icon = icon.icon}
 
@@ -61,6 +63,7 @@ protected constructor(startChecked: Boolean, private val imp: JToggleButton )
     {
         init {
             mouseListeners.forEach { removeMouseListener(it)}
+            adaptMouseSystem()
         }
     }
 }

@@ -4,6 +4,7 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import spirite.gui.resources.Skin
 import spirite.pc.gui.SColor
+import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
 import java.awt.KeyboardFocusManager
@@ -147,7 +148,7 @@ private constructor(
         }
     }
 
-    private class SwELabelImp : JPanel() {
+    private class SwELabelImp : SJPanel() {
         init {
             background = Skin.Global.Bg.jcolor
         }

@@ -1,7 +1,9 @@
 package spirite.pc.gui.basic
 
 import spirite.gui.resources.Skin.Global
+import spirite.pc.gui.adaptMouseSystem
 import java.awt.*
+import java.awt.event.MouseEvent
 import javax.swing.*
 import javax.swing.plaf.basic.BasicScrollBarUI
 
@@ -17,6 +19,8 @@ open class SScrollPane constructor(
         hsbPolicy: Int = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED)
     : JScrollPane()
 {
+    init { adaptMouseSystem()}
+
     private val isVerticalScrollBarfNecessary: Boolean
         get() {
             val viewRect = viewport.viewRect

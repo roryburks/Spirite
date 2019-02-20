@@ -2,11 +2,16 @@ package spirite.gui.components.basic.events
 
 import spirite.gui.UIPoint
 
-data class MouseEvent(
+data class MouseEvent
+constructor(
         val point: UIPoint,
         val button: MouseButton,
-        private val modifierMask : Int)
+        private val modifierMask : Int,
+        val type : MouseEventType)
 {
+    enum class MouseEventType {
+        RELEASED, ENTERED, CLICKED, EXITED, PRESSED, MOVED, DRAGGED,
+    }
     enum class MouseButton {
         LEFT, RIGHT, CENTER, UNKNOWN
     }

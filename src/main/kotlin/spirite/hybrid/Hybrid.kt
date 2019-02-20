@@ -3,6 +3,8 @@ package spirite.hybrid
 import spirite.base.graphics.gl.IGL
 import spirite.base.graphics.gl.IGLEngine
 import spirite.gui.components.basic.IComponentProvider
+import spirite.hybrid.mouseSystem.IMouseSystem
+import spirite.hybrid.mouseSystem.MouseSystem
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.gui.SwingComponentProvider
 
@@ -15,6 +17,7 @@ interface IHybrid {
     val timing : ITimerEngine
     val ui : IComponentProvider
     val imageIO : IImageIO
+    val mouseSystem : IMouseSystem
 
     val gl : IGL
     val gle : IGLEngine
@@ -34,6 +37,7 @@ object SwHybrid : IHybrid {
     override val imageCreator: IImageCreator get() = SwImageCreator
     override val imageConverter: ImageConverter get() = ImageConverter(EngineLaunchpoint.gle)
     override val imageIO: IImageIO get() = JImageIO
+    override val mouseSystem: IMouseSystem = MouseSystem()
 
     override fun LockFrom(o: Any): ILock = JLock(o)
     override fun beep() {

@@ -5,6 +5,7 @@ import spirite.base.util.Colors
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
+import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
 import java.awt.Graphics
@@ -35,7 +36,7 @@ private constructor(img: IImage, private val imp : SwImageBoxImp)
     override var stretch by OnChangeDelegate(true ) {redraw()}
     override var checkeredBackground by OnChangeDelegate(false){redraw()}
 
-    private class SwImageBoxImp() : JPanel() {
+    private class SwImageBoxImp() : SJPanel() {
         lateinit var context : SwImageBox
 
         init {

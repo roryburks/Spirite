@@ -4,6 +4,7 @@ import spirite.gui.components.basic.IButton
 import spirite.gui.components.basic.IButton.ButtonActionEvent
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.Skin
+import spirite.pc.gui.adaptMouseSystem
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.swing.BorderFactory
@@ -25,6 +26,7 @@ private constructor( val imp: SwButtonImp)
         set(value) { imp.action = value}
 
     private class SwButtonImp( str: String? = null) : JButton() {
+        init { adaptMouseSystem()}
         var action: ((ButtonActionEvent) -> Unit)? = null
 
         init {

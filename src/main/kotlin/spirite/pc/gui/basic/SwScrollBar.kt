@@ -8,6 +8,7 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IScrollBar
 import spirite.gui.components.basic.IScrollBarNonUIImp
 import spirite.gui.components.basic.ScrollBarNonUI
+import spirite.pc.gui.adaptMouseSystem
 import spirite.pc.gui.basic.SScrollPane.ModernScrollBarUI
 import javax.swing.JComponent
 import javax.swing.JScrollBar
@@ -45,6 +46,7 @@ private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidt
 
     private class SwScrollBarImp(orientation: Orientation, context: IComponent) : JScrollBar() {
         init {
+            adaptMouseSystem()
             isOpaque = false
             setUI( ModernScrollBarUI(context.component as JComponent))
             this.setOrientation(if( orientation == Orientation.VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL)
