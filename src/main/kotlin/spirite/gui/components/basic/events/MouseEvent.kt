@@ -1,6 +1,7 @@
 package spirite.gui.components.basic.events
 
 import spirite.gui.UIPoint
+import spirite.gui.components.basic.IComponent
 
 data class MouseEvent
 constructor(
@@ -30,4 +31,6 @@ constructor(
                 (if( holdingCtrl) ctrlMask else 0) or
                 (if( holdingAlt) altMask else 0)
     }
+
+    fun converted(component: IComponent) = copy(point = point.convert(component))
 }

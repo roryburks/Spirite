@@ -6,7 +6,12 @@ import spirite.base.util.linear.Rect
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IScrollBar
 import spirite.gui.components.basic.IScrollContainer
+import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.components.basic.events.MouseEvent.MouseEventType.*
+import spirite.hybrid.Hybrid
+import spirite.hybrid.inputSystems.IGlobalMouseHook
 import java.awt.Component
+import javax.swing.SwingUtilities
 
 class SwScrollContainer
 private constructor( private val imp: SwScrollContainerImp)
@@ -29,6 +34,36 @@ private constructor( private val imp: SwScrollContainerImp)
             verticalBar.scrollWidth = imp.verticalScrollBar.visibleAmount
             verticalBar.minScroll = imp.verticalScrollBar.minimum
             verticalBar.maxScroll = imp.verticalScrollBar.maximum
+        }
+
+        SwingUtilities.invokeLater {
+            Hybrid.mouseSystem.attachHook(mouseHook, this, SwingUtilities.getRoot(imp))
+        }
+    }
+
+    val mouseHook = object : IGlobalMouseHook {
+        var currentX : Int? = null    // Note: if null, not scroll-dragging
+        var currentY = 0
+
+        val scrollFactor = 1.0
+
+        override fun processMouseEvent(evt: MouseEvent) {
+            val nowX = currentX
+            when {
+                evt.type == PRESSED && Hybrid.keypressSystem.holdingSpace -> {
+                    currentX = evt.point.x
+                    currentY = evt.point.y
+                }
+                evt.type == DRAGGED && nowX != null && !Hybrid.keypressSystem.holdingSpace -> currentX = null
+                evt.type == DRAGGED && nowX != null -> {
+                    horizontalBar.scroll -= (evt.point.x - nowX )
+                    verticalBar.scroll -= (evt.point.y - currentY )
+                    currentX = evt.point.x
+                    currentY = evt.point.y
+                }
+                evt.type == RELEASED -> this.currentX = null
+            }
+
         }
     }
 

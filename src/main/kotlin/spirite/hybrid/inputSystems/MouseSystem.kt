@@ -1,4 +1,4 @@
-package spirite.hybrid.mouseSystem
+package spirite.hybrid.inputSystems
 
 import rb.owl.IContract
 import spirite.gui.components.basic.IComponent
@@ -50,6 +50,7 @@ class MouseSystem : IMouseSystem
         }
 
         for (hook in triggeringHooks) {
+
             hook.hook.processMouseEvent(mouseEvent)
         }
 
