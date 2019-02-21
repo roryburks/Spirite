@@ -16,6 +16,7 @@ import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
+import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
 import java.awt.BasicStroke
@@ -318,7 +319,7 @@ private constructor(
 
     // region Imp
     init {imp.context = this}
-    private class PaletteViewImp : JPanel() {
+    private class PaletteViewImp : SJPanel() {
         var context: PaletteView? = null
 
         override fun paintComponent(g: Graphics) {

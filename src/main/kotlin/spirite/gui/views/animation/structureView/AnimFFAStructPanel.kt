@@ -42,6 +42,7 @@ import spirite.gui.views.animation.structureView.RememberedStates.RememberedStat
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.JColor
+import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
 import java.awt.BasicStroke
 import java.awt.Color
@@ -633,7 +634,7 @@ internal class AnimDragStateManager(val context: AnimFFAStructPanel)
 }
 
 // region Custom Panels
-private class AnimFFAStructPanelImp : JPanel() {
+private class AnimFFAStructPanelImp : SJPanel() {
     lateinit var context : AnimFFAStructPanel
 
     fun setLayout( constructor: CrossInitializer.()->Unit) {
@@ -681,7 +682,7 @@ private class DashedOutPanel(val bgcol: JColor?, val fgcol: JColor) : JPanel() {
 
     }
 }
-private class ArrowPanel(val bgcol: JColor?, val fgcol: JColor, val dir: Direction) : JPanel() {
+private class ArrowPanel(val bgcol: JColor?, val fgcol: JColor, val dir: Direction) : SJPanel() {
     init {
         background = null
         isOpaque = false

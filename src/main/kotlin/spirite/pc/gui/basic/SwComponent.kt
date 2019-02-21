@@ -8,6 +8,8 @@ import spirite.gui.components.basic.IComponent.BasicBorder.*
 import spirite.gui.components.basic.Invokable
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.*
+import spirite.gui.components.basic.events.MouseEvent.MouseEventType
+import spirite.gui.components.basic.events.MouseEvent.MouseEventType.*
 import spirite.gui.components.basic.events.MouseWheelEvent
 import spirite.gui.resources.Skin
 import spirite.pc.gui.SColor
@@ -121,13 +123,14 @@ abstract class ASwComponent : ISwComponent {
             component.addMouseMotionListener(this)
         }
 
-        fun convert( e: JMouseEvent) : MouseEvent {
+        fun convert( e: JMouseEvent, type: MouseEventType) : MouseEvent {
             val scomp = SwComponent(e.component as Component)
             val smask = e.modifiersEx
             val mask = MouseEvent.toMask(
                     (smask and SHIFT_DOWN_MASK) == SHIFT_DOWN_MASK,
                     (smask and CTRL_DOWN_MASK) == CTRL_DOWN_MASK,
                     (smask and ALT_DOWN_MASK) == ALT_DOWN_MASK)
+
             return MouseEvent(
                     SUIPoint(e.x, e.y, scomp.component),
                     when (e.button) {
@@ -136,7 +139,8 @@ abstract class ASwComponent : ISwComponent {
                         JMouseEvent.BUTTON3 -> RIGHT
                         else -> UNKNOWN
                     },
-                    mask)
+                    mask,
+                    type)
         }
 
         val releaseStack = EventStack<MouseEvent>()
@@ -148,29 +152,29 @@ abstract class ASwComponent : ISwComponent {
         val dragStack = EventStack<MouseEvent>()
 
         override fun mouseReleased(e: JMouseEvent) {
-            val evt = convert(e)
+            val evt = convert(e, RELEASED)
             releaseStack.triggers.forEach { it(evt) }
             clickStack.triggers.forEach { it(evt) }
         }
         override fun mouseEntered(e: JMouseEvent) {
-            val evt = convert(e)
+            val evt = convert(e, ENTERED)
             enterStack.triggers.forEach { it(evt) }
         }
         override fun mouseClicked(e: JMouseEvent) {/*onMouseClick?.invoke(convert(e))*/}
         override fun mouseExited(e: JMouseEvent) {
-            val evt = convert(e)
+            val evt = convert(e, EXITED)
             exitStack.triggers.forEach { it(evt) }
         }
         override fun mousePressed(e: JMouseEvent) {
-            val evt = convert(e)
+            val evt = convert(e, PRESSED)
             pressStack.triggers.forEach { it(evt) }
         }
         override fun mouseMoved(e: JMouseEvent) {
-            val evt = convert(e)
+            val evt = convert(e, MOVED)
             moveStack.triggers.forEach { it(evt) }
         }
         override fun mouseDragged(e: JMouseEvent) {
-            val evt = convert(e)
+            val evt = convert(e, DRAGGED)
             dragStack.triggers.forEach { it(evt) }
         }
     }

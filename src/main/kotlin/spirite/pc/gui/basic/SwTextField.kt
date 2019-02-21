@@ -8,6 +8,7 @@ import spirite.gui.resources.Skin.BevelBorder.Light
 import spirite.gui.resources.Skin.TextField.Background
 import spirite.gui.resources.Skin.TextField.InvalidBg
 import spirite.hybrid.Hybrid
+import spirite.pc.gui.adaptMouseSystem
 import java.awt.Color
 import javax.swing.BorderFactory
 import javax.swing.JTextField
@@ -38,6 +39,7 @@ private constructor(val imp : SwTextFieldImp) : ITextField, ISwComponent by SwCo
     private class SwTextFieldImp() : JTextField()
     {
         init {
+            adaptMouseSystem()
             background = Background.jcolor
             border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Light.jcolor, Dark.jcolor)
         }
@@ -93,6 +95,7 @@ private constructor(
     private class SwNumberFieldImp() : JTextField()
     {
         init {
+            adaptMouseSystem()
             background = Background.jcolor
             border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Light.jcolor, Dark.jcolor)
         }

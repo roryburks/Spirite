@@ -5,6 +5,7 @@ import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.BoxList
 import spirite.gui.components.basic.IComponent
 import spirite.pc.gui.SwUtil
+import spirite.pc.gui.adaptMouseSystem
 import java.awt.GridLayout
 import java.awt.event.*
 import javax.swing.Action

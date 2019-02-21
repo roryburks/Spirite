@@ -21,6 +21,7 @@ import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ITimer
 import spirite.pc.graphics.ImageBI
+import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
 import java.awt.Graphics
@@ -185,7 +186,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
 private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationViewPanelImp()) : IComponent by SwComponent(imp) {
 
-    class AnimationViewPanelImp : JPanel() {
+    class AnimationViewPanelImp : SJPanel() {
         var context : AnimationPreviewView? = null
 
         override fun paintComponent(g: Graphics) {

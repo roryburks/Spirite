@@ -2,6 +2,7 @@ package spirite.pc.gui.basic
 
 import spirite.gui.Orientation
 import spirite.gui.components.basic.ISeparator
+import spirite.pc.gui.adaptMouseSystem
 import javax.swing.JSeparator
 import javax.swing.SwingConstants
 
@@ -14,4 +15,7 @@ private constructor(val imp : SwSeparatorImp) : ISeparator, ISwComponent by SwCo
         Orientation.HORIZONTAL -> SwingConstants.HORIZONTAL
         Orientation.VERTICAL -> SwingConstants.VERTICAL
     })
+    {
+        init {adaptMouseSystem()}
+    }
 }

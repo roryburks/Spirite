@@ -6,6 +6,7 @@ import spirite.gui.components.basic.ICheckBox
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IRadioButton
 import spirite.gui.resources.Skin
+import spirite.pc.gui.adaptMouseSystem
 import javax.swing.JCheckBox
 import javax.swing.JRadioButton
 
@@ -25,6 +26,7 @@ private constructor(val imp : SwCheckBoxImp)
 
     private class SwCheckBoxImp() : JCheckBox() {
         init {
+            adaptMouseSystem()
             background = Skin.Global.Bg.jcolor
         }
     }
@@ -49,6 +51,7 @@ private constructor(val imp : SwRadioButtonImp)
 
     private class SwRadioButtonImp(label: String , selected: Boolean) : JRadioButton(label, selected) {
         init {
+            adaptMouseSystem()
             background = Skin.Global.Bg.jcolor
         }
     }

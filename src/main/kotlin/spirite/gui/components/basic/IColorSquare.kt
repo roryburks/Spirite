@@ -4,6 +4,7 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import spirite.pc.gui.SColor
 import spirite.pc.gui.basic.ISwComponent
+import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
 import spirite.pc.gui.scolor
@@ -43,7 +44,7 @@ private constructor(
         colorBind.addObserver { new, _ -> imp.background = new.jcolor}
     }
 
-    private class SwColorSquareImp : JPanel() {
+    private class SwColorSquareImp : SJPanel() {
         var context :SwColorSquare? = null
 
         init {

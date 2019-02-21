@@ -6,6 +6,7 @@ import spirite.gui.components.basic.ITextArea
 import spirite.gui.resources.Skin.BevelBorder.Dark
 import spirite.gui.resources.Skin.BevelBorder.Light
 import spirite.gui.resources.Skin.TextField.Background
+import spirite.pc.gui.adaptMouseSystem
 import javax.swing.BorderFactory
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
@@ -43,11 +44,10 @@ private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComp
 
     private class SwTextAreaImp(val textArea :JTextArea = JTextArea()) : JScrollPane(textArea)
     {
-
         init {
+            adaptMouseSystem()
             textArea.background = Background.jcolor
             textArea.border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Light.jcolor, Dark.jcolor)
-
         }
     }
 }

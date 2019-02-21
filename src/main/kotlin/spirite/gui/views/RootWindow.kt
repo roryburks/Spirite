@@ -22,6 +22,7 @@ import spirite.gui.views.tool.ToolSection
 import spirite.gui.views.tool.ToolSettingsSection
 import spirite.gui.views.work.WorkTabPane
 import spirite.hybrid.Hybrid
+import spirite.hybrid.SwHybrid
 import spirite.pc.gui.basic.SwMenuBar
 import spirite.pc.gui.basic.jcomponent
 import spirite.pc.gui.menus.SwContextMenus
@@ -130,7 +131,8 @@ class RootWindow( val master: IMasterControl) : JFrame() {
             Hybrid.gle.runInGLContext {
                 when (evt.id) {
                     KeyEvent.KEY_PRESSED -> {
-                        if (evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = true
+                        if (evt.keyCode == KeyEvent.VK_SPACE)
+                            SwHybrid.keypressSystem.holdingSpace = true
                         val key = evt.keyCode
                         val modifier = evt.modifiersEx
 
@@ -138,7 +140,8 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                         command?.apply { master.commandExecutor.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }
                     }
                     KeyEvent.KEY_RELEASED -> {
-                        if (evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = false
+                        if (evt.keyCode == KeyEvent.VK_SPACE)
+                            SwHybrid.keypressSystem.holdingSpace = false
                     }
                 }
             }

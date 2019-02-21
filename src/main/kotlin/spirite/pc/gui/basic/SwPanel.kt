@@ -5,6 +5,7 @@ import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.resources.Skin.Global.Bg
+import spirite.pc.gui.adaptMouseSystem
 import java.awt.Graphics
 import javax.swing.JPanel
 
@@ -38,6 +39,7 @@ private constructor(val imp: SPanelImp)
         }
 
         init {
+            adaptMouseSystem()
             background = Bg.jcolor;
         }
     }

@@ -83,6 +83,7 @@ class MasterControl : IMasterControl {
     override val thumbnailStore: IThumbnailStore<IImage>
     override val nativeThumbnailStore: IThumbnailStore<NativeImage>
 
+
     init {
         val _thumbnailStore = ThumbnailStore(settingsManager, centralObservatory,workspaceSet)
         thumbnailStore = _thumbnailStore

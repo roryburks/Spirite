@@ -2,6 +2,7 @@ package spirite.pc.gui.basic
 
 import spirite.gui.components.basic.ILabel
 import spirite.gui.resources.Skin
+import spirite.pc.gui.adaptMouseSystem
 import java.awt.Color
 import java.awt.Font
 import javax.swing.JLabel
@@ -34,6 +35,7 @@ private constructor( val imp : SwLabelImp)
 
     private class SwLabelImp( text: String) : JLabel(text) {
         init {
+            adaptMouseSystem()
             foreground = Skin.Global.Text.jcolor
         }
     }
