@@ -101,6 +101,7 @@ Header
 ---- ANIM - Animation Data Chunk
 Per Animation:
 [n, UTF8 str] : Animation Name
+[4, Float] : Animation play speed
 [1, byte] : Animation Type ID:
     0x01 : FixedFrameAnimation
         [2, ushort] : Number of Layers

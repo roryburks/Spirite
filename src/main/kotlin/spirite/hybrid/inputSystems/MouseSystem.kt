@@ -28,13 +28,20 @@ interface IGlobalMouseHook
 
 class MouseSystem : IMouseSystem
 {
+    /***
+     * Note, the Mouse System has a weak reference to the Intermediate UI component with the expectation that
+     * the Intermediate UI component is integrated into the actual UI components life.
+     *
+     * If the drops out
+     */
+
     private inner class Contract
     constructor(
             val hook: IGlobalMouseHook,
             val component: WeakReference<IComponent>)
         : IContract
     {
-        lateinit var root : Any
+        var root : Any? = null
         init {_hooks.add(this)}
         override fun void() {_hooks.remove(this)}
     }
