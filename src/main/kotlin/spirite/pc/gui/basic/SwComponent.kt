@@ -179,7 +179,7 @@ abstract class ASwComponent : ISwComponent {
         }
     }
 
-    private val mouseMultiStack get() = MouseMultiStack()
+    private val mouseMultiStack by lazy { MouseMultiStack() }
 
     override val onMouseClick get() = mouseMultiStack.clickStack
     override val onMousePress get() = mouseMultiStack.pressStack

@@ -5,6 +5,9 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseEvent.MouseEventType.*
 import java.awt.Component
+import java.awt.Rectangle
+import java.lang.ref.WeakReference
+import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
 /**
@@ -28,7 +31,7 @@ class MouseSystem : IMouseSystem
     private inner class Contract
     constructor(
             val hook: IGlobalMouseHook,
-            val component: IComponent)
+            val component: WeakReference<IComponent>)
         : IContract
     {
         lateinit var root : Any
@@ -40,11 +43,19 @@ class MouseSystem : IMouseSystem
     private var _grabbedComponents : Set<Contract>? = null
 
     override fun broadcastMouseEvent(mouseEvent: MouseEvent, root: Any) {
+        _hooks.removeIf { it.component.get() == null }
+
         val overlappingComponents = _hooks.asSequence()
                 .filter { it.root == root }
-                .filter { mouseEvent.point.convert(it.component)
-                        .run { x >= 0 && x <= it.component.width && y >= 0 && y <= it.component.height }}
+                .filter {
+                    val component = it.component.get() ?: return@filter false
+                    val point = mouseEvent.point.convert(component)
+                    val visibleRect = (component.component as? JComponent)?.visibleRect ?:
+                            Rectangle(0,0, component.width, component.height)
+                    visibleRect.contains(point.x, point.y)
+                }
                 .toSet()
+
 
         val triggeringHooks = when(mouseEvent.type) {
             DRAGGED, RELEASED -> overlappingComponents.union(_grabbedComponents ?: emptySet())
@@ -63,7 +74,7 @@ class MouseSystem : IMouseSystem
     }
 
     override fun attachHook(hook: IGlobalMouseHook, component: IComponent) : IContract {
-        val contract = Contract(hook, component)
+        val contract = Contract(hook, WeakReference(component))
 
         SwingUtilities.invokeLater {
             contract.root = SwingUtilities.getRoot(component.component  as Component)

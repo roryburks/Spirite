@@ -11,10 +11,15 @@ import spirite.gui.components.advanced.IResizeContainerPanel.IResizeBar
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.components.basic.events.MouseEvent.MouseEventType.DRAGGED
+import spirite.gui.components.basic.events.MouseEvent.MouseEventType.PRESSED
 import spirite.gui.resources.Skin.ResizePanel.BarLineColor
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
+import spirite.hybrid.inputSystems.IGlobalMouseHook
 import spirite.pc.gui.basic.SwPanel
+import java.awt.Component
+import javax.swing.SwingUtilities
 import kotlin.reflect.KProperty
 
 interface IResizeContainerPanel : IComponent
@@ -129,11 +134,16 @@ private constructor(
                 .also{it.addObserver{ _, _ -> resetLayout() }}
         var componentVisible by componentVisibleBindable
 
-        init {
-            val tracker = ResizeBarTracker()
-            onMousePress += {tracker.onMousePress(it)}
-            onMouseDrag += {tracker.onMouseDrag(it)}
+        private val _tracker = ResizeBarTracker()
+        private val _mouseK = Hybrid.mouseSystem.attachHook(object: IGlobalMouseHook {
+            override fun processMouseEvent(evt: MouseEvent) {
+                if( evt.type == PRESSED) {_tracker.onMousePress(evt)}
+                if(evt.type == DRAGGED) {_tracker.onMouseDrag(evt)}
+            }
 
+        }, this)
+
+        init {
             val btnExpand =  Hybrid.ui.ToggleButton(true)
             btnExpand.plainStyle = true
             btnExpand.checkBind.bindTo(componentVisibleBindable)
