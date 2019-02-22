@@ -5,10 +5,7 @@ import rb.owl.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer
-import rb.vectrix.mathUtil.MathUtil
-import rb.vectrix.mathUtil.ceil
-import rb.vectrix.mathUtil.floor
-import rb.vectrix.mathUtil.round
+import rb.vectrix.mathUtil.*
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
@@ -34,6 +31,12 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = SwIcons.BigIcons.Frame_AnimationScheme
     override val name: String get() = "Animation Preview"
+
+
+    val offsetXBind = Bindable(0)
+    val offsetYBind = Bindable(0)
+    var offsetX by offsetXBind
+    var offsetY by offsetYBind
 
     private val viewPanel = AnimationViewPanel()
     private val btnPrev = Hybrid.ui.Button().also { it.setIcon(SwIcons.BigIcons.Anim_StepB) }
@@ -92,6 +95,11 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
 
     // region Bindings
+    init {
+        offsetXBind.addObserver { new, _ -> viewPanel.redraw() }
+        offsetYBind.addObserver { new, _ -> viewPanel.redraw() }
+    }
+
     private val _curAnimK = masterControl.centralObservatory.currentAnimationBind.addObserver { new, _ ->
         buildFromAnim(new)
         viewPanel.redraw()
@@ -122,11 +130,15 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     private var _fpsK : IContract? = null
     private var _zoomK : IContract? = null
     private var _metK : IContract? = null
+    private var _offsetXK : IContract? = null
+    private var _offsetYK : IContract? = null
 
     private fun unbind() {
         _fpsK?.void()
         _metK?.void()
         _zoomK?.void()
+        _offsetXK?.void()
+        _offsetYK?.void()
     }
 
     var i = 1.0f
@@ -136,6 +148,33 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         _fpsK = ffFps.valueBind.bindTo(anim.state.speedBind)
         _metK = metBind.bindTo(anim.state.metBind)
         _zoomK = ifZoom.valueBind.bindTo(anim.state.zoomBind)
+        _offsetXK = offsetXBind.bindTo(anim.state.offsetXBind)
+        _offsetYK = offsetYBind.bindTo(anim.state.offsetYBind)
+    }
+    // endregion
+
+    // region Mouse Controls
+    init {
+        var curX : Int? = null
+        var curY = 0
+        viewPanel.onMousePress += {
+            if( Hybrid.keypressSystem.holdingSpace) {
+                viewPanel.requestFocus()
+                curX = it.point.x
+                curY = it.point.y
+            }
+        }
+        viewPanel.onMouseDrag += {
+            val nowX = curX
+            if( nowX != null && Hybrid.keypressSystem.holdingSpace) {
+                offsetX -= ((it.point.x - nowX) * (animation?.state?.zoomF ?: 1f)).round
+                offsetY -= ((it.point.y - curY) * (animation?.state?.zoomF ?: 1f)).round
+                curX = it.point.x
+                curY = it.point.y
+            }
+            else curX = null
+        }
+        viewPanel.onMouseRelease += {curX = null}
     }
     // endregion
 
@@ -199,6 +238,7 @@ private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationView
                 val image = Hybrid.imageCreator.createImage(width, height)
                 val gc = image.graphics
                 gc.preScale(anim.state.zoomF, anim.state.zoomF)
+                gc.preTranslate(anim.state.offsetX.f, anim.state.offsetY.f)
 
                 anim.drawFrame(gc,anim.state.met)
 
