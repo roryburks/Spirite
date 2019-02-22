@@ -1,57 +1,43 @@
 package spirite.gui.views.animation.structureView
 
 import CrossLayout
+import rb.extendo.dataStructures.SinglySequence
 import rb.extendo.extensions.append
 import rb.extendo.extensions.lookup
+import rb.extendo.extensions.then
 import rb.jvm.owl.addWeakObserver
 import rb.owl.IContract
-import rb.vectrix.mathUtil.i
-import rb.vectrix.mathUtil.round
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
-import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.IFFALayer
 import spirite.base.imageData.animation.ffa.IFFAFrame
-import spirite.base.imageData.animation.ffa.FFALayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
 import spirite.base.util.linear.Rect
-import spirite.gui.Direction
-import spirite.gui.Direction.*
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.advanced.crossContainer.CrossRowInitializer
-import spirite.gui.components.basic.IButton
 import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
-import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
-import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.IScrollContainer
-import spirite.gui.components.basic.events.MouseEvent.MouseButton
-import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.resources.Skin
 import spirite.gui.resources.SwIcons
-import spirite.gui.views.animation.structureView.AnimDragStateManager.ResizingFrameBehavior
 import spirite.gui.views.animation.structureView.RememberedStates.RememberedState
+import spirite.gui.views.animation.structureView.ffa.FfaStructBuilderFactory
+import spirite.gui.views.animation.structureView.ffa.IFFAStructView
 import spirite.hybrid.Hybrid
-import spirite.pc.graphics.ImageBI
-import spirite.pc.gui.JColor
 import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
-import java.awt.image.BufferedImage
 import java.lang.ref.WeakReference
-import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
 
@@ -137,6 +123,38 @@ private constructor(
     }
 
     var stretchWidth = 0
+
+    private val _structBuilderFactory = FfaStructBuilderFactory(master)
+
+    private fun buildLayer(layer: IFFALayer) {
+        val builder = _structBuilderFactory.GetFactoryForFfaLayer(layer)
+
+        val nameView = builder.buildNameComponent(layer)
+
+        var met = anim.start
+        val end = anim.end
+
+        val frameMap = mutableListOf<Pair<IntRange,IFFAStructView>>()
+        while (met < end) {
+            val frame = layer.getFrameFromLocalMet(met, false)
+
+            if( frame == null)
+                met++
+            else {
+                val len = frame.length
+                if( len != 0) {
+                    val frameView = builder.buildFrameComponent(layer, frame)
+                    frameMap.add(Pair(IntRange(met,met+len), frameView))
+                }
+                met += len
+            }
+        }
+
+        val layerHeight = frameMap.asSequence().map { it.second.height }
+                .then(SinglySequence(nameView.height))
+                .max() ?: 0
+
+    }
 
     private fun buildLayerInfo(layer: IFFALayer) : Pair<Int,CrossRowInitializer.() -> Unit>{
         val state = RememberedStates.getState(layer)
@@ -325,30 +343,6 @@ private constructor(
         }
     }
 
-
-    private open inner class FrameResizeable(
-            private val _imp: IComponent,
-            private val _frame: IFFAFrame)
-    {
-        init {
-            _imp.markAsPassThrough()
-            _imp.onMouseMove += { evt ->
-                if (evt.point.x > _imp.width - 3)
-                    _imp.setBasicCursor(E_RESIZE)
-                else
-                    _imp.setBasicCursor(DEFAULT)
-            }
-            _imp.onMousePress += {evt ->
-                if (evt.point.x > _imp.width - 3) {
-                    dragStateManager.behavior = ResizingFrameBehavior(_frame, dragStateManager, viewspace)
-                    redraw()
-                }
-            }
-        }
-    }
-
-    // region SubPanels
-
     private inner class TickPanel( val tick: Int, private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         :ICrossPanel by imp
     {
@@ -359,125 +353,26 @@ private constructor(
         }
     }
 
-    private inner class GapPanel(
-            val frame: IFFAFrame,
-            private val imp : IComponent = SwComponent(DashedOutPanel(null, Skin.Global.Fg.jcolor)))
-        : FrameResizeable(imp,frame),IComponent by imp
-    {
-    }
-
-    private inner class BlankPanel() : IComponent by SwComponent(DashedOutPanel(null, Skin.Global.Bg.jcolor))
-    private inner class PseudoBlankPanel(
-            val frame: IFFAFrame,
-            private val imp : IComponent = SwComponent(DashedOutPanel(null, Skin.Global.Bg.jcolor)))
-        : FrameResizeable(imp,frame), IComponent by imp
-
-    private inner class LocalLoopPanel(
-            val frame: FFAFrame,
-            private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-        : FrameResizeable(imp,frame), IComponent by imp
-    {
-        init {
-            background = when(frame.loopDepth % 4) {
-                0 -> ColorARGB32Normal(0xffab93f2.i)
-                1 -> ColorARGB32Normal(0xff92c7f1.i)
-                2 ->ColorARGB32Normal(0xfff0c491.i)
-                else -> ColorARGB32Normal(0xffc1f2ab.i)
-            }
-
-            imp.setLayout { rows.add(Hybrid.ui.Label(frame.structure.node?.name ?: "")) }
-        }
-    }
-
-    private inner class FramePanel(
-            val frame: FFAFrame,
-            private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-        : FrameResizeable(imp,frame), IComponent by imp
-    {
-        val imageBox = Hybrid.ui.ImageBox(ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR)))
-        init {
-            imp.ref = this
-            imp.opaque = false
-            imp.setLayout {
-                cols.add(imageBox , width = tickWidth)
-
-                if( frame.length > 1) {
-                    cols.add(SwComponent(ArrowPanel(null, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.length-1))
-                }
-
-                cols.flex = 1f
-            }
-
-            imp.onMousePress += {evt ->
-                when(evt.button) {
-                    MouseButton.RIGHT -> {
-                        master.contextMenus.LaunchContextMenu(
-                                bottomRight,
-                                listOf(
-                                        MenuItem("Add Gap &Before", customAction = {frame.layer.addGapFrameAfter(frame.previous)}),
-                                        MenuItem("Add Gap &After", customAction = {frame.layer.addGapFrameAfter(frame)}),
-                                        MenuItem("Increase &Length", customAction = {frame.length += 1}) )
-                        )
-                    }
-                    MouseButton.LEFT -> {
-                        val tree = frame.layer.context.workspace.groupTree
-                        frame.node?.also { tree.selectedNode = it}
-                    }
-                }
-            }
-        }
-
-        val xyz = master.nativeThumbnailStore.contractThumbnail(frame.node!!, anim.workspace) {
-            imageBox.setImage(it)
-        }
-    }
-
-    private inner class SpritePartPanel(
-            val part: SpritePart,
-            val frame: FFAFrame,
-            private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-        :FrameResizeable(imp,frame), IComponent by imp
-    {
-        val imageBox = Hybrid.ui.ImageBox()
-        init {
-            imp.opaque = false
-            imp.ref = this
-            imp.setLayout {
-                cols.add(imageBox , width = tickWidth)
-
-                if( frame.length > 1) {
-                    cols.add(SwComponent(ArrowPanel(null, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.length-1))
-                }
-
-                cols.flex = 1f
-            }
-
-            imp.onMouseRelease += {evt ->
-                when( evt.button) {
-                    MouseButton.RIGHT -> {
-                        master.contextMenus.LaunchContextMenu(
-                                bottomRight,
-                                listOf(
-                                        MenuItem("Add Gap &Before", customAction = {frame.layer.addGapFrameAfter(frame.previous)}),
-                                        MenuItem("Add Gap &After", customAction = {frame.layer.addGapFrameAfter(frame)}),
-                                        MenuItem("Increase &Length", customAction = {frame.length += 1}) )
-                        )
-                    }
-                    MouseButton.LEFT -> {
-                        part.context.activePart = part
-                        val tree = part.context.workspace.groupTree
-                        frame.node?.also { tree.selectedNode = it}
-                    }
-                    else ->{}
-                }
-            }
-        }
-
-        val xyz = master.nativeThumbnailStore.contractThumbnail(part, anim.workspace) {
-            imageBox.setImage(it)
-        }
-    }
-    // endregion
+//    private open inner class FrameResizeable(
+//            private val _imp: IComponent,
+//            private val _frame: IFFAFrame)
+//    {
+//        init {
+//            _imp.markAsPassThrough()
+//            _imp.onMouseMove += { evt ->
+//                if (evt.point.x > _imp.width - 3)
+//                    _imp.setBasicCursor(E_RESIZE)
+//                else
+//                    _imp.setBasicCursor(DEFAULT)
+//            }
+//            _imp.onMousePress += {evt ->
+//                if (evt.point.x > _imp.width - 3) {
+//                    dragStateManager.behavior = ResizingFrameBehavior(_frame, dragStateManager, viewspace)
+//                    redraw()
+//                }
+//            }
+//        }
+//    }
 
     // region Listener/Observer Bindings
     private val _animationStructureObserverK = anim.workspace.animationManager.animationStructureChangeObservable.addWeakObserver(
@@ -622,57 +517,5 @@ private class AnimFFAStructPanelImp : SJPanel() {
     }
 }
 
-private class DashedOutPanel(val bgcol: JColor?, val fgcol: JColor) : JPanel() {
-    init {
-        background = null
-        isOpaque = false
-    }
 
-    override fun paintComponent(g: Graphics) {
-        if( bgcol != null) {
-            g.color = bgcol
-            g.fillRect(0, 0, width, height)
-        }
-
-        g.color = fgcol
-        (0.. (width + height)/4)
-                .forEach { g.drawLine(0, it*4, it*4, 0)}
-
-    }
-}
-private class ArrowPanel(val bgcol: JColor?, val fgcol: JColor, val dir: Direction) : SJPanel() {
-    init {
-        background = null
-        isOpaque = false
-    }
-    override fun paintComponent(g: Graphics) {
-        if( bgcol != null) {
-            g.color = bgcol
-            g.fillRect(0, 0, width, height)
-        }
-
-        g.color = fgcol
-
-        val w = width
-        val h = height
-
-        val logical_x = listOf( 0.05, 0.7, 0.7, 0.95, 0.7, 0.7, 0.05)
-        val logical_y = listOf( 0.35, 0.35, 0.15, 0.5, 0.85, 0.65, 0.65)
-
-        when( dir) {
-            UP -> g.fillPolygon(
-                    logical_y.map { w - (w * it).round }.toIntArray(),
-                    logical_x.map { h - (h* it).round }.toIntArray(), 7)
-            DOWN -> g.fillPolygon(
-                    logical_y.map { (w * it).round }.toIntArray(),
-                    logical_x.map { (h* it).round }.toIntArray(), 7)
-            LEFT -> g.fillPolygon(
-                    logical_x.map { w - (w * it).round }.toIntArray(),
-                    logical_y.map { h - (h* it).round }.toIntArray(), 7)
-            RIGHT -> g.fillPolygon(
-                    logical_x.map { (w * it).round }.toIntArray(),
-                    logical_y.map { (h* it).round }.toIntArray(), 7)
-        }
-    }
-}
 // endregion

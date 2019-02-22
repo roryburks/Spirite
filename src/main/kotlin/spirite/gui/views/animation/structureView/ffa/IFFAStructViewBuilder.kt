@@ -6,6 +6,7 @@ import spirite.base.imageData.animation.ffa.IFFALayer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.events.MouseEvent
 
+
 interface IAnimDragBehavior {
     fun intepretMouseEvent(evt: MouseEvent, terminationContrace : IContract)
 }
@@ -21,6 +22,6 @@ interface IFFAStructView {
 }
 
 interface IFFAStructViewBuilder {
-    fun buildMenuComponent(layer: IFFALayer) : IFFAStructView
+    fun buildNameComponent(layer: IFFALayer) : IFFAStructView
     fun buildFrameComponent(layer: IFFALayer, frame: IFFAFrame) : IFFAStructView
 }
