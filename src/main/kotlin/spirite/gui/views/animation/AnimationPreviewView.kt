@@ -96,8 +96,8 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
     // region Bindings
     init {
-        offsetXBind.addObserver { new, _ -> viewPanel.redraw() }
-        offsetYBind.addObserver { new, _ -> viewPanel.redraw() }
+        offsetXBind.addObserver { _, _ -> viewPanel.redraw() }
+        offsetYBind.addObserver { _, _ -> viewPanel.redraw() }
     }
 
     private val _curAnimK = masterControl.centralObservatory.currentAnimationBind.addObserver { new, _ ->

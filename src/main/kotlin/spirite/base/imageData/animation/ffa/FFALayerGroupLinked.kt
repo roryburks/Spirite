@@ -45,7 +45,7 @@ class FFALayerGroupLinked(
     }
 
     private fun constructFrameMap() : Map<Node,FFAFrameStructure> =
-        frames.mapNotNull {
+        _frames.mapNotNull {
             val node = it.node
             when(node) {
                 null -> null
@@ -72,7 +72,7 @@ class FFALayerGroupLinked(
         // Update this as needed
         fun frameIsUnlinked(frame : FFAFrame) = frame.marker == GAP
 
-        for( frame in frames) {
+        for( frame in _frames) {
             if(frameIsUnlinked(frame)) {
                 activeCluster = activeCluster ?: mutableListOf()
                 activeCluster.add(frame.structure)

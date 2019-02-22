@@ -11,8 +11,9 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
-import spirite.base.imageData.animation.ffa.FFALayer
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
+import spirite.base.imageData.animation.ffa.IFFALayer
+import spirite.base.imageData.animation.ffa.IFFAFrame
 import spirite.base.imageData.animation.ffa.FFALayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
@@ -58,14 +59,14 @@ private object RememberedStates {
     // Not sure if this is how I want to do this, but I'm fine with it for now.
     data class RememberedState(val expanded: Boolean = false)
 
-    private val map = mutableMapOf<Int,Pair<WeakReference<FFALayer>,RememberedState>>()
+    private val map = mutableMapOf<Int,Pair<WeakReference<IFFALayer>,RememberedState>>()
 
-    fun setState( layer: FFALayer, state: RememberedState)
+    fun setState( layer: IFFALayer, state: RememberedState)
     {
         map.values.removeIf { it.first.get() == null }
         map[layer.hashCode()] = Pair(WeakReference(layer), state)
     }
-    fun getState( layer: FFALayer) : RememberedState?
+    fun getState( layer: IFFALayer) : RememberedState?
     {
         map.values.removeIf { it.first.get() == null }
         val maybeMatch = map[layer.hashCode()] ?: return null
@@ -109,7 +110,7 @@ private constructor(
         frameLinks.clear()
         partLinks.clear()
 
-        val viewMap = mutableMapOf<FFALayer,IntRange>()
+        val viewMap = mutableMapOf<IFFALayer,IntRange>()
         var wy = 0
 
         imp.setLayout {
@@ -137,10 +138,10 @@ private constructor(
 
     var stretchWidth = 0
 
-    private fun buildLayerInfo(layer: FFALayer) : Pair<Int,CrossRowInitializer.() -> Unit>{
+    private fun buildLayerInfo(layer: IFFALayer) : Pair<Int,CrossRowInitializer.() -> Unit>{
         val state = RememberedStates.getState(layer)
         val distinctNames = layer.frames.flatMap {frame ->
-            ((frame.node as? LayerNode)?.layer as? SpriteLayer)?.parts?.map { it.partName } ?: listOf<String?>(null)
+            ((frame.structure.node as? LayerNode)?.layer as? SpriteLayer)?.parts?.map { it.partName } ?: listOf<String?>(null)
         }.distinct()
         val distinctCount = distinctNames.count()
         val expandable = distinctCount > 1
@@ -150,7 +151,7 @@ private constructor(
                 .map { it.loopDepth }
                 .max() ?: 0
 
-        fun defaultBuild(layer: FFALayer) : CrossRowInitializer.() -> Unit = {
+        fun defaultBuild(layer: IFFALayer) : CrossRowInitializer.() -> Unit = {
 
             // Label
             if(expandable)addFlatGroup(nameWidth-12) {
@@ -234,7 +235,7 @@ private constructor(
             height = layerHeight + squishedNameHeight*(maxSubLoopDepth)
         }
 
-        fun expandedBuild(layer: FFALayer) : CrossRowInitializer.()-> Unit = {
+        fun expandedBuild(layer: IFFALayer) : CrossRowInitializer.()-> Unit = {
             this.addFlatGroup(nameWidth-12) {
                 val expandButton = Hybrid.ui.Button()
                 expandButton.background = Colors.TRANSPARENT
@@ -266,10 +267,10 @@ private constructor(
                         if (frame.length > 0) {
                             this += {
                                 val topBar = FramePanel(frame)
-                                frame.node?.also { frameLinks.append(it, topBar)}
+                                frame.structure.node?.also { frameLinks.append(it, topBar)}
                                 add( topBar, height = squishedNameHeight)
 
-                                val lnLayer = (frame.node as? LayerNode)?.layer
+                                val lnLayer = (frame.structure.node as? LayerNode)?.layer
                                 distinctNames.forEach {name ->
                                     add( when(lnLayer) {
                                         null -> BlankPanel()
@@ -287,7 +288,7 @@ private constructor(
                                         else -> when( name) {
                                             null -> {
                                                 val comp = FramePanel(frame)
-                                                frame.node?.also { frameLinks.append(it, comp)}
+                                                frame.structure.node?.also { frameLinks.append(it, comp)}
                                                 comp
                                             }
                                             else -> BlankPanel()
@@ -327,7 +328,7 @@ private constructor(
 
     private open inner class FrameResizeable(
             private val _imp: IComponent,
-            private val _frame: FFAFrame)
+            private val _frame: IFFAFrame)
     {
         init {
             _imp.markAsPassThrough()
@@ -347,49 +348,6 @@ private constructor(
     }
 
     // region SubPanels
-    private inner class NamePanel(val layer: FFALayer, private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-        : IComponent by imp
-    {
-        init {
-            imp.setBasicBorder(BEVELED_LOWERED)
-
-            val label = Hybrid.ui.EditableLabel("layer")
-            if( layer is FFALayerLexical) {
-                imp.setLayout {
-                    rows.add(label)
-                    rows.add(LexiconButton(layer))
-                }
-            }
-            else {
-                imp.setLayout { rows.add(label) }
-            }
-            imp.onMouseRelease += { label.requestFocus() }
-        }
-
-    }
-    private inner class LexiconButton(val layer: FFALayerLexical, private val imp: IButton = Hybrid.ui.Button("Lexicon"))
-        : IComponent by imp
-    {
-        init {
-            imp.onMouseClick += {redoLexicon()}
-        }
-
-        fun redoLexicon() {
-            val lexicon = master.dialog.promptForString("Enter new Lexicon:",layer.lexicon) ?: return
-            layer.lexicon = lexicon
-        }
-    }
-
-    private inner class SubNamePanel(val title: String, private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-        : IComponent by imp
-    {
-        init {
-            imp.setBasicBorder(BEVELED_LOWERED)
-            val label = Hybrid.ui.EditableLabel(title)
-            imp.setLayout { rows.add(label) }
-            imp.onMouseRelease += {label.requestFocus()}
-        }
-    }
 
     private inner class TickPanel( val tick: Int, private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         :ICrossPanel by imp
@@ -402,7 +360,7 @@ private constructor(
     }
 
     private inner class GapPanel(
-            val frame: FFAFrame,
+            val frame: IFFAFrame,
             private val imp : IComponent = SwComponent(DashedOutPanel(null, Skin.Global.Fg.jcolor)))
         : FrameResizeable(imp,frame),IComponent by imp
     {
@@ -410,7 +368,7 @@ private constructor(
 
     private inner class BlankPanel() : IComponent by SwComponent(DashedOutPanel(null, Skin.Global.Bg.jcolor))
     private inner class PseudoBlankPanel(
-            val frame: FFAFrame,
+            val frame: IFFAFrame,
             private val imp : IComponent = SwComponent(DashedOutPanel(null, Skin.Global.Bg.jcolor)))
         : FrameResizeable(imp,frame), IComponent by imp
 
@@ -427,7 +385,7 @@ private constructor(
                 else -> ColorARGB32Normal(0xffc1f2ab.i)
             }
 
-            imp.setLayout { rows.add(Hybrid.ui.Label(frame.node?.name ?: "")) }
+            imp.setLayout { rows.add(Hybrid.ui.Label(frame.structure.node?.name ?: "")) }
         }
     }
 
@@ -577,10 +535,10 @@ data class FFAStructPanelViewspace(
         val leftJustification: Int,
         val topJustification: Int,
         val tickWidth: Int,
-        val layerHeights: Map<FFALayer,IntRange>,
+        val layerHeights: Map<IFFALayer,IntRange>,
         val naturalWidth: Int)
 {
-    fun rectForRangeInLayer( layer: FFALayer, range: IntRange) : Rect
+    fun rectForRangeInLayer( layer: IFFALayer, range: IntRange) : Rect
     {
         val heightRange = layerHeights[layer]
         return Rect(
@@ -602,7 +560,7 @@ internal class AnimDragStateManager(val context: AnimFFAStructPanel)
 
 
     class ResizingFrameBehavior(
-            val frame: FFAFrame,
+            val frame: IFFAFrame,
             val context: AnimDragStateManager,
             val viewspace: FFAStructPanelViewspace)
         : IAnimStateBehavior

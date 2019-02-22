@@ -1,7 +1,7 @@
 package spirite.base.imageData.animation.ffa
 
 interface IFFAFrame {
-    val context: IFFALayer
+    val layer: IFFALayer
 
     val start: Int
     val end: Int
@@ -15,5 +15,12 @@ interface IFFAFrame {
 }
 
 interface IFFALayer {
+    val start: Int
+    val end: Int
+
+    var asynchronous : Boolean
+
     val frames: List<IFFAFrame>
+
+    fun getFrameFromLocalMet(met : Int, loop: Boolean = true) : IFFAFrame?
 }

@@ -16,12 +16,12 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     constructor(name: String, workspace: IImageWorkspace, node : GroupNode) : this(name, workspace){
         addLinkedLayer(node, true)
     }
-    constructor(name: String, workspace: IImageWorkspace, layers: List<FFALayer>) : this(name, workspace){
+    constructor(name: String, workspace: IImageWorkspace, layers: List<IFFALayer>) : this(name, workspace){
         _layers.addAll(layers)
     }
 
-    private val _layers = mutableListOf<FFALayer>()
-    val layers : List<FFALayer> get() = _layers
+    private val _layers = mutableListOf<IFFALayer>()
+    val layers : List<IFFALayer> get() = _layers
 
     val start : Int get() = _layers.map { it.start }.min() ?: 0
     val end : Int get() = _layers.map { it.end }.max() ?: 0
@@ -37,7 +37,7 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
                 .filter { it.frames.any() }
                 .map { layer ->
                     val localMet = if( layer.asynchronous) MathUtil.cycle(layer.start, layer.end, _t) else met
-                    layer.getFramFromLocalMet(localMet)?.node }
+                    layer.getFrameFromLocalMet(localMet)?.structure?.node }
                 .filterIsInstance<LayerNode>()
                 .forEach { drawList.addAll(it.getDrawList()) }
 
@@ -69,11 +69,11 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
                 .forEach { it.groupLinkUpdated() }
     }
 
-    internal fun triggerFFAChange( layer: FFALayer?) {
+    internal fun triggerFFAChange( layer: IFFALayer?) {
         triggerStructureChange()
     }
 
-    fun removeLayer( layer: FFALayer) {
+    fun removeLayer( layer: IFFALayer) {
         _layers.remove(layer)
     }
 

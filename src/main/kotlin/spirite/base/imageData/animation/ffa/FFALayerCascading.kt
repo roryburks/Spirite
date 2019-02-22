@@ -7,20 +7,19 @@ class FFALayerCascading(
         context: FixedFrameAnimation,
         val groupLink: GroupNode,
         lexicon: String = "")
-    :FFALayer(context), IFFALayerLinked
+    :IFFALayer
 {
-    override fun groupLinkUpdated() {
+    override val start: Int
+        get() = TODO("not implemented")
+    override val end: Int
+        get() = TODO("not implemented")
+    override var asynchronous: Boolean
+        get() = TODO("not implemented")
+        set(value) {}
+    override val frames: List<IFFAFrame>
+        get() = TODO("not implemented")
+
+    override fun getFrameFromLocalMet(met: Int, loop: Boolean): IFFAFrame? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-    override fun shouldUpdate(contract: FFAUpdateContract) = contract.changedNodes.contains(groupLink)
-
-    override fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun addGapFrameAfter(frameBefore: FFAFrame?, gapLength: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
 }

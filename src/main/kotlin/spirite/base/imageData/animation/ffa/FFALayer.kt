@@ -14,14 +14,16 @@ interface IFFALayerLinked {
     fun shouldUpdate(contract: FFAUpdateContract) : Boolean
 }
 
-abstract class FFALayer( internal val context : FixedFrameAnimation) {
+abstract class FFALayer( internal val context : FixedFrameAnimation)
+    :IFFALayer
+{
     private val undoEngine get() = context.workspace.undoEngine
 
     abstract fun moveFrame( frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean)
     abstract fun addGapFrameAfter( frameBefore: FFAFrame?, gapLength: Int = 1)
 
-    val start = 0
-    val end : Int get() {
+    override val start = 0
+    override val end : Int get() {
         var caret = 0
         var i=0
         while( i < _frames.size) {
@@ -38,13 +40,13 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
         return caret
     }
 
-    var asynchronous by UndoableChangeDelegate(false, context.workspace.undoEngine,
+    override var asynchronous by UndoableChangeDelegate(false, context.workspace.undoEngine,
             "Toggled Frame Layer Asynchronousness", {context.triggerFFAChange(this)})
 
     protected val _frames = mutableListOf<FFAFrame>()
-    val frames : List<FFAFrame> get() = _frames
+    override val frames : List<IFFAFrame> get() = _frames
 
-    fun getFramFromLocalMet( met: Int, loop: Boolean = true) : FFAFrame? {
+    override fun getFrameFromLocalMet(met: Int, loop: Boolean) : FFAFrame? {
         if( !_frames.any())
             return null
 
@@ -83,14 +85,13 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
         return  _sub(0, met)
     }
 
-    inner class FFAFrame(
-            //val layer: IFFALayer,
-            structure: FFAFrameStructure)
+    inner class FFAFrame(structure: FFAFrameStructure)
+        :IFFAFrame
     {
         // region Calculations
-        val layer get() = this@FFALayer
+        override val layer get() = this@FFALayer
 
-        val start: Int get() {
+        override val start: Int get() {
             val carets = mutableListOf(0)
             _frames.forEach {
                 if( it == this)
@@ -105,7 +106,7 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
             }
             return Integer.MIN_VALUE
         }
-        val end get() = start + length
+        override val end get() = start + length
 
         val loopDepth: Int get() {
             var depth = 0
@@ -119,17 +120,17 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
             return 0
         }
 
-        val next: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) + 1)
-        val previous: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) - 1)
+        override val next: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) + 1)
+        override val previous: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) - 1)
 
         // endregion
 
         // region Structure
-        var structure = structure ; internal  set
+        override var structure = structure ; internal  set
 
         val node get() = structure.node
         val marker get() = structure.marker
-        var length get() = structure.length
+        override var length get() = structure.length
             set(value) { undoEngine.performAndStore(FFAStructureChangeAction(structure.copy(length = value),"Changed Frame Length"))}
 
         private inner class FFAStructureChangeAction(
