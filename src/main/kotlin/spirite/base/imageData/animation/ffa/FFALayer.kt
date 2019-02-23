@@ -1,11 +1,13 @@
 package spirite.base.imageData.animation.ffa
 
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
+import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.undo.NullAction
 import spirite.base.util.delegates.UndoableChangeDelegate
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+
 
 interface IFFALayerLinked {
     fun groupLinkUpdated()
@@ -81,7 +83,9 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
         return  _sub(0, met)
     }
 
-    inner class FFAFrame(structure: FFAFrameStructure)
+    inner class FFAFrame(
+            //val layer: IFFALayer,
+            structure: FFAFrameStructure)
     {
         // region Calculations
         val layer get() = this@FFALayer

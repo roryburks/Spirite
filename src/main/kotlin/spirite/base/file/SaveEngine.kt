@@ -316,7 +316,7 @@ object SaveEngine {
                                             END_LOCAL_LOOP -> null
                                         } ?: continue
                                         ra.writeByte(type)
-                                        ra.writeInt(context.nodeMap[frame.node] ?: -1 ) // [4] : NodeId
+                                        ra.writeInt(context.nodeMap[frame.structure.node] ?: -1 ) // [4] : NodeId
                                         ra.writeShort(frame.length)    // [2]: Length
                                     }
                                 }
