@@ -31,7 +31,7 @@ class MouseSystem : IMouseSystem
             val component: IComponent)
         : IContract
     {
-        lateinit var root : Any
+        var root : Any? = null
         init {_hooks.add(this)}
         override fun void() {_hooks.remove(this)}
     }

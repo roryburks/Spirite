@@ -98,7 +98,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
     val groupView = GroupView(master)
 
     private val omni = OmniContainer {
-        left += OmniSegment(groupView, 100, 150)
+        left += OmniSegment(groupView, 100, 300)
         center = SubContainer(200,200) {
             center = OmniSegment(workTabPane, 200)
             bottom += OmniSegment(AnimationStructureView(master), 100, 200, false)
