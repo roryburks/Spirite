@@ -76,7 +76,7 @@ class SpriteLayer : Layer {
     private var workingId = 0
 
     var activePartBind = Bindable<SpritePart?>(null)
-            .also { it.addObserver { new, _ ->
+            .also { it.addObserver(false) { new, _ ->
                 cAlphaBind.field = new?.alpha ?: 1f
                 cDepthBind.field = new?.depth ?: 0
                 cVisibleBind.field = new?.visible ?: true
