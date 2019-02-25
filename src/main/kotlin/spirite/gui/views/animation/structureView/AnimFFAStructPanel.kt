@@ -104,10 +104,10 @@ private constructor(
             val end = anim.end
 
             anim.layers.forEach {layer ->
-                val built = buildLayerInfo(layer)
-                rows += buildLayerInfo(layer).second
-                viewMap[layer] = IntRange(wy, wy+built.first)
-                wy += built.first
+                val built = buildLayer(layer, nameWidth, tickWidth)
+                rows += built.layout
+                viewMap[layer] = IntRange(wy, wy+built.height)
+                wy += built.height
             }
 
             // Bottom Justification
@@ -126,7 +126,22 @@ private constructor(
 
     private val _structBuilderFactory = FfaStructBuilderFactory(master)
 
-    private fun buildLayer(layer: IFFALayer) {
+    private data class FrameLinkSet(
+            val range: IntRange,
+            val frame: IFFAFrame,
+            val view: IFFAStructView)
+
+    private data class LayerBuildSet(
+            val height: Int,
+            val layout: CrossRowInitializer.() -> Unit,
+            val frameData: List<FrameLinkSet>)
+
+    private fun buildLayer(
+            layer: IFFALayer,
+            nameWidth: Int,
+            tickWidth: Int)
+            : LayerBuildSet
+    {
         val builder = _structBuilderFactory.GetFactoryForFfaLayer(layer)
 
         val nameView = builder.buildNameComponent(layer)
@@ -134,7 +149,7 @@ private constructor(
         var met = anim.start
         val end = anim.end
 
-        val frameMap = mutableListOf<Pair<IntRange,IFFAStructView>>()
+        val frameMap = mutableListOf<FrameLinkSet>()
         while (met < end) {
             val frame = layer.getFrameFromLocalMet(met, false)
 
@@ -144,203 +159,27 @@ private constructor(
                 val len = frame.length
                 if( len != 0) {
                     val frameView = builder.buildFrameComponent(layer, frame)
-                    frameMap.add(Pair(IntRange(met,met+len), frameView))
+                    frameMap.add(FrameLinkSet(IntRange(met, met+len), frame, frameView))
                 }
                 met += len
             }
         }
 
-        val layerHeight = frameMap.asSequence().map { it.second.height }
+        val layerHeight = frameMap.asSequence().map { it.view.height }
                 .then(SinglySequence(nameView.height))
                 .max() ?: 0
 
-    }
+        val initializer : CrossRowInitializer.() -> Unit = {
+            add(nameView.component, width = nameWidth, height = nameView.height)
+            frameMap.forEach { add(it.view.component, width = tickWidth * (it.range.last - it.range.first), height = it.view.height) }
 
-    private fun buildLayerInfo(layer: IFFALayer) : Pair<Int,CrossRowInitializer.() -> Unit>{
-        val state = RememberedStates.getState(layer)
-        val distinctNames = layer.frames.flatMap {frame ->
-            ((frame.structure.node as? LayerNode)?.layer as? SpriteLayer)?.parts?.map { it.partName } ?: listOf<String?>(null)
-        }.distinct()
-        val distinctCount = distinctNames.count()
-        val expandable = distinctCount > 1
-
-        val maxSubLoopDepth = layer.frames
-                .filter { it.marker == START_LOCAL_LOOP && it.length > 0 }
-                .map { it.loopDepth }
-                .max() ?: 0
-
-        fun defaultBuild(layer: IFFALayer) : CrossRowInitializer.() -> Unit = {
-
-            // Label
-            if(expandable)addFlatGroup(nameWidth-12) {
-                val expandButton = Hybrid.ui.Button()
-                expandButton.background = Colors.TRANSPARENT
-                expandButton.opaque = false
-                expandButton.setBasicBorder(null)
-                expandButton.setIcon(SwIcons.SmallIcons.Rig_New)
-                expandButton.action = {
-                    RememberedStates.setState(layer, RememberedState(true))
-                    rebuild()
-                }
-                add(expandButton,12,12)
-            }
-            add(NamePanel(layer), width = nameWidth )
-
-            // Frames
-            val frames = layer.frames.toList()
-            fun subBuildFrame( start: Int, length: Int, context: CrossRowInitializer) : Int
-            {
-                var index = start
-                var caret = 0
-                var localLength = 0
-
-                while (index < frames.size) {
-                    val frame = frames[index++]
-                    val effectiveLen = min(frame.length, length-caret)
-                    caret += frame.length
-                    localLength += frame.length
-
-
-                    when( frame.marker) {
-                        FRAME -> {
-                            if (frame.length > 0) {
-                                val component = FramePanel(frame)
-                                frame.node?.also { frameLinks.append(it, component)}
-                                context.add(component, width = tickWidth * effectiveLen, height = layerHeight)
-                            }
-                        }
-                        GAP -> {
-                            val component = GapPanel(frame)
-                            frame.node?.also { frameLinks.append(it, component)}
-                            context.add(component, width = tickWidth * effectiveLen, height = layerHeight)
-                        }
-                        START_LOCAL_LOOP -> {
-                            context.add(Hybrid.ui.CrossPanel {
-                                rows.add(LocalLoopPanel(frame), width = tickWidth*effectiveLen, height = squishedNameHeight)
-
-                                rows += {
-                                    if (frame.length != 0)
-                                        subBuildFrame(index, effectiveLen, this)
-                                    height = layerHeight + squishedNameHeight * (maxSubLoopDepth - frame.loopDepth)
-                                }
-                            }.also { it.markAsPassThrough() })
-                            var inll = 1
-                            while( inll > 0) when(frames[index++].marker) {
-                                END_LOCAL_LOOP -> inll--
-                                START_LOCAL_LOOP -> inll++
-                            }
-                        }
-                        END_LOCAL_LOOP -> {
-                            return caret
-                            //if( localLength == 0) return caret
-                            //index = start
-                        }
-                    }
-
-                    if( caret == length) return caret
-                }
-
-                return caret
-            }
-
-
-            val end = anim.end
-            val caret = subBuildFrame(0, end, this)
-            if( caret < end - 1) {
-                add(BlankPanel(), width = (end - caret) * tickWidth)
-            }
-
-            height = layerHeight + squishedNameHeight*(maxSubLoopDepth)
+            height = layerHeight
         }
 
-        fun expandedBuild(layer: IFFALayer) : CrossRowInitializer.()-> Unit = {
-            this.addFlatGroup(nameWidth-12) {
-                val expandButton = Hybrid.ui.Button()
-                expandButton.background = Colors.TRANSPARENT
-                expandButton.opaque = false
-                expandButton.setBasicBorder(null)
-                expandButton.setIcon(SwIcons.SmallIcons.Rig_Remove)
-                expandButton.action = {
-                    RememberedStates.setState(layer, RememberedState(false))
-                    rebuild()
-                }
-                add(expandButton,12,12)
-            }
-
-            // Labels
-            this += {
-                add(NamePanel(layer), width = nameWidth, height = squishedNameHeight)
-                distinctNames.forEach {
-                    add(SubNamePanel(it?:"<base>"), width = nameWidth, height = layerHeight)
-                }
-                width = nameWidth
-            }
-            var len = 0
-
-            // Frame Content
-            for( frame in layer.frames) {
-                len += frame.length
-                when( frame.marker) {
-                    FRAME -> {
-                        if (frame.length > 0) {
-                            this += {
-                                val topBar = FramePanel(frame)
-                                frame.structure.node?.also { frameLinks.append(it, topBar)}
-                                add( topBar, height = squishedNameHeight)
-
-                                val lnLayer = (frame.structure.node as? LayerNode)?.layer
-                                distinctNames.forEach {name ->
-                                    add( when(lnLayer) {
-                                        null -> BlankPanel()
-                                        is SpriteLayer -> {
-                                            val part = lnLayer.parts.firstOrNull() { it.partName == name }
-                                            when( part) {
-                                                null -> BlankPanel()
-                                                else -> {
-                                                    val comp = SpritePartPanel(part, frame)
-                                                    partLinks.append(part, comp)
-                                                    comp
-                                                }
-                                            }
-                                        }
-                                        else -> when( name) {
-                                            null -> {
-                                                val comp = FramePanel(frame)
-                                                frame.structure.node?.also { frameLinks.append(it, comp)}
-                                                comp
-                                            }
-                                            else -> BlankPanel()
-                                        }
-                                    }, height = layerHeight)
-                                }
-
-                                width = tickWidth * frame.length
-                            }
-                        }
-                    }
-                    GAP -> {
-                        this += {
-                            add(GapPanel(frame), height = squishedNameHeight)
-                            distinctNames.forEach { add(GapPanel(frame), height = layerHeight) }
-                            width = tickWidth * frame.length
-                        }
-                    }
-                    START_LOCAL_LOOP -> {}
-                    END_LOCAL_LOOP -> {}
-                }
-            }
-
-            val end = anim.end
-            if( len < end) {
-                add(BlankPanel(), width = (end - len) * tickWidth)
-            }
-        }
-
-
-        return when {
-            state == null || !state.expanded || !expandable -> Pair(layerHeight, defaultBuild(layer))
-            else -> Pair(squishedNameHeight + layerHeight * distinctCount, expandedBuild(layer))
-        }
+        return LayerBuildSet(
+                layerHeight,
+                initializer,
+                frameMap)
     }
 
     private inner class TickPanel( val tick: Int, private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
@@ -352,27 +191,6 @@ private constructor(
             }
         }
     }
-
-//    private open inner class FrameResizeable(
-//            private val _imp: IComponent,
-//            private val _frame: IFFAFrame)
-//    {
-//        init {
-//            _imp.markAsPassThrough()
-//            _imp.onMouseMove += { evt ->
-//                if (evt.point.x > _imp.width - 3)
-//                    _imp.setBasicCursor(E_RESIZE)
-//                else
-//                    _imp.setBasicCursor(DEFAULT)
-//            }
-//            _imp.onMousePress += {evt ->
-//                if (evt.point.x > _imp.width - 3) {
-//                    dragStateManager.behavior = ResizingFrameBehavior(_frame, dragStateManager, viewspace)
-//                    redraw()
-//                }
-//            }
-//        }
-//    }
 
     // region Listener/Observer Bindings
     private val _animationStructureObserverK = anim.workspace.animationManager.animationStructureChangeObservable.addWeakObserver(
