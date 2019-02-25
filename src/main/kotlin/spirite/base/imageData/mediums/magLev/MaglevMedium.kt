@@ -1,8 +1,6 @@
 package spirite.base.imageData.mediums.magLev
 
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.ImmutableTransformF
-import rb.vectrix.linear.Vec2f
+import rb.vectrix.linear.*
 import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
@@ -19,7 +17,7 @@ import spirite.base.util.Colors
 import spirite.pc.gui.SColor
 
 interface IMaglevThing {
-    fun transformPoints( lambda: (Vec2f)->(Vec2f))
+    fun transformPoints( lambda: (Vec3f)->(Vec3f))
     fun dupe() : IMaglevThing
     fun draw(built: BuiltMediumData)
 }
@@ -51,7 +49,7 @@ private constructor(
         })
     }
 
-    internal fun applyTrasformation( arranged: ArrangedMediumData, description: String, lambda: (Vec2f) -> Vec2f) {
+    internal fun applyTrasformation( arranged: ArrangedMediumData, description: String, lambda: (Vec3f) -> Vec3f) {
         things.forEach { it.transformPoints(lambda) }
 
         arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged) {

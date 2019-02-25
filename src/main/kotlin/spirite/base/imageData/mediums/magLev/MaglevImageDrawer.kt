@@ -2,6 +2,8 @@ package spirite.base.imageData.mediums.magLev
 
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.linear.Vec3f
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
@@ -68,11 +70,24 @@ class MaglevTransformModule(
 {
     val workspace get() = arranged.handle.workspace
 
+    // Note: Code mostly duplicated from DefaultImageDrawer
+
     override fun transform(trans: ITransformF) {
-        maglev.applyTrasformation(arranged, "Transform Maglev Layer") {trans.apply(it)}
+        val rect = arranged.handle.run { Rect(x,y,width, height) }
+
+        val cx = rect.x + rect.width /2f
+        val cy = rect.y + rect.height /2f
+
+        val effectiveTrans = ImmutableTransformF.Translation(cx,cy) * trans * ImmutableTransformF.Translation(-cx,-cy)
+
+        val det = effectiveTrans.determinantF * 0.8f + 0.2f
+
+        maglev.applyTrasformation(arranged, "Transform Maglev Layer") {
+            val vec2 = effectiveTrans.apply(Vec2f(it.xf, it.yf))
+            Vec3f(vec2.xf, vec2.yf, it.zf * det)
+        }
     }
 
-    // Note: Code mostly duplicated from DefaultImageDrawer
     override fun startManipulatingTransform(): Rect? {
         val tool = workspace.toolset.Reshape
 
