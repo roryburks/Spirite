@@ -12,6 +12,8 @@ import spirite.gui.components.basic.events.MouseEvent.MouseEventType
 import spirite.gui.components.basic.events.MouseEvent.MouseEventType.*
 import spirite.gui.components.basic.events.MouseWheelEvent
 import spirite.gui.resources.Skin
+import spirite.hybrid.Hybrid
+import spirite.hybrid.inputSystems.IGlobalMouseHook
 import spirite.pc.gui.SColor
 import spirite.pc.gui.jcolor
 import spirite.pc.gui.scolor
@@ -116,31 +118,25 @@ abstract class ASwComponent : ISwComponent {
     // endregion
 
     // region MouseListener
-    private inner class MouseMultiStack : java.awt.event.MouseListener, java.awt.event.MouseMotionListener
+    private inner class MouseMultiStack : IGlobalMouseHook
     {
         init {
-            component.addMouseListener(this)
-            component.addMouseMotionListener(this)
+            Hybrid.mouseSystem.attachHook(this, this@ASwComponent)
         }
 
-        fun convert( e: JMouseEvent, type: MouseEventType) : MouseEvent {
-            val scomp = SwComponent(e.component as Component)
-            val smask = e.modifiersEx
-            val mask = MouseEvent.toMask(
-                    (smask and SHIFT_DOWN_MASK) == SHIFT_DOWN_MASK,
-                    (smask and CTRL_DOWN_MASK) == CTRL_DOWN_MASK,
-                    (smask and ALT_DOWN_MASK) == ALT_DOWN_MASK)
-
-            return MouseEvent(
-                    SUIPoint(e.x, e.y, scomp.component),
-                    when (e.button) {
-                        JMouseEvent.BUTTON1 -> LEFT
-                        JMouseEvent.BUTTON2 -> CENTER
-                        JMouseEvent.BUTTON3 -> RIGHT
-                        else -> UNKNOWN
-                    },
-                    mask,
-                    type)
+        override fun processMouseEvent(evt: MouseEvent) {
+            when(evt.type) {
+                PRESSED ->  pressStack.triggers.forEach { it(evt) }
+                RELEASED -> {
+                    releaseStack.triggers.forEach { it(evt) }
+                    clickStack.triggers.forEach {it(evt)}
+                }
+                CLICKED -> {}
+                ENTERED -> enterStack.triggers.forEach { it(evt) }
+                EXITED -> exitStack.triggers.forEach { it(evt) }
+                MOVED -> moveStack.triggers.forEach { it(evt) }
+                DRAGGED -> dragStack.triggers.forEach { it(evt) }
+            }
         }
 
         val releaseStack = EventStack<MouseEvent>()
@@ -150,33 +146,6 @@ abstract class ASwComponent : ISwComponent {
         val pressStack = EventStack<MouseEvent>()
         val moveStack = EventStack<MouseEvent>()
         val dragStack = EventStack<MouseEvent>()
-
-        override fun mouseReleased(e: JMouseEvent) {
-            val evt = convert(e, RELEASED)
-            releaseStack.triggers.forEach { it(evt) }
-            clickStack.triggers.forEach { it(evt) }
-        }
-        override fun mouseEntered(e: JMouseEvent) {
-            val evt = convert(e, ENTERED)
-            enterStack.triggers.forEach { it(evt) }
-        }
-        override fun mouseClicked(e: JMouseEvent) {/*onMouseClick?.invoke(convert(e))*/}
-        override fun mouseExited(e: JMouseEvent) {
-            val evt = convert(e, EXITED)
-            exitStack.triggers.forEach { it(evt) }
-        }
-        override fun mousePressed(e: JMouseEvent) {
-            val evt = convert(e, PRESSED)
-            pressStack.triggers.forEach { it(evt) }
-        }
-        override fun mouseMoved(e: JMouseEvent) {
-            val evt = convert(e, MOVED)
-            moveStack.triggers.forEach { it(evt) }
-        }
-        override fun mouseDragged(e: JMouseEvent) {
-            val evt = convert(e, DRAGGED)
-            dragStack.triggers.forEach { it(evt) }
-        }
     }
 
     private val mouseMultiStack by lazy { MouseMultiStack() }
