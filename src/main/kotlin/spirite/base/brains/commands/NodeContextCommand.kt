@@ -9,6 +9,7 @@ import spirite.base.imageData.groupTree.MovableGroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.base.imageData.mediums.IMedium.MediumType.MAGLEV
 import spirite.base.util.StringUtil
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.MDebug
@@ -66,7 +67,7 @@ class NodeContextCommand(
             }
             QUICK_NEW_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Layer", DYNAMIC)
             DUPLICATE.string -> node?.also { workspace.groupTree.duplicateNode(it) }
-            NEW_PUPPET_LAYER.string -> TODO()
+            NEW_PUPPET_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Maglev Layer", MAGLEV)
             ANIM_FROM_GROUP.string -> {
                 val groupNode = node as? GroupNode ?: return false
                 val name = StringUtil.getNonDuplicateName(workspace.animationManager.animations.map { it.name },"New Animation")

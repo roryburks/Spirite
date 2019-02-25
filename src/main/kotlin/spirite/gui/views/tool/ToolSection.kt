@@ -14,6 +14,7 @@ import spirite.gui.resources.IIcon
 import spirite.gui.resources.Skin
 import spirite.gui.resources.ToolIcons
 import spirite.hybrid.Hybrid
+import spirite.pc.gui.adaptMouseSystem
 import spirite.pc.gui.basic.SwToggleButton
 import java.awt.Color
 import java.awt.GradientPaint
@@ -119,6 +120,7 @@ class ToolButton( val tool: Tool) : SwToggleButton(false, SwToolButtonImp(tool))
                 override fun mouseEntered(e: MouseEvent?) {hover = true; repaint()}
                 override fun mouseExited(e: MouseEvent?) {hover = false; repaint()}
             })
+            adaptMouseSystem()
         }
     }
 }

@@ -24,26 +24,44 @@ interface IMaglevThing {
     fun draw(built: BuiltMediumData)
 }
 
-class MaglevMedium(
+class MaglevMedium
+private constructor(
         val workspace: IImageWorkspace,
         private val mediumRepo: MMediumRepository,
-        things: List<IMaglevThing>? = null
-)
+        private val things: MutableList<IMaglevThing>,
+        private val builtImage : DynamicImage = DynamicImage()) // Maybe expose this so
     :IMedium
 {
-    private val builtImage = DynamicImage()
-    private val things = mutableListOf<IMaglevThing>()
+    constructor(
+            workspace: IImageWorkspace,
+            mediumRepo: MMediumRepository,
+            things: List<IMaglevThing>? = null)
+            : this(workspace, mediumRepo, things?.toMutableList() ?: mutableListOf())
 
-    init {
-        things?.also { this.things.addAll(it) }
-    }
 
+    // Note: since ImageActions are inherently designed to be destructive, i.e. not-undoable, we
+    //  do not need to worry about removing Things from the Medium, instead the duplication of medium snapshots
+    //  handles the thing lifecycle w.r.t. the undo engine
     internal fun addThing(thing : IMaglevThing, arranged: ArrangedMediumData, description: String) {
         things.add(thing)
 
         arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged){
             override val description: String get() = description
             override fun performImageAction(built: BuiltMediumData) = thing.draw(built)
+        })
+    }
+
+    internal fun applyTrasformation( arranged: ArrangedMediumData, description: String, lambda: (Vec2f) -> Vec2f) {
+        things.forEach { it.transformPoints(lambda) }
+
+        arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged) {
+            override val description: String get() = description
+            override val isHeavy: Boolean get() = true
+
+            override fun performImageAction(built: BuiltMediumData) {
+                built.rawAccessComposite {it.graphics.clear()}
+                things.forEach { it.draw(built) }
+            }
         })
     }
 
@@ -64,13 +82,11 @@ class MaglevMedium(
         else img.base?.getColor(x-this.x,y-this.y) ?: Colors.TRANSPARENT
     }
 
-    override fun build(arranged: ArrangedMediumData): BuiltMediumData {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun build(arranged: ArrangedMediumData) = MaglevBuiltMediumData(arranged)
 
-    override fun getImageDrawer(arranged: ArrangedMediumData) = MaglevImageDrawer(arranged)
+    override fun getImageDrawer(arranged: ArrangedMediumData) = MaglevImageDrawer(arranged, this)
 
-    override fun dupe() = MaglevMedium(workspace, mediumRepo, things)
+    override fun dupe() = MaglevMedium(workspace, mediumRepo, things, this.builtImage.deepCopy())
     override fun flush() { builtImage.flush() }
     // endregion
 
@@ -81,7 +97,7 @@ class MaglevMedium(
      * that the record of what was done to create the MaglevMedium is stored within it under a system that can be
      * transformed and re-rendered.
      */
-    inner class MaglevArrangedMediumData(arranged: ArrangedMediumData) : BuiltMediumData(arranged, mediumRepo)
+    inner class MaglevBuiltMediumData(arranged: ArrangedMediumData) : BuiltMediumData(arranged, mediumRepo)
     {
         override val width: Int get() = workspace.width
         override val height: Int get() = workspace.height

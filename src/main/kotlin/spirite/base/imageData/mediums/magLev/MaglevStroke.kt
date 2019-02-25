@@ -11,7 +11,7 @@ class MaglevStroke(
     : IMaglevThing
 {
     override fun transformPoints(lambda: (Vec2f) -> Vec2f) {
-        for( i in 0..drawPoints.length) {
+        for( i in 0 until drawPoints.length) {
             val vec = lambda(Vec2f(drawPoints.x[i], drawPoints.y[i]))
             drawPoints.x[i] = vec.xf
             drawPoints.y[i] = vec.yf
