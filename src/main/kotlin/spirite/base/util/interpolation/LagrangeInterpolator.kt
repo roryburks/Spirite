@@ -3,7 +3,7 @@ package spirite.base.util.interpolation
 import rb.vectrix.linear.Vec2f
 
 /** Constructs a Polygon of degree N-1 which goes through the given N
- * points and uses that Polygon to interpolate the data.
+ * drawPoints and uses that Polygon to interpolate the data.
  *
  * Lagrange Interpolations are a straightforward form of interpolation
  * that results in an infinitely differentiable curve (meaning it is

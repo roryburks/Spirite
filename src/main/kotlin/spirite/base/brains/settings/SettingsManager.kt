@@ -132,9 +132,9 @@ class SettingsManager (
     var _tabletPressureInterpolator : CubicSplineInterpolator by MutableLazy { cubicSplineInterpolatorFromByteArray(preferences.getByteArray("tcpPoints")) }
 
     /** Changes the intepolator for interpetting tablet pressure to one constructed
-     * from the given points, saving it to preferences as it makes it.
+     * from the given drawPoints, saving it to preferences as it makes it.
      *
-     * @param points list of points, must be non-null, at least 1 big, each point should
+     * @param points list of drawPoints, must be non-null, at least 1 big, each point should
      * be in between (0,0) and (1,1), inclusive
      * @return the constructed Interpolator
      * */

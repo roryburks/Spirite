@@ -10,8 +10,8 @@ import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium.MediumType
-import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
-import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
+import spirite.base.imageData.mediums.IMedium.MediumType.*
+import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
 import spirite.base.util.debug.SpiriteException
 import spirite.hybrid.Hybrid
@@ -26,6 +26,7 @@ class PrimaryGroupTree(
         val medium = when( type) {
             DYNAMIC -> DynamicMedium(workspace, DynamicImage(), mediumRepo)
             FLAT -> FlatMedium( Hybrid.imageCreator.createImage( width ?: workspace.width, height ?: workspace.height), mediumRepo)
+            MAGLEV -> MaglevMedium( workspace, mediumRepo)
             else -> throw SpiriteException("Attempted to create unsupported MediumType: $type")
         }
 

@@ -76,7 +76,7 @@ class SwContextMenus(commandExecuter: ICentralCommandExecutor) : ContextMenus(co
                 if( item.icon != null)
                     TODO()
 
-                // Add the MenuItem into the appropriate context
+                // Add the MenuItem into the appropriate workspace
                 when {
                     depth == 0 -> root.add( node)
                     else -> activeRootTree[depth-1]!!.add(node)

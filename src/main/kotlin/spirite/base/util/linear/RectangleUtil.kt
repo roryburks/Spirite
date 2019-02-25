@@ -29,7 +29,7 @@ object RectangleUtil {
         return rectFromEndpoints(x1, y1, x2, y2)
     }
 
-    /** Creates the smallest rectangle that contains all given points.  */
+    /** Creates the smallest rectangle that contains all given drawPoints.  */
     fun rectFromPoints(points: List<Vec2f>): Rect {
         if (points.isEmpty())
             return Rect(0, 0, 0, 0)

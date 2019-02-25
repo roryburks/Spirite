@@ -5,13 +5,13 @@ import rb.vectrix.mathUtil.MathUtil
 
 /**
  * CubicSplineInterpolator2D is a two-dimensional curve interpolator which
- * uses Cubic Hermite Spline interpolation from a given number of points
+ * uses Cubic Hermite Spline interpolation from a given number of drawPoints
  * to interpolate a 2D curve.  It maintains two separate Hermite Splines:
  * one for the AnimationCommand-axis, and another for the Y-axis, which are both traversed
  * along a common axis (t).
  *
  * The range of t is determined by the length of the line segments which
- * make up the key-points.
+ * make up the key-drawPoints.
  */
 class CubicSplineInterpolator2D : Interpolator2D {
     private var kx: FloatArray    // xi-differentials
@@ -31,7 +31,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
      * @param points
      * @param fast
      *  * If true, use Finite difference to get the slope vectors
-     * (i.e. takes the average of the two distance vectors to/from the points).
+     * (i.e. takes the average of the two distance vectors to/from the drawPoints).
      *  * If false, it finds the slopes such that the second-degree derivative
      * of the curve is 0 at each point (by solving the tridiagonal linear equation
      * system)

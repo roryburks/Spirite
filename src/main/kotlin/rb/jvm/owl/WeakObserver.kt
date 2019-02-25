@@ -15,7 +15,7 @@ class WeakObserver<T>(trigger: T) : IObserver<T>
 {
     val description = trigger.toString()
     private val weakTrigger = WeakReference(trigger)
-    override val trigger : T? =  weakTrigger.get() ?: null.also{ println("$description fallen out of context.")}
+    override val trigger : T? =  weakTrigger.get() ?: null.also{ println("$description fallen out of workspace.")}
 }
 
 /** Note: the contract strongly references the Trigger, so the t is preserved as long as the contract is. */

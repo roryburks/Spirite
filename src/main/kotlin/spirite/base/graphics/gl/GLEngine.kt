@@ -175,11 +175,11 @@ class GLEngine(
      *
      * @param xPoints	Array containing the xi coordinates.
      * @param yPoints 	Array containing the xi coordinates.
-     * @param numPoints	Number of points to use for the render.
-     * @param cap	How to draw the end-points.
+     * @param numPoints	Number of drawPoints to use for the render.
+     * @param cap	How to draw the end-drawPoints.
      * @param join	How to draw the line joints.
-     * @param loop	Whether or not to close the loop by joining the two end points
-     * 	together (cap is ignored if this is true because the curve has no end points)
+     * @param loop	Whether or not to close the loop by joining the two end drawPoints
+     * 	together (cap is ignored if this is true because the curve has no end drawPoints)
      * @param lineWidth    Width of the line.
      * @param color     Color of the line
      * @param alpha     Alpha of the line

@@ -18,7 +18,7 @@ import spirite.pc.gui.SColor
 
 /**
  * IInternalImages are a form of base data type that serves as an intermediate between
- * Layers and RawImages/CachedImages or other primary data points.
+ * Layers and RawImages/CachedImages or other primary data drawPoints.
  *
  * For now all IInternalImages have the same basic functionality of wrapping one or
  * more RawImage and piping them up to the image-modifying functions based on structure,
