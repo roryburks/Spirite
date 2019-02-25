@@ -50,6 +50,7 @@ private constructor( private val imp: SwScrollContainerImp)
                 evt.type == PRESSED && Hybrid.keypressSystem.holdingSpace -> {
                     currentX = evt.point.x
                     currentY = evt.point.y
+                    evt.consume()
                 }
                 evt.type == DRAGGED && nowX != null && !Hybrid.keypressSystem.holdingSpace -> currentX = null
                 evt.type == DRAGGED && nowX != null -> {
@@ -57,8 +58,9 @@ private constructor( private val imp: SwScrollContainerImp)
                     verticalBar.scroll -= ((evt.point.y - currentY ) * scrollFactor).round
                     currentX = evt.point.x
                     currentY = evt.point.y
+                    evt.consume()
                 }
-                evt.type == RELEASED -> this.currentX = null
+                evt.type == RELEASED && nowX != null -> this.currentX = null
             }
         }
     }, this)

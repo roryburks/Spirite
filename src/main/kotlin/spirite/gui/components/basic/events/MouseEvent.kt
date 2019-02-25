@@ -10,6 +10,8 @@ constructor(
         private val modifierMask : Int,
         val type : MouseEventType)
 {
+    var consumed = false ; private set
+
     enum class MouseEventType {
         RELEASED, ENTERED, CLICKED, EXITED, PRESSED, MOVED, DRAGGED,
     }
@@ -33,4 +35,5 @@ constructor(
     }
 
     fun converted(component: IComponent) = copy(point = point.convert(component))
+    fun consume() {consumed = true}
 }

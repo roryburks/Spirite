@@ -38,7 +38,7 @@ object SwHybrid : IHybrid {
     override val imageCreator: IImageCreator get() = SwImageCreator
     override val imageConverter: ImageConverter get() = ImageConverter(EngineLaunchpoint.gle)
     override val imageIO: IImageIO get() = JImageIO
-    override val mouseSystem: IMouseSystem = MouseSystem()
+    override val mouseSystem: IMouseSystem = SwMouseSystem()
     override val keypressSystem: MKeypressSystem = KeypressSystem()
 
     override fun LockFrom(o: Any): ILock = JLock(o)
