@@ -13,6 +13,7 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
@@ -223,6 +224,26 @@ object SaveEngine {
                         val byteArray = prepared.image?.run { Hybrid.imageIO.writePNG(this)}
                         ra.writeInt( byteArray?.size ?: 0)  // [4] : Size of Image Data (note: May be 0)
                         byteArray?.run { ra.write(this)}    // [n] : Image Data
+                    }
+                    is PreparedMaglevMedium -> {
+                        ra.writeByte(SaveLoadUtil.MEDIUM_MAGLEV)    // [1] : Medium Type
+                        ra.writeShort(prepared.things.size)     // [2] : number of things
+                        prepared.things.forEach {
+                            when(it) {
+                                is MaglevStroke -> {
+                                    ra.writeByte(SaveLoadUtil.MAGLEV_THING_STROKE)  // [1] : Thing type
+                                    ra.writeInt(it.params.color.argb32)             // [4] : Color
+                                    ra.writeByte(it.params.method.fileId)            // [1] : Method
+                                    ra.writeFloat(it.params.width)                  // [4] : Stroke Width
+                                    ra.writeShort(it.drawPoints.length)     // [2] : Num Vertices
+                                    for ( i in 0 until it.drawPoints.length) {
+                                        ra.writeFloat(it.drawPoints.x[i])   // [4] : x
+                                        ra.writeFloat(it.drawPoints.y[i])   // [4] : y
+                                        ra.writeFloat(it.drawPoints.w[i])   // [4] : w
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

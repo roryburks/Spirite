@@ -25,6 +25,10 @@ object SaveLoadUtil {
     const val MEDIUM_PRISMATIC = 0x02
     const val MEDIUM_MAGLEV = 0x03
 
+    // :::: Maglev Thing Type
+    const val MAGLEV_THING_STROKE = 0
+    const val MAGLEV_THING_FILL = 1
+
     // :::: AnimationType
     const val ANIM_FFA = 0x01
     const val ANIM_RIG = 0x02

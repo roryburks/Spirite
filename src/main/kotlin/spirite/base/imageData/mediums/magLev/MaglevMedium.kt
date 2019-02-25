@@ -36,6 +36,7 @@ private constructor(
             things: List<IMaglevThing>? = null)
             : this(workspace, mediumRepo, things?.toMutableList() ?: mutableListOf())
 
+    fun getThings() = things.toList()
 
     // Note: since ImageActions are inherently designed to be destructive, i.e. not-undoable, we
     //  do not need to worry about removing Things from the Medium, instead the duplication of medium snapshots

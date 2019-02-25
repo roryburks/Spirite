@@ -74,6 +74,14 @@ object PrismaticMediumIgnorer :IMediumLoader
     }
 }
 
+object MagneticMediumPartialLoader : IMediumLoader
+{
+    override fun loadMedium(context: LoadContext): IMedium? {
+        val ra = context.ra
+        TODO()
+    }
+}
+
 object MagneticMediumIgnorer : IMediumLoader
 {
     override fun loadMedium(context: LoadContext): IMedium? {
