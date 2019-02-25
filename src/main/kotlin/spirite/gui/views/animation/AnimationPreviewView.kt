@@ -124,7 +124,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         sliderMet.onMouseDrag += {  metBind.field = sliderMet.value / 100f }
         sliderMet.onMouseRelease +=  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
         btnPlay.checkBind.addObserver { new, _ -> if(!new) metBind.field = floor(metBind.field) }
-        metBind.addObserver { new, _ ->  ifMet.value = new.floor}
+        metBind.addObserver { new, _ ->ifMet.value = new.floor}
     }
 
     private var _fpsK : IContract? = null
