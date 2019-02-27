@@ -4,6 +4,7 @@ import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
 import rb.owl.IContract
 import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
@@ -55,15 +56,15 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                     boxList.resetAllWithSelected(value.parts, value.activePart)
                     _layerChangeObsK = value.layerChangeObserver.addWeakObserver(onPartChange)
 
-                    _tfTypeK = tfType.textBind.bindWeaklyTo(value.cPartNameBind)
-                    _tfDepthK = tfDepth.valueBind.bindWeaklyTo(value.cDepthBind)
-                    _tfTransXK = tfTransX.valueBind.bindWeaklyTo(value.cTransXBind)
-                    _tfTransYK = tfTransY.valueBind.bindWeaklyTo(value.cTransYBind)
-                    _tfScaleXK = tfScaleX.valueBind.bindWeaklyTo(value.cScaleXBind)
-                    _tfScaleYK = tfScaleY.valueBind.bindWeaklyTo(value.cScaleYBind)
-                    _tfRotK = tfRot.valueBind.bindWeaklyTo(value.cRotBind)
-                    _opacitySliderK = opacitySlider.valueBind.bindWeaklyTo(value.cAlphaBind)
-                    _btnVisibilityK = btnVisibility.checkBind.bindWeaklyTo(value.cVisibleBind)
+                    _tfTypeK = tfType.textBind.bindTo(value.cPartNameBind)
+                    _tfDepthK = tfDepth.valueBind.bindTo(value.cDepthBind)
+                    _tfTransXK = tfTransX.valueBind.bindTo(value.cTransXBind)
+                    _tfTransYK = tfTransY.valueBind.bindTo(value.cTransYBind)
+                    _tfScaleXK = tfScaleX.valueBind.bindTo(value.cScaleXBind)
+                    _tfScaleYK = tfScaleY.valueBind.bindTo(value.cScaleYBind)
+                    _tfRotK = tfRot.valueBind.bindTo(value.cRotBind)
+                    _opacitySliderK = opacitySlider.valueBind.bindTo(value.cAlphaBind)
+                    _btnVisibilityK = btnVisibility.checkBind.bindTo(value.cVisibleBind)
                 }
                 else boxList.clear()
             }
@@ -96,6 +97,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
     private val btnVisibility = Hybrid.ui.ToggleButton()
 
     init {
+
         btnVisibility.setOnIcon(SwIcons.SmallIcons.Rig_VisibileOn)
         btnVisibility.setOffIcon(SwIcons.SmallIcons.Rig_VisibleOff)
         btnNewPart.setIcon(SwIcons.SmallIcons.Rig_New)

@@ -1,6 +1,7 @@
 package spirite.base.file.load
 
 import rb.vectrix.mathUtil.i
+import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.file.SaveLoadUtil
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.mediums.DynamicMedium
@@ -95,6 +96,10 @@ object MagneticMediumPartialLoader : IMediumLoader
                     val color = ra.readInt().toColor()
                     val strokeMethod = StrokeParams.Method.fromFileId(ra.readByte().i) ?: BASIC
                     val strokeWidth = ra.readFloat()
+                    val mode =
+                            if( context.version < 0x1_0005) PenDrawMode.NORMAL
+                            else PenDrawMode.fromFileId(ra.readUnsignedByte())
+
                     val numVertices = ra.readUnsignedShort()
 
                     val x = FloatArray(numVertices)
@@ -108,7 +113,7 @@ object MagneticMediumPartialLoader : IMediumLoader
                     }
 
                     MaglevStroke(
-                            StrokeParams(color, strokeMethod, width = strokeWidth),
+                            StrokeParams(color, strokeMethod, width = strokeWidth, mode = mode),
                             DrawPoints(x,y,w))
                 }
                 SaveLoadUtil.MAGLEV_THING_FILL -> {

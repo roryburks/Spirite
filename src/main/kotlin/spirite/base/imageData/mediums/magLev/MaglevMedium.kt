@@ -7,6 +7,7 @@ import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
+import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.IMedium
@@ -15,6 +16,7 @@ import spirite.base.imageData.mediums.IMedium.MediumType.MAGLEV
 import spirite.base.imageData.undo.ImageAction
 import spirite.base.util.Colors
 import spirite.pc.gui.SColor
+import javax.swing.SwingUtilities
 
 interface IMaglevThing {
     fun transformPoints( lambda: (Vec3f)->(Vec3f))
@@ -115,4 +117,10 @@ private constructor(
 
     }
     // endregion
+
+
+    init {
+        val fakeHandle = MediumHandle(workspace, -1)
+        things.forEach { it.draw(build(ArrangedMediumData(fakeHandle, 0f, 0f))) }
+    }
 }

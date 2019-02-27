@@ -235,6 +235,7 @@ object SaveEngine {
                                     ra.writeInt(it.params.color.argb32)             // [4] : Color
                                     ra.writeByte(it.params.method.fileId)            // [1] : Method
                                     ra.writeFloat(it.params.width)                  // [4] : Stroke Width
+                                    ra.writeByte(it.params.mode.fileId)        // [1] : Mode
                                     ra.writeShort(it.drawPoints.length)     // [2] : Num Vertices
                                     for ( i in 0 until it.drawPoints.length) {
                                         ra.writeFloat(it.drawPoints.x[i])   // [4] : x

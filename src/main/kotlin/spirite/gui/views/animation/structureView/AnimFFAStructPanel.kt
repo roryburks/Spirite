@@ -371,7 +371,7 @@ private constructor(
         : IComponent by imp
     {
         init {
-            imp.onMouseClick += {redoLexicon()}
+            imp.action = {redoLexicon()}
         }
 
         fun redoLexicon() {

@@ -26,3 +26,5 @@
     -Added Lexical FFA Layer Type (breaking on FFA Layer)
 0x0001_0005:
     -Added Animation Speed per-animation to the animation chunk
+0x0001_0006:
+    -Added Mode to MagLev Stroke Properties

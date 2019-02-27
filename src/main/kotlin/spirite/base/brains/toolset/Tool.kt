@@ -49,12 +49,22 @@ class ButtonProperty(override val hrName: String, val command: ICommand) : ToolP
 class FloatBoxProperty(override val hrName: String, default: Float) : ToolProperty<Float>(default)
 class DualFloatBoxProperty(override val hrName: String, val label1: String, val label2: String, default: Vec2f) : ToolProperty<Vec2f>(default)
 
-enum class PenDrawMode( val hrName: String) {
-    NORMAL("Normal"),
-    KEEP_ALPHA("Preserve Alpha"),
-    BEHIND("Behind"),
+enum class PenDrawMode(
+        val hrName: String,
+        val fileId: Int) {
+    NORMAL("Normal", 1),
+    KEEP_ALPHA("Preserve Alpha", 2),
+    BEHIND("Behind", 3),
     ;
     override fun toString() = hrName
+    companion object {
+        fun fromFileId( fileId: Int) = when(fileId) {
+            1 -> NORMAL
+            2 -> KEEP_ALPHA
+            3 -> BEHIND
+            else -> throw IllegalArgumentException("BadFileId")
+        }
+    }
 }
 
 class Pen( toolset: Toolset) : Tool(toolset){
