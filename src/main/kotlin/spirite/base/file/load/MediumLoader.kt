@@ -97,7 +97,7 @@ object MagneticMediumPartialLoader : IMediumLoader
                     val strokeMethod = StrokeParams.Method.fromFileId(ra.readByte().i) ?: BASIC
                     val strokeWidth = ra.readFloat()
                     val mode =
-                            if( context.version < 0x1_0005) PenDrawMode.NORMAL
+                            if( context.version < 0x1_0006) PenDrawMode.NORMAL
                             else PenDrawMode.fromFileId(ra.readUnsignedByte())
 
                     val numVertices = ra.readUnsignedShort()
