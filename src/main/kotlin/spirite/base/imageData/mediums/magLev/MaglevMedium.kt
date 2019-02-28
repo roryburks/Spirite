@@ -40,6 +40,13 @@ private constructor(
 
     fun getThings() = things.toList()
 
+    fun build(handle: MediumHandle)
+    {
+        val arranged = ArrangedMediumData(handle, 0f, 0f)
+        val built = build(arranged)
+        things.forEach { it.draw(built) }
+    }
+
     // Note: since ImageActions are inherently designed to be destructive, i.e. not-undoable, we
     //  do not need to worry about removing Things from the Medium, instead the duplication of medium snapshots
     //  handles the thing lifecycle w.r.t. the undo engine
@@ -87,7 +94,11 @@ private constructor(
 
     override fun getImageDrawer(arranged: ArrangedMediumData) = MaglevImageDrawer(arranged, this)
 
-    override fun dupe() = MaglevMedium(workspace, mediumRepo, things, this.builtImage.deepCopy())
+    override fun dupe() = MaglevMedium(
+            workspace,
+            mediumRepo,
+            things.map { it.dupe() }.toMutableList(),
+            this.builtImage.deepCopy())
     override fun flush() { builtImage.flush() }
     // endregion
 

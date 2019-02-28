@@ -21,6 +21,7 @@ import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.Compositor
+import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.selection.ISelectionEngine
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.selection.SelectionEngine
@@ -29,6 +30,7 @@ import spirite.base.imageData.undo.UndoEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.delegates.UndoableDelegate
 import java.io.File
+import kotlin.system.measureTimeMillis
 
 interface IImageWorkspace {
     var width: Int
@@ -116,6 +118,12 @@ class ImageWorkspace(
         undoEngine.reset()
         hasChanged = false
         mediumRepository.locked = false
+
+        mediumRepository.dataList.forEach {
+            val medium = mediumRepository.getData(it)
+            if( medium is MaglevMedium)
+                medium.build(MediumHandle(this, it))
+        }
     }
 
     override fun fileSaved(newFile: File) {
