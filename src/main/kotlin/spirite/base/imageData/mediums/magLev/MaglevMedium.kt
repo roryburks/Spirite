@@ -28,7 +28,7 @@ class MaglevMedium
 private constructor(
         val workspace: IImageWorkspace,
         private val mediumRepo: MMediumRepository,
-        private val things: MutableList<IMaglevThing>,
+        internal val things: MutableList<IMaglevThing>,
         private val builtImage : DynamicImage = DynamicImage()) // Maybe expose this so
     :IMedium
 {

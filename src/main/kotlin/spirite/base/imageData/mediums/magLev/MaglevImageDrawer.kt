@@ -1,18 +1,24 @@
 package spirite.base.imageData.mediums.magLev
 
+import rb.owl.IContract
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
+import spirite.base.brains.toolset.ColorChangeMode
+import spirite.base.brains.toolset.ColorChangeMode.AUTO
+import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.imageData.drawer.IImageDrawer
-import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
-import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
+import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.mediums.ArrangedMediumData
+import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.CompositeSource
+import spirite.base.imageData.undo.ImageAction
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
+import spirite.base.util.Color
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 
@@ -21,7 +27,8 @@ class MaglevImageDrawer(
         maglev: MaglevMedium)
     :IImageDrawer,
         IStrokeModule by MaglevStrokeModule(arranged),
-        ITransformModule by MaglevTransformModule(arranged, maglev)
+        ITransformModule by MaglevTransformModule(arranged, maglev),
+        IColorChangeModule by MaglevColorChangeModule(arranged, maglev)
 {
 }
 
@@ -114,4 +121,31 @@ class MaglevTransformModule(
         workspace.compositor.compositeSource = null
     }
 
+}
+
+class MaglevColorChangeModule(val arranged: ArrangedMediumData, val maglev: MaglevMedium) : IColorChangeModule
+{
+    override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
+        val things = maglev.things
+        things.forEach {
+            if( it is MaglevStroke) {
+                val color = it.params.color
+                if( mode == AUTO || (color.red == from.red && color.blue == from.blue && color.green == from.green &&
+                        (color.alpha == from.alpha || mode == IGNORE_ALPHA)))
+                {
+                    it.params = it.params.copy(color = to)
+                }
+            }
+        }
+
+        arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged) {
+            override val description: String get() = "Color Change Maglev Layer"
+            override val isHeavy: Boolean get() = true
+
+            override fun performImageAction(built: BuiltMediumData) {
+                built.rawAccessComposite {it.graphics.clear()}
+                things.forEach { it.draw(built) }
+            }
+        })
+    }
 }

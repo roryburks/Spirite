@@ -8,7 +8,7 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 
 class MaglevStroke(
-        val params: StrokeParams,
+        var params: StrokeParams,
         val drawPoints: DrawPoints)
     : IMaglevThing
 {
