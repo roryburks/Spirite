@@ -414,9 +414,9 @@ private constructor(private val imp : SwTreeViewImp<T>)
         val dndGR = mutableListOf<BTDnDGR>()
 
         fun addDropSource(component: Component, root: Boolean = false) {
-            dndGR.add(
-            BTDnDGR(dragSource, component,DnDConstants.ACTION_COPY_OR_MOVE, if(root) rootDragListener else componentBasedDragListener))
-            //dragSource.createDefaultDragGestureRecognizer(component, DnDConstants.ACTION_COPY_OR_MOVE, if(root) rootDragListener else componentBasedDragListener)
+            //dndGR.add(
+            //BTDnDGR(dragSource, component,DnDConstants.ACTION_COPY_OR_MOVE, if(root) rootDragListener else componentBasedDragListener))
+            dragSource.createDefaultDragGestureRecognizer(component, DnDConstants.ACTION_COPY_OR_MOVE, if(root) rootDragListener else componentBasedDragListener)
         }
 
         override fun drop(evt: DropTargetDropEvent) {

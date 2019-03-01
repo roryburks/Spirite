@@ -88,10 +88,23 @@ class MaglevTransformModule(
 
         val det = effectiveTrans.determinantF * 0.8f + 0.2f
 
-        maglev.applyTrasformation(arranged, "Transform Maglev Layer") {
-            val vec2 = effectiveTrans.apply(Vec2f(it.xf, it.yf))
-            Vec3f(vec2.xf, vec2.yf, it.zf * det)
-        }
+        val things = maglev.things
+        things.asSequence()
+                .filterIsInstance<IMaglevPointwiseThing>()
+                .forEach { it.transformPoints{
+                    val vec2 = effectiveTrans.apply(Vec2f(it.xf, it.yf))
+                    Vec3f(vec2.xf, vec2.yf, it.zf * det)
+                } }
+
+        arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged) {
+            override val description: String get() = "Transform Maglev Layer"
+            override val isHeavy: Boolean get() = true
+
+            override fun performImageAction(built: BuiltMediumData) {
+                built.rawAccessComposite {it.graphics.clear()}
+                things.forEach { it.draw(built) }
+            }
+        })
     }
 
     override fun startManipulatingTransform(): Rect? {
@@ -126,16 +139,15 @@ class MaglevColorChangeModule(val arranged: ArrangedMediumData, val maglev: Magl
 {
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
         val things = maglev.things
-        things.forEach {
-            if( it is MaglevStroke) {
-                val color = it.params.color
-                if( mode == AUTO || (color.red == from.red && color.blue == from.blue && color.green == from.green &&
-                        (color.alpha == from.alpha || mode == IGNORE_ALPHA)))
-                {
-                    it.params = it.params.copy(color = to)
-                }
-            }
-        }
+        things.asSequence()
+                .filterIsInstance<IMaglevColorwiseThing>()
+                .forEach { it.transformColor { color ->
+                    if( mode == AUTO || (color.red == from.red && color.blue == from.blue && color.green == from.green &&
+                                    (color.alpha == from.alpha || mode == IGNORE_ALPHA)))
+                        to
+                    else
+                        color
+                } }
 
         arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged) {
             override val description: String get() = "Color Change Maglev Layer"

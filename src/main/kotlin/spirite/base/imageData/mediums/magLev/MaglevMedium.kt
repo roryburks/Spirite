@@ -18,11 +18,6 @@ import spirite.base.util.Colors
 import spirite.pc.gui.SColor
 import javax.swing.SwingUtilities
 
-interface IMaglevThing {
-    fun transformPoints( lambda: (Vec3f)->(Vec3f))
-    fun dupe() : IMaglevThing
-    fun draw(built: BuiltMediumData)
-}
 
 class MaglevMedium
 private constructor(
@@ -56,20 +51,6 @@ private constructor(
         arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged){
             override val description: String get() = description
             override fun performImageAction(built: BuiltMediumData) = thing.draw(built)
-        })
-    }
-
-    internal fun applyTrasformation( arranged: ArrangedMediumData, description: String, lambda: (Vec3f) -> Vec3f) {
-        things.forEach { it.transformPoints(lambda) }
-
-        arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged) {
-            override val description: String get() = description
-            override val isHeavy: Boolean get() = true
-
-            override fun performImageAction(built: BuiltMediumData) {
-                built.rawAccessComposite {it.graphics.clear()}
-                things.forEach { it.draw(built) }
-            }
         })
     }
 
