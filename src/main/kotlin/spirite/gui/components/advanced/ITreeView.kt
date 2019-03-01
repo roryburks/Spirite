@@ -29,7 +29,9 @@ import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.*
 import java.awt.event.ActionEvent
+import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
+import java.awt.event.MouseEvent
 import javax.swing.AbstractAction
 import javax.swing.JPanel
 import javax.swing.KeyStroke
@@ -375,6 +377,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
     // endRegion
 
     // region DnD
+
     private val dnd = BTDnDManager()
     init {
         imp.dropTarget = dnd
@@ -383,14 +386,37 @@ private constructor(private val imp : SwTreeViewImp<T>)
     private var draggingRelativeTo: TreeNode<T>? = null
     private var draggingDirection : DropDirection = ABOVE
 
+    init {
+        this.onMousePress += { evt->
+            dnd.dndGR.forEach { it.fire(evt.point.x, evt.point.y)}
+        }
+    }
+
+
+    inner class  BTDnDGR(source: DragSource, comp: Component, i: Int, dls: DragGestureListener) : DragGestureRecognizer(source, comp, i, dls) {
+        override fun unregisterListeners() {}
+
+        override fun registerListeners() {
+        }
+
+        fun fire( x: Int, y: Int) {
+            events = ArrayList<InputEvent>(1)
+            events.add(MouseEvent(imp, 0, 0, 0, 0, 0, 0,  false))
+            fireDragGestureRecognized(DnDConstants.ACTION_MOVE, Point(x,y))
+        }
+    }
 
     private inner class BTDnDManager : DropTarget(), DragSourceListener
     {
 
         val dragSource = DragSource.getDefaultDragSource()
 
+        val dndGR = mutableListOf<BTDnDGR>()
+
         fun addDropSource(component: Component, root: Boolean = false) {
-            dragSource.createDefaultDragGestureRecognizer(component, DnDConstants.ACTION_COPY_OR_MOVE, if(root) rootDragListener else componentBasedDragListener)
+            dndGR.add(
+            BTDnDGR(dragSource, component,DnDConstants.ACTION_COPY_OR_MOVE, if(root) rootDragListener else componentBasedDragListener))
+            //dragSource.createDefaultDragGestureRecognizer(component, DnDConstants.ACTION_COPY_OR_MOVE, if(root) rootDragListener else componentBasedDragListener)
         }
 
         override fun drop(evt: DropTargetDropEvent) {

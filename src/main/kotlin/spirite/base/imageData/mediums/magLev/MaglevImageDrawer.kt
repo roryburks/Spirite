@@ -1,6 +1,5 @@
 package spirite.base.imageData.mediums.magLev
 
-import rb.owl.IContract
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
