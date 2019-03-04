@@ -164,14 +164,21 @@ class MaglevColorChangeModule(val arranged: ArrangedMediumData, val maglev: Magl
 }
 
 class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: MaglevMedium) : IMagneticFillModule {
+    data class BuildingStrokeSegment(
+            val strokeId: Int,
+            val pivotPoint: Int,
+            var travel: Int)
+    {
+    }
+    var ss : BuildingStrokeSegment? =  null
+    val segments = mutableListOf<BuildingStrokeSegment>()
+
     override val magFillXs: FloatArray
         get() = TODO("not implemented")
     override val magFillYs: FloatArray
         get() = TODO("not implemented")
 
-    override fun startMagneticFill() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun startMagneticFill() {}
 
     override fun endMagneticFill(color: SColor, mode: MagneticFillMode) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

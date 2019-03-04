@@ -24,7 +24,8 @@ private constructor(
         val workspace: IImageWorkspace,
         private val mediumRepo: MMediumRepository,
         internal val things: MutableList<IMaglevThing>,
-        private val builtImage : DynamicImage = DynamicImage()) // Maybe expose this so
+        private val builtImage : DynamicImage = DynamicImage(),
+        internal val thingMap: MutableMap<Int,Int>)
     :IMedium
 {
     constructor(
