@@ -3,6 +3,7 @@ package spirite.base.imageData.drawer
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.brains.toolset.ColorChangeMode
+import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.selection.ILiftedData
@@ -13,6 +14,7 @@ import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.Color
 import spirite.base.util.linear.Rect
+import spirite.pc.gui.SColor
 
 
 fun IUndoEngine.performMaskedImageAction(description: String, arranged: ArrangedMediumData, mask: Selection?, action: (BuiltMediumData, Selection?)->Any? )
@@ -81,14 +83,14 @@ interface IImageDrawer {
 //        fun weightErase(xi: Float, yi: Float, wf: Float)
 //    }
 //
-//    interface IMagneticFillModule {
-//        val magFillXs: FloatArray
-//        val magFillYs: FloatArray
-//        fun startMagneticFill()
-//        fun endMagneticFill(jcolor: Int, mode: MagneticFillMode)
-//        fun anchorPoints(xi: Float, yi: Float, r: Float, locked: Boolean, relooping: Boolean)
-//        fun erasePoints(xi: Float, yi: Float, r: Float)
-//    }
+    interface IMagneticFillModule {
+        val magFillXs: FloatArray
+        val magFillYs: FloatArray
+        fun startMagneticFill()
+        fun endMagneticFill(color: SColor, mode: MagneticFillMode)
+        fun anchorPoints(xi: Float, yi: Float, r: Float, locked: Boolean, relooping: Boolean)
+        fun erasePoints(xi: Float, yi: Float, r: Float)
+    }
 
     interface ILiftSelectionModule {
         fun liftSelection(selection: Selection, clearLifted: Boolean = true): ILiftedData

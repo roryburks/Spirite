@@ -235,5 +235,21 @@ class StencilTool(toolset: Toolset) : Tool(toolset) {
     override val description: String get() = "Stencil Tool"
 
     val clearStencilBind by scheme.Property(ButtonProperty("Clear Stencil", DrawCommand.APPLY_TRANFORM))
+}
 
+enum class MagneticFillMode(val hrName: String, val fileId: Int) {
+    NORMAL("Normal", 0),
+    BEHIND("Behind",1),
+    ;
+    companion object {
+        fun fromFileId(id: Int) = MagneticFillMode.values().firstOrNull { it.fileId == id }
+    }
+}
+
+class MagneticFillTool(toolset: Toolset) : Tool(toolset) {
+    override val iconX: Int get() = 1
+    override val iconY: Int get() = 3
+    override val description: String get() = "Magnetic Fill Tool"
+
+    val modeBind by scheme.Property(DropDownProperty("Fill Mode", MagneticFillMode.NORMAL, MagneticFillMode.values()))
 }
