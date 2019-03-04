@@ -3,13 +3,14 @@ package spirite.base.file
 import rb.vectrix.mathUtil.i
 import java.io.ByteArrayOutputStream
 import java.io.RandomAccessFile
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 object SaveLoadUtil {
     val header : ByteArray get() =ByteArray(4).apply {
         System.arraycopy("SIFF".toByteArray(charset("UTF-8")), 0, this, 0, 4)
     }
-    const val version = 0x0001_0006
+    const val version = 0x0001_0007
 
 
     // :::: Node Type Identifiers for the SIFF GroupTree Section
@@ -82,3 +83,18 @@ fun RandomAccessFile.writeUFT8NT(str: String) {
 }
 
 fun RandomAccessFile.readNullTerminatedStringUTF8() = SaveLoadUtil.readNullTerminatedStringUTF8(this)
+
+fun RandomAccessFile.writeFloatArray( floatArray: FloatArray) {
+    val buf = ByteBuffer.allocate(floatArray.size * 4)
+    buf.clear()
+    buf.asFloatBuffer().put(floatArray)
+    this.channel.write(buf)
+}
+
+fun RandomAccessFile.readFloatArray( len: Int) : FloatArray {
+    val buf = ByteBuffer.allocate(len*4)
+    buf.clear()
+    channel.read(buf)
+    buf.rewind()
+    return FloatArray(len).also { buf.asFloatBuffer().get(it) }
+}

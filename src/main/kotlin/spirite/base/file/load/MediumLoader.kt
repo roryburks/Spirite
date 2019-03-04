@@ -3,6 +3,7 @@ package spirite.base.file.load
 import rb.vectrix.mathUtil.i
 import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.file.SaveLoadUtil
+import spirite.base.file.readFloatArray
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
@@ -18,6 +19,7 @@ import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
+import java.nio.ByteBuffer
 
 interface IMediumLoader
 {
@@ -31,7 +33,9 @@ object MediumLoaderFactory
         SaveLoadUtil.MEDIUM_PLAIN -> FlatMediumLoader
         SaveLoadUtil.MEDIUM_DYNAMIC -> DynamicMediumLoader
         SaveLoadUtil.MEDIUM_PRISMATIC -> PrismaticMediumIgnorer
-        SaveLoadUtil.MEDIUM_MAGLEV -> MagneticMediumPartialLoader
+        SaveLoadUtil.MEDIUM_MAGLEV ->
+            if( version <= 0x1_0006) Legacy_1_0006_MagneticMediumPartialLoader
+            else MagneticMediumPartialLoader
         else -> throw BadSifFileException("Unrecognized Medium Type Id: $typeId.  Trying to load a newer SIF version in an older program version or corrupt file.")
     }
 }
@@ -84,6 +88,55 @@ object PrismaticMediumIgnorer :IMediumLoader
 }
 
 object MagneticMediumPartialLoader : IMediumLoader
+{
+    override fun loadMedium(context: LoadContext): IMedium? {
+        val ra = context.ra
+
+        val numThings = ra.readUnsignedShort()
+        val things = List<IMaglevThing?>(numThings) {
+            val thingType = ra.readByte()
+            when( thingType.i) {
+                SaveLoadUtil.MAGLEV_THING_STROKE -> {
+                    val color = ra.readInt().toColor()
+                    val strokeMethod = StrokeParams.Method.fromFileId(ra.readByte().i) ?: BASIC
+                    val strokeWidth = ra.readFloat()
+                    val mode = PenDrawMode.fromFileId(ra.readUnsignedByte())
+
+                    val numVertices = ra.readInt()
+
+                    val x = ra.readFloatArray(numVertices)
+                    val y = ra.readFloatArray(numVertices)
+                    val w = ra.readFloatArray(numVertices)
+
+                    MaglevStroke(
+                            StrokeParams(color, strokeMethod, width = strokeWidth, mode = mode),
+                            DrawPoints(x,y,w))
+                }
+                SaveLoadUtil.MAGLEV_THING_FILL -> {
+                    MDebug.handleWarning(UNSUPPORTED, "Maglev Fills are currently not supported by Spirite v2, ignoring.")
+                    ra.readInt()
+                    ra.readByte()
+                    val numReferences = ra.readUnsignedShort()
+                    repeat(numReferences) {
+                        ra.readUnsignedShort()
+                        ra.readFloat()
+                        ra.readFloat()
+                    }
+                    null
+                }
+                else -> {
+                    MDebug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
+                    null
+                }
+
+            }
+        }.filterNotNull()
+
+        return MaglevMedium(context.workspace, context.workspace.mediumRepository, things)
+    }
+}
+
+object Legacy_1_0006_MagneticMediumPartialLoader : IMediumLoader
 {
     override fun loadMedium(context: LoadContext): IMedium? {
         val ra = context.ra

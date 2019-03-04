@@ -21,6 +21,7 @@ import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 import java.io.File
 import java.io.RandomAccessFile
+import java.nio.ByteBuffer
 import kotlin.math.min
 
 class SaveContext(
@@ -228,20 +229,20 @@ object SaveEngine {
                     is PreparedMaglevMedium -> {
                         ra.writeByte(SaveLoadUtil.MEDIUM_MAGLEV)    // [1] : Medium Type
                         ra.writeShort(prepared.things.size)     // [2] : number of things
-                        prepared.things.forEach {
-                            when(it) {
+                        prepared.things.forEach {thing ->
+                            when(thing) {
                                 is MaglevStroke -> {
+                                    val numVert = min(thing.drawPoints.length, 65535)
                                     ra.writeByte(SaveLoadUtil.MAGLEV_THING_STROKE)  // [1] : Thing type
-                                    ra.writeInt(it.params.color.argb32)             // [4] : Color
-                                    ra.writeByte(it.params.method.fileId)            // [1] : Method
-                                    ra.writeFloat(it.params.width)                  // [4] : Stroke Width
-                                    ra.writeByte(it.params.mode.fileId)        // [1] : Mode
-                                    ra.writeShort(it.drawPoints.length)     // [2] : Num Vertices
-                                    for ( i in 0 until it.drawPoints.length) {
-                                        ra.writeFloat(it.drawPoints.x[i])   // [4] : x
-                                        ra.writeFloat(it.drawPoints.y[i])   // [4] : y
-                                        ra.writeFloat(it.drawPoints.w[i])   // [4] : w
-                                    }
+                                    ra.writeInt(thing.params.color.argb32)             // [4] : Color
+                                    ra.writeByte(thing.params.method.fileId)            // [1] : Method
+                                    ra.writeFloat(thing.params.width)                  // [4] : Stroke Width
+                                    ra.writeByte(thing.params.mode.fileId)        // [1] : Mode
+                                    ra.writeInt(numVert)     // [4] : Num Vertices
+
+                                    ra.writeFloatArray(thing.drawPoints.x)
+                                    ra.writeFloatArray(thing.drawPoints.y)
+                                    ra.writeFloatArray(thing.drawPoints.w)
                                 }
                             }
                         }

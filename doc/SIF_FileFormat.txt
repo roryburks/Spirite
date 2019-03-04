@@ -1,4 +1,4 @@
-Version 0x0001_0004
+Version 0x0001_0007
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -83,11 +83,11 @@ Header
 				[4, int] : color
 				[1, byte] : Stroke Method
 				[4, float] : width of stroke
-				[2, ushort] : number of vertices
-				Per vertex:
-					[4, float] : x
-					[4, float] : y
-					[4, float] : pressure
+				[4, int] : number of vertices
+				[4*n, float] : x array
+				[4*n, float] : y array
+				[4*n, float] : pressure
+				[4*n, float] : t
 			Case 1 (Fill) :
 				[4, int] : color
 				[1, byte] : Fill Method
