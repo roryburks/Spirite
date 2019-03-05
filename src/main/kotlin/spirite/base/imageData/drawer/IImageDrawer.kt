@@ -88,8 +88,8 @@ interface IImageDrawer {
         val magFillYs: FloatArray
         fun startMagneticFill()
         fun endMagneticFill(color: SColor, mode: MagneticFillMode)
-        fun anchorPoints(xi: Float, yi: Float, r: Float, locked: Boolean, relooping: Boolean)
-        fun erasePoints(xi: Float, yi: Float, r: Float)
+        fun anchorPoints(x: Float, y: Float, r: Float, locked: Boolean, relooping: Boolean)
+        fun erasePoints(x: Float, y: Float, r: Float)
     }
 
     interface ILiftSelectionModule {

@@ -180,6 +180,12 @@ class Penner(
                     }
                     tool is ColorPicker -> behavior = PickBehavior( this, button == LEFT)
                     tool is Rigger -> behavior = RigSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
+                    tool is MagneticFillTool -> {
+                        if(drawer is IMagneticFillModule) {
+                            behavior = MagneticFillBehavior(this, drawer, color)
+                        }
+                        else Hybrid.beep()
+                    }
                 }
             }
         }

@@ -17,8 +17,11 @@ class MagneticFillBehavior(penner: Penner, val drawer: IMagneticFillModule, val 
     override fun onMove()  = drawer.anchorPoints(penner.x.f, penner.y.f, 10f, penner.holdingShift, penner.holdingCtrl)
     override fun onPenUp() {
         val mode = penner.toolsetManager.toolset.MagneticFill.mode
-        drawer.endMagneticFill(color, mode)
-        super.onPenUp()
+        try {
+            drawer.endMagneticFill(color, mode)
+        }finally {
+            super.onPenUp()
+        }
     }
 
     override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {

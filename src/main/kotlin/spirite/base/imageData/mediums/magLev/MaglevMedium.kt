@@ -25,7 +25,7 @@ private constructor(
         private val mediumRepo: MMediumRepository,
         internal val things: MutableList<IMaglevThing>,
         private val builtImage : DynamicImage = DynamicImage(),
-        internal val thingMap: MutableMap<Int,Int>)
+        internal val thingMap: MutableMap<Int,Int> = mutableMapOf())
     :IMedium
 {
     constructor(
@@ -47,11 +47,13 @@ private constructor(
     //  do not need to worry about removing Things from the Medium, instead the duplication of medium snapshots
     //  handles the thing lifecycle w.r.t. the undo engine
     internal fun addThing(thing : IMaglevThing, arranged: ArrangedMediumData, description: String) {
-        things.add(thing)
-
         arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged){
             override val description: String get() = description
-            override fun performImageAction(built: BuiltMediumData) = thing.draw(built)
+            override fun performImageAction(built: BuiltMediumData) {
+                things.add(thing)
+                thingMap[things.lastIndex] = things.lastIndex
+                thing.draw(built)
+            }
         })
     }
 

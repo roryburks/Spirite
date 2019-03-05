@@ -10,8 +10,8 @@ class MaglevFill(
 {
     data class StrokeSegment(
             val strokeId: Int,
-            val start: Float,
-            val end: Float)
+            val start: Int,
+            val end: Int)
 
     var color: SColor = color ; private set
 
