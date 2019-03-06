@@ -13,6 +13,7 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.mediums.magLev.MaglevFill
 import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
@@ -204,11 +205,11 @@ object SaveEngine {
     /** IMGD chunk containing all Medium Data, with images saved in PNG Format*/
     private fun saveImageData( context: SaveContext) {
         context.writeChunk("IMGD") {ra->
-            context.floatingData.forEach {
+            context.floatingData.forEach { floatingMedium ->
                 // [4] : Medium Handle Id
-                ra.writeInt( it.id)
+                ra.writeInt( floatingMedium.id)
 
-                val prepared = it.condensed
+                val prepared = floatingMedium.condensed
                 when( prepared) {
                     is PreparedFlatMedium -> {
                         ra.writeByte(SaveLoadUtil.MEDIUM_PLAIN) // [1] : Medium Type
@@ -232,17 +233,29 @@ object SaveEngine {
                         prepared.things.forEach {thing ->
                             when(thing) {
                                 is MaglevStroke -> {
-                                    val numVert = min(thing.drawPoints.length, 65535)
                                     ra.writeByte(SaveLoadUtil.MAGLEV_THING_STROKE)  // [1] : Thing type
                                     ra.writeInt(thing.params.color.argb32)             // [4] : Color
                                     ra.writeByte(thing.params.method.fileId)            // [1] : Method
                                     ra.writeFloat(thing.params.width)                  // [4] : Stroke Width
                                     ra.writeByte(thing.params.mode.fileId)        // [1] : Mode
-                                    ra.writeInt(numVert)     // [4] : Num Vertices
+                                    ra.writeInt(thing.drawPoints.length)     // [4] : Num Vertices
 
                                     ra.writeFloatArray(thing.drawPoints.x)
                                     ra.writeFloatArray(thing.drawPoints.y)
                                     ra.writeFloatArray(thing.drawPoints.w)
+                                }
+                                is MaglevFill -> {
+                                    ra.writeByte(SaveLoadUtil.MAGLEV_THING_FILL)    // [1] : ThingType
+                                    ra.writeInt(thing.color.argb32) // [4] : Color
+                                    ra.writeByte(thing.mode.fileId) // [1] : FillMethod
+
+                                    val numSegs = min(65535, thing.segments.size)
+                                    ra.writeShort(numSegs)  // [2] : Num Segments
+                                    thing.segments.asSequence().take(numSegs).forEach { seg ->
+                                        ra.write(seg.strokeId)   // [4]: StrokeId
+                                        ra.write(seg.start)  // [4] : Start
+                                        ra.write(seg.end)    // [4]
+                                    }
                                 }
                             }
                         }
