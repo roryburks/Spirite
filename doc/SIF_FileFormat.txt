@@ -1,4 +1,4 @@
-Version 0x0001_0007
+Version 0x0001_0008
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -87,15 +87,14 @@ Header
 				[4*n, float] : x array
 				[4*n, float] : y array
 				[4*n, float] : pressure
-				[4*n, float] : t
 			Case 1 (Fill) :
 				[4, int] : color
 				[1, byte] : Fill Method
 				[2, ushort] : number of stroke segments
 				Per reference:
-					[2, ushort] : reference to stroke
-					[4, float] : start point of stroke
-					[4, float] : end point of stroke
+					[4, Int] : reference to stroke
+					[4, Int] : start point of stroke
+					[4, Int] : end point of stroke
 		Per Stroke :
 
 ---- ANIM - Animation Data Chunk

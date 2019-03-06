@@ -24,8 +24,7 @@ private constructor(
         val workspace: IImageWorkspace,
         private val mediumRepo: MMediumRepository,
         internal val things: MutableList<IMaglevThing>,
-        private val builtImage : DynamicImage = DynamicImage(),
-        internal val thingMap: MutableMap<Int,Int> = mutableMapOf())
+        private val builtImage : DynamicImage = DynamicImage())
     :IMedium
 {
     constructor(
@@ -51,7 +50,6 @@ private constructor(
             override val description: String get() = description
             override fun performImageAction(built: BuiltMediumData) {
                 things.add(thing)
-                thingMap[things.lastIndex] = things.lastIndex
                 thing.draw(built)
             }
         })

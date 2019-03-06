@@ -30,3 +30,7 @@
     -Added Mode to MagLev Stroke Properties
 0x0001_0007:
     -Completely Redid Maglev Strokes (now arrays are consecutive rather than interlaced, also Int length numVertices)
+0x0001_0008:
+    -Re-added Maglev Fills
+        -StrokeId from Ushort to Int
+        -Start/End from [0,1]-based Floats to Ints
