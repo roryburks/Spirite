@@ -1,16 +1,20 @@
 package spirite.base.file.load
 
 import rb.vectrix.mathUtil.i
+import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readFloatArray
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.magLev.IMaglevThing
+import spirite.base.imageData.mediums.magLev.MaglevFill
+import spirite.base.imageData.mediums.magLev.MaglevFill.StrokeSegment
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC
+import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.toColor
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE
@@ -43,16 +47,17 @@ object MagneticMediumPartialLoader : IMediumLoader
                             DrawPoints(x,y,w))
                 }
                 SaveLoadUtil.MAGLEV_THING_FILL -> {
-                    MDebug.handleWarning(UNSUPPORTED, "Maglev Fills are currently not supported by Spirite v2, ignoring.")
-                    ra.readInt()
-                    ra.readByte()
-                    val numReferences = ra.readUnsignedShort()
-                    repeat(numReferences) {
-                        ra.readUnsignedShort()
-                        ra.readFloat()
-                        ra.readFloat()
+                    val color = ColorARGB32Normal(ra.readInt())
+                    val mode = MagneticFillMode.fromFileId(ra.readByte().i)!!
+
+                    val numSeqments = ra.readUnsignedShort()
+                    val segments = List(numSeqments) {
+                        val strokeId = ra.readInt()
+                        val start = ra.readInt()
+                        val end = ra.readInt()
+                        StrokeSegment(strokeId, start, end)
                     }
-                    null
+                    MaglevFill(segments, mode, color)
                 }
                 else -> {
                     MDebug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
@@ -100,7 +105,7 @@ object Legacy_1_0006_MagneticMediumPartialLoader : IMediumLoader
                             DrawPoints(x,y,w))
                 }
                 SaveLoadUtil.MAGLEV_THING_FILL -> {
-                    MDebug.handleWarning(UNSUPPORTED, "Maglev Fills are currently not supported by Spirite v2, ignoring.")
+                    MDebug.handleWarning(UNSUPPORTED, "Maglev Fills in the old style are currently not supported by Spirite v2, ignoring.")
                     ra.readInt()
                     ra.readByte()
                     val numReferences = ra.readUnsignedShort()

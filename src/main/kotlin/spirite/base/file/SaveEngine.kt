@@ -247,14 +247,14 @@ object SaveEngine {
                                 is MaglevFill -> {
                                     ra.writeByte(SaveLoadUtil.MAGLEV_THING_FILL)    // [1] : ThingType
                                     ra.writeInt(thing.color.argb32) // [4] : Color
-                                    ra.writeByte(thing.mode.fileId) // [1] : FillMethod
+                                    ra.writeByte(thing.mode.fileId) // [1] : FillMode
 
                                     val numSegs = min(65535, thing.segments.size)
                                     ra.writeShort(numSegs)  // [2] : Num Segments
-                                    thing.segments.asSequence().take(numSegs).forEach { seg ->
-                                        ra.write(seg.strokeId)   // [4]: StrokeId
-                                        ra.write(seg.start)  // [4] : Start
-                                        ra.write(seg.end)    // [4]
+                                    thing.segments.forEach { seg ->
+                                        ra.writeInt(seg.strokeId)   // [4]: StrokeId
+                                        ra.writeInt(seg.start)  // [4] : Start
+                                        ra.writeInt(seg.end)    // [4]
                                     }
                                 }
                             }
