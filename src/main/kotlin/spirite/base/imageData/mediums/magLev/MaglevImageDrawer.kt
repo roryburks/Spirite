@@ -29,6 +29,8 @@ import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.pc.gui.SColor
+import kotlin.math.abs
+import kotlin.math.sign
 
 class MaglevImageDrawer(
         arranged: ArrangedMediumData,
@@ -181,26 +183,41 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
     var ss : BuildingStrokeSegment? =  null
     val segments by lazy { mutableListOf<BuildingStrokeSegment>()}
 
-    private val _magFillXs = DerivedLazy<FloatArray>{
-        val totalLen = segments.sumBy { it.travel + 1 }
-        val out = FloatArray(totalLen)
+
+    // region MagFill Coords
+    private fun resetMagFills() {
+        _magFillXs = null
+        _magFillYs = null
+    }
+    private fun recalcMagFills() : Pair<FloatArray,FloatArray> {
+        val totalLen = segments.sumBy { abs(it.travel) + 1 }
+        val outX = FloatArray(totalLen)
+        val outY = FloatArray(totalLen)
         var i = 0
-        segments.forEach {
-            // TODO
+        segments.forEach { seg ->
+            val stroke = maglev.things[maglev.thingMap[seg.strokeId]!!] as MaglevStroke
+            val sign = if(seg.travel < 0) -1 else 1
+            (0..abs(seg.travel)).forEach { c ->
+                outX[i] = stroke.drawPoints.x[seg.pivotPoint + c * sign]
+                outY[i] = stroke.drawPoints.y[seg.pivotPoint + c * sign]
+                ++i
+            }
         }
 
-        out
+        _magFillXs = outX
+        _magFillYs = outY
+        return Pair(outX,outY)
     }
-    override val magFillXs: FloatArray get() {
-
-    }
-    override val magFillYs: FloatArray
-        get() = TODO("not implemented")
+    private var _magFillXs: FloatArray? = null
+    private var _magFillYs: FloatArray? = null
+    override val magFillXs get() = _magFillXs ?: recalcMagFills().first
+    override val magFillYs get() = _magFillYs ?: recalcMagFills().second
+    // endregion
 
     override fun startMagneticFill() {}
 
     override fun endMagneticFill(color: SColor, mode: MagneticFillMode) {
-        val fill = MaglevFill(segments.map {StrokeSegment(it.strokeId, it.pivotPoint, it.travel)}, color)
+        val fill = MaglevFill(segments.map {StrokeSegment(it.strokeId, it.pivotPoint, it.pivotPoint + it.travel)}, color)
         maglev.addThing(fill,  arranged, "Magnetic Fill")
     }
 
@@ -221,6 +238,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
             }
             else
                 ss.travel = closest.pivotPoint - ss.pivotPoint
+            resetMagFills()
         }
         else if(!locked || ss == null){
             // Can reach here either because we are not currently latched onto something or because
@@ -228,6 +246,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
             //  (b) closer to something else
             this.ss = closest
             segments.add(closest)
+            resetMagFills()
         }
     }
 

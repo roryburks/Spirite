@@ -112,10 +112,4 @@ private constructor(
 
     }
     // endregion
-
-
-    init {
-        val fakeHandle = MediumHandle(workspace, -1)
-        things.forEach { it.draw(build(ArrangedMediumData(fakeHandle, 0f, 0f))) }
-    }
 }
