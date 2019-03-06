@@ -8,6 +8,14 @@ import spirite.base.util.linear.Rect
 import kotlin.math.max
 import kotlin.math.min
 
+// TODO: Merge into Vectrix once spirite.Rect is replaced with Vectrix.RectI
+data class PackedRectangle (
+        val packedRects : List<Rect>
+){
+    val width: Int = packedRects.map{ it.x + it.width}.max() ?: 0
+    val height: Int = packedRects.map{ it.y + it.height}.max() ?: 0
+}
+
 private val NilPacked get() = PackedRectangle(emptyList())
 
 fun ModifiedSleatorAlgorithm2(toPack: List<Vec2i>) : PackedRectangle {

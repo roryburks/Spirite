@@ -1,7 +1,5 @@
 package spirite.base.imageData.mediums.magLev
 
-import rb.vectrix.linear.Vec2f
-import rb.vectrix.linear.Vec3
 import rb.vectrix.linear.Vec3f
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.pen.stroke.DrawPoints

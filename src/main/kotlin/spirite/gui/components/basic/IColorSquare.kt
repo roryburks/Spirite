@@ -10,7 +10,6 @@ import spirite.pc.gui.jcolor
 import spirite.pc.gui.scolor
 import java.awt.Graphics
 import javax.swing.JColorChooser
-import javax.swing.JPanel
 
 interface IColorSquareNonUI {
     val colorBind : Bindable<SColor>

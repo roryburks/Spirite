@@ -7,8 +7,6 @@ import spirite.gui.components.basic.IComponent.*
 import spirite.gui.components.basic.IComponent.BasicBorder.*
 import spirite.gui.components.basic.Invokable
 import spirite.gui.components.basic.events.MouseEvent
-import spirite.gui.components.basic.events.MouseEvent.MouseButton.*
-import spirite.gui.components.basic.events.MouseEvent.MouseEventType
 import spirite.gui.components.basic.events.MouseEvent.MouseEventType.*
 import spirite.gui.components.basic.events.MouseWheelEvent
 import spirite.gui.resources.Skin
@@ -20,7 +18,6 @@ import spirite.pc.gui.scolor
 import java.awt.Component
 import java.awt.Cursor
 import java.awt.event.*
-import java.awt.event.InputEvent.*
 import java.lang.ref.WeakReference
 import javax.swing.BorderFactory
 import javax.swing.JComponent

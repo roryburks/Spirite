@@ -1,6 +1,7 @@
 package spirite.gui.components.advanced
 
 import CrossLayout
+import rb.extendo.delegates.OnChangeDelegate
 import rb.owl.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
@@ -8,14 +9,14 @@ import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.graphics.IImage
 import spirite.base.graphics.NillImage
-import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.components.advanced.ITreeElementConstructor.ITNode
 import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.advanced.crossContainer.CrossColInitializer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IToggleButton
-import spirite.gui.resources.Skin
+import spirite.gui.resources.Skin.ContentTree.Background
+import spirite.gui.resources.Skin.ContentTree.SelectedBackground
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
@@ -33,7 +34,6 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import javax.swing.AbstractAction
-import javax.swing.JPanel
 import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 import kotlin.math.max
@@ -147,11 +147,11 @@ private constructor(private val imp : SwTreeViewImp<T>)
 {
     constructor() : this(SwTreeViewImp())
 
-    override var backgroundColor : Color by OnChangeDelegate(Skin.ContentTree.Background.jcolor) {imp.background = backgroundColor ; redraw()}
-    override var selectedColor : Color by OnChangeDelegate(Skin.ContentTree.SelectedBackground.jcolor) {redraw()}
+    override var backgroundColor : Color by OnChangeDelegate(Background.jcolor) { imp.background = backgroundColor; redraw() }
+    override var selectedColor : Color by OnChangeDelegate(SelectedBackground.jcolor) { redraw() }
 
-    override var gapSize by OnChangeDelegate( 12) {rebuildTree()}
-    override var leftSize by OnChangeDelegate(0) {rebuildTree()}
+    override var gapSize by OnChangeDelegate(12) { rebuildTree() }
+    override var leftSize by OnChangeDelegate(0) { rebuildTree() }
 
     //fun nodeAtPoint( p: Vec2i)
 

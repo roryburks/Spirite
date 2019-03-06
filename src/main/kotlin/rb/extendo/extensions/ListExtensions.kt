@@ -1,4 +1,5 @@
-package spirite.base.util
+package rb.extendo.extensions
+
 
 fun <T> MutableList<T>.pop() : T {
     val ret = get(lastIndex)

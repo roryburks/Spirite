@@ -2,11 +2,15 @@ package spirite.base.util.glu
 
 import com.jogamp.opengl.glu.GLU
 import com.jogamp.opengl.glu.GLUtessellatorCallback
+import rb.vectrix.compaction.FloatCompactor
 import spirite.base.graphics.gl.GLPrimitive
-import spirite.base.util.compaction.FloatCompactor
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
 
+// TODO: Wrap in shared-interface with Javascript interpolator and then put
+//  interface: rb.glow.glu
+//  this: rb.jvm.glow.glu
+//  js version: rb.js.glow.glu
 object PolygonTesselater {
     fun tesselatePolygon( x: List<Float>, y: List<Float>, count: Int) : GLPrimitive {
         val tess = GLU.gluNewTess()

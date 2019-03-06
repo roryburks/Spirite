@@ -1,9 +1,10 @@
 package spirite.base.util.shapes
 
+import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.mathUtil.f
 import spirite.base.graphics.gl.GLPrimitive
-import spirite.base.util.compaction.FloatCompactor
 
+// TODO: Merge with Vectrix Shapes
 interface IShape {
     fun buildPrimitive(
             maxError: Float = 0.2f,

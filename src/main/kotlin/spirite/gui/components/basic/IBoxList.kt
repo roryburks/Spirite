@@ -1,9 +1,9 @@
 package spirite.gui.components.basic
 
+import rb.extendo.delegates.OnChangeDelegate
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
-import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IBoxList.*
 import spirite.hybrid.Hybrid
@@ -53,8 +53,8 @@ interface IBoxList<T> : IComponent
 abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val del: IBoxListImp)
     :IBoxList<T>, IComponent by del.component
 {
-    var boxWidth by OnChangeDelegate(boxWidth, {rebuild()})
-    var boxHeight by OnChangeDelegate(boxHeight, {rebuild()})
+    var boxWidth by OnChangeDelegate(boxWidth, { rebuild() })
+    var boxHeight by OnChangeDelegate(boxHeight, { rebuild() })
 
     override val selectedIndexBind = Bindable(0)
             .also { it.addObserver(false) { new, old ->

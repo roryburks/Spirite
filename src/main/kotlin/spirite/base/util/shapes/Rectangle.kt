@@ -1,10 +1,11 @@
 package spirite.base.util.shapes
 
+import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.mathUtil.d
 import spirite.base.graphics.gl.GLPrimitive
-import spirite.base.util.compaction.FloatCompactor
 import spirite.base.util.glu.GLC
 
+// TODO: Merge with Vectrix Shapes
 class Rectangle(
         val x : Float,
         val y: Float,

@@ -25,34 +25,4 @@ class FlippingBehavior ( penner: Penner, val drawer: IFlipModule) : PennerBehavi
 
         super.onPenUp()
     }
-
 }
-
-/**
-public class FlippingBehavior extends StateBehavior {
-public FlippingBehavior(Penner penner) {
-super(penner);
-}
-int startX, startY;
-
-@Override
-public void start() {
-startX = this.penner.xi;
-startY = this.penner.yi;
-}
-@Override
-public void onMove() {
-
-}
-@Override
-public void onPenUp() {
-boolean horizontal = MUtil.distance(this.penner.xi , this.penner.yi, startX, startY) < 5
-||Math.abs(this.penner.xi - startX) > Math.abs(this.penner.yi - startY);
-this.penner.tryFlip( horizontal);
-
-super.onPenUp();
-}
-@Override public void onTock() {}
-
-
-}*/

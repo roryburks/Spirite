@@ -18,8 +18,6 @@ import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.hybrid.inputSystems.IGlobalMouseHook
 import spirite.pc.gui.basic.SwPanel
-import java.awt.Component
-import javax.swing.SwingUtilities
 import kotlin.reflect.KProperty
 
 interface IResizeContainerPanel : IComponent

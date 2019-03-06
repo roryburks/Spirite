@@ -1,17 +1,20 @@
 package spirite.base.pen.selectionBuilders
 
+import rb.vectrix.compaction.IntCompactor
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.f
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.Colors
-import spirite.base.util.compaction.IntCompactor
 import spirite.hybrid.Hybrid
 
 class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(workspace) {
-    val xCompactor = IntCompactor()
-    val yCompactor = IntCompactor()
+    private val xCompactor = IntCompactor()
+    private val yCompactor = IntCompactor()
+
+    val start get() = Vec2i(xCompactor[0], yCompactor[0])
+    val end get() = Vec2i(xCompactor[xCompactor.size - 1], yCompactor[yCompactor.size - 1])
 
     override fun start(x: Int, y: Int) {
         xCompactor.add(x)
@@ -37,8 +40,4 @@ class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(w
             gc.drawPolyLine( xCompactor.getChunk(i), yCompactor.getChunk(i), xCompactor.getChunkSize(i))
         }
     }
-
-    val start get() = Vec2i(xCompactor[0], yCompactor[0])
-    val end get() = Vec2i(xCompactor[xCompactor.size - 1], yCompactor[yCompactor.size - 1])
-
 }

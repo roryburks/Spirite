@@ -4,6 +4,7 @@ import rb.vectrix.linear.Vec2i
 import kotlin.math.max
 import kotlin.math.min
 
+// TODO: Remove and replace with Vectrix.RectI
 data class Rect(
         var x: Int,
         var y: Int,

@@ -19,20 +19,14 @@ class FormingSelectionBehavior(
         val mode: BuildMode)
     : DrawnPennerBehavior(penner)
 {
-    val builder : SelectionBuilder = when(shape) {
+    private val builder : SelectionBuilder = when(shape) {
         RECTANGLE -> RectSelectionBuilder(penner.workspace!!)
         OVAL -> OvalSelectionBuilder(penner.workspace!!)
     }
 
-    override fun onStart() {
-        builder.start(penner.x, penner.y)
-    }
-
+    override fun onStart() = builder.start(penner.x, penner.y)
     override fun onTock() {}
-
-    override fun onMove() {
-        builder.update(penner.x, penner.y)
-    }
+    override fun onMove() = builder.update(penner.x, penner.y)
 
     override fun onPenUp() {
         val built = builder.build()

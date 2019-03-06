@@ -1,4 +1,4 @@
-package spirite.base.util.compaction
+package rb.vectrix.compaction
 
 import kotlin.math.max
 

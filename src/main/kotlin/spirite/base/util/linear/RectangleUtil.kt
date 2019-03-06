@@ -3,6 +3,7 @@ package spirite.base.util.linear
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 
+// TODO: Merge into Vectrix once spirite.Rect is replaced with Vectrix.RectI
 object RectangleUtil {
     /**
      * Constructs a non-negative dimension Rectangle from two coordinates

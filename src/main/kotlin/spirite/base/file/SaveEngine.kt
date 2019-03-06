@@ -22,7 +22,6 @@ import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 import java.io.File
 import java.io.RandomAccessFile
-import java.nio.ByteBuffer
 import kotlin.math.min
 
 class SaveContext(

@@ -1,4 +1,4 @@
-package spirite.base.util.interpolation
+package rb.vectrix.interpolation
 
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil

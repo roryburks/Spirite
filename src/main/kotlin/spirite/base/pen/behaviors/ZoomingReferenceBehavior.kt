@@ -6,8 +6,8 @@ import spirite.base.pen.Penner
 
 class ZoomingReferenceBehavior(penner: Penner) : PennerBehavior(penner) {
 
-    val startX = penner.x
-    val startY = penner.y
+    private val startX = penner.x
+    private val startY = penner.y
 
     override fun onStart() {}
     override fun onTock() {}

@@ -1,9 +1,5 @@
-package spirite.base.util.delegates
+package spirite.base.imageData.undo
 
-import spirite.base.imageData.undo.IUndoEngine
-import spirite.base.imageData.undo.NullAction
-import spirite.base.imageData.undo.StackableAction
-import spirite.base.imageData.undo.UndoableAction
 import kotlin.reflect.KProperty
 
 
@@ -16,11 +12,10 @@ class UndoableDelegate<T>(
 
     operator fun getValue(thisRef: Any, prop: KProperty<*>): T = field
 
-    operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {
-        if( undoEngine == null) field = value
-        else if( field != value) {
+    operator fun setValue(thisRef:Any, prop: KProperty<*>, newValue: T) {
+        if( undoEngine == null) field = newValue
+        else if( field != newValue) {
             val oldValue = field
-            val newValue = value
             undoEngine.performAndStore( object : NullAction() {
                 override val description: String get() = changeDescription
                 override fun performAction() {field = newValue}
@@ -46,11 +41,10 @@ class UndoableChangeDelegate<T>(
 
     operator fun getValue(thisRef: Any, prop: KProperty<*>): T = field
 
-    operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {
-        if( undoEngine == null) field = value
-        else if( field != value) {
+    operator fun setValue(thisRef:Any, prop: KProperty<*>, newValue: T) {
+        if( undoEngine == null) field = newValue
+        else if( field != newValue) {
             val oldValue = field
-            val newValue = value
             undoEngine.performAndStore( object : NullAction() {
                 override val description: String get() = changeDescription
                 override fun performAction() {field = newValue}
@@ -87,11 +81,11 @@ class StackableUndoableDelegate<T>(
         override fun undoAction() {field=  oldValue}
 
         override fun canStack(other: UndoableAction): Boolean {
-            return (other as? StackableUndoableDelegate<*>.SUDAction)?.context == context
+            return (other as? StackableUndoableDelegate<T>.SUDAction)?.context == context
         }
 
         override fun stackNewAction(other: UndoableAction) {
-            ((other as? StackableUndoableDelegate<T>.SUDAction)?.newValue as? T)?.also { newValue = it }
+            ((other as? StackableUndoableDelegate<T>.SUDAction)?.newValue)?.also { newValue = it }
         }
 
     }

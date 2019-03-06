@@ -1,8 +1,8 @@
 package spirite.pc.gui.basic
 
+import rb.extendo.delegates.OnChangeDelegate
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
-import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.UIUtil
 import spirite.gui.components.basic.GradientSliderNonUI
 import spirite.gui.components.basic.IGradientSlider
@@ -15,7 +15,6 @@ import java.awt.GradientPaint
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.text.DecimalFormat
-import javax.swing.JPanel
 
 
 class SwGradientSlider

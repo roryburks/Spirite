@@ -1,10 +1,10 @@
-package spirite.base.util
+package rb.vectrix.mathUtil
 
 interface IDataStreamHasher {
     fun getHash(stream: Sequence<Byte>) : Int
 }
 
-class CyclicRedundancyChecker : IDataStreamHasher{
+class CyclicRedundancyChecker : IDataStreamHasher {
     val crcTable = arrayOf(
             0x00000000.toInt(), 0x77073096.toInt(), 0xee0e612c.toInt(), 0x990951ba.toInt(), 0x076dc419.toInt(), 0x706af48f.toInt(),
             0xe963a535.toInt(), 0x9e6495a3.toInt(),	0x0edb8832.toInt(), 0x79dcb8a4.toInt(), 0xe0d5e91e.toInt(), 0x97d2d988.toInt(),

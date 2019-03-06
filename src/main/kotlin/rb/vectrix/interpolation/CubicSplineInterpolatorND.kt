@@ -1,4 +1,4 @@
-package spirite.base.util.interpolation
+package rb.vectrix.interpolation
 
 import kotlin.math.max
 

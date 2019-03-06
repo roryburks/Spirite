@@ -14,8 +14,8 @@ class FreeformSelectionBehavior(
         val mode: BuildMode)
     : DrawnPennerBehavior(penner)
 {
-    val builder = FreeformSelectionBuilder(penner.workspace!!)
-    var drawing = true
+    private val builder = FreeformSelectionBuilder(penner.workspace!!)
+    private var drawing = true
 
     override fun onStart() {
         builder.update(penner.x, penner.y)

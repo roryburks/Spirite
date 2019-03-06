@@ -1,6 +1,7 @@
 package spirite.base.imageData.mediums.magLev
 
-import rb.vectrix.linear.*
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
@@ -16,7 +17,6 @@ import spirite.base.imageData.mediums.IMedium.MediumType.MAGLEV
 import spirite.base.imageData.undo.ImageAction
 import spirite.base.util.Colors
 import spirite.pc.gui.SColor
-import javax.swing.SwingUtilities
 
 
 class MaglevMedium

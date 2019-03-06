@@ -1,9 +1,8 @@
-package spirite.base.util.delegates
+package rb.extendo.delegates
 
 import kotlin.reflect.KProperty
 
-
-class DerivedLazy<T>(private val delegate : () -> T) {
+class MutableLazy<T>(private val delegate : () -> T) {
     var field : T? = null
 
     operator fun getValue(thisRef: Any, prop: KProperty<*>): T {
@@ -14,9 +13,5 @@ class DerivedLazy<T>(private val delegate : () -> T) {
 
     operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {
         field = value
-    }
-
-    fun reset() {
-        field = null
     }
 }

@@ -5,10 +5,11 @@ import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.BoxList
 import spirite.gui.components.basic.IComponent
 import spirite.pc.gui.SwUtil
-import spirite.pc.gui.adaptMouseSystem
 import java.awt.GridLayout
 import java.awt.Point
-import java.awt.event.*
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.awt.event.KeyEvent
 import javax.swing.Action
 import javax.swing.KeyStroke
 import kotlin.math.max

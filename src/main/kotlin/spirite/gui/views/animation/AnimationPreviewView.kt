@@ -1,6 +1,5 @@
 package spirite.gui.views.animation
 
-import rb.jvm.owl.bindWeaklyTo
 import rb.owl.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
@@ -22,7 +21,6 @@ import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
 import java.awt.Graphics
-import javax.swing.JPanel
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.round

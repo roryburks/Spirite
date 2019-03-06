@@ -27,10 +27,9 @@ import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.selection.SelectionEngine
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
+import spirite.base.imageData.undo.UndoableDelegate
 import spirite.base.pen.stroke.IStrokeDrawerProvider
-import spirite.base.util.delegates.UndoableDelegate
 import java.io.File
-import kotlin.system.measureTimeMillis
 
 interface IImageWorkspace {
     var width: Int

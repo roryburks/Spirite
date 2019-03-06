@@ -1,5 +1,6 @@
 package spirite.base.file.load
 
+import rb.vectrix.interpolation.CubicSplineInterpolator2D
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.round
@@ -7,7 +8,6 @@ import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readFloatArray
-import spirite.base.graphics.gl.stroke.GLStrokeDrawerV3
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.magLev.IMaglevThing
 import spirite.base.imageData.mediums.magLev.MaglevFill
@@ -15,13 +15,14 @@ import spirite.base.imageData.mediums.magLev.MaglevFill.StrokeSegment
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.base.pen.PenState
-import spirite.base.pen.stroke.*
+import spirite.base.pen.stroke.BasicDynamics
+import spirite.base.pen.stroke.DrawPoints
+import spirite.base.pen.stroke.DrawPointsBuilder
+import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC
 import spirite.base.util.ColorARGB32Normal
-import spirite.base.util.interpolation.CubicSplineInterpolator2D
 import spirite.base.util.toColor
-import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED

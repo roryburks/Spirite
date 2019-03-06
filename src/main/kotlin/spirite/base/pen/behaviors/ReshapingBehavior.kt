@@ -88,11 +88,13 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
 
     val workingTransform : ITransformF
         get() {
-        val trans = MutableTransformF.Scale(scale.xf, scale.yf)
-        trans.preRotate(rotation)
-        trans.preTranslate(translation.xf, translation.yf)
-        return trans
-    }
+            val trans = MutableTransformF.Scale(scale.xf, scale.yf)
+            trans.preRotate(rotation)
+            trans.preTranslate(translation.xf, translation.yf)
+            return trans
+        }
+
+    var overlap = -1
 
     fun calcDisplayTransform( view : WorkSectionView) : ITransformF {
         val region = region ?: return workingTransform
@@ -106,7 +108,6 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
     }
 
 
-    var overlap = -1
 
 
     override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {

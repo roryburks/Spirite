@@ -1,6 +1,5 @@
 package spirite.base.imageData.mediums.magLev
 
-import rb.hydra.miniTiamatGrind
 import rb.hydra.miniTiamatGrindSync
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
@@ -25,12 +24,10 @@ import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.Color
-import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.pc.gui.SColor
 import kotlin.math.abs
-import kotlin.math.sign
 
 class MaglevImageDrawer(
         arranged: ArrangedMediumData,

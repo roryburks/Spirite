@@ -3,7 +3,6 @@ package spirite.gui.views.groupView
 import rb.jvm.owl.addWeakObserver
 import rb.owl.IContract
 import rb.owl.bindable.addObserver
-import rb.owl.observer
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
@@ -25,9 +24,7 @@ import spirite.gui.resources.SwIcons
 import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
 import spirite.hybrid.inputSystems.IGlobalMouseHook
-import java.awt.Component
 import java.awt.datatransfer.Transferable
-import javax.swing.SwingUtilities
 
 class PrimaryGroupView
 private constructor(

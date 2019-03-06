@@ -1,10 +1,10 @@
 package spirite.gui.views.animation
 
+import rb.extendo.delegates.OnChangeDelegate
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.components.basic.IComponent
-import spirite.gui.resources.Skin
+import spirite.gui.resources.Skin.Global.Bg
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.SColor
@@ -22,7 +22,7 @@ private constructor(val imp: Imp) : IComponent by SwComponent(imp)
     init { imp.context = this}
     constructor() : this(Imp())
 
-    var animation: Animation? by OnChangeDelegate<Animation?>(null) {redraw()}
+    var animation: Animation? by OnChangeDelegate<Animation?>(null) { redraw() }
     var frame: Float = 0f
         set(value) {
             val newValue = if( animation is FixedFrameAnimation) floor(value) else value
@@ -32,7 +32,7 @@ private constructor(val imp: Imp) : IComponent by SwComponent(imp)
             }
         }
 
-    var bgColor: SColor by OnChangeDelegate(Skin.Global.Bg.scolor) {redraw()}
+    var bgColor: SColor by OnChangeDelegate(Bg.scolor) { redraw() }
 
     private class Imp : JPanel() {
         var context: AnimationPlayView? = null
