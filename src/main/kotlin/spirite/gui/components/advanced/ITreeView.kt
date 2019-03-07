@@ -24,7 +24,6 @@ import spirite.pc.gui.JColor
 import spirite.pc.gui.SimpleMouseListener
 import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
-import spirite.pc.gui.basic.jcomponent
 import spirite.pc.gui.dragAndDrop.addDragSource
 import spirite.pc.gui.dragAndDrop.setDragTarget
 import java.awt.*
@@ -32,9 +31,7 @@ import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.*
 import java.awt.event.ActionEvent
-import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
-import java.awt.event.MouseEvent
 import javax.swing.AbstractAction
 import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
@@ -156,22 +153,6 @@ private constructor(private val imp : SwTreeViewImp<T>,
     override var gapSize by OnChangeDelegate(12) { rebuildTree() }
     override var leftSize by OnChangeDelegate(0) { rebuildTree() }
 
-    //fun nodeAtPoint( p: Vec2i)
-
-    init {
-        onMousePress += {
-            getNodeFromY(it.point.y)?.also { selectedNode = it }
-            requestFocus()
-        }
-
-        imp.inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "rename")
-        imp.actionMap.put("rename", object : AbstractAction(){
-            override fun actionPerformed(e: ActionEvent?) {
-                nodesAsList.firstOrNull { it == selectedNode }?.also { it.component?.onRename() }
-            }
-        })
-    }
-
     override val selectedBind = Bindable<T?>(null)
     override var selected: T?
         get() = selectedBind.field
@@ -187,6 +168,22 @@ private constructor(private val imp : SwTreeViewImp<T>,
                 redraw()
             } }
     override var selectedNode: ITreeNode<T>? by selectedNodeBind
+
+    private val compToNodeMap = mutableMapOf<IComponent,TreeNode<T>>()
+
+    init {
+        onMousePress += {evt ->
+            selectedNode = getNodeFromY(evt.point.y) ?: selectedNode
+            requestFocus()
+        }
+
+        imp.inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "rename")
+        imp.actionMap.put("rename", object : AbstractAction(){
+            override fun actionPerformed(e: ActionEvent?) {
+                nodesAsList.firstOrNull { it == selectedNode }?.also { it.component?.onRename() }
+            }
+        })
+    }
 
     // region Tree Construction
     private fun makeToggleButton( checked: Boolean) : IToggleButton {
@@ -317,8 +314,6 @@ private constructor(private val imp : SwTreeViewImp<T>,
     // endregion
 
 
-    private val compToNodeMap = mutableMapOf<IComponent,TreeNode<T>>()
-
     // region TreeNode
     inner class TreeNode<T>
     internal constructor( defaultValue: T, val attributes: TreeNodeAttributes<T>, expanded: Boolean = true)
@@ -396,7 +391,7 @@ private constructor(private val imp : SwTreeViewImp<T>,
                 val draggingRelativeTo = draggingRelativeTo
                 if (draggingRelativeTo == dragging && dragging != null) return
 
-                val interpreter = (if (draggingRelativeTo == null) treeRootInterpreter else draggingRelativeTo.attributes)
+                val interpreter = (draggingRelativeTo?.attributes ?: treeRootInterpreter)
                         ?: return
                 if (interpreter.canImport(evt.transferable) && draggingRelativeTo != null)
                     interpreter.interpretDrop(evt.transferable, draggingRelativeTo, draggingDirection)
