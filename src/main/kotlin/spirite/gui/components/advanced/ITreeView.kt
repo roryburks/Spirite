@@ -25,6 +25,8 @@ import spirite.pc.gui.SimpleMouseListener
 import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.jcomponent
+import spirite.pc.gui.dragAndDrop.addDragSource
+import spirite.pc.gui.dragAndDrop.setDragTarget
 import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
@@ -141,9 +143,10 @@ class ITreeElementConstructor<T> {
 }
 
 class SwTreeView<T>
-private constructor(private val imp : SwTreeViewImp<T>)
+private constructor(private val imp : SwTreeViewImp<T>,
+                    private val swImp : SwComponent = SwComponent(imp))
     : ITreeView<T>,
-        IComponent by SwComponent(imp)
+        IComponent by swImp
 {
     constructor() : this(SwTreeViewImp())
 
@@ -211,7 +214,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
             treeComponent.leftComponent?.also { compToNodeMap[it] = node}
             node.component = treeComponent
 
-            dnd.addDropSource(treeComponent.component.jcomponent)
+            //dnd.addDropSource(treeComponent.component.jcomponent)
 
             treeComponent.component.onMouseClick += {
                 selectedNode = node
@@ -374,50 +377,19 @@ private constructor(private val imp : SwTreeViewImp<T>)
             //rebuildTree()
         }
     }
-    // endRegion
+    // endregion
 
     // region DnD
 
-    private val dnd = BTDnDManager()
-    init {
-        imp.dropTarget = dnd
-    }
     private var dragging: TreeNode<T>? = null
     private var draggingRelativeTo: TreeNode<T>? = null
     private var draggingDirection : DropDirection = ABOVE
+    private val dragSource = DragSource.getDefaultDragSource()
 
-    init {
-        this.onMousePress += { evt->
-            dnd.dndGR.forEach { it.fire(evt.point.x, evt.point.y)}
-        }
-    }
-
-
-    inner class  BTDnDGR(source: DragSource, comp: Component, i: Int, dls: DragGestureListener) : DragGestureRecognizer(source, comp, i, dls) {
-        override fun unregisterListeners() {}
-
-        override fun registerListeners() {
-        }
-
-        fun fire( x: Int, y: Int) {
-            events = ArrayList<InputEvent>(1)
-            events.add(MouseEvent(imp, 0, 0, 0, 0, 0, 0,  false))
-            fireDragGestureRecognized(DnDConstants.ACTION_MOVE, Point(x,y))
-        }
-    }
-
-    private inner class BTDnDManager : DropTarget(), DragSourceListener
-    {
-
-        val dragSource = DragSource.getDefaultDragSource()
-
-        val dndGR = mutableListOf<BTDnDGR>()
-
-        fun addDropSource(component: Component, root: Boolean = false) {
-            //dndGR.add(
-            //BTDnDGR(dragSource, component,DnDConstants.ACTION_COPY_OR_MOVE, if(root) rootDragListener else componentBasedDragListener))
-            dragSource.createDefaultDragGestureRecognizer(component, DnDConstants.ACTION_COPY_OR_MOVE, if(root) rootDragListener else componentBasedDragListener)
-        }
+    private val dropTargetListener = object : DropTargetListener {
+        override fun dropActionChanged(dtde: DropTargetDragEvent) {}
+        override fun dragExit(dte: DropTargetEvent) {}
+        override fun dragEnter(dtde: DropTargetDragEvent) {}
 
         override fun drop(evt: DropTargetDropEvent) {
             try {
@@ -466,14 +438,14 @@ private constructor(private val imp : SwTreeViewImp<T>)
             if( oldDir != draggingDirection || oldNode != draggingRelativeTo)
                 redraw()
         }
+    }
 
-        // region DragSourceListener
-        // Note: This Listener is only used for the DragDropEnd for when things are dragged out of the tree, everything
-        //  else is handled by the DropTarget object
+    private val dragSourceListener = object : DragSourceListener {
+        override fun dropActionChanged(dsde: DragSourceDragEvent?) {}
         override fun dragOver(dsde: DragSourceDragEvent?) {}
         override fun dragExit(dse: DragSourceEvent?) {}
-        override fun dropActionChanged(dsde: DragSourceDragEvent?) {}
         override fun dragEnter(dsde: DragSourceDragEvent?) {}
+
         override fun dragDropEnd(evt: DragSourceDropEvent) {
             val p = evt.location
             SwingUtilities.convertPointFromScreen(evt.location, imp)
@@ -486,44 +458,36 @@ private constructor(private val imp : SwTreeViewImp<T>)
             dragging = null
             redraw()
         }
-        // endregion
-
-        // region DragGestureListener
-        val componentBasedDragListener : DragGestureListener = object : DragGestureListener {
-            override fun dragGestureRecognized(evt: DragGestureEvent) {
-                if( dragging != null) return
-
-                val node = compToNodeMap.entries.firstOrNull { it.key.jcomponent == evt.component}?.value ?: return
-                recognized(evt, node)
-            }
-        }
-
-        val rootDragListener = object : DragGestureListener {
-            override fun dragGestureRecognized(evt: DragGestureEvent) {
-                if( dragging != null) return
-
-                val node = getNodeFromY(evt.dragOrigin.y) ?: return
-                recognized(evt, node)
-            }
-        }
-
-        private fun recognized( evt: DragGestureEvent, node: TreeNode<T>) {
-            if( node.attributes.canDrag()) {
-                dragging = node
-
-                val cursor = DragSource.DefaultMoveDrop
-                val cursorImage = Hybrid.imageConverter.convertOrNull<ImageBI>(node.attributes.makeCursor(node.value))?.bi
-                dragSource.startDrag(
-                        evt,
-                        cursor,
-                        cursorImage,
-                        Point(10,10),
-                        node.attributes.makeTransferable(node.value),
-                        this)
-            }
-        }
-        // endregion
     }
+
+    private val dragGestureListener = object : DragGestureListener {
+        override fun dragGestureRecognized(evt: DragGestureEvent) {
+            if( dragging != null) return
+
+            val node = getNodeFromY(evt.dragOrigin.y) ?: return
+            recognized(evt, node)
+        }
+    }
+    fun recognized(evt: DragGestureEvent, node: TreeNode<T>) {
+        if (node.attributes.canDrag()) {
+            dragging = node
+
+            val cursor = DragSource.DefaultMoveDrop
+            val cursorImage = Hybrid.imageConverter.convertOrNull<ImageBI>(node.attributes.makeCursor(node.value))?.bi
+            dragSource.startDrag(
+                    evt,
+                    cursor,
+                    cursorImage,
+                    Point(10, 10),
+                    node.attributes.makeTransferable(node.value),
+                    dragSourceListener)
+        }
+    }
+    init {
+        swImp.setDragTarget(dropTargetListener)
+        swImp.addDragSource(dragGestureListener)
+    }
+
     // endregion
 
     // region Implementation (Drawing Mostly)
@@ -619,8 +583,4 @@ private constructor(private val imp : SwTreeViewImp<T>)
     }
 
     //endregion
-
-    init {
-        dnd.addDropSource(this.jcomponent, true)
-    }
 }

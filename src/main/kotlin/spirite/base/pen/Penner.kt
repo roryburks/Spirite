@@ -47,9 +47,9 @@ class Penner(
     : IPenner
 {
     val holdingSpace get() = Hybrid.keypressSystem.holdingSpace
-    var holdingShift = false ; private set
-    var holdingAlt = false ; private set
-    var holdingCtrl = false ; private set
+    var holdingShift = false
+    var holdingAlt = false
+    var holdingCtrl = false
 
     val workspace get() = context.currentWorkspace
 
