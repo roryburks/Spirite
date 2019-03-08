@@ -1,6 +1,7 @@
 package spirite.base.brains.commands
 
 import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import spirite.base.brains.IWorkspaceSet
@@ -28,6 +29,7 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
         SHIFT_DOWN("shiftDown"),
         SHIFT_LEFT("shiftLeft"),
         SHIFT_RIGHT("shiftRight"),
+        SCALE3x("Scale3x")
         ;
 
         override val commandString: String get() = "draw.$string"
@@ -62,6 +64,11 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
             SHIFT_DOWN.string -> if( !shift(0,1, workspace)) return false
             SHIFT_LEFT.string -> if( !shift(-1,0, workspace)) return false
             SHIFT_RIGHT.string -> if( !shift(1,0, workspace)) return false
+            SCALE3x.string -> {
+                val transform = MutableTransformF.Scale(3f,3f)
+                transform.preTranslate(0f, -200f)
+                (workspace.activeDrawer as? ITransformModule)?.transform(transform) ?: print("dont")
+            }
 
             else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: draw.$string")
         }

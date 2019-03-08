@@ -191,9 +191,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
 
         out
     }
-    override val magFillXs: FloatArray get() {
-
-    }
+    override val magFillXs: FloatArray get()  = TODO()
     override val magFillYs: FloatArray
         get() = TODO("not implemented")
 
@@ -238,15 +236,16 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
     private data class StrokePointContext(val strokeIndex: Int, val index: Int, val drawPoints: DrawPoints)
     fun findClosestStroke( x: Float, y: Float) : Pair<Double,BuildingStrokeSegment>?
     {
-        val (dist, closest) = maglev.things.asSequence()
-                .mapIndexedNotNull { index, iMaglevThing ->
-                    if( iMaglevThing is MaglevStroke) Pair(index, iMaglevThing.drawPoints)
-                    else null }
-                .flatMap { (index, drawPoints) ->
-                    (0 until drawPoints.length).asSequence().map { StrokePointContext(index, it, drawPoints) } }
-                .miniTiamatGrindSync { MathUtil.distance(x, y, it.drawPoints.x[it.index], it.drawPoints.y[it.index]).d } ?: return null
-
-        val remappedStrokeId = maglev.thingMap.entries.first { it.value == closest.strokeIndex }.key
-        return Pair(dist, BuildingStrokeSegment(remappedStrokeId, closest.index))
+        return null
+//        val (dist, closest) = maglev.things.asSequence()
+//                .mapIndexedNotNull { index, iMaglevThing ->
+//                    if( iMaglevThing is MaglevStroke) Pair(index, iMaglevThing.drawPoints)
+//                    else null }
+//                .flatMap { (index, drawPoints) ->
+//                    (0 until drawPoints.length).asSequence().map { StrokePointContext(index, it, drawPoints) } }
+//                .miniTiamatGrindSync { MathUtil.distance(x, y, it.drawPoints.x[it.index], it.drawPoints.y[it.index]).d } ?: return null
+//
+//        val remappedStrokeId = maglev.thingMap.entries.first { it.value == closest.strokeIndex }.key
+//        return Pair(dist, BuildingStrokeSegment(remappedStrokeId, closest.index))
     }
 }
