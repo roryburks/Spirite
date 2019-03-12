@@ -3,7 +3,6 @@ package spirite.pc.gui.basic
 import spirite.gui.resources.Skin.Global
 import spirite.pc.gui.adaptMouseSystem
 import java.awt.*
-import java.awt.event.MouseEvent
 import javax.swing.*
 import javax.swing.plaf.basic.BasicScrollBarUI
 

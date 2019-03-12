@@ -1,14 +1,14 @@
 package spirite.base.pen.stroke
 
+import rb.vectrix.compaction.FloatCompactor
+import rb.vectrix.interpolation.Interpolator2D
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.pen.PenState
-import spirite.base.util.compaction.FloatCompactor
-import spirite.base.util.interpolation.Interpolator2D
 
 object DrawPointsBuilder {
 
     // The Interpolator tick distance.  Lower means smoother but more rendering time (especially with Maglev layers)
-    val DIFF = 1.0f
+    private const val DIFF = 1.0f
 
     fun buildPoints(interpolator: Interpolator2D?, penStates: List<PenState>, dynamics: PenDynamics?) : DrawPoints {
         val num = penStates.size

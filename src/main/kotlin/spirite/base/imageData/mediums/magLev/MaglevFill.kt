@@ -1,11 +1,14 @@
 package spirite.base.imageData.mediums.magLev
 
+import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.pc.gui.SColor
+import kotlin.math.abs
 
-class MaglevFill(
+data class MaglevFill(
         val segments: List<StrokeSegment>,
-        color: SColor) :
+        val mode: MagneticFillMode,
+        var color: SColor) :
         IMaglevThing, IMaglevColorwiseThing
 {
     data class StrokeSegment(
@@ -13,16 +16,33 @@ class MaglevFill(
             val start: Int,
             val end: Int)
 
-    var color: SColor = color ; private set
-
-
-
-    override fun dupe(): IMaglevThing {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun dupe() = this.copy(color = color) // note: segments are currently immutable so no need to deep-copy
 
     override fun draw(built: BuiltMediumData) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val len = segments.sumBy { abs(it.end - it.start) + 1 }
+        val outX = FloatArray(len)
+        val outY = FloatArray(len)
+        var i = 0
+        val maglev = built.arranged.handle.medium as MaglevMedium
+        for( segment in segments) {
+            val stroke = maglev.things[segment.strokeId] as MaglevStroke
+
+            val stepping =
+                    if(segment.end >= segment.start) segment.start..segment.end
+                    else segment.start downTo segment.end
+
+            stepping.forEach { c ->
+                outX[i] = stroke.drawPoints.x[c]
+                outY[i] = stroke.drawPoints.y[c]
+                ++i
+            }
+        }
+
+        built.rawAccessComposite {raw ->
+            val gc = raw.graphics
+            gc.color = color
+            gc.fillPolygon(outX.asList(), outY.asList(), len)
+        }
     }
 
     override fun transformColor(lambda: (SColor) -> SColor) {
@@ -32,5 +52,4 @@ class MaglevFill(
             color = newColor
         }
     }
-
 }

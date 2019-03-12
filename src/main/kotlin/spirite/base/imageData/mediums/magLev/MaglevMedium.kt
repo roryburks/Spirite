@@ -1,6 +1,7 @@
 package spirite.base.imageData.mediums.magLev
 
-import rb.vectrix.linear.*
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
@@ -16,7 +17,6 @@ import spirite.base.imageData.mediums.IMedium.MediumType.MAGLEV
 import spirite.base.imageData.undo.ImageAction
 import spirite.base.util.Colors
 import spirite.pc.gui.SColor
-import javax.swing.SwingUtilities
 
 
 class MaglevMedium
@@ -24,8 +24,7 @@ private constructor(
         val workspace: IImageWorkspace,
         private val mediumRepo: MMediumRepository,
         internal val things: MutableList<IMaglevThing>,
-        private val builtImage : DynamicImage = DynamicImage(),
-        internal val thingMap: MutableMap<Int,Int> = mutableMapOf())
+        private val builtImage : DynamicImage = DynamicImage())
     :IMedium
 {
     constructor(
@@ -51,7 +50,6 @@ private constructor(
             override val description: String get() = description
             override fun performImageAction(built: BuiltMediumData) {
                 things.add(thing)
-                thingMap[things.lastIndex] = things.lastIndex
                 thing.draw(built)
             }
         })
@@ -112,10 +110,4 @@ private constructor(
 
     }
     // endregion
-
-
-    init {
-        val fakeHandle = MediumHandle(workspace, -1)
-        things.forEach { it.draw(build(ArrangedMediumData(fakeHandle, 0f, 0f))) }
-    }
 }

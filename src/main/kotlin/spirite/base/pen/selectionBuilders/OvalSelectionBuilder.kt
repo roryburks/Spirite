@@ -7,10 +7,10 @@ import spirite.hybrid.Hybrid
 
 
 class OvalSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( workspace) {
-    var startX: Int = 0
-    var startY: Int = 0
-    var currentX: Int = 0
-    var currentY: Int = 0
+    private var startX: Int = 0
+    private var startY: Int = 0
+    private var currentX: Int = 0
+    private var currentY: Int = 0
 
     override fun start(x: Int, y: Int) {
         startX = x

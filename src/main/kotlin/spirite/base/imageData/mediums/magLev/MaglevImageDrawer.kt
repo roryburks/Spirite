@@ -1,6 +1,5 @@
 package spirite.base.imageData.mediums.magLev
 
-import rb.hydra.miniTiamatGrind
 import rb.hydra.miniTiamatGrindSync
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
@@ -25,10 +24,10 @@ import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.Color
-import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.pc.gui.SColor
+import kotlin.math.abs
 
 class MaglevImageDrawer(
         arranged: ArrangedMediumData,
@@ -181,24 +180,42 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
     var ss : BuildingStrokeSegment? =  null
     val segments by lazy { mutableListOf<BuildingStrokeSegment>()}
 
-    private val _magFillXs = DerivedLazy<FloatArray>{
-        val totalLen = segments.sumBy { it.travel + 1 }
-        val out = FloatArray(totalLen)
+
+    // region MagFill Coords
+    private fun resetMagFills() {
+        _magFillXs = null
+        _magFillYs = null
+    }
+
+    private fun recalcMagFills() : Pair<FloatArray,FloatArray> {
+        val totalLen = segments.sumBy { abs(it.travel) + 1 }
+        val outX = FloatArray(totalLen)
+        val outY = FloatArray(totalLen)
         var i = 0
-        segments.forEach {
-            // TODO
+        segments.forEach { seg ->
+            val stroke = maglev.things[seg.strokeId] as MaglevStroke
+            val sign = if(seg.travel < 0) -1 else 1
+            (0..abs(seg.travel)).forEach { c ->
+                outX[i] = stroke.drawPoints.x[seg.pivotPoint + c * sign]
+                outY[i] = stroke.drawPoints.y[seg.pivotPoint + c * sign]
+                ++i
+            }
         }
 
-        out
+        _magFillXs = outX
+        _magFillYs = outY
+        return Pair(outX,outY)
     }
-    override val magFillXs: FloatArray get()  = TODO()
-    override val magFillYs: FloatArray
-        get() = TODO("not implemented")
+    private var _magFillXs: FloatArray? = null
+    private var _magFillYs: FloatArray? = null
+    override val magFillXs get() = _magFillXs ?: recalcMagFills().first
+    override val magFillYs get() = _magFillYs ?: recalcMagFills().second
+    // endregion
 
     override fun startMagneticFill() {}
 
     override fun endMagneticFill(color: SColor, mode: MagneticFillMode) {
-        val fill = MaglevFill(segments.map {StrokeSegment(it.strokeId, it.pivotPoint, it.travel)}, color)
+        val fill = MaglevFill(segments.map {StrokeSegment(it.strokeId, it.pivotPoint, it.pivotPoint + it.travel)}, mode, color)
         maglev.addThing(fill,  arranged, "Magnetic Fill")
     }
 
@@ -208,7 +225,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
         if( closestDist > r) return
 
         if( closest.strokeId == ss?.strokeId) {
-            val stroke = maglev.things[maglev.thingMap[closest.strokeId] ?: return] as MaglevStroke
+            val stroke = maglev.things[closest.strokeId] as MaglevStroke
             val sx = stroke.drawPoints.x[closest.pivotPoint]
             val sy = stroke.drawPoints.y[closest.pivotPoint]
 
@@ -219,6 +236,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
             }
             else
                 ss.travel = closest.pivotPoint - ss.pivotPoint
+            resetMagFills()
         }
         else if(!locked || ss == null){
             // Can reach here either because we are not currently latched onto something or because
@@ -226,6 +244,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
             //  (b) closer to something else
             this.ss = closest
             segments.add(closest)
+            resetMagFills()
         }
     }
 
@@ -236,16 +255,14 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
     private data class StrokePointContext(val strokeIndex: Int, val index: Int, val drawPoints: DrawPoints)
     fun findClosestStroke( x: Float, y: Float) : Pair<Double,BuildingStrokeSegment>?
     {
-        return null
-//        val (dist, closest) = maglev.things.asSequence()
-//                .mapIndexedNotNull { index, iMaglevThing ->
-//                    if( iMaglevThing is MaglevStroke) Pair(index, iMaglevThing.drawPoints)
-//                    else null }
-//                .flatMap { (index, drawPoints) ->
-//                    (0 until drawPoints.length).asSequence().map { StrokePointContext(index, it, drawPoints) } }
-//                .miniTiamatGrindSync { MathUtil.distance(x, y, it.drawPoints.x[it.index], it.drawPoints.y[it.index]).d } ?: return null
-//
-//        val remappedStrokeId = maglev.thingMap.entries.first { it.value == closest.strokeIndex }.key
-//        return Pair(dist, BuildingStrokeSegment(remappedStrokeId, closest.index))
+        val (dist, closest) = maglev.things.asSequence()
+                .mapIndexedNotNull { index, iMaglevThing ->
+                    if( iMaglevThing is MaglevStroke) Pair(index, iMaglevThing.drawPoints)
+                    else null }
+                .flatMap { (index, drawPoints) ->
+                    (0 until drawPoints.length).asSequence().map { StrokePointContext(index, it, drawPoints) } }
+                .miniTiamatGrindSync { MathUtil.distance(x, y, it.drawPoints.x[it.index], it.drawPoints.y[it.index]).d } ?: return null
+
+        return Pair(dist, BuildingStrokeSegment(closest.strokeIndex, closest.index))
     }
 }

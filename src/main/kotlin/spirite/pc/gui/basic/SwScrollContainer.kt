@@ -11,7 +11,6 @@ import spirite.gui.components.basic.events.MouseEvent.MouseEventType.*
 import spirite.hybrid.Hybrid
 import spirite.hybrid.inputSystems.IGlobalMouseHook
 import java.awt.Component
-import javax.swing.SwingUtilities
 
 class SwScrollContainer
 private constructor( private val imp: SwScrollContainerImp)

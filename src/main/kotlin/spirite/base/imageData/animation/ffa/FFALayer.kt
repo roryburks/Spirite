@@ -1,10 +1,9 @@
 package spirite.base.imageData.animation.ffa
 
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
-import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.undo.NullAction
-import spirite.base.util.delegates.UndoableChangeDelegate
+import spirite.base.imageData.undo.UndoableChangeDelegate
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 
@@ -39,7 +38,7 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
     }
 
     var asynchronous by UndoableChangeDelegate(false, context.workspace.undoEngine,
-            "Toggled Frame Layer Asynchronousness", {context.triggerFFAChange(this)})
+            "Toggled Frame Layer Asynchronousness", { context.triggerFFAChange(this) })
 
     protected val _frames = mutableListOf<FFAFrame>()
     val frames : List<FFAFrame> get() = _frames

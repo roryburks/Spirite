@@ -1,5 +1,6 @@
 package spirite.base.util
 
+// TODO: Determine where this really belongs and what it really should be called (maybe interfaced as a name-deduping service?)
 object StringUtil {
 
     private val endNumRegex = """_([0-9]+)$""".toRegex()

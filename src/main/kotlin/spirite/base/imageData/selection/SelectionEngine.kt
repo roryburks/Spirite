@@ -1,5 +1,6 @@
 package spirite.base.imageData.selection
 
+import rb.extendo.delegates.DerivedLazy
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.vectrix.linear.ITransformF
@@ -15,7 +16,6 @@ import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
-import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.Hybrid
@@ -54,7 +54,7 @@ class SelectionEngine(
         val workspace: IImageWorkspace
 ) : ISelectionEngine {
 
-    private val selectionDerived = DerivedLazy { selectionMask?.let { Selection(it, selectionTransform) }}
+    private val selectionDerived = DerivedLazy { selectionMask?.let { Selection(it, selectionTransform) } }
     override val selection by selectionDerived
 
     // region Base Selection Stuff

@@ -22,8 +22,8 @@ import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
+import spirite.base.imageData.undo.UndoableDelegate
 import spirite.base.util.StringUtil
-import spirite.base.util.delegates.UndoableDelegate
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
 
@@ -332,7 +332,7 @@ class SpriteLayer : Layer {
         private var structure = _structure
         val context get() = this@SpriteLayer
 
-        var subdepth by UndoableDelegate(subdepth, workspace.undoEngine,"Internal Change (should not see this).")
+        var subdepth by UndoableDelegate(subdepth, workspace.undoEngine, "Internal Change (should not see this).")
 
         // region Shadowing SpritePartStructure scroll with Undoable Wrapper
         var depth get() = structure.depth ; set(value) { if( value != structure.depth) replaceStructure(structure.copy(depth = value), 0)}

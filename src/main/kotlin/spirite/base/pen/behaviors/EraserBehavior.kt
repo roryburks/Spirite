@@ -11,11 +11,10 @@ import spirite.base.util.Color
 
 object EraserBehavior {
     class Stroke(penner: Penner, drawer: IStrokeModule, val color: Color) : StrokeBehavior(penner,drawer) {
-        override fun makeStroke() = _makeStroke(penner.toolsetManager, color)
+        override fun makeStroke() = EraserBehavior.makeStroke(penner.toolsetManager, color)
     }
 
-
-    private fun _makeStroke(toolsetManager: IToolsetManager, color: Color) : StrokeParams {
+    private fun makeStroke(toolsetManager: IToolsetManager, color: Color) : StrokeParams {
         val settings = toolsetManager.toolset.Eraser
 
         return StrokeParams(

@@ -1,25 +1,14 @@
 package spirite.base.file.load
 
 import rb.vectrix.mathUtil.i
-import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.file.SaveLoadUtil
-import spirite.base.file.readFloatArray
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.magLev.IMaglevThing
-import spirite.base.imageData.mediums.magLev.MaglevMedium
-import spirite.base.imageData.mediums.magLev.MaglevStroke
-import spirite.base.pen.stroke.DrawPoints
-import spirite.base.pen.stroke.StrokeParams
-import spirite.base.pen.stroke.StrokeParams.Method.BASIC
-import spirite.base.util.toColor
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.FILE
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
-import java.nio.ByteBuffer
 
 interface IMediumLoader
 {
@@ -33,9 +22,11 @@ object MediumLoaderFactory
         SaveLoadUtil.MEDIUM_PLAIN -> FlatMediumLoader
         SaveLoadUtil.MEDIUM_DYNAMIC -> DynamicMediumLoader
         SaveLoadUtil.MEDIUM_PRISMATIC -> PrismaticMediumIgnorer
-        SaveLoadUtil.MEDIUM_MAGLEV ->
-            if( version <= 0x1_0006) Legacy_1_0006_MagneticMediumPartialLoader
-            else MagneticMediumPartialLoader
+        SaveLoadUtil.MEDIUM_MAGLEV -> when {
+            version < 0x1_0000 -> Legacy_pre_1_0000_MaglevMediumLoader
+            version <= 0x1_0006 -> Legacy_1_0006_MagneticMediumPartialLoader
+            else -> MagneticMediumLoader
+        }
         else -> throw BadSifFileException("Unrecognized Medium Type Id: $typeId.  Trying to load a newer SIF version in an older program version or corrupt file.")
     }
 }

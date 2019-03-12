@@ -1,9 +1,9 @@
 package sjunit.spirite.base.util;
 
 import org.junit.Test;
-import spirite.base.util.compaction.DoubleEndedFloatCompactor;
-import spirite.base.util.compaction.FloatCompactor;
-import spirite.base.util.compaction.ReverseFloatCompactor;
+import rb.vectrix.compaction.DoubleEndedFloatCompactor;
+import rb.vectrix.compaction.FloatCompactor;
+import rb.vectrix.compaction.ReverseFloatCompactor;
 
 public class CompactionTests {
 

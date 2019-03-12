@@ -53,8 +53,7 @@ class Penner(
 
     val workspace get() = context.currentWorkspace
 
-
-    var rawX = 0 ; private  set
+    var rawX = 0 ; private set
     var rawY = 0 ; private set
     var oldRawX = 0 ; private set
     var oldRawY = 0 ; private set
@@ -67,17 +66,14 @@ class Penner(
     var oldX = 0 ; private set
     var oldY = 0 ; private set
 
-
     var pressure = 1.0f ; private set
 
     var behavior : PennerBehavior? = null
         set(new) {
             val old = field
             field = new
-            if( old != null)
-                old.onEnd()
-            if( new != null)
-                new.onStart()
+            old?.onEnd()
+            new?.onStart()
         }
 
     init {
@@ -226,14 +222,12 @@ class Penner(
         }
     }
 
-    override fun rawUpdatePressure(rawPressure: Float) {
-        pressure = rawPressure
-    }
+    override fun rawUpdatePressure(rawPressure: Float) { pressure = rawPressure }
 
     override val drawsOverlay: Boolean get() = behavior is DrawnPennerBehavior
     override fun drawOverlay(gc: GraphicsContext, view: WorkSectionView) {
         (behavior as? DrawnPennerBehavior)?.paintOverlay(gc,view)
     }
 
-    val __toolBinding = toolsetManager.selectedToolBinding.addObserver { _, _ -> behavior = null }
+    val _toolBindingK = toolsetManager.selectedToolBinding.addObserver { _, _ -> behavior = null }
 }

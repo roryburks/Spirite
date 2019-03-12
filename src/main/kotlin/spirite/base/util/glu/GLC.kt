@@ -1,5 +1,6 @@
 package spirite.base.util.glu
 
+// TODO: Move to rb.glow.glu
 /**
  * GLC is a namespace which includes all needed GL Constants whether the
  * local OpenGL version supports them or not.

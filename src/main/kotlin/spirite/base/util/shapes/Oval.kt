@@ -1,14 +1,15 @@
 package spirite.base.util.shapes
 
 import com.hackoeur.jglm.support.FastMath
+import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import spirite.base.graphics.gl.GLPrimitive
-import spirite.base.util.compaction.FloatCompactor
 import spirite.base.util.glu.GLC
 import kotlin.math.PI
 
 
+// TODO: Merge with Vectrix Shapes
 data class Oval(
         val x : Float,
         val y: Float,

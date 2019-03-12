@@ -1,5 +1,6 @@
 package spirite.base.util
 
+// TODO: Figure out where this belongs.
 
 /** Given a sorted, increasing list of floats, returns an approximate index of
 * the given float's position in the array.
