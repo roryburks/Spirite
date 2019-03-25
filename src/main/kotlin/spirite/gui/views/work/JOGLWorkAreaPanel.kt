@@ -101,27 +101,22 @@ private constructor(
 
         })
 
-        val moveEvent = {it: MouseEvent ->
-            penner.holdingAlt = it.holdingAlt
-            penner.holdingCtrl = it.holdingCtrl
-            penner.holdingShift = it.holdingShift
-            //penner.rawUpdateX(it.point.xi)
-            //penner.rawUpdateY(it.point.yi)
+        val mouseAdapter = object : MouseAdapter() {
+            fun update(e: java.awt.event.MouseEvent) {
+                penner.holdingAlt = e.isAltDown
+                penner.holdingCtrl = e.isControlDown
+                penner.holdingShift = Hybrid.keypressSystem.holdingSpace
+
+            }
+
+            override fun mouseMoved(e: java.awt.event.MouseEvent) = update(e)
+            override fun mouseDragged(e: java.awt.event.MouseEvent)  = update(e)
+            override fun mousePressed(e: java.awt.event.MouseEvent) = update(e)
+            override fun mouseReleased(e: java.awt.event.MouseEvent) = update(e)
         }
-        onMouseMove += moveEvent
-        onMouseDrag += moveEvent
-        onMousePress += {
-            penner.holdingAlt = it.holdingAlt
-            penner.holdingCtrl = it.holdingCtrl
-            penner.holdingShift = it.holdingShift
-           // penner.penDown(it.button)
-        }
-        onMouseRelease += {
-            penner.holdingAlt = it.holdingAlt
-            penner.holdingCtrl = it.holdingCtrl
-            penner.holdingShift = it.holdingShift
-            //penner.penUp(it.button)
-        }
+
+        canvas.addMouseMotionListener(mouseAdapter)
+        canvas.addMouseListener(mouseAdapter)
 
         canvas.addGLEventListener(object : GLEventListener {
             override fun reshape(drawable: GLAutoDrawable?, x: Int, y: Int, width: Int, height: Int) {}
