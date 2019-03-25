@@ -111,7 +111,10 @@ private constructor(
 
             override fun mouseMoved(e: java.awt.event.MouseEvent) = update(e)
             override fun mouseDragged(e: java.awt.event.MouseEvent)  = update(e)
-            override fun mousePressed(e: java.awt.event.MouseEvent) = update(e)
+            override fun mousePressed(e: java.awt.event.MouseEvent) {
+                update(e)
+                canvas.requestFocus()
+            }
             override fun mouseReleased(e: java.awt.event.MouseEvent) = update(e)
         }
 
