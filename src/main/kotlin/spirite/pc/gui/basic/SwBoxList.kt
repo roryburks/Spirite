@@ -16,7 +16,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class SwBoxList<T>
-private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val imp: SwBoxListImp)
+private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, private val imp: SwBoxListImp)
     : BoxList<T>( boxWidth, boxHeight, entries, imp)
 {
     constructor(boxWidth:Int, boxHeight: Int, entries: Collection<T>? = null) : this(boxWidth, boxHeight, entries, SwBoxListImp())

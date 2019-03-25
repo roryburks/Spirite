@@ -19,7 +19,7 @@ import javax.swing.text.AttributeSet
 import javax.swing.text.PlainDocument
 
 class SwTextField
-private constructor(val imp : SwTextFieldImp) : ITextField, ISwComponent by SwComponent(imp)
+private constructor(private val imp : SwTextFieldImp) : ITextField, ISwComponent by SwComponent(imp)
 {
     constructor() : this(SwTextFieldImp())
 

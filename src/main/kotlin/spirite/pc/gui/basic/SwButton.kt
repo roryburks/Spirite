@@ -13,7 +13,7 @@ import javax.swing.border.BevelBorder
 
 
 class SwButton
-private constructor( val imp: SwButtonImp)
+private constructor( private val imp: SwButtonImp)
     : IButton, ISwComponent by SwComponent(imp)
 {
 

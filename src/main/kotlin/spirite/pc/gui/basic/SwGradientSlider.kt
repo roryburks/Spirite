@@ -18,7 +18,7 @@ import java.text.DecimalFormat
 
 
 class SwGradientSlider
-private constructor(minValue: Float, maxValue: Float, label: String, val imp : SwGradientSliderImp)
+private constructor(minValue: Float, maxValue: Float, label: String, private val imp : SwGradientSliderImp)
     :
         IGradientSliderNonUIImpl by GradientSliderNonUI(minValue, maxValue),
         IGradientSlider,

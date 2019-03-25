@@ -9,7 +9,7 @@ import javax.swing.JLabel
 
 
 class SwLabel
-private constructor( val imp : SwLabelImp)
+private constructor( private val imp : SwLabelImp)
     : ILabel,
         ISwComponent by SwComponent(imp)
 {

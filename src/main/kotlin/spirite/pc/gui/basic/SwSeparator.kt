@@ -7,7 +7,7 @@ import javax.swing.JSeparator
 import javax.swing.SwingConstants
 
 class SwSeparator
-private constructor(val imp : SwSeparatorImp) : ISeparator, ISwComponent by SwComponent(imp)
+private constructor(private val imp : SwSeparatorImp) : ISeparator, ISwComponent by SwComponent(imp)
 {
     constructor(orientation: Orientation) : this(SwSeparatorImp(orientation))
 

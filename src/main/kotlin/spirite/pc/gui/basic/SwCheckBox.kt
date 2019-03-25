@@ -11,7 +11,7 @@ import javax.swing.JCheckBox
 import javax.swing.JRadioButton
 
 class SwCheckBox
-private constructor(val imp : SwCheckBoxImp)
+private constructor(private val imp : SwCheckBoxImp)
     : ICheckBox, IComponent by SwComponent(imp)
 {
     constructor() : this(SwCheckBoxImp())
@@ -33,7 +33,7 @@ private constructor(val imp : SwCheckBoxImp)
 }
 
 class SwRadioButton
-private constructor(val imp : SwRadioButtonImp)
+private constructor(private val imp : SwRadioButtonImp)
     : IRadioButton, IComponent by SwComponent(imp)
 {
     constructor(label: String = "", selected: Boolean = false) : this(SwRadioButtonImp(label, selected))

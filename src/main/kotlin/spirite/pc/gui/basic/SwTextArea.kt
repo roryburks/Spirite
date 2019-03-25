@@ -16,7 +16,7 @@ import javax.swing.event.DocumentListener
 
 
 class SwTextArea
-private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComponent(imp)
+private constructor(private val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComponent(imp)
 {
     // TODO: Re-implement TextBind -> UI binding
     constructor() : this(SwTextAreaImp())
