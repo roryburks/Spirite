@@ -8,8 +8,11 @@ import spirite.gui.resources.Skin.BevelBorder.Light
 import spirite.gui.resources.Skin.TextField.Background
 import spirite.gui.resources.Skin.TextField.InvalidBg
 import spirite.hybrid.Hybrid
+import spirite.hybrid.SwHybrid
 import spirite.pc.gui.adaptMouseSystem
 import java.awt.Color
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
 import javax.swing.BorderFactory
 import javax.swing.JTextField
 import javax.swing.border.BevelBorder
@@ -34,6 +37,16 @@ private constructor(private val imp : SwTextFieldImp) : ITextField, ISwComponent
             override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
         })
         textBind.addObserver { new, _ -> if(!locked)imp.text = new }
+
+
+        imp.addFocusListener(object : FocusListener {
+            override fun focusLost(e: FocusEvent) {
+                SwHybrid.keypressSystem.hotkeysEnabled = true
+            }
+            override fun focusGained(e: FocusEvent?) {
+                SwHybrid.keypressSystem.hotkeysEnabled = false
+            }
+        })
     }
 
     private class SwTextFieldImp() : JTextField()
