@@ -177,8 +177,6 @@ class SelectionEngine(
         gc.transform = transform
         gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
         gc.renderImage(selectionMask, 0, 0)
-        Hybrid.imageIO.saveImage(selectionMask, File("C:/Bucket/t1.png"))
-        Hybrid.imageIO.saveImage(newImage, File("C:/Bucket/t2.png"))
         val newSelection = Selection(newImage, ImmutableTransformF.Translation(bakedArea.x.f, bakedArea.y.f) , false)
 
         workspace.undoEngine.doAsAggregateAction("Bake Lifted") {
