@@ -2,6 +2,7 @@ package spirite.base.imageData.layers.sprite
 
 import rb.extendo.dataStructures.SinglyList
 import rb.extendo.dataStructures.SinglySequence
+import rb.extendo.extensions.toHashMap
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.owl.bindable.Bindable
@@ -196,9 +197,14 @@ class SpriteLayer : Layer {
 
         undoEngine.doAsAggregateAction("Add Sprite Part") {
 
-            val indexOfAPart = if( aPart == null) -1 else _parts.indexOf(aPart)
-            if(indexOfAPart != -1)
-                _bubbleUpDepth(indexOfAPart+1, realDepth)
+            if(aPart != null) {
+                val remapping = _parts.map { Pair(it,it.depth) }.toMap().toMutableMap()
+                _bubbleUpDepth(
+                        realDepth+1,
+                        _parts.asSequence().drop(_parts.indexOf(aPart)+1),
+                        remapping)
+                undoEngine.performAndStore(DepthRemappingAction(remapping.toList()))
+            }
             _addPart( SpritePartStructure( realDepth, partName), handle)
         }
     }
@@ -227,48 +233,38 @@ class SpriteLayer : Layer {
     }
     fun movePart( fromIndex: Int, toIndex: Int) {
         if( fromIndex == toIndex) return
-        undoEngine.doAsAggregateAction("Moved Sprite Part"){
-            val toMove = _parts[fromIndex]
-            val leftIndex = if( toIndex > fromIndex) toIndex else toIndex-1
-            val rightIndex = if( toIndex < fromIndex) toIndex else toIndex+1
-            val left = _parts.getOrNull(leftIndex)
-            val right = _parts.getOrNull(rightIndex)
 
-            when {
-                left == null -> when {
-                    _parts.first().depth == toMove.depth -> toMove.subdepth = _parts.first().subdepth-1
-                    else -> toMove.depth = _parts.first().depth - 1
-                }
-                right == null -> when {
-                    _parts.last().depth == toMove.depth -> toMove.subdepth = _parts.last().subdepth+1
-                    else -> toMove.depth = _parts.last().depth + 1
-                }
-                left.depth == right.depth -> {
-                    toMove.depth = left.depth
-                    toMove.subdepth = left.subdepth+1
-                    right.subdepth = left.subdepth+2
-                }
-                toMove.depth == left.depth -> toMove.subdepth = left.subdepth+1
-                toMove.depth == right.depth -> toMove.subdepth = right.subdepth-1
-                left.depth == right.depth-1 -> {
-                    _bubbleUpDepth(toIndex+1, left.depth+2)
-                    toMove.depth = left.depth+1
-                }
-                else -> toMove.depth = left.depth + 1
+        val remapping = _parts.map { Pair(it,it.depth) }.toMap().toMutableMap()
+
+        val toMove = _parts[fromIndex]
+        val leftIndex = if( toIndex > fromIndex) toIndex else toIndex-1
+        val rightIndex = if( toIndex < fromIndex) toIndex else toIndex+1
+        val left = _parts.getOrNull(leftIndex)
+        val right = _parts.getOrNull(rightIndex)
+
+        when {
+            left == null -> remapping[toMove] = _parts.first().depth - 1
+            right == null -> remapping[toMove] = parts.last().depth + 1
+            left.depth == right.depth || left.depth == right.depth -1 -> {
+                remapping[toMove] = left.depth + 1
+                _bubbleUpDepth(
+                        left.depth + 2,
+                        _parts.asSequence().drop(leftIndex).filter { it != toMove },
+                        remapping)
             }
+            else -> remapping[toMove] = left.depth + 1
         }
+
+        undoEngine.performAndStore(DepthRemappingAction(remapping.toList()))
     }
 
-    private fun _bubbleUpDepth( startIndex: Int, startDepth:Int) {
-        var currentPart = _parts.getOrNull(startIndex)?:return
+    private fun _bubbleUpDepth( startDepth: Int, parts: Sequence<SpritePart>, mapping: MutableMap<SpritePart,Int>) {
         var currentDepth = startDepth
-        var currentIndex = startIndex
-        while (currentPart.depth <= currentDepth) {
-            when {
-                currentPart.depth < currentDepth -> currentPart.depth = currentDepth
-                else -> currentPart.depth = ++currentDepth
+        parts.forEach {
+            if( mapping[it]!! < currentDepth) {
+                mapping[it] = currentDepth
             }
-            currentPart = _parts.getOrNull(++currentIndex) ?: return
+            currentDepth = (mapping[it]!! ) + 1
         }
     }
 
@@ -303,6 +299,23 @@ class SpriteLayer : Layer {
     private fun _sort() {
         _parts.sortWith(compareBy({it.depth}, {it.subdepth}))
     }
+
+
+    inner class DepthRemappingAction( val remap: List<Pair<SpritePart,Int>>)
+        : NullAction()
+    {
+        val reverseMap = remap.map { (part, _) -> Pair(part, part.structure.depth) }
+        override val description: String get() = "Sprite Part Depth Change"
+        override fun performAction() {
+            remap.forEach { (from,to) ->from.structure = from.structure.copy(depth = to)}
+            _sort()
+        }
+
+        override fun undoAction() {
+            reverseMap.forEach { (from,to) ->from.structure = from.structure.copy(depth = to)}
+            _sort()
+        }
+    }
     // endregion
 
 
@@ -329,14 +342,16 @@ class SpriteLayer : Layer {
             val handle: MediumHandle,
             subdepth: Int)
     {
-        private var structure = _structure
+        internal var structure = _structure
         val context get() = this@SpriteLayer
 
         var subdepth by UndoableDelegate(subdepth, workspace.undoEngine, "Internal Change (should not see this).")
 
-        // region Shadowing SpritePartStructure scroll with Undoable Wrapper
-        var depth get() = structure.depth ; set(value) { if( value != structure.depth) replaceStructure(structure.copy(depth = value), 0)}
+        var depth get() = structure.depth ; set(value)
+        {
+        }
 
+        // region Shadowing SpritePartStructure scroll with Undoable Wrapper
         var visible get() = structure.visible ; set(value) { if( value != structure.visible) replaceStructure(structure.copy(visible = value), 1)}
         var partName get() = structure.partName ; set(value) { if( value != structure.partName) replaceStructure(structure.copy(partName = value), 2)}
         var alpha get() = structure.alpha ; set(value) { if( value != structure.alpha) replaceStructure(structure.copy(alpha = value), 3)}

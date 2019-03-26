@@ -30,13 +30,19 @@ private constructor(private val imp : SwTextFieldImp) : ITextField, ISwComponent
     override var text by textBind
 
     init {
-        var locked = false
+        // I despise Swing Document Listeners.  Tell me the whole story, not one piece at a time.
+        var swLocked = false
+        var bindLocked = false
         imp.document.addDocumentListener(object: DocumentListener {
-            override fun changedUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
-            override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
-            override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
+            override fun changedUpdate(e: DocumentEvent?) {swLocked = true; if( !bindLocked)text = imp.text; swLocked = false}
+            override fun insertUpdate(e: DocumentEvent?) {swLocked = true; if( !bindLocked)text = imp.text; swLocked = false}
+            override fun removeUpdate(e: DocumentEvent?) {swLocked = true; if( !bindLocked)text = imp.text; swLocked = false}
         })
-        textBind.addObserver { new, _ -> if(!locked)imp.text = new }
+        textBind.addObserver { new, _ ->
+            bindLocked = true
+            if(!swLocked) imp.text = new
+            bindLocked = false
+        }
 
 
         imp.addFocusListener(object : FocusListener {
