@@ -30,17 +30,16 @@ private constructor(private val imp : SwTextFieldImp) : ITextField, ISwComponent
     override var text by textBind
 
     init {
-        // I despise Swing Document Listeners.  Tell me the whole story, not one piece at a time.
-        var swLocked = false
+        var locked = false
         var bindLocked = false
         imp.document.addDocumentListener(object: DocumentListener {
-            override fun changedUpdate(e: DocumentEvent?) {swLocked = true; if( !bindLocked)text = imp.text; swLocked = false}
-            override fun insertUpdate(e: DocumentEvent?) {swLocked = true; if( !bindLocked)text = imp.text; swLocked = false}
-            override fun removeUpdate(e: DocumentEvent?) {swLocked = true; if( !bindLocked)text = imp.text; swLocked = false}
+            override fun changedUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
+            override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
+            override fun removeUpdate(e: DocumentEvent?) {locked = true; if( imp.text != "")text = imp.text; locked = false}
         })
-        textBind.addObserver { new, _ ->
+        textBind.addObserver { new, _ -> if(!locked)
             bindLocked = true
-            if(!swLocked) imp.text = new
+            imp.text = new
             bindLocked = false
         }
 
@@ -103,7 +102,7 @@ private constructor(
         imp.document.addDocumentListener(object: DocumentListener {
             override fun changedUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
             override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
-            override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
+            override fun removeUpdate(e: DocumentEvent?) {locked = true; if( imp.text != "")text = imp.text; locked = false;checkIfOob()}
         })
         textBind.addObserver { new, _->
             if(!locked)

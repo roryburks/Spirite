@@ -309,11 +309,13 @@ class SpriteLayer : Layer {
         override fun performAction() {
             remap.forEach { (from,to) ->from.structure = from.structure.copy(depth = to)}
             _sort()
+            triggerChange()
         }
 
         override fun undoAction() {
             reverseMap.forEach { (from,to) ->from.structure = from.structure.copy(depth = to)}
             _sort()
+            triggerChange()
         }
     }
     // endregion
@@ -349,6 +351,15 @@ class SpriteLayer : Layer {
 
         var depth get() = structure.depth ; set(value)
         {
+            if( structure.depth != value) {
+                val remapping = _parts.map { Pair(it, it.depth) }.toMap().toMutableMap()
+                remapping[this] = value
+                _bubbleUpDepth(
+                        value + 1,
+                        _parts.asSequence().filter { it.depth >= value && it != this},
+                        remapping)
+                undoEngine.performAndStore(DepthRemappingAction(remapping.toList()))
+            }
         }
 
         // region Shadowing SpritePartStructure scroll with Undoable Wrapper
