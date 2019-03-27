@@ -52,7 +52,7 @@ constructor(
         else return SinglyList(ShiftedImage(img, x, y))
     }
 
-    override fun dupe() = DynamicMedium(workspace, image.deepCopy())
+    override fun dupe(workspace: MImageWorkspace) = DynamicMedium(workspace, image.deepCopy())
 
     override fun flush() {
         image.flush()

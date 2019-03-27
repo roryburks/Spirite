@@ -2,6 +2,7 @@ package sjunit.spirite.base.imageData.undo
 
 import io.mockk.mockk
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -12,10 +13,10 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class ImageContextTests {
-    val mockWorkspace = mockk<IImageWorkspace>(relaxed = true)
+    val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)
     val mediumHandle = MediumHandle(mockWorkspace, 9)
     val mockMediumRepo = mockk<MMediumRepository>(relaxed = true)
-    val contextUnderTest = ImageContext(mediumHandle, mockMediumRepo)
+    val contextUnderTest = ImageContext(mediumHandle, mockWorkspace)
 
     @test fun doesUndoRedo3() {
         val action1 = TestImageAction(ArrangedMediumData(mediumHandle))

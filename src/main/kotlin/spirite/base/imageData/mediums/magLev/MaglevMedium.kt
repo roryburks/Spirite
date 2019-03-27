@@ -75,7 +75,7 @@ private constructor(
 
     override fun getImageDrawer(arranged: ArrangedMediumData) = MaglevImageDrawer(arranged, this)
 
-    override fun dupe() = MaglevMedium(
+    override fun dupe(workspace: MImageWorkspace) = MaglevMedium(
             workspace,
             things.map { it.dupe() }.toMutableList(),
             this.builtImage.deepCopy())

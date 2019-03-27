@@ -156,7 +156,7 @@ class SpriteLayer : Layer {
     }
 
     override fun dupe(workspace: MImageWorkspace) =
-            SpriteLayer( workspace, parts.map { Pair(workspace.mediumRepository.addMedium(it.handle.medium.dupe()), SpritePartStructure(it)) })
+            SpriteLayer( workspace, parts.map { Pair(workspace.mediumRepository.addMedium(it.handle.medium.dupe(workspace)), SpritePartStructure(it)) })
     // endregion
 
 

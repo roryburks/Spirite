@@ -24,6 +24,6 @@ class SimpleLayer(val medium: MediumHandle) : Layer {
 
 
     override fun dupe(workspace: MImageWorkspace): Layer {
-        return SimpleLayer(workspace.mediumRepository.addMedium(medium.medium.dupe()))
+        return SimpleLayer(workspace.mediumRepository.addMedium(medium.medium.dupe(workspace)))
     }
 }

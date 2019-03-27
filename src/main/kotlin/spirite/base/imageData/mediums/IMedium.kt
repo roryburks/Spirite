@@ -7,6 +7,7 @@ import spirite.base.graphics.IFlushable
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IFloatingMedium
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.drawer.IImageDrawer
@@ -42,7 +43,7 @@ interface IMedium : IFlushable {
 
     fun render( gc: GraphicsContext, render: RenderRubric? = null)
 
-    fun dupe(): IMedium
+    fun dupe(workspace: MImageWorkspace): IMedium
     override fun flush()
 
     enum class MediumType constructor(
@@ -94,7 +95,7 @@ object NilMedium : IMedium {
     override fun build(arranged: ArrangedMediumData) = NilBuiltMedium(arranged)
     override fun getColor(x: Int, y: Int) = Colors.TRANSPARENT
 
-    override fun dupe() = this
+    override fun dupe(workspace: MImageWorkspace) = this
     override fun flush() {}
     override fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer  = throw Exception("Tried to Get Drawer for NilMedium")
     override fun render( gc: GraphicsContext, render: RenderRubric?) {}
