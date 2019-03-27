@@ -13,14 +13,16 @@ import java.awt.datatransfer.UnsupportedFlavorException
 
 val SpiriteLayerDataFlavor = DataFlavor(IImage::class.java, "SpiriteInternalImage")
 
+typealias LayerBuilder = (MImageWorkspace) -> Layer
 class TransferableSpiriteLayer(layer: Layer) : Transferable {
     private val _layer = layer
 
     fun buildLayer( workspace: MImageWorkspace) = _layer.dupe(workspace)
+    var layerBuilder : LayerBuilder = {workspace : MImageWorkspace -> buildLayer(workspace)}
 
     override fun getTransferData(flavor: DataFlavor?): Any {
-        when( flavor) {
-            SpiriteLayerDataFlavor -> return {workspace : MImageWorkspace -> buildLayer(workspace)}
+        return when( flavor) {
+            SpiriteLayerDataFlavor -> layerBuilder
             else -> throw UnsupportedFlavorException(flavor)
         }
     }

@@ -1,5 +1,7 @@
 package spirite.base.brains.commands
 
+import rb.extendo.dataStructures.SinglySequence
+import rb.extendo.dataStructures.SinglySet
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil
@@ -10,6 +12,7 @@ import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
 import spirite.base.file.workspaceFromImage
 import spirite.base.graphics.Composite.SRC_IN
+import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
@@ -18,6 +21,7 @@ import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
@@ -27,6 +31,7 @@ import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
+import spirite.hybrid.Transferables.IClipboard.ClipboardThings.Image
 
 class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
     enum class GlobalCommand(val string: String) : ICommand {
@@ -87,36 +92,44 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
             }
             COPY_VISIBLE.string -> {
                 val workspace = master.workspaceSet.currentWorkspace ?: return false
-                Hybrid.imageIO.imageToClipboard(copyVisible(workspace))
+                Hybrid.clipboard.postToClipboard(copyVisible(workspace))
             }
             CUT.string -> {
                 val workspace = master.workspaceSet.currentWorkspace ?: return false
                 copy(workspace, true)
             }
             PASTE.string -> {
-                val image = Hybrid.imageIO.imageFromClipboard() ?: return false
-                val workspace = master.workspaceSet.currentWorkspace
-                if( workspace == null)
-                    master.workspaceFromImage(image)
-                else {
-                    val selected = workspace.groupTree.selectedNode
-                    when( selected) {
-                        null, is GroupNode -> workspace.groupTree.addSimpleLayerFromImage(selected, "Pasted", image)
-                        else -> {
-                            val workview = master.frameManager.workView?.tScreenToWorkspace ?: ImmutableTransformF.Identity
-                            val pt = workview.apply(Vec2f.Zero)
-                            println("$pt")
-                            val x = MathUtil.clip(0, pt.x.floor, workspace.width - image.width)
-                            val y = MathUtil.clip(0, pt.y.floor, workspace.height - image.height)
-                            workspace.selectionEngine.setSelectionWithLifted(
-                                    Selection.RectangleSelection(Rect(x, y, image.width, image.height)),
-                                    LiftedImageData(image))
+                val thing = Hybrid.clipboard.getFromClipboard()
+
+                when( thing) {
+                    is IImage -> {
+                        val image = thing
+                        val workspace = master.workspaceSet.currentWorkspace
+                        if( workspace == null)
+                            master.workspaceFromImage(image)
+                        else {
+                            val selected = workspace.groupTree.selectedNode
+                            when( selected) {
+                                null, is GroupNode -> workspace.groupTree.addSimpleLayerFromImage(selected, "Pasted", image)
+                                else -> {
+                                    val workview = master.frameManager.workView?.tScreenToWorkspace ?: ImmutableTransformF.Identity
+                                    val pt = workview.apply(Vec2f.Zero)
+                                    println("$pt")
+                                    val x = MathUtil.clip(0, pt.x.floor, workspace.width - image.width)
+                                    val y = MathUtil.clip(0, pt.y.floor, workspace.height - image.height)
+                                    workspace.selectionEngine.setSelectionWithLifted(
+                                            Selection.RectangleSelection(Rect(x, y, image.width, image.height)),
+                                            LiftedImageData(image))
+                                }
+                            }
                         }
                     }
+                    is Layer -> TODO()
+                    else -> return false
                 }
             }
             PASTE_AS_LAYER.string -> {
-                val image = Hybrid.imageIO.imageFromClipboard() ?: return false
+                val image = (Hybrid.clipboard.getFromClipboard(SinglySet(Image)) as? IImage) ?: return false
                 val workspace = master.workspaceSet.currentWorkspace
                 if( workspace == null)
                     master.workspaceFromImage(image)
@@ -211,8 +224,6 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
             }
         }
 
-        using(image) {
-            Hybrid.imageIO.imageToClipboard(image)
-        }
+        using(image) {Hybrid.clipboard.postToClipboard(it)}
     }
 }
