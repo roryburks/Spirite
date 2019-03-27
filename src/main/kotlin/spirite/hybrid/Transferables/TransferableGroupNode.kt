@@ -2,28 +2,23 @@ package spirite.hybrid.Transferables
 
 import spirite.base.graphics.IImage
 import spirite.base.imageData.MImageWorkspace
+import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.Layer
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
 
 
-val SpiriteLayerDataFlavor = DataFlavor(IImage::class.java, "SpiriteInternalImage")
+val SpiriteGNodeFlavor = DataFlavor(IImage::class.java, "SpiriteInternalImage")
 
-interface  ILayerBuilder {
-    fun buildLayer(workspace: MImageWorkspace) : Layer
-}
 
-class TransferableSpiriteLayer(layer: Layer) : Transferable {
-    private val _layer = layer
-
-    private val _layerBuilder = object  : ILayerBuilder {
-        override fun buildLayer(workspace: MImageWorkspace) = _layer.dupe(workspace)
-    }
+class TransferableSpiriteNode(node: Node) : Transferable {
+    private val _node = node
 
     override fun getTransferData(flavor: DataFlavor?): Any {
         return when( flavor) {
-            SpiriteLayerDataFlavor -> _layerBuilder
+            SpiriteGNodeFlavor -> _node♥
             else -> throw UnsupportedFlavorException(flavor)
         }
     }
@@ -31,5 +26,5 @@ class TransferableSpiriteLayer(layer: Layer) : Transferable {
     override fun isDataFlavorSupported(flavor: DataFlavor?) = _dataFlavors.contains(flavor)
     override fun getTransferDataFlavors(): Array<DataFlavor> = _dataFlavors
 
-    private val _dataFlavors = arrayOf( SpiriteLayerDataFlavor)
+    private val _dataFlavors = arrayOf( SpiriteGNodeFlavor)
 }

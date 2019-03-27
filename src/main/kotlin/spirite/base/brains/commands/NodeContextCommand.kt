@@ -12,6 +12,7 @@ import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.IMedium.MediumType.MAGLEV
 import spirite.base.util.StringUtil
 import spirite.gui.components.dialogs.IDialog
+import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 
 interface ICommandExecuter {
@@ -33,6 +34,7 @@ class NodeContextCommand(
         NEW_PUPPET_LAYER("newPuppetLayer"),
         QUICK_NEW_LAYER("newLayer"),
         DUPLICATE("duplicate"),
+        COPY("copy"),
         DELETE("delete"),
 
         ANIM_FROM_GROUP("animationFromGroup"),
@@ -131,6 +133,10 @@ class NodeContextCommand(
                     workspace.groupTree.importLayer(node, node.name, layer)
                 }
                 else workspace.groupTree.addNewSpriteLayer(node, "Sprite Layer", true)
+            }
+            COPY.string-> {
+                val layerNode = node as? LayerNode ?: return false
+                Hybrid.clipboard.postToClipboard(layerNode.layer)
             }
 
             else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: node.$string")
