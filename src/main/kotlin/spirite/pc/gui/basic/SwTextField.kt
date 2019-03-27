@@ -30,17 +30,29 @@ private constructor(private val imp : SwTextFieldImp) : ITextField, ISwComponent
     override var text by textBind
 
     init {
-        var locked = false
-        var bindLocked = false
+        var swInducedLock = false
+        var bindInducedLock = false
         imp.document.addDocumentListener(object: DocumentListener {
-            override fun changedUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
-            override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
-            override fun removeUpdate(e: DocumentEvent?) {locked = true; if( imp.text != "")text = imp.text; locked = false}
+            override fun changedUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if(!bindInducedLock)text = imp.text
+                swInducedLock = false
+            }
+            override fun insertUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if(!bindInducedLock)text = imp.text
+                swInducedLock = false
+            }
+            override fun removeUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if(!bindInducedLock || imp.text != "")text = imp.text
+                swInducedLock = false
+            }
         })
-        textBind.addObserver { new, _ -> if(!locked)
-            bindLocked = true
-            imp.text = new
-            bindLocked = false
+        textBind.addObserver { new, _ ->
+            bindInducedLock = true
+            if(!swInducedLock) imp.text = new
+            bindInducedLock = false
         }
 
 
@@ -98,15 +110,32 @@ private constructor(
     init {
         imp.document = SwNFDocument()
 
-        var locked = false
+        var swInducedLock = false
+        var bindInducedLock = false
         imp.document.addDocumentListener(object: DocumentListener {
-            override fun changedUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
-            override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
-            override fun removeUpdate(e: DocumentEvent?) {locked = true; if( imp.text != "")text = imp.text; locked = false;checkIfOob()}
+            override fun changedUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if( !bindInducedLock)text = imp.text
+                swInducedLock = false
+                checkIfOob()
+            }
+            override fun insertUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if( !bindInducedLock)text = imp.text
+                swInducedLock = false
+                checkIfOob()
+            }
+            override fun removeUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if( !bindInducedLock && imp.text != "")text = imp.text
+                swInducedLock = false
+                checkIfOob()}
         })
         textBind.addObserver { new, _->
-            if(!locked)
+            bindInducedLock = true
+            if(!swInducedLock)
                 imp.text = new
+            bindInducedLock = false
         }
     }
 

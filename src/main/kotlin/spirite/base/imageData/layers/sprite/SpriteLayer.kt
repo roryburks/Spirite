@@ -93,7 +93,8 @@ class SpriteLayer : Layer {
                     getAllLinkedLayers()
                             .forEach { sprite -> sprite.activePart = sprite.parts.firstOrNull { it.partName == name }  ?: sprite.activePart}
                 }
-            } }
+                triggerChange()
+            }}
     var activePart : SpritePart? by activePartBind
 
     private var _layerChangeObserver = Observable<()->Any?>()
