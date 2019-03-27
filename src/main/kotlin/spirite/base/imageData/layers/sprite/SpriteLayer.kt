@@ -15,6 +15,7 @@ import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.*
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.drawer.DefaultImageDrawer
+import spirite.base.imageData.drawer.performMaskedImageAction
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.traverse
 import spirite.base.imageData.layers.Layer
@@ -161,68 +162,83 @@ class SpriteLayer : Layer {
 
 
     // region Part Add/Move/Remove
-    fun addPartLinked(partName: String, depth: Int? = null)
+    fun addPart(partName: String, depth: Int? = null, linked: Boolean = false)
     {
-        val linked = getAllLinkedLayers()
-        val names = linked.flatMap { sprite -> sprite.parts.asSequence().map { it.partName } }.distinct().toSet()
-        val realName = StringUtil.getNonDuplicateName(names, partName)
+        val namesToAccountFor =
+                if(linked) parts.asSequence().map { it.partName }
+                else getAllLinkedLayers().flatMap { sprite -> sprite.parts.asSequence().map { it.partName } }
+        val realName = StringUtil.getNonDuplicateName(namesToAccountFor.distinct().toHashSet(), partName)
 
-        val aPart = activePart
-        val realDepth = depth ?: when {
-            !_parts.any() -> 0
-            aPart == null -> _parts.last().depth + 1
-            else -> aPart.depth+1
-        }
+        fun addPartSub( layer: SpriteLayer, partName: String, depth: Int? = null) {
+            layer.run {
+                val handle = workspace.mediumRepository.addMedium(DynamicMedium(workspace))
 
-        undoEngine.doAsAggregateAction("Add Sprite Part (Linked)") {
-            linked.forEach {it.addPart(realName, realDepth)}
-        }
-    }
-    fun addPart( partName : String, depth: Int? = null) {
-        val handle = workspace.mediumRepository.addMedium( DynamicMedium(workspace))
+                val aPart = activePart
+                val realDepth = depth ?: when {
+                    !_parts.any() -> 0
+                    aPart == null -> _parts.last().depth + 1
+                    else -> aPart.depth + 1
+                }
 
-        val aPart = activePart
-        val realDepth = depth ?: when {
-            !_parts.any() -> 0
-            aPart == null -> _parts.last().depth + 1
-            else -> aPart.depth+1
+                undoEngine.doAsAggregateAction("Add Sprite Part") {
+
+                    if (aPart != null) {
+                        val remapping = _parts.map { Pair(it, it.depth) }.toMap().toMutableMap()
+                        _bubbleUpDepth(
+                                realDepth + 1,
+                                _parts.asSequence().drop(_parts.indexOf(aPart) + 1),
+                                remapping)
+                        undoEngine.performAndStore(DepthRemappingAction(remapping.toList()))
+                    }
+                    _addPart(SpritePartStructure(realDepth, partName), handle)
+                }
+            }
         }
 
         undoEngine.doAsAggregateAction("Add Sprite Part") {
-
-            if(aPart != null) {
-                val remapping = _parts.map { Pair(it,it.depth) }.toMap().toMutableMap()
-                _bubbleUpDepth(
-                        realDepth+1,
-                        _parts.asSequence().drop(_parts.indexOf(aPart)+1),
-                        remapping)
-                undoEngine.performAndStore(DepthRemappingAction(remapping.toList()))
-            }
-            _addPart( SpritePartStructure( realDepth, partName), handle)
+            if (linked)
+                getAllLinkedLayers().forEach { addPartSub(it, realName, depth) }
+            else
+                addPartSub(this, realName, depth)
         }
+
     }
-    fun removePart( toRemove: SpritePart) {
-        if( !_parts.contains(toRemove)) return
 
-        undoEngine.performAndStore( object: NullAction() {
-            override val description: String get() = "Remove Sprite Part"
+    fun removePart( toRemove: SpritePart, linked: Boolean = false) {
+        fun removeSub( layer: SpriteLayer, part: SpritePart) {
+            layer.run {
+                undoEngine.performAndStore(object : NullAction() {
+                    override val description: String get() = "Remove Sprite Part"
 
-            override fun performAction() {
-                if( activePart == toRemove)
-                    activePart = null
-                _parts.remove(toRemove)
-                triggerChange()
+                    override fun performAction() {
+                        if (activePart == part)
+                            activePart = null
+                        _parts.remove(part)
+                        triggerChange()
+                    }
+
+                    override fun undoAction() {
+                        // Note: Since _parts are automatically sorted by drawDepth, no need to remember its old drawDepth
+                        _parts.add(part)
+                        _sort()
+                        triggerChange()
+                    }
+
+                    override fun getDependencies() = SinglyList(part.handle)
+                })
             }
+        }
 
-            override fun undoAction() {
-                // Note: Since _parts are automatically sorted by drawDepth, no need to remember its old drawDepth
-                _parts.add(toRemove)
-                _sort()
-                triggerChange()
+        if( linked) {
+            undoEngine.doAsAggregateAction("Removing Sprite Part [Linked]") {
+                getAllLinkedLayers().forEach { layer ->
+                    layer._parts.firstOrNull { it.partName == toRemove.partName }?.also { removeSub(layer, it) }
+                }
             }
+        }
+        else
+            removeSub(this, toRemove)
 
-            override fun getDependencies() = SinglyList(toRemove.handle)
-        })
     }
     fun movePart( fromIndex: Int, toIndex: Int) {
         if( fromIndex == toIndex) return

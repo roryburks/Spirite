@@ -18,7 +18,7 @@ class TransferableSpiriteNode(node: Node) : Transferable {
 
     override fun getTransferData(flavor: DataFlavor?): Any {
         return when( flavor) {
-            SpiriteGNodeFlavor -> _node♥
+            SpiriteGNodeFlavor -> _node
             else -> throw UnsupportedFlavorException(flavor)
         }
     }

@@ -92,21 +92,22 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
 
     private val btnNewPart = Hybrid.ui.Button()
-    private val btnRemovePart = Hybrid.ui.Button().also { it.action = {activePart?.also {  linkedSprite?.removePart( it)} }}
+    private val btnRemovePart = Hybrid.ui.Button()
     private val btnVisibility = Hybrid.ui.ToggleButton()
 
     init {
-
         btnVisibility.setOnIcon(SwIcons.SmallIcons.Rig_VisibileOn)
         btnVisibility.setOffIcon(SwIcons.SmallIcons.Rig_VisibleOff)
         btnNewPart.setIcon(SwIcons.SmallIcons.Rig_New)
         btnRemovePart.setIcon(SwIcons.SmallIcons.Rig_Remove)
 
         btnNewPart.action = {evt ->
-            if( evt.pressingShift)
-                linkedSprite?.addPartLinked("new")
-            else
-                linkedSprite?.addPart("new")
+            linkedSprite?.addPart("new", linked = evt.pressingShift)
+        }
+        btnRemovePart.action = { evt ->
+            activePart?.also { activePart ->
+                linkedSprite?.removePart(activePart, evt.pressingShift)
+            }
         }
 
         boxList.movementContract = object : IMovementContract {
