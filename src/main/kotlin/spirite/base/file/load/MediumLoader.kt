@@ -56,7 +56,7 @@ object DynamicMediumLoader : IMediumLoader
                 Hybrid.imageIO.loadImage(imgData)
             }
         }
-        return DynamicMedium(context.workspace, DynamicImage(img, ox, oy), context.workspace.mediumRepository)
+        return DynamicMedium(context.workspace, DynamicImage(img, ox, oy))
     }
 }
 

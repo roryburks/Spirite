@@ -7,6 +7,7 @@ import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
@@ -22,12 +23,14 @@ import spirite.pc.gui.SColor
  * time it takes to commit an image change, but substantially reduces memory overhead as well as
  * the number of pixels pushed to constantly re-draw the Workspace.
  */
-class DynamicMedium(
-        val workspace: IImageWorkspace,
-        val image: DynamicImage = DynamicImage(),
-        val mediumRepo: MMediumRepository)
+class DynamicMedium
+constructor(
+        val workspace: MImageWorkspace,
+        val image: DynamicImage = DynamicImage())
     : IImageMedium
 {
+    val mediumRepo: MMediumRepository get() = workspace.mediumRepository
+
     override val width: Int get() = image.width
     override val height: Int get() = image.height
     override val x: Int get() = image.xOffset
@@ -49,7 +52,7 @@ class DynamicMedium(
         else return SinglyList(ShiftedImage(img, x, y))
     }
 
-    override fun dupe() = DynamicMedium(workspace, image.deepCopy(), mediumRepo)
+    override fun dupe() = DynamicMedium(workspace, image.deepCopy())
 
     override fun flush() {
         image.flush()

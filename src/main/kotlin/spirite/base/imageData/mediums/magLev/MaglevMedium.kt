@@ -7,6 +7,7 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -21,17 +22,15 @@ import spirite.pc.gui.SColor
 
 class MaglevMedium
 private constructor(
-        val workspace: IImageWorkspace,
-        private val mediumRepo: MMediumRepository,
+        private val workspace: MImageWorkspace,
         internal val things: MutableList<IMaglevThing>,
         private val builtImage : DynamicImage = DynamicImage())
     :IMedium
 {
     constructor(
-            workspace: IImageWorkspace,
-            mediumRepo: MMediumRepository,
+            workspace: MImageWorkspace,
             things: List<IMaglevThing>? = null)
-            : this(workspace, mediumRepo, things?.toMutableList() ?: mutableListOf())
+            : this(workspace, things?.toMutableList() ?: mutableListOf())
 
     fun getThings() = things.toList()
 
@@ -78,7 +77,6 @@ private constructor(
 
     override fun dupe() = MaglevMedium(
             workspace,
-            mediumRepo,
             things.map { it.dupe() }.toMutableList(),
             this.builtImage.deepCopy())
     override fun flush() { builtImage.flush() }
@@ -91,7 +89,7 @@ private constructor(
      * that the record of what was done to create the MaglevMedium is stored within it under a system that can be
      * transformed and re-rendered.
      */
-    inner class MaglevBuiltMediumData(arranged: ArrangedMediumData) : BuiltMediumData(arranged, mediumRepo)
+    inner class MaglevBuiltMediumData(arranged: ArrangedMediumData) : BuiltMediumData(arranged, workspace.mediumRepository)
     {
         override val width: Int get() = workspace.width
         override val height: Int get() = workspace.height

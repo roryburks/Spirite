@@ -74,7 +74,7 @@ object MagneticMediumLoader : IMediumLoader
             }
         }.filterNotNull()
 
-        return MaglevMedium(context.workspace, context.workspace.mediumRepository, things)
+        return MaglevMedium(context.workspace, things)
     }
 }
 
@@ -132,7 +132,7 @@ object Legacy_1_0006_MagneticMediumPartialLoader : IMediumLoader
             }
         }.filterNotNull()
 
-        return MaglevMedium(context.workspace, context.workspace.mediumRepository, things)
+        return MaglevMedium(context.workspace, things)
     }
 }
 
@@ -187,7 +187,7 @@ object Legacy_pre_1_0000_MaglevMediumLoader : IMediumLoader {
             strokeLengths.add( (thing as? MaglevStroke)?.drawPoints?.length)
             thing
         }
-        return MaglevMedium(context.workspace, context.workspace.mediumRepository, things)
+        return MaglevMedium(context.workspace, things)
     }
 }
 

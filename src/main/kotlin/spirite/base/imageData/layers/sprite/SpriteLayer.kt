@@ -34,17 +34,17 @@ import spirite.hybrid.MDebug.WarningType
 class SpriteLayer : Layer {
 
     constructor(
-            workspace: IImageWorkspace,
+            workspace: MImageWorkspace,
             mediumRepo: MMediumRepository)
     {
         this.workspace = workspace
         this.mediumRepo = mediumRepo
-        _parts.add(SpritePart(SpritePartStructure(0, "base"), mediumRepo.addMedium(DynamicMedium(workspace, mediumRepo = mediumRepo)), workingId++))
+        _parts.add(SpritePart(SpritePartStructure(0, "base"), mediumRepo.addMedium(DynamicMedium(workspace)), workingId++))
         activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
     }
 
     constructor(
-            workspace: IImageWorkspace,
+            workspace: MImageWorkspace,
             mediumRepo: MMediumRepository,
             toImport: List<Pair<MediumHandle,SpritePartStructure>>)
     {
@@ -57,19 +57,19 @@ class SpriteLayer : Layer {
 
     constructor(
             toImport : List<SpritePartStructure>,
-            workspace: IImageWorkspace,
+            workspace: MImageWorkspace,
             mediumRepo: MMediumRepository)
     {
         this.workspace = workspace
         this.mediumRepo = mediumRepo
         toImport.forEach {
-            _parts.add(SpritePart(it, mediumRepo.addMedium(DynamicMedium(workspace, mediumRepo = mediumRepo)), workingId++))
+            _parts.add(SpritePart(it, mediumRepo.addMedium(DynamicMedium(workspace)), workingId++))
         }
         _sort()
         activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
     }
 
-    val workspace: IImageWorkspace
+    val workspace: MImageWorkspace
     val mediumRepo: MMediumRepository
     val undoEngine get() = workspace.undoEngine
     val parts : List<SpritePart> get() = _parts
@@ -187,7 +187,7 @@ class SpriteLayer : Layer {
         }
     }
     fun addPart( partName : String, depth: Int? = null) {
-        val handle = mediumRepo.addMedium( DynamicMedium(workspace, mediumRepo = mediumRepo))
+        val handle = mediumRepo.addMedium( DynamicMedium(workspace))
 
         val aPart = activePart
         val realDepth = depth ?: when {

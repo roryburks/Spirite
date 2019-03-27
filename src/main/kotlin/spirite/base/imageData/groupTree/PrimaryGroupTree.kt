@@ -3,6 +3,7 @@ package spirite.base.imageData.groupTree
 import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.IImage
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.SimpleLayer
@@ -16,17 +17,15 @@ import spirite.base.util.StringUtil
 import spirite.base.util.debug.SpiriteException
 import spirite.hybrid.Hybrid
 
-class PrimaryGroupTree(
-        val workspace: IImageWorkspace,
-        val mediumRepo : MMediumRepository
-) : MovableGroupTree( workspace.undoEngine) {
+class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTree( workspace.undoEngine) {
+    private val mediumRepo get() = workspace.mediumRepository
     override val treeDescription: String get() = "Primary Group Tree"
 
     fun addNewSimpleLayer( contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null, select: Boolean = true) : LayerNode{
         val medium = when( type) {
-            DYNAMIC -> DynamicMedium(workspace, DynamicImage(), mediumRepo)
+            DYNAMIC -> DynamicMedium(workspace, DynamicImage())
             FLAT -> FlatMedium( Hybrid.imageCreator.createImage( width ?: workspace.width, height ?: workspace.height), mediumRepo)
-            MAGLEV -> MaglevMedium( workspace, mediumRepo)
+            MAGLEV -> MaglevMedium( workspace)
             else -> throw SpiriteException("Attempted to create unsupported MediumType: $type")
         }
 
