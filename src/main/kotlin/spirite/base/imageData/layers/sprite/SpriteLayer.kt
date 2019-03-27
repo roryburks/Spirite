@@ -15,7 +15,6 @@ import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.*
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.drawer.DefaultImageDrawer
-import spirite.base.imageData.drawer.performMaskedImageAction
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.traverse
 import spirite.base.imageData.layers.Layer
@@ -183,12 +182,12 @@ class SpriteLayer : Layer {
                 undoEngine.doAsAggregateAction("Add Sprite Part") {
 
                     if (aPart != null) {
-                        val remapping = _parts.map { Pair(it, it.depth) }.toMap().toMutableMap()
+                        val remapping = _parts.toHashMap({it.partName}, {it.depth})
                         _bubbleUpDepth(
                                 realDepth + 1,
                                 _parts.asSequence().drop(_parts.indexOf(aPart) + 1),
                                 remapping)
-                        undoEngine.performAndStore(DepthRemappingAction(remapping.toList()))
+                        undoEngine.performAndStore(DepthRemappingAction(remapping, _parts.toHashMap({it.partName}, {it.depth})))
                     }
                     _addPart(SpritePartStructure(realDepth, partName), handle)
                 }
@@ -243,7 +242,7 @@ class SpriteLayer : Layer {
     fun movePart( fromIndex: Int, toIndex: Int) {
         if( fromIndex == toIndex) return
 
-        val remapping = _parts.map { Pair(it,it.depth) }.toMap().toMutableMap()
+        val remapping = _parts.toHashMap({it.partName}, {it.depth})
 
         val toMove = _parts[fromIndex]
         val leftIndex = if( toIndex > fromIndex) toIndex else toIndex-1
@@ -252,28 +251,28 @@ class SpriteLayer : Layer {
         val right = _parts.getOrNull(rightIndex)
 
         when {
-            left == null -> remapping[toMove] = _parts.first().depth - 1
-            right == null -> remapping[toMove] = parts.last().depth + 1
+            left == null -> remapping[toMove.partName] = _parts.first().depth - 1
+            right == null -> remapping[toMove.partName] = parts.last().depth + 1
             left.depth == right.depth || left.depth == right.depth -1 -> {
-                remapping[toMove] = left.depth + 1
+                remapping[toMove.partName] = left.depth + 1
                 _bubbleUpDepth(
                         left.depth + 2,
                         _parts.asSequence().drop(leftIndex).filter { it != toMove },
                         remapping)
             }
-            else -> remapping[toMove] = left.depth + 1
+            else -> remapping[toMove.partName] = left.depth + 1
         }
 
-        undoEngine.performAndStore(DepthRemappingAction(remapping.toList()))
+        undoEngine.performAndStore(DepthRemappingAction(remapping, _parts.toHashMap({it.partName}, {it.depth})))
     }
 
-    private fun _bubbleUpDepth( startDepth: Int, parts: Sequence<SpritePart>, mapping: MutableMap<SpritePart,Int>) {
+    private fun _bubbleUpDepth( startDepth: Int, parts: Sequence<SpritePart>, mapping: MutableMap<String,Int>) {
         var currentDepth = startDepth
         parts.forEach {
-            if( mapping[it]!! < currentDepth) {
-                mapping[it] = currentDepth
+            if( mapping[it.partName]!! < currentDepth) {
+                mapping[it.partName] = currentDepth
             }
-            currentDepth = (mapping[it]!! ) + 1
+            currentDepth = (mapping[it.partName]!! ) + 1
         }
     }
 
@@ -310,21 +309,25 @@ class SpriteLayer : Layer {
     }
 
 
-    inner class DepthRemappingAction( val remap: List<Pair<SpritePart,Int>>)
-        : NullAction()
+    inner class DepthRemappingAction(
+            val newMap: HashMap<String,Int>,
+            val oldMap: HashMap<String,Int>) : NullAction()
     {
-        val reverseMap = remap.map { (part, _) -> Pair(part, part.structure.depth) }
         override val description: String get() = "Sprite Part Depth Change"
         override fun performAction() {
-            remap.forEach { (from,to) ->from.structure = from.structure.copy(depth = to)}
-            _sort()
-            triggerChange()
+            getAllLinkedLayers().forEach { sprite ->
+                sprite._parts.forEach { newMap[it.partName]?.apply { it.structure = it.structure.copy(depth = this) } }
+                sprite._sort()
+                sprite.triggerChange()
+            }
         }
 
         override fun undoAction() {
-            reverseMap.forEach { (from,to) ->from.structure = from.structure.copy(depth = to)}
-            _sort()
-            triggerChange()
+            getAllLinkedLayers().forEach { sprite ->
+                sprite._parts.forEach { oldMap[it.partName]?.apply { it.structure = it.structure.copy(depth = this) } }
+                sprite._sort()
+                sprite.triggerChange()
+            }
         }
     }
     // endregion
@@ -361,13 +364,13 @@ class SpriteLayer : Layer {
         var depth get() = structure.depth ; set(value)
         {
             if( structure.depth != value) {
-                val remapping = _parts.map { Pair(it, it.depth) }.toMap().toMutableMap()
-                remapping[this] = value
+                val remapping = _parts.toHashMap({it.partName}, {it.depth})
+                remapping[partName] = value
                 _bubbleUpDepth(
                         value + 1,
                         _parts.asSequence().filter { it.depth >= value && it != this},
                         remapping)
-                undoEngine.performAndStore(DepthRemappingAction(remapping.toList()))
+                undoEngine.performAndStore(DepthRemappingAction(remapping,_parts.toHashMap({it.partName}, {it.depth})))
             }
         }
 
