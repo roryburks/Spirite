@@ -18,29 +18,28 @@ import spirite.base.util.debug.SpiriteException
 import spirite.hybrid.Hybrid
 
 class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTree( workspace.undoEngine) {
-    private val mediumRepo get() = workspace.mediumRepository
     override val treeDescription: String get() = "Primary Group Tree"
 
     fun addNewSimpleLayer( contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null, select: Boolean = true) : LayerNode{
         val medium = when( type) {
             DYNAMIC -> DynamicMedium(workspace, DynamicImage())
-            FLAT -> FlatMedium( Hybrid.imageCreator.createImage( width ?: workspace.width, height ?: workspace.height), mediumRepo)
+            FLAT -> FlatMedium( Hybrid.imageCreator.createImage( width ?: workspace.width, height ?: workspace.height), workspace.mediumRepository)
             MAGLEV -> MaglevMedium( workspace)
             else -> throw SpiriteException("Attempted to create unsupported MediumType: $type")
         }
 
-        val handle = mediumRepo.addMedium( medium)
+        val handle = workspace.mediumRepository.addMedium( medium)
 
         return importLayer(contextNode, name, SimpleLayer(handle), select)
     }
 
     fun addSimpleLayerFromImage( contextNode: Node?, name: String, image: IImage, select: Boolean = true) : LayerNode {
-        val med = FlatMedium(image.deepCopy(), mediumRepo)
-        val handle = mediumRepo.addMedium(med)
+        val med = FlatMedium(image.deepCopy(), workspace.mediumRepository)
+        val handle = workspace.mediumRepository.addMedium(med)
         return importLayer(contextNode, name, SimpleLayer(handle), select)
     }
     fun addNewSpriteLayer( contextNode: Node?, name: String, select: Boolean = true) : LayerNode {
-        return importLayer(contextNode, name, SpriteLayer(workspace, mediumRepo), select)
+        return importLayer(contextNode, name, SpriteLayer(workspace), select)
     }
 
     fun importLayer( contextNode: Node?, name: String, layer:Layer, select: Boolean = true) : LayerNode {
@@ -57,7 +56,7 @@ class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTre
         workspace.undoEngine.doAsAggregateAction("Duplicate Node"){
             when( node) {
                 is LayerNode ->
-                    LayerNode(null, getNonDuplicateName(node.name), node.layer.dupe(mediumRepo))
+                    LayerNode(null, getNonDuplicateName(node.name), node.layer.dupe(workspace))
                             .apply { insertNode(node, this) }
                 is GroupNode -> {
                     data class NodeContext( val toDupe: Node, val parentInDuper: GroupNode)
@@ -72,7 +71,7 @@ class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTre
                         val dupe : Node? = when (next.toDupe) {
                             is GroupNode -> addGroupNode(next.parentInDuper, getNonDuplicateName(next.toDupe.name))
                                     .apply { next.toDupe.children.forEach { dupeQueue.add( NodeContext( it, this )) } }
-                            is LayerNode -> LayerNode( null, getNonDuplicateName(next.toDupe.name), next.toDupe.layer.dupe(mediumRepo))
+                            is LayerNode -> LayerNode( null, getNonDuplicateName(next.toDupe.name), next.toDupe.layer.dupe(workspace))
                                     .apply { insertNode( next.parentInDuper, this) }
                             else -> null
                         }

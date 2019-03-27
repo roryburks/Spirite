@@ -57,7 +57,7 @@ object LegacySpriteLayerLoader_0_4 : ILayerLoader
                     SpritePartStructure(drawDepth, partName, true, 1f, transX, transY, 1f, 1f, 0f))
         }
 
-        return SpriteLayer(workspace, workspace.mediumRepository, parts)
+        return SpriteLayer(workspace, parts)
     }
 }
 object SpriteLayerLoader : ILayerLoader
@@ -81,7 +81,7 @@ object SpriteLayerLoader : ILayerLoader
             Pair( MediumHandle(workspace,context.reindex(handleId)),
                     SpritePartStructure(drawDepth, partName, true, alpha, transX, transY, scaleX, scaleY, rot))
         }
-        return SpriteLayer(workspace, workspace.mediumRepository, parts)
+        return SpriteLayer(workspace, parts)
     }
 }
 

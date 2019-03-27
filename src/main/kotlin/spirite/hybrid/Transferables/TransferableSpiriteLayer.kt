@@ -16,7 +16,7 @@ val SpiriteLayerDataFlavor = DataFlavor(IImage::class.java, "SpiriteInternalImag
 class TransferableSpiriteLayer(layer: Layer) : Transferable {
     private val _layer = layer
 
-    fun buildLayer( workspace: MImageWorkspace) = _layer.dupe(workspace.mediumRepository)
+    fun buildLayer( workspace: MImageWorkspace) = _layer.dupe(workspace)
 
     override fun getTransferData(flavor: DataFlavor?): Any {
         when( flavor) {

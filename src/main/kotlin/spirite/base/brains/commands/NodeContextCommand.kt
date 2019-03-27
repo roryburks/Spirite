@@ -127,7 +127,7 @@ class NodeContextCommand(
             NEW_SPRITE_LAYER.string -> {
                 if( node is LayerNode && node.layer is SpriteLayer) {
                     val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
-                    val layer = SpriteLayer(structure, workspace, workspace.mediumRepository)
+                    val layer = SpriteLayer(structure, workspace)
                     workspace.groupTree.importLayer(node, node.name, layer)
                 }
                 else workspace.groupTree.addNewSpriteLayer(node, "Sprite Layer", true)

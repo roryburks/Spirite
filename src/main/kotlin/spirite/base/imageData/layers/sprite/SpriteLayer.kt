@@ -33,23 +33,18 @@ import spirite.hybrid.MDebug.WarningType
  */
 class SpriteLayer : Layer {
 
-    constructor(
-            workspace: MImageWorkspace,
-            mediumRepo: MMediumRepository)
+    constructor(workspace: MImageWorkspace)
     {
         this.workspace = workspace
-        this.mediumRepo = mediumRepo
-        _parts.add(SpritePart(SpritePartStructure(0, "base"), mediumRepo.addMedium(DynamicMedium(workspace)), workingId++))
+        _parts.add(SpritePart(SpritePartStructure(0, "base"), workspace.mediumRepository.addMedium(DynamicMedium(workspace)), workingId++))
         activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
     }
 
     constructor(
             workspace: MImageWorkspace,
-            mediumRepo: MMediumRepository,
             toImport: List<Pair<MediumHandle,SpritePartStructure>>)
     {
         this.workspace = workspace
-        this.mediumRepo = mediumRepo
         toImport.forEach {_parts.add(SpritePart(it.second, it.first, workingId++))}
         _sort()
         activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
@@ -57,20 +52,17 @@ class SpriteLayer : Layer {
 
     constructor(
             toImport : List<SpritePartStructure>,
-            workspace: MImageWorkspace,
-            mediumRepo: MMediumRepository)
+            workspace: MImageWorkspace)
     {
         this.workspace = workspace
-        this.mediumRepo = mediumRepo
         toImport.forEach {
-            _parts.add(SpritePart(it, mediumRepo.addMedium(DynamicMedium(workspace)), workingId++))
+            _parts.add(SpritePart(it, workspace.mediumRepository.addMedium(DynamicMedium(workspace)), workingId++))
         }
         _sort()
         activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
     }
 
     val workspace: MImageWorkspace
-    val mediumRepo: MMediumRepository
     val undoEngine get() = workspace.undoEngine
     val parts : List<SpritePart> get() = _parts
     private val _parts = mutableListOf<SpritePart>()
@@ -163,8 +155,8 @@ class SpriteLayer : Layer {
         }
     }
 
-    override fun dupe(mediumRepo: MMediumRepository) =
-            SpriteLayer( workspace, mediumRepo, parts.map { Pair(mediumRepo.addMedium(it.handle.medium.dupe()), SpritePartStructure(it)) })
+    override fun dupe(workspace: MImageWorkspace) =
+            SpriteLayer( workspace, parts.map { Pair(workspace.mediumRepository.addMedium(it.handle.medium.dupe()), SpritePartStructure(it)) })
     // endregion
 
 
@@ -187,7 +179,7 @@ class SpriteLayer : Layer {
         }
     }
     fun addPart( partName : String, depth: Int? = null) {
-        val handle = mediumRepo.addMedium( DynamicMedium(workspace))
+        val handle = workspace.mediumRepository.addMedium( DynamicMedium(workspace))
 
         val aPart = activePart
         val realDepth = depth ?: when {
