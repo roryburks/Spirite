@@ -201,6 +201,7 @@ class SpriteLayer : Layer {
                 addPartSub(this, realName, depth)
         }
 
+        activePart = _parts.firstOrNull { it.partName == realName } ?: activePart
     }
 
     fun removePart( toRemove: SpritePart, linked: Boolean = false) {
