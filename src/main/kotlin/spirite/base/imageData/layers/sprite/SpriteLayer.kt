@@ -105,15 +105,15 @@ class SpriteLayer : Layer {
 
     // region ILayer methods
 
-//    private val _keyPointsDerived = DerivedLazy{ etc }
+    //    private val _keyPointsDerived = DerivedLazy{ etc }
     private val _keyPoints get() = parts.flatMap { part ->
         val tPartToWhole = part.tPartToWhole
-                listOf(
-                        Vec2f(0f,0f),
-                        Vec2f(0f, part.handle.height+0f),
-                        Vec2f( part.handle.width+0f,0f),
-                        Vec2f(part.handle.width+0f, part.handle.height+0f))
-                        .map { tPartToWhole.apply(it)}
+        listOf(
+                Vec2f(0f,0f),
+                Vec2f(0f, part.handle.height+0f),
+                Vec2f( part.handle.width+0f,0f),
+                Vec2f(part.handle.width+0f, part.handle.height+0f))
+                .map { tPartToWhole.apply(it)}
     }
 
     override val x: Int get() = _keyPoints.map { it.xf.floor }.min() ?: 0
@@ -130,9 +130,9 @@ class SpriteLayer : Layer {
 
     override val activeData: ArrangedMediumData
         get() {
-        val part = activePart ?: parts.first()
-        return ArrangedMediumData( part.handle, part.tPartToWhole)
-    }
+            val part = activePart ?: parts.first()
+            return ArrangedMediumData( part.handle, part.tPartToWhole)
+        }
 
     override fun getDrawer(arranged: ArrangedMediumData) = DefaultImageDrawer(arranged)
     override val imageDependencies: List<MediumHandle> get() = parts.map { it.handle }
@@ -446,14 +446,14 @@ class SpriteLayer : Layer {
         val isVisible: Boolean get() = structure.visible && structure.alpha != 0f
         val tPartToWhole : MutableTransformF
             get() {
-            val cx = structure.centerX?.toFloat() ?: handle.width/2f
-            val cy = structure.centerY?.toFloat() ?: handle.height/2f
-            val ret = MutableTransformF.Translation(-cx, -cy)
-            ret.preScale(structure.scaleX, structure.scaleY)
-            ret.preRotate( structure.rot)
-            ret.preTranslate( structure.transX + handle.width/2f, structure.transY + handle.height/2f)
-            return  ret
-        }
+                val cx = structure.centerX?.toFloat() ?: handle.width/2f
+                val cy = structure.centerY?.toFloat() ?: handle.height/2f
+                val ret = MutableTransformF.Translation(-cx, -cy)
+                ret.preScale(structure.scaleX, structure.scaleY)
+                ret.preRotate( structure.rot)
+                ret.preTranslate( structure.transX + handle.width/2f, structure.transY + handle.height/2f)
+                return  ret
+            }
 
         val tWholeToPart : MutableTransformF get() = tPartToWhole.invert()?.toMutable() ?: MutableTransformF.Identity
 
