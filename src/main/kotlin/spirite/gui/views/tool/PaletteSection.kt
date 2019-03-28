@@ -98,6 +98,7 @@ class PaletteSection(
         secondaryColorSquare.onMouseRelease += {evt ->paletteView.onMouseRelease.triggers.forEach { it(evt) }}
 
         paletteView.onMousePress += { evt ->
+            paletteView.requestFocus()
             if( evt.point.x / 12 <= paletteView.w && evt.point.x >= 0 && evt.point.y >= 0) {
 
                 val index = (evt.point.x / 12) + (evt.point.y / 12 * paletteView.w)

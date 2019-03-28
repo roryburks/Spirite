@@ -254,3 +254,9 @@ class MagneticFillTool(toolset: Toolset) : Tool(toolset) {
     val modeBind by scheme.Property(DropDownProperty("Fill Mode", MagneticFillMode.NORMAL, MagneticFillMode.values()))
     val mode by modeBind
 }
+
+class DeformTool(toolset: Toolset) : Tool(toolset) {
+    override val iconX: Int get() = 4
+    override val iconY: Int get() = 1
+    override val description: String get() = "Deformation Tool"
+}
