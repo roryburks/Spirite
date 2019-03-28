@@ -106,7 +106,7 @@ class Penner(
         
 
         when {
-            behavior != null -> behavior?.onPenDown()
+            behavior != null -> behavior?.onPenDown(button)
             context.currentWorkspace?.referenceManager?.editingReference ?: false -> behavior = when {
                 holdingCtrl     -> ZoomingReferenceBehavior(this)
                 holdingShift    -> RotatingReferenceBehavior( this)

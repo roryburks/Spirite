@@ -20,6 +20,7 @@ import spirite.base.util.linear.Rect
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.base.util.shapes.Rectangle
+import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.views.work.WorkSectionView
 import kotlin.math.atan2
 
@@ -295,7 +296,7 @@ class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : Transfor
         state = READY
     }
 
-    override fun onPenDown() {
+    override fun onPenDown(button: MouseButton) {
         state = when( overlap) {
             in 0..7 -> RESIZE
             in 8..0xB -> ROTATE

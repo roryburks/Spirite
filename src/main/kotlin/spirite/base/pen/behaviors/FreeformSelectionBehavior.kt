@@ -7,6 +7,7 @@ import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.pen.Penner
 import spirite.base.pen.selectionBuilders.FreeformSelectionBuilder
 import spirite.base.util.Colors
+import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.views.work.WorkSectionView
 
 class FreeformSelectionBehavior(
@@ -33,7 +34,7 @@ class FreeformSelectionBehavior(
         testFinish()
     }
 
-    override fun onPenDown() {
+    override fun onPenDown(button: MouseButton) {
         drawing = true
         if( !testFinish())
             builder.update(penner.x, penner.y)

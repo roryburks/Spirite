@@ -259,4 +259,8 @@ class DeformTool(toolset: Toolset) : Tool(toolset) {
     override val iconX: Int get() = 4
     override val iconY: Int get() = 1
     override val description: String get() = "Deformation Tool"
+
+
+    val applyBind by scheme.Property(ButtonProperty("Apply Deformation", DrawCommand.APPLY_TRANFORM))
+    var apply by applyBind
 }

@@ -20,9 +20,9 @@ class StrokeDeformationPiece(
 }
 
 class StrokeDeformation(
-        val pieces : List<StrokeDeformationPiece>)
+        val pieces : List<StrokeDeformationPiece>) : IDeformation
 {
-    fun transform( x: Float, y: Float) : Vec2f {
+    override fun transform(x: Float, y: Float) : Vec2f {
         val numMutations = pieces.sumBy { it.len }
         val weights = FloatArray(numMutations)
 
@@ -42,8 +42,8 @@ class StrokeDeformation(
         offset = 0
         for (piece in pieces) {
             for (i in 0 until piece.len) {
-                newX += (piece.toX[i] - piece.fromX[i]) * weights[i + offset]
-                newY += (piece.toY[i] - piece.fromY[i]) * weights[i + offset]
+                newX += (piece.toX[i] - piece.fromX[i]) * weights[i + offset]/sumWeights
+                newY += (piece.toY[i] - piece.fromY[i]) * weights[i + offset]/sumWeights
             }
             offset += piece.len
         }

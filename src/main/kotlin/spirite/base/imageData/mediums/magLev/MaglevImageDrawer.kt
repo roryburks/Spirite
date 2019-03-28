@@ -34,7 +34,8 @@ class MaglevImageDrawer(
         IStrokeModule by MaglevStrokeModule(arranged),
         ITransformModule by MaglevTransformModule(arranged, maglev),
         IColorChangeModule by MaglevColorChangeModule(arranged, maglev),
-        IMagneticFillModule by MaglevMagneticFillModule(arranged, maglev)
+        IMagneticFillModule by MaglevMagneticFillModule(arranged, maglev),
+        IDeformDrawer by MaglevDeformationModule(arranged, maglev)
 {
 }
 
