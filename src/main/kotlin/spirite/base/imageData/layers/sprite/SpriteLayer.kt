@@ -68,22 +68,29 @@ class SpriteLayer : Layer {
     private val _parts = mutableListOf<SpritePart>()
     private var workingId = 0
 
-
-    val cDepthBind = Bindable(0)
-    val cVisibleBind = Bindable(true)
-    val cPartNameBind = Bindable("")
-    val cAlphaBind = Bindable(1f)
-    val cTransXBind = Bindable(0f)
-    val cTransYBind = Bindable(0f)
-    val cScaleXBind = Bindable(1f)
-    val cScaleYBind = Bindable(1f)
-    val cRotBind = Bindable(0f)
-
     var activePartBind = Bindable<SpritePart?>(null)
+            .also { it.addObserver(false) { new, _ ->
+                cAlphaBind.field = new?.alpha ?: 1f
+                cDepthBind.field = new?.depth ?: 0
+                cVisibleBind.field = new?.visible ?: true
+                cPartNameBind.field = new?.partName ?: ""
+                cTransXBind.field = new?.transX ?: 0f
+                cTransYBind.field = new?.transY ?: 0f
+                cScaleXBind.field = new?.scaleX ?: 1f
+                cScaleYBind.field = new?.scaleY ?: 1f
+                cRotBind.field = new?.rot ?: 0f
+
+                val name = new?.partName
+                if( name != null) {
+                    getAllLinkedLayers()
+                            .forEach { sprite -> sprite.activePart = sprite.parts.firstOrNull { it.partName == name }  ?: sprite.activePart}
+                }
+                triggerChange()
+            }}
     var activePart : SpritePart? by activePartBind
 
-    val layerChangeObserver : IObservable<()->Any?> get() = _layerChangeObserver
     private var _layerChangeObserver = Observable<()->Any?>()
+    val layerChangeObserver : IObservable<()->Any?> get() = _layerChangeObserver
     private fun triggerChange() {
         _layerChangeObserver.trigger { it() }
         workspace.imageObservatory.triggerRefresh(
@@ -94,40 +101,11 @@ class SpriteLayer : Layer {
         )
     }
 
-    // region Triggers
-    init {
-        activePartBind.addObserver { new, _ ->
-            cAlphaBind.field = new?.alpha ?: 1f
-            cDepthBind.field = new?.depth ?: 0
-            cVisibleBind.field = new?.visible ?: true
-            cPartNameBind.field = new?.partName ?: ""
-            cTransXBind.field = new?.transX ?: 0f
-            cTransYBind.field = new?.transY ?: 0f
-            cScaleXBind.field = new?.scaleX ?: 1f
-            cScaleYBind.field = new?.scaleY ?: 1f
-            cRotBind.field = new?.rot ?: 0f
-
-            val name = new?.partName
-            if( name != null) {
-                getAllLinkedLayers()
-                        .forEach { sprite -> sprite.activePart = sprite.parts.firstOrNull { it.partName == name }  ?: sprite.activePart}
-            }
-        }
-
-        cDepthBind.addObserver { new, _ -> activePart?.depth = new }
-        cVisibleBind.addObserver { new, _ -> activePart?.visible = new }
-        cPartNameBind.addObserver { new, _ -> activePart?.partName = new }
-        cAlphaBind.addObserver { new, _ -> activePart?.alpha = new }
-        cTransXBind.addObserver { new, _ -> activePart?.transX = new }
-        cTransYBind.addObserver { new, _ -> activePart?.transY = new }
-        cScaleXBind.addObserver { new, _ -> activePart?.scaleX = new }
-        cScaleYBind.addObserver { new, _ -> activePart?.scaleY = new }
-        cRotBind.addObserver { new, _ -> activePart?.rot = new }
-    }
-    // endregion
 
 
     // region ILayer methods
+
+//    private val _keyPointsDerived = DerivedLazy{ etc }
     private val _keyPoints get() = parts.flatMap { part ->
         val tPartToWhole = part.tPartToWhole
                 listOf(
@@ -356,6 +334,15 @@ class SpriteLayer : Layer {
     // endregion
 
 
+    val cDepthBind = Bindable(0)  .also{it.addObserver { new, _ -> activePart?.depth = new }}
+    val cVisibleBind = Bindable(true) .also{it.addObserver { new, _ -> activePart?.visible = new }}
+    val cPartNameBind = Bindable("") .also{it.addObserver { new, _ -> activePart?.partName = new }}
+    val cAlphaBind = Bindable(1f) .also { it.addObserver { new, _ -> activePart?.alpha = new  } }
+    val cTransXBind = Bindable(0f) .also{it.addObserver { new, _ -> activePart?.transX = new }}
+    val cTransYBind = Bindable(0f).also{it.addObserver { new, _ -> activePart?.transY = new }}
+    val cScaleXBind = Bindable(1f).also{it.addObserver { new, _ -> activePart?.scaleX = new }}
+    val cScaleYBind = Bindable(1f).also{it.addObserver { new, _ -> activePart?.scaleY = new }}
+    val cRotBind = Bindable(0f).also{it.addObserver { new, _ -> activePart?.rot = new }}
 
     private fun getAllLinkedLayers() : Sequence<SpriteLayer> {
         return workspace.groupTree.root.traverse()

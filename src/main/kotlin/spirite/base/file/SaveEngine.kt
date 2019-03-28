@@ -6,6 +6,8 @@ import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
+import spirite.base.imageData.animation.ffa.FFALayer
+import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked
 import spirite.base.imageData.animation.ffa.FFALayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -345,7 +347,7 @@ object SaveEngine {
 
                                     ra.writeShort(min(layer.frames.size, MaxFFALayerFrames)) // [2] : Number of Frames
                                     for( frame in layer.frames.asSequence().take(MaxFFALayerFrames)) {
-                                        val type = when(frame.marker) {
+                                        val type = when((frame as FFAFrame).marker) {
                                             GAP -> SaveLoadUtil.FFAFRAME_GAP
                                             START_LOCAL_LOOP -> SaveLoadUtil.FFAFRAME_STARTOFLOOP
                                             FRAME -> SaveLoadUtil.FFAFRAME_FRAME

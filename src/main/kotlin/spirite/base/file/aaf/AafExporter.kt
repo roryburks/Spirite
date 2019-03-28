@@ -7,6 +7,8 @@ import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
+import spirite.base.imageData.animation.ffa.FFAFrameStructure
+import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.mediums.IImageMedium
@@ -80,7 +82,7 @@ class AafExporter(
 
     fun getAllImages(animation: FixedFrameAnimation) : Sequence<ShiftedImage> {
         return animation.layers.asSequence()
-                .flatMap { it.frames.asSequence().map { it.node }.filterIsInstance<LayerNode>() }
+                .flatMap { it.frames.asSequence().filterIsInstance<FFAFrame>().map { it.node }.filterIsInstance<LayerNode>() }
                 .flatMap { it.getDrawList().asSequence() }
                 .map { it.handle.medium }
                 .filterIsInstance<IImageMedium>()
