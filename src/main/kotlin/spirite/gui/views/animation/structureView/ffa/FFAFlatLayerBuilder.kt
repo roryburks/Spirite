@@ -7,13 +7,21 @@ import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FFALayerLexical
 import spirite.base.imageData.animation.ffa.IFFAFrame
 import spirite.base.imageData.animation.ffa.IFFALayer
+import spirite.gui.Direction
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.basic.IImageBox
 import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.components.basic.events.MouseEvent.MouseEventType.RELEASED
 import spirite.gui.components.dialogs.IDialog
+import spirite.gui.resources.Skin
 import spirite.hybrid.Hybrid
+import spirite.hybrid.customGui.ArrowPanel
+import spirite.pc.graphics.ImageBI
+import spirite.pc.gui.basic.SwComponent
+import java.awt.image.BufferedImage
 import java.io.InvalidClassException
 
 
@@ -106,11 +114,20 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
         // TODO: Add Expose Drag-Drop behavior of Gap, and context menu
     }
 
-    private class ImageFrameView(val frame: FFAFrame, val layer: FFALayer) : IFFAStructView
+    private inner class ImageFrameView(val frame: FFAFrame, val layer: FFALayer) : IFFAStructView
     {
-        override val component: IComponent get() = TODO("not implemented")
-        override val height: Int get() = TODO("not implemented")
-        override val dragBrain: IAnimDragBrain? get() = TODO("not implemented")
+        val imgBox = Hybrid.ui.ImageBox(ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR)))
+        override val component = Hybrid.ui.CrossPanel {
+            cols.add(imgBox, width = 24)
+            if( frame.length > 1) {
+                cols.add(SwComponent(ArrowPanel(null, Skin.FFAAnimation.Arrow.jcolor, Direction.RIGHT)), width = 24 * (frame.length - 1))
+            }
+        }
+        override val height: Int get() = 24
+        override val dragBrain: IAnimDragBrain? get() = null
+
+        val k = _master.nativeThumbnailStore.contractThumbnail(frame.node!!, layer.context.workspace)
+                {imgBox.setImage(it)}
     }
 
     private class StartLoopView(val frame: FFAFrame, val layer: FFALayer) : IFFAStructView
