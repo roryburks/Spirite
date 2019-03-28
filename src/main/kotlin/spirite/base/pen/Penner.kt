@@ -170,18 +170,19 @@ class Penner(
                         tool.flipMode == VERTICAL -> drawer.flip(false)
                         tool.flipMode == BY_MOVEMENT -> behavior = FlippingBehavior(this, drawer)
                     }
-                    tool is Reshaper -> {
+                    tool is Reshaper ->
                         if( drawer is ITransformModule) behavior = ReshapingBehavior(this, drawer)
                         else Hybrid.beep()
-                    }
-                    tool is ColorPicker -> behavior = PickBehavior( this, button == LEFT)
-                    tool is Rigger -> behavior = RigSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
-                    tool is MagneticFillTool -> {
-                        if(drawer is IMagneticFillModule) {
-                            behavior = MagneticFillBehavior(this, drawer, color)
-                        }
+                    tool is ColorPicker ->
+                        behavior = PickBehavior( this, button == LEFT)
+                    tool is Rigger ->
+                        behavior = RigSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
+                    tool is MagneticFillTool ->
+                        if( drawer is IMagneticFillModule) behavior = MagneticFillBehavior(this, drawer, color)
                         else Hybrid.beep()
-                    }
+                    tool is DeformTool ->
+                        if( drawer is IDeformDrawer) behavior = StrokeDeformComposingBehavior(this, drawer)
+                        else Hybrid.beep()
                 }
             }
         }

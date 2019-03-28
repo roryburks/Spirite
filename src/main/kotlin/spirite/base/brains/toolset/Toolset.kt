@@ -21,13 +21,14 @@ class Toolset( internal val manager: ToolsetManager) {
     val ColorPicker = ColorPicker( this)
     val Stencil = StencilTool(this)
     val MagneticFill = MagneticFillTool(this)
+    val Deformer = DeformTool(this)
 
 
     private val defaultTools = listOf(
             Pen, Eraser, Fill, ShapeSelection, FreeSelection, Rigger, Move, Pixel, Crop, Flip, Reshape,
             ColorChanger, ColorPicker, Stencil)
     private val maglevTools = listOf(
-            Pen, Eraser, Pixel, Flip, Reshape, ColorChanger, MagneticFill)
+            Pen, Eraser, Pixel, Flip, Reshape, ColorChanger, MagneticFill, Deformer)
     fun toolsForDrawer(drawer: IImageDrawer) : List<Tool> {
         return when( drawer) {
             is NillImageDrawer -> listOf(Pen)

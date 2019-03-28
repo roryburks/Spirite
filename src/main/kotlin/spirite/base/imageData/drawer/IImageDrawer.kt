@@ -4,6 +4,7 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.MagneticFillMode
+import spirite.base.imageData.deformation.IDeformation
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.selection.ILiftedData
@@ -99,6 +100,10 @@ interface IImageDrawer {
     interface IAnchorLiftModule {
         fun acceptsLifted(lifted: ILiftedData): Boolean
         fun anchorLifted(lifted: ILiftedData, trans: ITransformF?)
+    }
+
+    interface IDeformDrawer {
+        fun deform(deformation: IDeformation)
     }
 //
 //    interface IBoneDrawer {

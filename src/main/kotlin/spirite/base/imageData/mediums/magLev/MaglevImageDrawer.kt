@@ -1,16 +1,14 @@
 package spirite.base.imageData.mediums.magLev
 
 import rb.hydra.miniTiamatGrindSync
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.ImmutableTransformF
-import rb.vectrix.linear.Vec2f
-import rb.vectrix.linear.Vec3f
+import rb.vectrix.linear.*
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.ColorChangeMode.AUTO
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.brains.toolset.MagneticFillMode
+import spirite.base.imageData.deformation.IDeformation
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -265,4 +263,29 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
 
         return Pair(dist, BuildingStrokeSegment(closest.strokeIndex, closest.index))
     }
+}
+
+class MaglevDeformationModule(val arranged: ArrangedMediumData, val maglev: MaglevMedium) : IDeformDrawer {
+    override fun deform(deformation: IDeformation) {
+
+        val things = maglev.things
+        things.asSequence()
+                .filterIsInstance<IMaglevPointwiseThing>()
+                .forEach { it.transformPoints{
+                    val vec2 = deformation.transform(it.xf, it.yf)
+                    Vec3f(vec2.xf, vec2.yf, it.zf)
+                } }
+
+        arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged) {
+            override val description: String get() = "Transform Maglev Layer"
+            override val isHeavy: Boolean get() = true
+
+            override fun performImageAction(built: BuiltMediumData) {
+                built.rawAccessComposite {it.graphics.clear()}
+                things.forEach { it.draw(built) }
+            }
+        })
+
+    }
+
 }
