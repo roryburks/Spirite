@@ -5,6 +5,7 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
@@ -35,7 +36,7 @@ class FlatMedium(
 
     override fun getImages() = SinglyList(ShiftedImage(image))
 
-    override fun dupe() = FlatMedium(image.deepCopy(),mediumRepo)
+    override fun dupe(workspace: MImageWorkspace) = FlatMedium(image.deepCopy(),workspace.mediumRepository)
 
     override fun flush() { image.flush() }
 

@@ -49,12 +49,22 @@ class ButtonProperty(override val hrName: String, val command: ICommand) : ToolP
 class FloatBoxProperty(override val hrName: String, default: Float) : ToolProperty<Float>(default)
 class DualFloatBoxProperty(override val hrName: String, val label1: String, val label2: String, default: Vec2f) : ToolProperty<Vec2f>(default)
 
-enum class PenDrawMode( val hrName: String) {
-    NORMAL("Normal"),
-    KEEP_ALPHA("Preserve Alpha"),
-    BEHIND("Behind"),
+enum class PenDrawMode(
+        val hrName: String,
+        val fileId: Int) {
+    NORMAL("Normal", 1),
+    KEEP_ALPHA("Preserve Alpha", 2),
+    BEHIND("Behind", 3),
     ;
     override fun toString() = hrName
+    companion object {
+        fun fromFileId( fileId: Int) = when(fileId) {
+            1 -> NORMAL
+            2 -> KEEP_ALPHA
+            3 -> BEHIND
+            else -> throw IllegalArgumentException("BadFileId")
+        }
+    }
 }
 
 class Pen( toolset: Toolset) : Tool(toolset){
@@ -225,5 +235,32 @@ class StencilTool(toolset: Toolset) : Tool(toolset) {
     override val description: String get() = "Stencil Tool"
 
     val clearStencilBind by scheme.Property(ButtonProperty("Clear Stencil", DrawCommand.APPLY_TRANFORM))
+}
 
+enum class MagneticFillMode(val hrName: String, val fileId: Int) {
+    NORMAL("Normal", 0),
+    BEHIND("Behind",1),
+    ;
+    companion object {
+        fun fromFileId(id: Int) = MagneticFillMode.values().firstOrNull { it.fileId == id }
+    }
+}
+
+class MagneticFillTool(toolset: Toolset) : Tool(toolset) {
+    override val iconX: Int get() = 1
+    override val iconY: Int get() = 3
+    override val description: String get() = "Magnetic Fill Tool"
+
+    val modeBind by scheme.Property(DropDownProperty("Fill Mode", MagneticFillMode.NORMAL, MagneticFillMode.values()))
+    val mode by modeBind
+}
+
+class DeformTool(toolset: Toolset) : Tool(toolset) {
+    override val iconX: Int get() = 4
+    override val iconY: Int get() = 1
+    override val description: String get() = "Deformation Tool"
+
+
+    val applyBind by scheme.Property(ButtonProperty("Apply Deformation", DrawCommand.APPLY_TRANFORM))
+    var apply by applyBind
 }

@@ -61,6 +61,7 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
 
             scheme.add(MenuItem("-"))
             scheme.add(MenuItem("D&uplicate $descriptor", NodeCommand.DUPLICATE))
+            scheme.add(MenuItem("&Copy $descriptor", NodeCommand.COPY))
             scheme.add(MenuItem("&Delete $descriptor", NodeCommand.DELETE))
 
             when( node) {

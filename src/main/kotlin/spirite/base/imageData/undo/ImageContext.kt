@@ -1,6 +1,7 @@
 package spirite.base.imageData.undo
 
 import rb.extendo.dataStructures.SinglySet
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -16,11 +17,11 @@ val MAX_TICKS_PER_KEY = 10
  * change as an image or painstakingly calculating the delta between two images, instead only every AnimationCommand (default 10)
  * changes are stored as images and the in-between frames are calculated working forward from that frame.
  */
-class ImageContext(
+class ImageContext
+constructor(
         override val medium: MediumHandle,
-        private val mediumRepo: MMediumRepository) : UndoContext<ImageAction>
+        private val workspace: MImageWorkspace) : UndoContext<ImageAction>
 {
-    private val workspace get() = medium.workspace
     private val actions = mutableListOf<ImageAction>()
     private var pointer = 0     // The poisition on the actionsList
     private var met = 0         // Amount of actions it's been since a keyframe
@@ -150,11 +151,11 @@ class ImageContext(
         }
 
         override fun performImageAction(built: BuiltMediumData) {
-            mediumRepo.replaceMediumDirect( medium, frame.dupe())
+            workspace.mediumRepository.replaceMediumDirect( medium, frame.dupe(workspace))
             medium.refresh()
         }
 
-        private val frame = medium.medium.dupe()
+        private val frame = medium.medium.dupe(workspace)
 
         override fun onAdd() {
             underlyingAction?.onAdd()

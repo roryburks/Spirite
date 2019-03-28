@@ -11,7 +11,7 @@ class SpriteLayerTests {
     val workspace = TestHelper.makeShellWorkspace(100,100)
 
     @test fun makesSpriteLayer() {
-        val spriteLayer = SpriteLayer(workspace, workspace.mediumRepository)
+        val spriteLayer = SpriteLayer(workspace)
         (spriteLayer.parts[0].handle.medium as DynamicMedium).image.drawToImage(100, 100, drawer = {
             it.graphics.drawLine(0f,0f,10f,10f)
         })
@@ -21,7 +21,7 @@ class SpriteLayerTests {
     }
 
     @test fun addsLayer() {
-        val spriteLayer = SpriteLayer(workspace, workspace.mediumRepository)
+        val spriteLayer = SpriteLayer(workspace)
         spriteLayer.addPart("foot")
 
         assertEquals(2, spriteLayer.parts.size)
@@ -39,8 +39,8 @@ class SpriteLayerTests {
     }
 
     @test fun editsProperties() {
-        val layer1 = SpriteLayer(workspace, workspace.mediumRepository)
-        val layer2 = SpriteLayer(workspace, workspace.mediumRepository)
+        val layer1 = SpriteLayer(workspace)
+        val layer2 = SpriteLayer(workspace)
 
         layer1.parts[0].alpha = 0.5f
         layer1.parts[0].alpha = 0.25f

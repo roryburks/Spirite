@@ -1,5 +1,7 @@
 package spirite.base.brains.commands
 
+import rb.extendo.dataStructures.SinglySequence
+import rb.extendo.dataStructures.SinglySet
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil
@@ -7,9 +9,11 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
+import spirite.base.brains.MWorkspaceSet
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
 import spirite.base.file.workspaceFromImage
 import spirite.base.graphics.Composite.SRC_IN
+import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
@@ -18,6 +22,7 @@ import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
@@ -27,8 +32,15 @@ import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
+import spirite.hybrid.Transferables.IClipboard.ClipboardThings.Image
+import spirite.hybrid.Transferables.ILayerBuilder
 
-class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
+class GlobalCommandExecuter(
+        val master: IMasterControl,
+        val mworkspaceSet : MWorkspaceSet)
+    : ICommandExecuter
+{
+
     enum class GlobalCommand(val string: String) : ICommand {
         NEW_WORKSPACE("newWorkspace"),
         SAVE_WORKSPACE("saveWorkspace"),
@@ -51,6 +63,7 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
     override val domain: String get() = "global"
 
     override fun executeCommand(string: String, extra: Any?): Boolean {
+        val workspace = mworkspaceSet.currentMWorkspace
         when( string) {
             NEW_WORKSPACE.string -> {
                 val result = master.dialog.invokeNewWorkspace() ?: return false
@@ -60,7 +73,7 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                 master.workspaceSet.addWorkspace(newWorkspace)
             }
             SAVE_WORKSPACE.string -> {
-                val workspace = master.workspaceSet.currentWorkspace ?: return false
+                workspace ?: return false
                 val wsfile = workspace.file
 
                 when {
@@ -72,7 +85,7 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                 }
             }
             SAVE_WORKSPACE_AS.string -> {
-                val workspace = master.workspaceSet.currentWorkspace ?: return false
+                workspace ?: return false
                 val file = master.dialog.pickFile(SAVE_SIF) ?: return true
                 master.fileManager.saveWorkspace(workspace, file)
             }
@@ -82,41 +95,57 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                     master.workspaceSet.currentWorkspace ?: return true,
                     master.dialog.pickFile(FilePickType.EXPORT) ?: return true)
             COPY.string -> {
-                val workspace = master.workspaceSet.currentWorkspace?: return false
+                workspace ?: return false
                 copy(workspace, false)
             }
             COPY_VISIBLE.string -> {
-                val workspace = master.workspaceSet.currentWorkspace ?: return false
-                Hybrid.imageIO.imageToClipboard(copyVisible(workspace))
+                workspace ?: return false
+                Hybrid.clipboard.postToClipboard(copyVisible(workspace))
             }
             CUT.string -> {
-                val workspace = master.workspaceSet.currentWorkspace ?: return false
+                workspace ?: return false
                 copy(workspace, true)
             }
             PASTE.string -> {
-                val image = Hybrid.imageIO.imageFromClipboard() ?: return false
-                val workspace = master.workspaceSet.currentWorkspace
-                if( workspace == null)
-                    master.workspaceFromImage(image)
-                else {
-                    val selected = workspace.groupTree.selectedNode
-                    when( selected) {
-                        null, is GroupNode -> workspace.groupTree.addSimpleLayerFromImage(selected, "Pasted", image)
-                        else -> {
-                            val workview = master.frameManager.workView?.tScreenToWorkspace ?: ImmutableTransformF.Identity
-                            val pt = workview.apply(Vec2f.Zero)
-                            println("$pt")
-                            val x = MathUtil.clip(0, pt.x.floor, workspace.width - image.width)
-                            val y = MathUtil.clip(0, pt.y.floor, workspace.height - image.height)
-                            workspace.selectionEngine.setSelectionWithLifted(
-                                    Selection.RectangleSelection(Rect(x, y, image.width, image.height)),
-                                    LiftedImageData(image))
+                val thing = Hybrid.clipboard.getFromClipboard()
+
+                when( thing) {
+                    is IImage -> {
+                        val image : IImage = thing
+                        if( workspace == null)
+                            master.workspaceFromImage(image)
+                        else {
+                            val selected = workspace.groupTree.selectedNode
+                            when( selected) {
+                                null, is GroupNode -> workspace.groupTree.addSimpleLayerFromImage(selected, "Pasted", image)
+                                else -> {
+                                    val workview = master.frameManager.workView?.tScreenToWorkspace ?: ImmutableTransformF.Identity
+                                    val pt = workview.apply(Vec2f.Zero)
+                                    println("$pt")
+                                    val x = MathUtil.clip(0, pt.x.floor, workspace.width - image.width)
+                                    val y = MathUtil.clip(0, pt.y.floor, workspace.height - image.height)
+                                    workspace.selectionEngine.setSelectionWithLifted(
+                                            Selection.RectangleSelection(Rect(x, y, image.width, image.height)),
+                                            LiftedImageData(image))
+                                }
+                            }
                         }
                     }
+                    is ILayerBuilder -> {
+
+                        if(workspace == null)
+                            TODO()
+                        else {
+                            val layer : Layer = thing.buildLayer(workspace)
+                            val selected = workspace.groupTree.selectedNode
+                            workspace.groupTree.importLayer(selected, "ImportedLayer", layer)
+                        }
+                    }
+                    else -> return false
                 }
             }
             PASTE_AS_LAYER.string -> {
-                val image = Hybrid.imageIO.imageFromClipboard() ?: return false
+                val image = (Hybrid.clipboard.getFromClipboard(SinglySet(Image)) as? IImage) ?: return false
                 val workspace = master.workspaceSet.currentWorkspace
                 if( workspace == null)
                     master.workspaceFromImage(image)
@@ -211,8 +240,6 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
             }
         }
 
-        using(image) {
-            Hybrid.imageIO.imageToClipboard(image)
-        }
+        using(image) {Hybrid.clipboard.postToClipboard(it)}
     }
 }

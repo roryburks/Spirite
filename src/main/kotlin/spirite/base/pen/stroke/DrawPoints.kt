@@ -12,6 +12,8 @@ open class DrawPoints(val x: FloatArray, val y: FloatArray, val w: FloatArray) {
         if (x.size != y.size || x.size != w.size)
             MDebug.handleWarning(STRUCTURAL, "Miss-matched xi/yi/wf array lengths.")
     }
+
+    open fun dupe() = DrawPoints(x.clone(), y.clone(), w.clone())
 }
 
 class IndexedDrawPoints(x: FloatArray, y: FloatArray, w: FloatArray, val t: FloatArray) : DrawPoints(x, y, w) {
@@ -28,4 +30,6 @@ class IndexedDrawPoints(x: FloatArray, y: FloatArray, w: FloatArray, val t: Floa
     fun getNearIndex(met: Float): Float {
         return nearestBinarySearch(t, met)
     }
+
+    override fun dupe() = IndexedDrawPoints(x.clone(), y.clone(), w.clone(), t.clone())
 }

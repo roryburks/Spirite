@@ -3,6 +3,8 @@ package spirite.base.file
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
+import spirite.base.imageData.mediums.magLev.IMaglevThing
+import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 
@@ -23,6 +25,8 @@ class PreparedDynamicMedium(
         val image: ImageBI?,
         val offsetX: Int,
         val offsetY: Int) : IPreparedMedium
+class PreparedMaglevMedium(
+        val things: List<IMaglevThing>) : IPreparedMedium
 
 object MediumPreparer
 {
@@ -33,6 +37,7 @@ object MediumPreparer
                     medium.image.base?.run { Hybrid.imageConverter.convert<ImageBI>(this) },
                     medium.image.xOffset,
                     medium.image.yOffset)
+            is MaglevMedium -> PreparedMaglevMedium(medium.getThings())
             else -> null
         }
     }

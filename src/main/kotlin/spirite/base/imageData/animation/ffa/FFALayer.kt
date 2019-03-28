@@ -1,10 +1,9 @@
 package spirite.base.imageData.animation.ffa
 
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
-import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.undo.NullAction
-import spirite.base.util.delegates.UndoableChangeDelegate
+import spirite.base.imageData.undo.UndoableChangeDelegate
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 

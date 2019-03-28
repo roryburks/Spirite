@@ -3,10 +3,8 @@ package spirite.base.util
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
 
-/**
- * Created by Guy on 4/29/2017.
- */
 
+// TODO: Eventually I will need a more robust color space... space.
 sealed class Color {
     val rgbComponent : Vec3f by lazy { Vec3f(red, green, blue) }
     val rgbaComponent : Vec4f by lazy { Vec4f(red, green, blue, alpha) }

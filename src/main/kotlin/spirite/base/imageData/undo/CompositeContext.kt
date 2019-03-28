@@ -1,5 +1,6 @@
 package spirite.base.imageData.undo
 
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.hybrid.MDebug
@@ -13,7 +14,7 @@ import spirite.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
 class CompositeContext(
         private val nullContext: NullContext,
         private val imageContexts: MutableList<ImageContext>,
-        private val mediumRepo: MMediumRepository
+        private val workspace: MImageWorkspace
 ) : UndoContext<CompositeAction> {
     override val medium: MediumHandle? = null
     private val actions = mutableListOf<CompositeAction>()
@@ -35,7 +36,7 @@ class CompositeContext(
                     var imageContext = imageContexts.find { it.medium == innerAction.arranged.handle }
 
                     if( imageContext == null) {
-                        imageContext = ImageContext(innerAction.arranged.handle, mediumRepo)
+                        imageContext = ImageContext(innerAction.arranged.handle, workspace)
                         imageContexts.add(imageContext)
                     }
 

@@ -3,6 +3,7 @@ package spirite.base.util.linear
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 
+// TODO: Merge into Vectrix once spirite.Rect is replaced with Vectrix.RectI
 object RectangleUtil {
     /**
      * Constructs a non-negative dimension Rectangle from two coordinates
@@ -29,7 +30,7 @@ object RectangleUtil {
         return rectFromEndpoints(x1, y1, x2, y2)
     }
 
-    /** Creates the smallest rectangle that contains all given points.  */
+    /** Creates the smallest rectangle that contains all given drawPoints.  */
     fun rectFromPoints(points: List<Vec2f>): Rect {
         if (points.isEmpty())
             return Rect(0, 0, 0, 0)

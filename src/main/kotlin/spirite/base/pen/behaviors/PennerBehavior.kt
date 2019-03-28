@@ -2,6 +2,7 @@ package spirite.base.pen.behaviors
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.pen.Penner
+import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.views.work.WorkSectionView
 
 
@@ -15,7 +16,7 @@ abstract class PennerBehavior(
 
     // For most StateBehavior, onPenDown will be irrelevant/not make sense
     //	because their penUp action is to cancel the state.
-    open fun onPenDown() {}
+    open fun onPenDown(button: MouseButton) {}
     open fun onPenUp() {end()}
     open fun onEnd() {}
 

@@ -17,7 +17,8 @@ class Observable<T> : IObservable<T>
     override fun addObserver(observer: IObserver<T>, trigger: Boolean): IContract = MetaContract(observer)
 
     fun trigger(lambda : (T)->Unit) {
-        observers.removeIf { it.observer.trigger?.apply(lambda) == null }
+        observers.forEach {it.observer.trigger?.apply(lambda)}
+        observers.removeIf { it.observer.trigger == null }
     }
 
     private val observers = mutableListOf<MetaContract>()

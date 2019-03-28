@@ -22,7 +22,11 @@ object MediumLoaderFactory
         SaveLoadUtil.MEDIUM_PLAIN -> FlatMediumLoader
         SaveLoadUtil.MEDIUM_DYNAMIC -> DynamicMediumLoader
         SaveLoadUtil.MEDIUM_PRISMATIC -> PrismaticMediumIgnorer
-        SaveLoadUtil.MEDIUM_MAGLEV -> MagneticMediumIgnorer
+        SaveLoadUtil.MEDIUM_MAGLEV -> when {
+            version < 0x1_0000 -> Legacy_pre_1_0000_MaglevMediumLoader
+            version <= 0x1_0006 -> Legacy_1_0006_MagneticMediumPartialLoader
+            else -> MagneticMediumLoader
+        }
         else -> throw BadSifFileException("Unrecognized Medium Type Id: $typeId.  Trying to load a newer SIF version in an older program version or corrupt file.")
     }
 }
@@ -52,7 +56,7 @@ object DynamicMediumLoader : IMediumLoader
                 Hybrid.imageIO.loadImage(imgData)
             }
         }
-        return DynamicMedium(context.workspace, DynamicImage(img, ox, oy), context.workspace.mediumRepository)
+        return DynamicMedium(context.workspace, DynamicImage(img, ox, oy))
     }
 }
 
@@ -69,42 +73,6 @@ object PrismaticMediumIgnorer :IMediumLoader
             ra.readShort()
             val imgSize = ra.readInt()
             ra.skipBytes(imgSize)
-        }
-        return null
-    }
-}
-
-object MagneticMediumIgnorer : IMediumLoader
-{
-    override fun loadMedium(context: LoadContext): IMedium? {
-        val ra = context.ra
-        MDebug.handleWarning(UNSUPPORTED, "Maglev Mediums are currently not supported by Spirite v2, ignoring.")
-        val numThings = ra.readUnsignedShort()
-        repeat(numThings) {
-            val thingType = ra.readByte()
-            when( thingType.i) {
-                0 -> { // stroke
-                    ra.readInt()
-                    ra.readByte()
-                    ra.readFloat()
-                    val numVertices = ra.readUnsignedShort()
-                    repeat(numVertices) {
-                        ra.readFloat()
-                        ra.readFloat()
-                        ra.readFloat()
-                    }
-                }
-                1 -> { // fill
-                    ra.readInt()
-                    ra.readByte()
-                    val numReferences = ra.readUnsignedShort()
-                    repeat(numReferences) {
-                        ra.readUnsignedShort()
-                        ra.readFloat()
-                        ra.readFloat()
-                    }
-                }
-            }
         }
         return null
     }

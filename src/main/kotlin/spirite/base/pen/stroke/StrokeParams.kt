@@ -20,8 +20,8 @@ data class StrokeParams(
     enum class Method constructor(val fileId: Int) {
         BASIC(0),
         ERASE(1),
-        PIXEL(2);
-
+        PIXEL(2)
+        ;
 
         companion object {
             fun fromFileId(fid: Int): Method? = Method.values().find { it.fileId == fid }

@@ -5,6 +5,7 @@ import rb.vectrix.linear.Mat4f
 import spirite.base.graphics.gl.IFloat32Source
 import spirite.base.graphics.gl.IGL
 
+// TODO: Figure out where this belongs (later).  Possibly in Glow
 object MatrixBuilder {
     /** Creates a transform matrix representing an Orthagonal Projection
      * (A flat, rectangular projection in XY coordinates). */

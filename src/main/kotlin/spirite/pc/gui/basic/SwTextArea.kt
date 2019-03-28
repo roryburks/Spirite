@@ -6,17 +6,22 @@ import spirite.gui.components.basic.ITextArea
 import spirite.gui.resources.Skin.BevelBorder.Dark
 import spirite.gui.resources.Skin.BevelBorder.Light
 import spirite.gui.resources.Skin.TextField.Background
+import spirite.hybrid.Hybrid
+import spirite.hybrid.SwHybrid
 import spirite.pc.gui.adaptMouseSystem
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
 import javax.swing.BorderFactory
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 import javax.swing.border.BevelBorder
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import javax.swing.event.HyperlinkEvent
 
 
 class SwTextArea
-private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComponent(imp)
+private constructor(private val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComponent(imp)
 {
     // TODO: Re-implement TextBind -> UI binding
     constructor() : this(SwTextAreaImp())
@@ -39,6 +44,15 @@ private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComp
         textBind.addObserver { _, _ ->
                 //imp.textArea.text = new
         }
+
+        imp.textArea.addFocusListener(object : FocusListener {
+            override fun focusLost(e: FocusEvent) {
+                SwHybrid.keypressSystem.hotkeysEnabled = true
+            }
+            override fun focusGained(e: FocusEvent?) {
+                SwHybrid.keypressSystem.hotkeysEnabled = false
+            }
+        })
     }
 
 

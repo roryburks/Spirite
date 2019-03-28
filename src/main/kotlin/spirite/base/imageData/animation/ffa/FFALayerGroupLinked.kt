@@ -3,7 +3,7 @@ package spirite.base.imageData.animation.ffa
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.*
-import spirite.base.util.delegates.UndoableChangeDelegate
+import spirite.base.imageData.undo.UndoableChangeDelegate
 
 
 class FFALayerGroupLinked(
@@ -22,7 +22,7 @@ class FFALayerGroupLinked(
             includeSubtrees,
             context.workspace.undoEngine,
             "Change Animation Layer's IncludeSubtrees Structure")
-            {groupLinkUpdated()}
+    { groupLinkUpdated() }
 
     init {
         groupLinkImported(frameMap, unlinkedClusters)

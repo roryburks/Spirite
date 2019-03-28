@@ -13,6 +13,8 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.mediums.magLev.MaglevFill
+import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
@@ -202,11 +204,11 @@ object SaveEngine {
     /** IMGD chunk containing all Medium Data, with images saved in PNG Format*/
     private fun saveImageData( context: SaveContext) {
         context.writeChunk("IMGD") {ra->
-            context.floatingData.forEach {
+            context.floatingData.forEach { floatingMedium ->
                 // [4] : Medium Handle Id
-                ra.writeInt( it.id)
+                ra.writeInt( floatingMedium.id)
 
-                val prepared = it.condensed
+                val prepared = floatingMedium.condensed
                 when( prepared) {
                     is PreparedFlatMedium -> {
                         ra.writeByte(SaveLoadUtil.MEDIUM_PLAIN) // [1] : Medium Type
@@ -223,6 +225,39 @@ object SaveEngine {
                         val byteArray = prepared.image?.run { Hybrid.imageIO.writePNG(this)}
                         ra.writeInt( byteArray?.size ?: 0)  // [4] : Size of Image Data (note: May be 0)
                         byteArray?.run { ra.write(this)}    // [n] : Image Data
+                    }
+                    is PreparedMaglevMedium -> {
+                        ra.writeByte(SaveLoadUtil.MEDIUM_MAGLEV)    // [1] : Medium Type
+                        ra.writeShort(prepared.things.size)     // [2] : number of things
+                        prepared.things.forEach {thing ->
+                            when(thing) {
+                                is MaglevStroke -> {
+                                    ra.writeByte(SaveLoadUtil.MAGLEV_THING_STROKE)  // [1] : Thing type
+                                    ra.writeInt(thing.params.color.argb32)             // [4] : Color
+                                    ra.writeByte(thing.params.method.fileId)            // [1] : Method
+                                    ra.writeFloat(thing.params.width)                  // [4] : Stroke Width
+                                    ra.writeByte(thing.params.mode.fileId)        // [1] : Mode
+                                    ra.writeInt(thing.drawPoints.length)     // [4] : Num Vertices
+
+                                    ra.writeFloatArray(thing.drawPoints.x)
+                                    ra.writeFloatArray(thing.drawPoints.y)
+                                    ra.writeFloatArray(thing.drawPoints.w)
+                                }
+                                is MaglevFill -> {
+                                    ra.writeByte(SaveLoadUtil.MAGLEV_THING_FILL)    // [1] : ThingType
+                                    ra.writeInt(thing.color.argb32) // [4] : Color
+                                    ra.writeByte(thing.mode.fileId) // [1] : FillMode
+
+                                    val numSegs = min(65535, thing.segments.size)
+                                    ra.writeShort(numSegs)  // [2] : Num Segments
+                                    thing.segments.forEach { seg ->
+                                        ra.writeInt(seg.strokeId)   // [4]: StrokeId
+                                        ra.writeInt(seg.start)  // [4] : Start
+                                        ra.writeInt(seg.end)    // [4]
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

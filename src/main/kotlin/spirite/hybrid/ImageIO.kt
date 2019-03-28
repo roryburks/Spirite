@@ -22,8 +22,6 @@ interface IImageIO {
     fun writePNG(image: IImage) : ByteArray
     fun saveImage( image: IImage, file: File)
     fun loadImage( byteArray: ByteArray) : RawImage
-    fun imageToClipboard(image: IImage)
-    fun imageFromClipboard() : RawImage?
 }
 
 object JImageIO : IImageIO {
@@ -40,29 +38,6 @@ object JImageIO : IImageIO {
     override fun loadImage(byteArray: ByteArray): RawImage {
         val bi = ImageIO.read(ByteArrayInputStream(byteArray))
         return Hybrid.imageConverter.convert<GLImage>(ImageBI(bi))
-    }
-
-    override fun imageToClipboard(image: IImage) {
-        val transfer = TransferableImage( image)
-        Toolkit.getDefaultToolkit().systemClipboard.setContents(transfer, null)
-    }
-
-    override fun imageFromClipboard(): RawImage? {
-        val clip = Toolkit.getDefaultToolkit().systemClipboard
-        if( clip.isDataFlavorAvailable( IImageDataFlavor)) {
-            return (clip.getData(IImageDataFlavor) as IImage).deepCopy()
-        }
-        if( clip.isDataFlavorAvailable( DataFlavor.imageFlavor)) {
-            val image = (clip.getData(DataFlavor.imageFlavor) as Image)
-            if( image is BufferedImage)
-                return Hybrid.imageConverter.convertToInternal(ImageBI(image))
-            else {
-                val bi = BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB)
-                bi.graphics.drawImage(image, 0, 0, null)
-                return Hybrid.imageConverter.convertToInternal(ImageBI(bi))
-            }
-        }
-        return null
     }
 }
 

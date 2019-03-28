@@ -3,6 +3,7 @@ package spirite.gui.components.basic
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import spirite.gui.resources.Skin
+import spirite.hybrid.SwHybrid
 import spirite.pc.gui.SColor
 import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
@@ -113,7 +114,6 @@ private constructor(
                 override fun mousePressed(e: MouseEvent?) {parent.dispatchEvent(e)}
             })
 
-
             addMouseMotionListener( object : MouseMotionListener {
                 override fun mouseMoved(e: MouseEvent?) = parent.dispatchEvent(e)
                 override fun mouseDragged(e: MouseEvent?) = parent.dispatchEvent(e)
@@ -143,6 +143,15 @@ private constructor(
             actionMap.put("enter", object : AbstractAction(){
                 override fun actionPerformed(e: ActionEvent?) {
                     doneEditing()
+                }
+            })
+
+            addFocusListener(object : FocusListener {
+                override fun focusLost(e: FocusEvent) {
+                    SwHybrid.keypressSystem.hotkeysEnabled = true
+                }
+                override fun focusGained(e: FocusEvent?) {
+                    SwHybrid.keypressSystem.hotkeysEnabled = false
                 }
             })
         }

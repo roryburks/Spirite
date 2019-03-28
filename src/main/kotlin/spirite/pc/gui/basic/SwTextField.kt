@@ -8,8 +8,11 @@ import spirite.gui.resources.Skin.BevelBorder.Light
 import spirite.gui.resources.Skin.TextField.Background
 import spirite.gui.resources.Skin.TextField.InvalidBg
 import spirite.hybrid.Hybrid
+import spirite.hybrid.SwHybrid
 import spirite.pc.gui.adaptMouseSystem
 import java.awt.Color
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
 import javax.swing.BorderFactory
 import javax.swing.JTextField
 import javax.swing.border.BevelBorder
@@ -19,7 +22,7 @@ import javax.swing.text.AttributeSet
 import javax.swing.text.PlainDocument
 
 class SwTextField
-private constructor(val imp : SwTextFieldImp) : ITextField, ISwComponent by SwComponent(imp)
+private constructor(private val imp : SwTextFieldImp) : ITextField, ISwComponent by SwComponent(imp)
 {
     constructor() : this(SwTextFieldImp())
 
@@ -27,13 +30,40 @@ private constructor(val imp : SwTextFieldImp) : ITextField, ISwComponent by SwCo
     override var text by textBind
 
     init {
-        var locked = false
+        var swInducedLock = false
+        var bindInducedLock = false
         imp.document.addDocumentListener(object: DocumentListener {
-            override fun changedUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
-            override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
-            override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
+            override fun changedUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if(!bindInducedLock)text = imp.text
+                swInducedLock = false
+            }
+            override fun insertUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if(!bindInducedLock)text = imp.text
+                swInducedLock = false
+            }
+            override fun removeUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if(!bindInducedLock || imp.text != "")text = imp.text
+                swInducedLock = false
+            }
         })
-        textBind.addObserver { new, _ -> if(!locked)imp.text = new }
+        textBind.addObserver { new, _ ->
+            bindInducedLock = true
+            if(!swInducedLock) imp.text = new
+            bindInducedLock = false
+        }
+
+
+        imp.addFocusListener(object : FocusListener {
+            override fun focusLost(e: FocusEvent) {
+                SwHybrid.keypressSystem.hotkeysEnabled = true
+            }
+            override fun focusGained(e: FocusEvent?) {
+                SwHybrid.keypressSystem.hotkeysEnabled = false
+            }
+        })
     }
 
     private class SwTextFieldImp() : JTextField()
@@ -80,15 +110,32 @@ private constructor(
     init {
         imp.document = SwNFDocument()
 
-        var locked = false
+        var swInducedLock = false
+        var bindInducedLock = false
         imp.document.addDocumentListener(object: DocumentListener {
-            override fun changedUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
-            override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
-            override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
+            override fun changedUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if( !bindInducedLock)text = imp.text
+                swInducedLock = false
+                checkIfOob()
+            }
+            override fun insertUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if( !bindInducedLock)text = imp.text
+                swInducedLock = false
+                checkIfOob()
+            }
+            override fun removeUpdate(e: DocumentEvent?) {
+                swInducedLock = true
+                if( !bindInducedLock && imp.text != "")text = imp.text
+                swInducedLock = false
+                checkIfOob()}
         })
         textBind.addObserver { new, _->
-            if(!locked)
+            bindInducedLock = true
+            if(!swInducedLock)
                 imp.text = new
+            bindInducedLock = false
         }
     }
 

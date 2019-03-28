@@ -15,7 +15,7 @@ interface UndoContext<T> where T : UndoableAction {
 
     val lastAction : T
 
-    /** Removes All points after the current pointer */
+    /** Removes All drawPoints after the current pointer */
     fun clipHead()
 
     /** Removes the oldest entry */

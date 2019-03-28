@@ -21,13 +21,14 @@ import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.Compositor
+import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.selection.ISelectionEngine
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.selection.SelectionEngine
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
+import spirite.base.imageData.undo.UndoableDelegate
 import spirite.base.pen.stroke.IStrokeDrawerProvider
-import spirite.base.util.delegates.UndoableDelegate
 import java.io.File
 
 interface IImageWorkspace {
@@ -96,7 +97,7 @@ class ImageWorkspace(
     override val mediumRepository = MediumRepository( this)
     override val undoEngine = UndoEngine(this, mediumRepository)
     override val imageObservatory: IImageObservatory = ImageObservatory()
-    override val groupTree = PrimaryGroupTree(this, mediumRepository)
+    override val groupTree = PrimaryGroupTree(this)
     override val animationManager: IAnimationManager = AnimationManager(this)
     override val selectionEngine: ISelectionEngine = SelectionEngine(this)
     override val referenceManager: ReferenceManager = ReferenceManager()
@@ -116,6 +117,12 @@ class ImageWorkspace(
         undoEngine.reset()
         hasChanged = false
         mediumRepository.locked = false
+
+        mediumRepository.dataList.forEach {
+            val medium = mediumRepository.getData(it)
+            if( medium is MaglevMedium)
+                medium.build(MediumHandle(this, it))
+        }
     }
 
     override fun fileSaved(newFile: File) {

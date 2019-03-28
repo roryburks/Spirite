@@ -1,5 +1,6 @@
 package spirite.base.imageData.selection
 
+import rb.extendo.delegates.DerivedLazy
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.vectrix.linear.ITransformF
@@ -15,7 +16,6 @@ import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
-import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.Hybrid
@@ -54,7 +54,7 @@ class SelectionEngine(
         val workspace: IImageWorkspace
 ) : ISelectionEngine {
 
-    private val selectionDerived = DerivedLazy { selectionMask?.let { Selection(it, selectionTransform) }}
+    private val selectionDerived = DerivedLazy { selectionMask?.let { Selection(it, selectionTransform) } }
     override val selection by selectionDerived
 
     // region Base Selection Stuff
@@ -177,8 +177,6 @@ class SelectionEngine(
         gc.transform = transform
         gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
         gc.renderImage(selectionMask, 0, 0)
-        Hybrid.imageIO.saveImage(selectionMask, File("C:/Bucket/t1.png"))
-        Hybrid.imageIO.saveImage(newImage, File("C:/Bucket/t2.png"))
         val newSelection = Selection(newImage, ImmutableTransformF.Translation(bakedArea.x.f, bakedArea.y.f) , false)
 
         workspace.undoEngine.doAsAggregateAction("Bake Lifted") {

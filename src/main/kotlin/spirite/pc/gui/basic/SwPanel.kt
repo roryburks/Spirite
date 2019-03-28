@@ -11,7 +11,7 @@ import javax.swing.JPanel
 
 
 open class SwPanel
-private constructor(val imp: SPanelImp)
+private constructor(private val imp: SPanelImp)
     : ICrossPanel, ISwComponent by SwComponent(imp)
 {
 

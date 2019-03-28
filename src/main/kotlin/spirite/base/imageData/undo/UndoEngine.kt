@@ -54,7 +54,7 @@ class UndoEngine(
 
     private var nullContext : NullContext = NullContext()
     private val imageContexts = mutableListOf<ImageContext>()
-    private var compositeContext: CompositeContext = CompositeContext(nullContext, imageContexts, mediumRepo)
+    private var compositeContext: CompositeContext = CompositeContext(nullContext, imageContexts, workspace)
     private val contexts get()
             = SinglyList(nullContext).then(SinglyList(compositeContext)).then(imageContexts)
 
@@ -70,7 +70,7 @@ class UndoEngine(
         imageContexts.clear()
         saveSpot = 0
         nullContext = NullContext()
-        compositeContext = CompositeContext(nullContext, imageContexts, mediumRepo)
+        compositeContext = CompositeContext(nullContext, imageContexts, workspace)
     }
 
     override var queuePosition: Int
@@ -96,7 +96,7 @@ class UndoEngine(
     // region Core Functionality
     override fun performAndStore(action: UndoableAction) {
         if( action is ImageAction && !imageContexts.any{it.medium == action.arranged.handle})
-            imageContexts.add(ImageContext(action.arranged.handle, mediumRepo))
+            imageContexts.add(ImageContext(action.arranged.handle, workspace))
 
         action.performAction()
         activeStoreState?.add(action) ?: storeAction(action)
@@ -141,7 +141,7 @@ class UndoEngine(
                 var imageContext = imageContexts.find { it.medium == action.arranged.handle }
 
                 if( imageContext == null) {
-                    imageContext = ImageContext(action.arranged.handle,mediumRepo)
+                    imageContext = ImageContext(action.arranged.handle,workspace)
                     imageContexts.add(imageContext)
                 }
                 imageContext.addAction(action)

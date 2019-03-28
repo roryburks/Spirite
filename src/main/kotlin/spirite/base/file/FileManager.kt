@@ -104,7 +104,7 @@ class FileManager( val master: IMasterControl)  : IFileManager{
             // TODO: Trigger autosave
             return
         } catch (e: BadSifFileException){
-            MDebug.handleError(FILE, e.message ?: "Failed to Load SIF")
+            MDebug.handleError(FILE, e.message ?: "Failed to Load SIF", e)
         }
         if( !attempted) {
             try {

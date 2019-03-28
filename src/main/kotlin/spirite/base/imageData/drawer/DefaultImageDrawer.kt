@@ -72,8 +72,8 @@ class DefaultImageDrawer(
             val sb = strokeBuilder ?: return
 
             // NOTE: Storing the bakedDrawPoints rather than the baseStates, this means two things:
-            //  1: Far more points are stored than is necessary, but don't need to be recalculated every time (both minimal)
-            //  2: You need to use rawAccessComposite rather than drawToComposite as the points are already transformed
+            //  1: Far more drawPoints are stored than is necessary, but don't need to be recalculated every time (both minimal)
+            //  2: You need to use rawAccessComposite rather than drawToComposite as the drawPoints are already transformed
             val bakedDrawPoints = sb.currentPoints
             val params = sb.params
             workspace.undoEngine.performAndStore( object : ImageAction(arranged) {

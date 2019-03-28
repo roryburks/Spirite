@@ -128,6 +128,9 @@ class RootWindow( val master: IMasterControl) : JFrame() {
 
     init /* Bindings */ {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher { evt ->
+            if(focusOwner == null || !Hybrid.keypressSystem.hotkeysEnabled)
+                return@addKeyEventDispatcher false
+
             Hybrid.gle.runInGLContext {
                 when (evt.id) {
                     KeyEvent.KEY_PRESSED -> {

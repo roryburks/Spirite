@@ -2,6 +2,7 @@ package spirite.base.brains.toolset
 
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
+import spirite.base.imageData.mediums.magLev.MaglevImageDrawer
 
 /** A Toolset is a complete set of every tool */
 class Toolset( internal val manager: ToolsetManager) {
@@ -19,14 +20,19 @@ class Toolset( internal val manager: ToolsetManager) {
     val ColorChanger = ColorChanger( this)
     val ColorPicker = ColorPicker( this)
     val Stencil = StencilTool(this)
+    val MagneticFill = MagneticFillTool(this)
+    val Deformer = DeformTool(this)
 
 
     private val defaultTools = listOf(
             Pen, Eraser, Fill, ShapeSelection, FreeSelection, Rigger, Move, Pixel, Crop, Flip, Reshape,
             ColorChanger, ColorPicker, Stencil)
+    private val maglevTools = listOf(
+            Pen, Eraser, Pixel, Flip, Reshape, ColorChanger, MagneticFill, Deformer)
     fun toolsForDrawer(drawer: IImageDrawer) : List<Tool> {
         return when( drawer) {
             is NillImageDrawer -> listOf(Pen)
+            is MaglevImageDrawer -> maglevTools
             else -> defaultTools
         }
     }

@@ -43,7 +43,7 @@ class JglpanelDemo : JFrame() {
             }
 
             override fun init(drawable: GLAutoDrawable) {
-                // Disassociate default context and assosciate the context from the GLEngine
+                // Disassociate default workspace and assosciate the workspace from the GLEngine
                 //	(so they can share resources)
                 val primaryContext = offscreenDrawable.context
 

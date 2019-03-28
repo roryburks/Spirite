@@ -9,8 +9,10 @@ import spirite.base.imageData.groupTree.MovableGroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.base.imageData.mediums.IMedium.MediumType.MAGLEV
 import spirite.base.util.StringUtil
 import spirite.gui.components.dialogs.IDialog
+import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 
 interface ICommandExecuter {
@@ -32,6 +34,7 @@ class NodeContextCommand(
         NEW_PUPPET_LAYER("newPuppetLayer"),
         QUICK_NEW_LAYER("newLayer"),
         DUPLICATE("duplicate"),
+        COPY("copy"),
         DELETE("delete"),
 
         ANIM_FROM_GROUP("animationFromGroup"),
@@ -66,7 +69,7 @@ class NodeContextCommand(
             }
             QUICK_NEW_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Layer", DYNAMIC)
             DUPLICATE.string -> node?.also { workspace.groupTree.duplicateNode(it) }
-            NEW_PUPPET_LAYER.string -> TODO()
+            NEW_PUPPET_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Maglev Layer", MAGLEV)
             ANIM_FROM_GROUP.string -> {
                 val groupNode = node as? GroupNode ?: return false
                 val name = StringUtil.getNonDuplicateName(workspace.animationManager.animations.map { it.name },"New Animation")
@@ -126,10 +129,14 @@ class NodeContextCommand(
             NEW_SPRITE_LAYER.string -> {
                 if( node is LayerNode && node.layer is SpriteLayer) {
                     val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
-                    val layer = SpriteLayer(structure, workspace, workspace.mediumRepository)
+                    val layer = SpriteLayer(structure, workspace)
                     workspace.groupTree.importLayer(node, node.name, layer)
                 }
                 else workspace.groupTree.addNewSpriteLayer(node, "Sprite Layer", true)
+            }
+            COPY.string-> {
+                val layerNode = node as? LayerNode ?: return false
+                Hybrid.clipboard.postToClipboard(layerNode.layer)
             }
 
             else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: node.$string")

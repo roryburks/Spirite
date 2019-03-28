@@ -5,16 +5,18 @@ import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.BoxList
 import spirite.gui.components.basic.IComponent
 import spirite.pc.gui.SwUtil
-import spirite.pc.gui.adaptMouseSystem
 import java.awt.GridLayout
-import java.awt.event.*
+import java.awt.Point
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.awt.event.KeyEvent
 import javax.swing.Action
 import javax.swing.KeyStroke
 import kotlin.math.max
 import kotlin.math.min
 
 class SwBoxList<T>
-private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val imp: SwBoxListImp)
+private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, private val imp: SwBoxListImp)
     : BoxList<T>( boxWidth, boxHeight, entries, imp)
 {
     constructor(boxWidth:Int, boxHeight: Int, entries: Collection<T>? = null) : this(boxWidth, boxHeight, entries, SwBoxListImp())
@@ -23,17 +25,15 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val 
         imp.addComponentListener( object : ComponentAdapter(){
             override fun componentResized(e: ComponentEvent?) {rebuild()}
         })
-        imp.content.addMouseListener(object: MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                if( enabled) {
-                    imp.requestFocus()
-                    val comp = imp.content.getComponentAt(e.point)
-                    val index = _entries.indexOfFirst { it.component.component.jcomponent == comp }
-                    if( index != -1)
-                        selectedIndex = index
-                }
+        onMousePress += {e ->
+            if( enabled) {
+                imp.requestFocus()
+                val comp = imp.content.getComponentAt(Point(e.point.x, e.point.y))
+                val index = _entries.indexOfFirst { it.component.component.jcomponent == comp }
+                if( index != -1)
+                    selectedIndex = index
             }
-        })
+        }
     }
     init /*Map*/ {
         val actionMap = HashMap<KeyStroke, Action>(4)

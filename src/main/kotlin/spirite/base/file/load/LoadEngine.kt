@@ -226,7 +226,7 @@ object LoadEngine {
 
         while( ra.filePointer < endPointer) {
             val name = if( context.version == 0x1_0000) "animation" else SaveLoadUtil.readNullTerminatedStringUTF8(ra)
-            val speed = ra.readFloat()
+            val speed = if( context.version < 0x1_0005) 8.0f else ra.readFloat()
             val type = ra.readByte().i
 
             val animation = AnimationLoaderFactory

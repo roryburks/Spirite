@@ -3,6 +3,8 @@ package spirite.hybrid
 import spirite.base.graphics.gl.IGL
 import spirite.base.graphics.gl.IGLEngine
 import spirite.gui.components.basic.IComponentProvider
+import spirite.hybrid.Transferables.IClipboard
+import spirite.hybrid.Transferables.SwClipboard
 import spirite.hybrid.inputSystems.*
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.gui.SwingComponentProvider
@@ -16,6 +18,7 @@ interface IHybrid {
     val timing : ITimerEngine
     val ui : IComponentProvider
     val imageIO : IImageIO
+    val clipboard : IClipboard
 
     val mouseSystem : IMouseSystem
     val keypressSystem : IKeypressSystem
@@ -38,6 +41,8 @@ object SwHybrid : IHybrid {
     override val imageCreator: IImageCreator get() = SwImageCreator
     override val imageConverter: ImageConverter get() = ImageConverter(EngineLaunchpoint.gle)
     override val imageIO: IImageIO get() = JImageIO
+    override val clipboard: IClipboard get() = SwClipboard
+
     override val mouseSystem: IMouseSystem = SwMouseSystem()
     override val keypressSystem: MKeypressSystem = KeypressSystem()
 

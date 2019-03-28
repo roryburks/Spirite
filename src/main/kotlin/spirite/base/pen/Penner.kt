@@ -53,8 +53,7 @@ class Penner(
 
     val workspace get() = context.currentWorkspace
 
-
-    var rawX = 0 ; private  set
+    var rawX = 0 ; private set
     var rawY = 0 ; private set
     var oldRawX = 0 ; private set
     var oldRawY = 0 ; private set
@@ -67,17 +66,14 @@ class Penner(
     var oldX = 0 ; private set
     var oldY = 0 ; private set
 
-
     var pressure = 1.0f ; private set
 
     var behavior : PennerBehavior? = null
         set(new) {
             val old = field
             field = new
-            if( old != null)
-                old.onEnd()
-            if( new != null)
-                new.onStart()
+            old?.onEnd()
+            new?.onStart()
         }
 
     init {
@@ -110,7 +106,7 @@ class Penner(
         
 
         when {
-            behavior != null -> behavior?.onPenDown()
+            behavior != null -> behavior?.onPenDown(button)
             context.currentWorkspace?.referenceManager?.editingReference ?: false -> behavior = when {
                 holdingCtrl     -> ZoomingReferenceBehavior(this)
                 holdingShift    -> RotatingReferenceBehavior( this)
@@ -174,12 +170,19 @@ class Penner(
                         tool.flipMode == VERTICAL -> drawer.flip(false)
                         tool.flipMode == BY_MOVEMENT -> behavior = FlippingBehavior(this, drawer)
                     }
-                    tool is Reshaper -> {
+                    tool is Reshaper ->
                         if( drawer is ITransformModule) behavior = ReshapingBehavior(this, drawer)
                         else Hybrid.beep()
-                    }
-                    tool is ColorPicker -> behavior = PickBehavior( this, button == LEFT)
-                    tool is Rigger -> behavior = RigSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
+                    tool is ColorPicker ->
+                        behavior = PickBehavior( this, button == LEFT)
+                    tool is Rigger ->
+                        behavior = RigSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
+                    tool is MagneticFillTool ->
+                        if( drawer is IMagneticFillModule) behavior = MagneticFillBehavior(this, drawer, color)
+                        else Hybrid.beep()
+                    tool is DeformTool ->
+                        if( drawer is IDeformDrawer) behavior = StrokeDeformComposingBehavior(this, drawer)
+                        else Hybrid.beep()
                 }
             }
         }
@@ -220,14 +223,12 @@ class Penner(
         }
     }
 
-    override fun rawUpdatePressure(rawPressure: Float) {
-        pressure = rawPressure
-    }
+    override fun rawUpdatePressure(rawPressure: Float) { pressure = rawPressure }
 
     override val drawsOverlay: Boolean get() = behavior is DrawnPennerBehavior
     override fun drawOverlay(gc: GraphicsContext, view: WorkSectionView) {
         (behavior as? DrawnPennerBehavior)?.paintOverlay(gc,view)
     }
 
-    val __toolBinding = toolsetManager.selectedToolBinding.addObserver { _, _ -> behavior = null }
+    val _toolBindingK = toolsetManager.selectedToolBinding.addObserver { _, _ -> behavior = null }
 }

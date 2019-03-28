@@ -3,13 +3,14 @@ package spirite.base.file
 import rb.vectrix.mathUtil.i
 import java.io.ByteArrayOutputStream
 import java.io.RandomAccessFile
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 object SaveLoadUtil {
     val header : ByteArray get() =ByteArray(4).apply {
         System.arraycopy("SIFF".toByteArray(charset("UTF-8")), 0, this, 0, 4)
     }
-    const val version = 0x0001_0005
+    const val version = 0x0001_0008
 
 
     // :::: Node Type Identifiers for the SIFF GroupTree Section
@@ -24,6 +25,10 @@ object SaveLoadUtil {
     const val MEDIUM_DYNAMIC = 0x01
     const val MEDIUM_PRISMATIC = 0x02
     const val MEDIUM_MAGLEV = 0x03
+
+    // :::: Maglev Thing Type
+    const val MAGLEV_THING_STROKE = 0
+    const val MAGLEV_THING_FILL = 1
 
     // :::: AnimationType
     const val ANIM_FFA = 0x01
@@ -78,3 +83,18 @@ fun RandomAccessFile.writeUFT8NT(str: String) {
 }
 
 fun RandomAccessFile.readNullTerminatedStringUTF8() = SaveLoadUtil.readNullTerminatedStringUTF8(this)
+
+fun RandomAccessFile.writeFloatArray( floatArray: FloatArray) {
+    val buf = ByteBuffer.allocate(floatArray.size * 4)
+    buf.clear()
+    buf.asFloatBuffer().put(floatArray)
+    this.channel.write(buf)
+}
+
+fun RandomAccessFile.readFloatArray( len: Int) : FloatArray {
+    val buf = ByteBuffer.allocate(len*4)
+    buf.clear()
+    channel.read(buf)
+    buf.rewind()
+    return FloatArray(len).also { buf.asFloatBuffer().get(it) }
+}
