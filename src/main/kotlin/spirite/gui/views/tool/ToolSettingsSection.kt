@@ -91,7 +91,9 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
     is DropDownProperty -> toolProperty.getComponent()
     is ButtonProperty -> Hybrid.ui.Button(toolProperty.hrName).apply {
         action = {
-            master.commandExecutor.executeCommand(toolProperty.command.commandString, toolProperty.value)
+            Hybrid.gle.runInGLContext {
+                master.commandExecutor.executeCommand(toolProperty.command.commandString, toolProperty.value)
+            }
             toolProperty.value = !toolProperty.value
         }
     }
