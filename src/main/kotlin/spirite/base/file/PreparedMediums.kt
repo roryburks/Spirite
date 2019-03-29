@@ -26,7 +26,10 @@ class PreparedDynamicMedium(
         val offsetX: Int,
         val offsetY: Int) : IPreparedMedium
 class PreparedMaglevMedium(
-        val things: List<IMaglevThing>) : IPreparedMedium
+        val things: List<IMaglevThing>,
+        val offsetX: Int,
+        val offsetY: Int,
+        val image: ImageBI?) : IPreparedMedium
 
 object MediumPreparer
 {
@@ -37,7 +40,11 @@ object MediumPreparer
                     medium.image.base?.run { Hybrid.imageConverter.convert<ImageBI>(this) },
                     medium.image.xOffset,
                     medium.image.yOffset)
-            is MaglevMedium -> PreparedMaglevMedium(medium.getThings())
+            is MaglevMedium -> PreparedMaglevMedium(
+                    medium.getThings(),
+                    medium.builtImage.xOffset,
+                    medium.builtImage.yOffset,
+                    medium.builtImage.base?.run { Hybrid.imageConverter.convert<ImageBI>(this) })
             else -> null
         }
     }

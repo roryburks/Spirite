@@ -1,4 +1,4 @@
-Version 0x0001_0008
+Version 0x0001_0009
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -95,7 +95,10 @@ Header
 					[4, Int] : reference to stroke
 					[4, Int] : start point of stroke
 					[4, Int] : end point of stroke
-		Per Stroke :
+		[4, int] : Size of Image Data
+        [2, short] : Dynamic offsetX
+        [2, short] : Dynamic offsetY
+		[n, RAW] : PNG-saved Image File
 
 ---- ANIM - Animation Data Chunk
 Per Animation:

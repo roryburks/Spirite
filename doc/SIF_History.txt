@@ -34,3 +34,6 @@
     -Re-added Maglev Fills
         -StrokeId from Ushort to Int
         -Start/End from [0,1]-based Floats to Ints
+0x0001_0009:
+    -To combat atrocious re-construct times, Maglev Mediums can now save its composed PNG image along with its MaglevThings
+    (this will be optional in the file format, option might not be exposed in saving)

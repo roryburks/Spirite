@@ -258,6 +258,11 @@ object SaveEngine {
                                 }
                             }
                         }
+                        val byteArray = prepared.image?.run { Hybrid.imageIO.writePNG(this)}
+                        ra.writeInt( byteArray?.size ?: 0)  // [4] : Size of Image Data
+                        ra.writeShort( prepared.offsetX)        // [2] : Dynamic AnimationCommand Offset
+                        ra.writeShort( prepared.offsetY)        // [2] : Dynamic Y Offset
+                        byteArray?.run { ra.write(this)}    // [n] : Image Data
                     }
                 }
             }

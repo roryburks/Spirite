@@ -120,7 +120,7 @@ class ImageWorkspace(
 
         mediumRepository.dataList.forEach {
             val medium = mediumRepository.getData(it)
-            if( medium is MaglevMedium)
+            if( medium is MaglevMedium && medium.builtImage.base == null)
                 medium.build(MediumHandle(this, it))
         }
     }

@@ -20,16 +20,16 @@ import spirite.pc.gui.SColor
 
 
 class MaglevMedium
-private constructor(
+constructor(
         private val workspace: MImageWorkspace,
         internal val things: MutableList<IMaglevThing>,
-        private val builtImage : DynamicImage = DynamicImage())
+        val builtImage : DynamicImage)
     :IMedium
 {
     constructor(
             workspace: MImageWorkspace,
             things: List<IMaglevThing>? = null)
-            : this(workspace, things?.toMutableList() ?: mutableListOf())
+            : this(workspace, things?.toMutableList() ?: mutableListOf(), DynamicImage())
 
     fun getThings() = things.toList()
 
