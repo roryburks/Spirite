@@ -3,7 +3,8 @@ package spirite.base.imageData.deformation
 import com.hackoeur.jglm.support.FastMath
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil
-import spirite.base.pen.stroke.DrawPoints
+import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.round
 import kotlin.math.min
 
 interface IDeformation {
@@ -13,26 +14,42 @@ interface IDeformation {
 class StrokeDeformationPiece(
         val fromX : FloatArray,
         val fromY : FloatArray,
-        val toX : FloatArray,
-        val toY : FloatArray)
+        toX : FloatArray,
+        toY : FloatArray)
 {
-    val len by lazy {min(min(fromX.size, fromY.size), min(toX.size, toY.size)) }
+    val fromLen = min(fromX.size, fromY.size)
+
+    val toX : FloatArray = FloatArray(fromLen)
+    val toY : FloatArray = FloatArray(fromLen)
+    init {
+        // Note: the from-to logic could either be brought out earlier, made more complicated, etc
+        // for now it's designed to treat the lengths equally
+        val toLen = min(toX.size, toY.size)
+
+        for (i in (0 until toLen)) {
+            val toIndex = MathUtil.clip(0, (i.f / toLen.f * fromLen.f).round, toLen)
+
+            this.toX[toLen] = toX[i]
+            this.toY[toLen] = toY[i]
+        }
+    }
 }
+
 
 class StrokeDeformation(
         val pieces : List<StrokeDeformationPiece>) : IDeformation
 {
     override fun transform(x: Float, y: Float) : Vec2f {
-        val numMutations = pieces.sumBy { it.len }
+        val numMutations = pieces.sumBy { it.fromLen }
         val weights = FloatArray(numMutations)
 
         var offset = 0
         for (piece in pieces) {
-            for (i in 0 until piece.len) {
+            for (i in 0 until piece.fromLen) {
                 weights[i + offset] = FastMath.invSqrtFast ((x - piece.fromX[i]).run { this*this } + (y - piece.fromY[i]).run { this*this })
             }
 
-            offset += piece.len
+            offset += piece.fromLen
         }
 
         val sumWeights = weights.sum()
@@ -41,11 +58,11 @@ class StrokeDeformation(
         var newY = y
         offset = 0
         for (piece in pieces) {
-            for (i in 0 until piece.len) {
+            for (i in 0 until piece.fromLen) {
                 newX += (piece.toX[i] - piece.fromX[i]) * weights[i + offset]/sumWeights
                 newY += (piece.toY[i] - piece.fromY[i]) * weights[i + offset]/sumWeights
             }
-            offset += piece.len
+            offset += piece.fromLen
         }
         return Vec2f(newX, newY)
     }
