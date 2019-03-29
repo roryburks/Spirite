@@ -15,7 +15,6 @@ import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.CompositeSource
 import spirite.base.imageData.mediums.magLev.MaglevFill.StrokeSegment
-import spirite.base.imageData.undo.ImageAction
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeBuilder
@@ -96,19 +95,20 @@ class MaglevTransformModule(
 
         val det = effectiveTrans.determinantF * 0.8f + 0.2f
 
-        val things = maglev.things
-        things.asSequence()
-                .filterIsInstance<IMaglevPointwiseThing>()
-                .forEach { it.transformPoints{
-                    val vec2 = effectiveTrans.apply(Vec2f(it.xf, it.yf))
-                    Vec3f(vec2.xf, vec2.yf, it.zf * det)
-                } }
 
-        arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged) {
+        arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged) {
+
             override val description: String get() = "Transform Maglev Layer"
             override val isHeavy: Boolean get() = true
 
-            override fun performImageAction(built: BuiltMediumData) {
+            override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
+                val things = maglev.things
+                things.asSequence()
+                        .filterIsInstance<IMaglevPointwiseThing>()
+                        .forEach { it.transformPoints{
+                            val vec2 = effectiveTrans.apply(Vec2f(it.xf, it.yf))
+                            Vec3f(vec2.xf, vec2.yf, it.zf * det)
+                        } }
                 built.rawAccessComposite {it.graphics.clear()}
                 things.forEach { it.draw(built) }
             }
@@ -146,22 +146,20 @@ class MaglevTransformModule(
 class MaglevColorChangeModule(val arranged: ArrangedMediumData, val maglev: MaglevMedium) : IColorChangeModule
 {
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
-        val things = maglev.things
-        things.asSequence()
-                .filterIsInstance<IMaglevColorwiseThing>()
-                .forEach { it.transformColor { color ->
-                    if( mode == AUTO || (color.red == from.red && color.blue == from.blue && color.green == from.green &&
-                                    (color.alpha == from.alpha || mode == IGNORE_ALPHA)))
-                        to
-                    else
-                        color
-                } }
-
-        arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged) {
+        arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged) {
             override val description: String get() = "Color Change Maglev Layer"
             override val isHeavy: Boolean get() = true
-
-            override fun performImageAction(built: BuiltMediumData) {
+            override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
+                val things = maglev.things
+                things.asSequence()
+                        .filterIsInstance<IMaglevColorwiseThing>()
+                        .forEach { it.transformColor { color ->
+                            if( mode == AUTO || (color.red == from.red && color.blue == from.blue && color.green == from.green &&
+                                            (color.alpha == from.alpha || mode == IGNORE_ALPHA)))
+                                to
+                            else
+                                color
+                        } }
                 built.rawAccessComposite {it.graphics.clear()}
                 things.forEach { it.draw(built) }
             }
@@ -269,19 +267,19 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
 class MaglevDeformationModule(val arranged: ArrangedMediumData, val maglev: MaglevMedium) : IDeformDrawer {
     override fun deform(deformation: IDeformation) {
 
-        val things = maglev.things
-        things.asSequence()
-                .filterIsInstance<IMaglevPointwiseThing>()
-                .forEach { it.transformPoints{
-                    val vec2 = deformation.transform(it.xf, it.yf)
-                    Vec3f(vec2.xf, vec2.yf, it.zf)
-                } }
 
-        arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged) {
+        arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged) {
             override val description: String get() = "Transform Maglev Layer"
             override val isHeavy: Boolean get() = true
 
-            override fun performImageAction(built: BuiltMediumData) {
+            override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
+                val things = maglev.things
+                things.asSequence()
+                        .filterIsInstance<IMaglevPointwiseThing>()
+                        .forEach { it.transformPoints{
+                            val vec2 = deformation.transform(it.xf, it.yf)
+                            Vec3f(vec2.xf, vec2.yf, it.zf)
+                        } }
                 built.rawAccessComposite {it.graphics.clear()}
                 things.forEach { it.draw(built) }
             }
