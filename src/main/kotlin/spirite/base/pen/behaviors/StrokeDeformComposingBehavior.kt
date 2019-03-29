@@ -1,11 +1,15 @@
 package spirite.base.pen.behaviors
 
 import rb.vectrix.compaction.FloatCompactor
+import rb.vectrix.interpolation.CubicSplineInterpolator2D
+import rb.vectrix.mathUtil.MathUtil
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.deformation.StrokeDeformation
 import spirite.base.imageData.deformation.StrokeDeformationPiece
 import spirite.base.imageData.drawer.IImageDrawer.IDeformDrawer
+import spirite.base.pen.PenState
 import spirite.base.pen.Penner
+import spirite.base.pen.stroke.DrawPointsBuilder
 import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
@@ -67,7 +71,7 @@ class StrokeDeformComposingBehavior(
                                 fromStrokes.zip(toStrokes) { from, to ->
                                     StrokeDeformationPiece(from.first, from.second, to.first, to.second)
                                 }))
-                super.onEnd()
+                end()
             }
         }
     }
@@ -77,8 +81,29 @@ class StrokeDeformComposingBehavior(
         val yCompact = yCompact
         if( xCompact != null && yCompact != null)
         {
+
+            val interpolator = CubicSplineInterpolator2D(xCompact.toArray(), yCompact.toArray(), true)
+
+            val builtFcX = FloatCompactor()
+            val builtFcY = FloatCompactor()
+
+            var interpos = 0f
+
+
+            fun addPoint() {
+                val ip = interpolator.evalExt(interpos)
+                builtFcX.add(ip.x)
+                builtFcY.add(ip.y)
+            }
+            addPoint()
+
+            while( interpos + 1.0f < interpolator.curveLength) {
+                interpos += 1.0f
+                addPoint()
+            }
+
             val listToAddTo = if(from) fromStrokes else toStrokes
-            listToAddTo.add(Pair(xCompact.toArray(), yCompact.toArray()))
+            listToAddTo.add(Pair(builtFcX.toArray(), builtFcY.toArray()))
             this.xCompact = null
             this.yCompact = null
         }
@@ -101,6 +126,7 @@ class StrokeDeformComposingBehavior(
             gc.color = Colors.MAGENTA
             val xs = xCompact.toArray()
             val ys = yCompact.toArray()
+
             gc.drawPolyLine(xs, ys, xs.size)
         }
     }
