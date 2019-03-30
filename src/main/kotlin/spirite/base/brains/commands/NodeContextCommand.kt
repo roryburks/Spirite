@@ -8,8 +8,8 @@ import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.MovableGroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
-import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
-import spirite.base.imageData.mediums.IMedium.MediumType.MAGLEV
+import spirite.base.imageData.mediums.MediumType.DYNAMIC
+import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.util.StringUtil
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.Hybrid
@@ -69,7 +69,6 @@ class NodeContextCommand(
             }
             QUICK_NEW_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Layer", DYNAMIC)
             DUPLICATE.string -> node?.also { workspace.groupTree.duplicateNode(it) }
-            NEW_PUPPET_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Maglev Layer", MAGLEV)
             ANIM_FROM_GROUP.string -> {
                 val groupNode = node as? GroupNode ?: return false
                 val name = StringUtil.getNonDuplicateName(workspace.animationManager.animations.map { it.name },"New Animation")
@@ -129,10 +128,18 @@ class NodeContextCommand(
             NEW_SPRITE_LAYER.string -> {
                 if( node is LayerNode && node.layer is SpriteLayer) {
                     val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
-                    val layer = SpriteLayer(structure, workspace)
+                    val layer = SpriteLayer(structure, workspace, node.layer.type)
                     workspace.groupTree.importLayer(node, node.name, layer)
                 }
                 else workspace.groupTree.addNewSpriteLayer(node, "Sprite Layer", true)
+            }
+            NEW_PUPPET_LAYER.string -> {
+                if( node is LayerNode && node.layer is SpriteLayer) {
+                    val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
+                    val layer = SpriteLayer(structure, workspace, MAGLEV)
+                    workspace.groupTree.importLayer(node, node.name, layer)
+                }
+                else workspace.groupTree.addNewSpriteLayer(node, "Puppet Layer", true, MAGLEV)
             }
             COPY.string-> {
                 val layerNode = node as? LayerNode ?: return false

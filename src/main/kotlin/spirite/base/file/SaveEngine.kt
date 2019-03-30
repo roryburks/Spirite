@@ -153,8 +153,8 @@ object SaveEngine {
                                 ra.writeInt( layer.medium.id)
                             }
                             is SpriteLayer -> {
-                                // [1] : NodeTypeId
-                                ra.writeByte(SaveLoadUtil.NODE_SPRITE_LAYER)
+                                ra.writeByte(SaveLoadUtil.NODE_SPRITE_LAYER) // [1] : NodeTypeId
+                                ra.writeByte(layer.type.permanentCode)  // [1] : Sprite LAyer Medium Type
 
                                 val parts = layer.parts.toList()
 

@@ -7,6 +7,7 @@ import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
+import spirite.base.imageData.mediums.MediumType
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 
@@ -66,6 +67,8 @@ object SpriteLayerLoader : ILayerLoader
         val ra = context.ra
         val workspace = context.workspace
 
+        val type = if( context.version >= 0x1_000A) MediumType.fromCode(ra.readByte().i) ?: MediumType.DYNAMIC else MediumType.DYNAMIC
+
         val partSize = ra.readUnsignedByte()
         val parts = List(partSize) {
             val partName = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
@@ -81,7 +84,7 @@ object SpriteLayerLoader : ILayerLoader
             Pair( MediumHandle(workspace,context.reindex(handleId)),
                     SpritePartStructure(drawDepth, partName, true, alpha, transX, transY, scaleX, scaleY, rot))
         }
-        return SpriteLayer(workspace, parts)
+        return SpriteLayer(workspace, parts, type = type)
     }
 }
 

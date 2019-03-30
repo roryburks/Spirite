@@ -15,11 +15,16 @@ import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.*
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.drawer.DefaultImageDrawer
+import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.traverse
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
+import spirite.base.imageData.mediums.MediumType
+import spirite.base.imageData.mediums.magLev.MaglevImageAction
+import spirite.base.imageData.mediums.magLev.MaglevImageDrawer
+import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
@@ -33,17 +38,22 @@ import spirite.hybrid.MDebug.WarningType
  */
 class SpriteLayer : Layer {
 
-    constructor(workspace: MImageWorkspace)
+    val type : MediumType
+
+    constructor(workspace: MImageWorkspace, type: MediumType = MediumType.DYNAMIC)
     {
+        this.type = type
         this.workspace = workspace
-        _parts.add(SpritePart(SpritePartStructure(0, "base"), workspace.mediumRepository.addMedium(DynamicMedium(workspace)), workingId++))
+        _parts.add(SpritePart(SpritePartStructure(0, "base"), workspace.mediumRepository.addMedium(makeThing(workspace)), workingId++))
         activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
     }
 
     constructor(
             workspace: MImageWorkspace,
-            toImport: List<Pair<MediumHandle,SpritePartStructure>>)
+            toImport: List<Pair<MediumHandle,SpritePartStructure>>,
+            type: MediumType = MediumType.DYNAMIC)
     {
+        this.type = type
         this.workspace = workspace
         toImport.forEach {_parts.add(SpritePart(it.second, it.first, workingId++))}
         _sort()
@@ -52,11 +62,13 @@ class SpriteLayer : Layer {
 
     constructor(
             toImport : List<SpritePartStructure>,
-            workspace: MImageWorkspace)
+            workspace: MImageWorkspace,
+            type: MediumType = MediumType.DYNAMIC)
     {
+        this.type = type
         this.workspace = workspace
         toImport.forEach {
-            _parts.add(SpritePart(it, workspace.mediumRepository.addMedium(DynamicMedium(workspace)), workingId++))
+            _parts.add(SpritePart(it, workspace.mediumRepository.addMedium(makeThing(workspace)), workingId++))
         }
         _sort()
         activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
@@ -101,7 +113,13 @@ class SpriteLayer : Layer {
         )
     }
 
-
+    fun makeThing(workspace: MImageWorkspace) = when(type) {
+        MediumType.DYNAMIC -> {
+            DynamicMedium(workspace)
+        }
+        MediumType.MAGLEV -> MaglevMedium(workspace)
+        else -> TODO("Unimplemented.")
+    }
 
     // region ILayer methods
 
@@ -134,7 +152,12 @@ class SpriteLayer : Layer {
         return ArrangedMediumData( part.handle, part.tPartToWhole)
     }
 
-    override fun getDrawer(arranged: ArrangedMediumData) = DefaultImageDrawer(arranged)
+    override fun getDrawer(arranged: ArrangedMediumData) = when(val med = arranged.handle.medium) {
+        is MaglevMedium -> MaglevImageDrawer(arranged, med)
+        is DynamicMedium -> DefaultImageDrawer(arranged)
+        else -> NillImageDrawer
+    }
+
     override val imageDependencies: List<MediumHandle> get() = parts.map { it.handle }
     override fun getDrawList(isolator: IIsolator?): List<TransformedHandle> {
         return when (isolator) {
@@ -156,7 +179,7 @@ class SpriteLayer : Layer {
     }
 
     override fun dupe(workspace: MImageWorkspace) =
-            SpriteLayer( workspace, parts.map { Pair(workspace.mediumRepository.addMedium(it.handle.medium.dupe(workspace)), SpritePartStructure(it)) })
+            SpriteLayer( workspace, parts.map { Pair(workspace.mediumRepository.addMedium(it.handle.medium.dupe(workspace)), SpritePartStructure(it)) }, type)
     // endregion
 
 
@@ -170,7 +193,7 @@ class SpriteLayer : Layer {
 
         fun addPartSub( layer: SpriteLayer, partName: String, depth: Int? = null) {
             layer.run {
-                val handle = workspace.mediumRepository.addMedium(DynamicMedium(workspace))
+                val handle = workspace.mediumRepository.addMedium(makeThing(workspace))
 
                 val aPart = activePart
                 val realDepth = depth ?: when {

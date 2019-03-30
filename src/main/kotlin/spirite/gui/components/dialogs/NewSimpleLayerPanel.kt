@@ -2,8 +2,8 @@ package spirite.gui.components.dialogs
 
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.mediums.IMedium.MediumType
-import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
+import spirite.base.imageData.mediums.MediumType
+import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.base.util.Color
 import spirite.base.util.Colors
 import spirite.gui.Orientation.HORIZONTAL

@@ -1,4 +1,4 @@
-Version 0x0001_0009
+Version 0x0001_000A
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -28,6 +28,7 @@ Header
     0x01 : Simple Layer
         [4, int] : ID of linked MediumData
     0x02 : Sprite Layer
+        [1, byte] : Sprite Layer Type
         [1, byte] : Number of Parts
         Per Part:
             [n, UTF8 str] : Part Type name

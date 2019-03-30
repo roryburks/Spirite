@@ -49,7 +49,6 @@ class StrokeDeformationPiece(
     }
 }
 
-
 class StrokeDeformation(
         val pieces : List<StrokeDeformationPiece>) : IDeformation
 {

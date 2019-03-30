@@ -6,15 +6,13 @@ import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
-import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.IMedium.MediumType
-import spirite.base.imageData.mediums.IMedium.MediumType.MAGLEV
+import spirite.base.imageData.mediums.MediumType
+import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.util.Colors
 import spirite.pc.gui.SColor
 

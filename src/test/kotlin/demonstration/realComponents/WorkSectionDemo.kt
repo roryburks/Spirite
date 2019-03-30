@@ -3,7 +3,7 @@ package demonstration.realComponents
 import demonstration.DemoLauncher
 import sjunit.TestHelper
 import spirite.base.brains.MasterControl
-import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.gui.views.work.WorkTabPane

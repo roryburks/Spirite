@@ -11,8 +11,7 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.drawer.IImageDrawer
-import spirite.base.imageData.mediums.IMedium.MediumType
-import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
+import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.base.util.Colors
 import spirite.pc.gui.SColor
 
@@ -46,33 +45,6 @@ interface IMedium : IFlushable {
     fun dupe(workspace: MImageWorkspace): IMedium
     override fun flush()
 
-    enum class MediumType constructor(
-            // This way, these values can be used in saving and loading without failing when
-            //	an Enum is removed
-            val permanentCode: Int,
-            // Whether or not the user can directly create them (if they'll show up on the "Create Simple Layer" screen)
-            val userCreatable: Boolean = true)
-    {
-        FLAT(0),
-        DYNAMIC(1),
-        PRISMATIC(2),
-        MAGLEV(3),
-        DERIVED_MAGLEV(4, false);
-
-        companion object {
-            fun fromCode(code: Int): MediumType? {
-                val values = MediumType.values()
-
-                return values.indices
-                        .firstOrNull { values[it].permanentCode == code }
-                        ?.let { values[it] }
-            }
-
-            val creatableTypes: Array<MediumType> by lazy {
-                MediumType.values().asList().filter { it.userCreatable }.toTypedArray()
-            }
-        }
-    }
 }
 
 abstract class IComplexMedium : IMedium {
