@@ -6,6 +6,7 @@ import rb.vectrix.mathUtil.MathUtil
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.deformation.StrokeDeformation
 import spirite.base.imageData.deformation.StrokeDeformationPiece
+import spirite.base.imageData.deformation.StrokeDeformationV2
 import spirite.base.imageData.drawer.IImageDrawer.IDeformDrawer
 import spirite.base.pen.PenState
 import spirite.base.pen.Penner
@@ -67,7 +68,7 @@ class StrokeDeformComposingBehavior(
                 val toCt = toStrokes.size
 
                 drawer.deform(
-                        StrokeDeformation(
+                        StrokeDeformationV2(
                                 fromStrokes.zip(toStrokes) { from, to ->
                                     StrokeDeformationPiece(from.first, from.second, to.first, to.second)
                                 }))
