@@ -6,7 +6,9 @@ import spirite.base.brains.commands.NodeContextCommand.NodeCommand
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.gui.UIPoint
 import spirite.gui.resources.IIcon
 
@@ -72,7 +74,7 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
                     scheme.add(MenuItem("&Construct Simple Animation From Group", NodeCommand.ANIM_FROM_GROUP))
                     scheme.add(MenuItem("&Add Group To Animation As New Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION, enabled = ffaEnabled))
                     if( ffaEnabled)
-                        scheme.add(MenuItem("&Add Group To Animation As New Lexical Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION_LEXICAL))
+                        scheme.add(MenuItem("Add Group To Animation As New &Lexical Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION_LEXICAL))
                     scheme.add(MenuItem("Write Group To GIF Animation", NodeCommand.GIF_FROM_FROUP))
                 }
                 is LayerNode -> {
@@ -80,6 +82,7 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
                     scheme.add(MenuItem("&Merge Layer Down", NodeCommand.MERGE_DOWN))
                     val layer = node.layer
                     when( layer) {
+                        is SimpleLayer -> scheme.add(MenuItem(("Con&vert Simple Layer To Sprite Layer"), NodeCommand.CONVERT_LAYER_TO_SPRITE))
                         is SpriteLayer -> scheme.add(MenuItem("Construct &Rig Animation From Sprite", NodeCommand.NEW_RIG_ANIMATION))
                         //is PuppetLayer -> scheme.add(MenuItem("Add &Derived Puppet Layer", customAction = {TODO()}))
                     }

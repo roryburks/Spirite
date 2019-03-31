@@ -6,10 +6,13 @@ import spirite.base.brains.commands.NodeContextCommand.NodeCommand.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.MovableGroupTree
+import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
+import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.MediumType.MAGLEV
+import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.Hybrid
@@ -45,6 +48,8 @@ class NodeContextCommand(
         NEW_RIG_ANIMATION("newRigAnimation"),
         MOVE_UP("moveUp"),
         MOVE_DOWN("moveDown"),
+
+        CONVERT_LAYER_TO_SPRITE("converSimpleLayerToSpirite")
         ;
 
         override val commandString: String get() = "node.$string"
@@ -144,6 +149,25 @@ class NodeContextCommand(
             COPY.string-> {
                 val layerNode = node as? LayerNode ?: return false
                 Hybrid.clipboard.postToClipboard(layerNode.layer)
+            }
+            CONVERT_LAYER_TO_SPRITE.string -> {
+                if( node?.tree != workspace.groupTree) return false
+                val simpleLayer = (node as? LayerNode)?.layer as? SimpleLayer ?: return false
+                val medium = simpleLayer.medium
+                val type = when( medium.medium) {
+                    is MaglevMedium -> MAGLEV
+                    is DynamicMedium -> DYNAMIC
+                    else -> return false
+                }
+
+                val spriteLayer = SpriteLayer(
+                        workspace,
+                        listOf(Pair(medium, SpritePartStructure(0, "base"))),
+                        type)
+                workspace.undoEngine.doAsAggregateAction("Convert Simple Layer to Sprite Layer") {
+                    workspace.groupTree.importLayer(node, node.name, spriteLayer, workspace.groupTree.selectedNode == node)
+                    node.delete()
+                }
             }
 
             else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: node.$string")
