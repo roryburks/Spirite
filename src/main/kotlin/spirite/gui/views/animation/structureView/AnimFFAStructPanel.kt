@@ -2,23 +2,16 @@ package spirite.gui.views.animation.structureView
 
 import CrossLayout
 import rb.extendo.dataStructures.SinglySequence
-import rb.extendo.extensions.append
-import rb.extendo.extensions.lookup
 import rb.extendo.extensions.then
 import rb.jvm.owl.addWeakObserver
 import rb.owl.IContract
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
-import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.IFFALayer
 import spirite.base.imageData.animation.ffa.IFFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.GroupTree.Node
-import spirite.base.imageData.layers.sprite.SpriteLayer
-import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import spirite.base.util.Colors
 import spirite.base.util.linear.Rect
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.advanced.crossContainer.CrossRowInitializer
@@ -26,9 +19,8 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.IScrollContainer
 import spirite.gui.resources.Skin
-import spirite.gui.resources.SwIcons
-import spirite.gui.views.animation.structureView.RememberedStates.RememberedState
 import spirite.gui.views.animation.structureView.ffa.FfaStructBuilderFactory
+import spirite.gui.views.animation.structureView.ffa.IAnimDragBehavior
 import spirite.gui.views.animation.structureView.ffa.IFFAStructView
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SJPanel
@@ -37,9 +29,9 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
+import java.awt.event.MouseEvent
 import java.lang.ref.WeakReference
 import kotlin.math.max
-import kotlin.math.min
 
 private object RememberedStates {
     // Not sure if this is how I want to do this, but I'm fine with it for now.
@@ -72,29 +64,42 @@ private constructor(
     constructor(master: IMasterControl, anim: FixedFrameAnimation) : this(master, anim, AnimFFAStructPanelImp())
     init {imp.context = this}
 
-
     lateinit var scrollContext : IScrollContainer
-    var nameWidth = 60
-    var layerHeight = 32
+    var stretchWidth = 0
 
-    var squishedNameHeight = 12
+    var NAME_WIDTH = 60
+    var LAYER_HEIGHT = 32
+    var SQUISHED_NAME_HEIGHT = 12
+    var TICK_WIDTH = 32
+    var TICK_HEIGHT = 16
 
-    var tickWidth = 32
-    var tickHeight = 16
+    private val _structBuilderFactory = FfaStructBuilderFactory(master)
+
 
     var viewspace = FFAStructPanelViewspace(
-            nameWidth,
+            NAME_WIDTH,
             0,
-            tickWidth,
+            TICK_WIDTH,
             emptyMap(),
-            nameWidth)
+            emptyMap())
 
-    private val frameLinks = mutableMapOf<Node,MutableList<IComponent>>()
-    private val partLinks = mutableMapOf<SpritePart,MutableList<IComponent>>()
+    //private val partLinks = mutableMapOf<SpritePart,MutableList<IFFAStructView>>()
 
+    var dragBehavior: IAnimDragBehavior? = null
+
+    private data class FrameLinkSet(
+            val frameRange: IntRange,
+            val frame: IFFAFrame,
+            val view: IFFAStructView)
+
+    private data class LayerBuildSet(
+            val height: Int,
+            val layout: CrossRowInitializer.() -> Unit,
+            val frameData: List<FrameLinkSet>)
+
+    // region Building
     private fun rebuild() {
-        frameLinks.clear()
-        partLinks.clear()
+        val frameLinks = mutableMapOf<IFFAFrame,IFFAStructView>()
 
         val viewMap = mutableMapOf<IFFALayer,IntRange>()
         var wy = 0
@@ -103,38 +108,32 @@ private constructor(
             val start = anim.start
             val end = anim.end
 
+            // Anim Layers
             anim.layers.forEach {layer ->
-                val built = buildLayer(layer, nameWidth, tickWidth)
+                val built = buildLayer(layer, NAME_WIDTH, TICK_WIDTH)
                 rows += built.layout
                 viewMap[layer] = IntRange(wy, wy+built.height)
                 wy += built.height
+
+                built.frameData.forEach {frameLinks[it.frame] = it.view}
             }
 
             // Bottom Justification
             rows += {
-                addGap(nameWidth)
-                (start until end).forEach { add(TickPanel(it), width = tickWidth) }
-                height = tickHeight
+                addGap(NAME_WIDTH)
+                (start until end).forEach { add(TickPanel(it), width = TICK_WIDTH) }
+                height = TICK_HEIGHT
             }
         }
 
-        viewspace = FFAStructPanelViewspace(nameWidth, 0, tickWidth, HashMap(viewMap), nameWidth + tickWidth * anim.end)
+        viewspace = FFAStructPanelViewspace(
+                NAME_WIDTH,
+                0,
+                TICK_WIDTH,
+                HashMap(viewMap),
+                frameLinks)
         anim.workspace.groupTree.selectedNode?.also {setBordersForNode(it) }
     }
-
-    var stretchWidth = 0
-
-    private val _structBuilderFactory = FfaStructBuilderFactory(master)
-
-    private data class FrameLinkSet(
-            val range: IntRange,
-            val frame: IFFAFrame,
-            val view: IFFAStructView)
-
-    private data class LayerBuildSet(
-            val height: Int,
-            val layout: CrossRowInitializer.() -> Unit,
-            val frameData: List<FrameLinkSet>)
 
     private fun buildLayer(
             layer: IFFALayer,
@@ -171,7 +170,7 @@ private constructor(
 
         val initializer : CrossRowInitializer.() -> Unit = {
             add(nameView.component, width = nameWidth, height = nameView.height)
-            frameMap.forEach { add(it.view.component, width = tickWidth * (it.range.last - it.range.first), height = it.view.height) }
+            frameMap.forEach { add(it.view.component, width = tickWidth * (it.frameRange.last - it.frameRange.first), height = it.view.height) }
 
             height = layerHeight
         }
@@ -181,6 +180,7 @@ private constructor(
                 initializer,
                 frameMap)
     }
+    // endregion
 
     private inner class TickPanel( val tick: Int, private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         :ICrossPanel by imp
@@ -202,46 +202,61 @@ private constructor(
         }
     )
 
-    private  var _activePartContract : IContract? = null
-    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, old ->
-        _activePartContract?.void()
+    private  var _activePartK : IContract? = null
+    private val _selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, old ->
+        _activePartK?.void()
         if( old != null) {
-            frameLinks.lookup(old).forEach { it.setBasicBorder(null) }
-            partLinks.values.flatten().forEach { it.setBasicBorder(null) }
+            // TODO
         }
         if( new != null)
             setBordersForNode(new)
     }
 
     private fun setBordersForNode( node: Node){
-        frameLinks.lookup(node).forEach { it.setColoredBorder(Colors.BLACK, 2) }
-        val spriteLayer = ((node as? LayerNode)?.layer as? SpriteLayer)
-        if( spriteLayer != null) {
-            _activePartContract = spriteLayer.activePartBind.addWeakObserver { new, _ ->
-                partLinks.values.flatten().forEach { it.setBasicBorder(null) }
-                if( new != null)
-                    partLinks.lookup(new).forEach { it.setColoredBorder(Colors.BLACK, 2) }
-            }
-        }
+        // TODO
+//        frameLinks.lookup(node).forEach { it.component.setColoredBorder(Colors.BLACK, 2) }
+//        val spriteLayer = ((node as? LayerNode)?.layer as? SpriteLayer)
+//        if( spriteLayer != null) {
+//            _activePartK = spriteLayer.activePartBind.addWeakObserver { new, _ ->
+//                partLinks.values.flatten().forEach { it.component.setBasicBorder(null) }
+//                if( new != null)
+//                    partLinks.lookup(new).forEach { it.component.setColoredBorder(Colors.BLACK, 2) }
+//            }
+//        }
     }
 
     // endregion
 
-    init /* Bindings */ {
+
+    init /* Behavior  */ {
         imp.background = Skin.Global.BgDark.jcolor
         rebuild()
 
-        onMouseRelease += {
-            val pt = it.point.convert(this)
-            dragStateManager.behavior?.release(pt.x, pt.y)
+        val nullingContract = object : IContract {
+            override fun void() { dragBehavior = null}
         }
-        onMouseDrag += {
-            val pt = it.point.convert(this)
-            dragStateManager.behavior?.move(pt.x, pt.y)
+
+        fun interpretEvt( evt: spirite.gui.components.basic.events.MouseEvent) {
+            if( dragBehavior == null) {
+                val pt = evt.point.convert(this)
+
+                dragBehavior = viewspace.getViewFromCoordinates(pt.x, pt.y)
+                        ?.dragBrain
+                        ?.interpretMouseEvent(evt, this)
+            }
+
+            dragBehavior?.interpretMouseEvent(evt, nullingContract)
         }
+
+        onMouseClick += {interpretEvt(it)}
+        onMouseDrag += {interpretEvt(it)}
+        onMouseEnter += {interpretEvt(it)}
+        onMouseExit += {interpretEvt(it)}
+        onMouseMove += {interpretEvt(it)}
+        onMousePress += {interpretEvt(it)}
+        onMouseRelease += {interpretEvt(it)}
     }
 
-    internal val dragStateManager = AnimDragStateManager(this)
 }
 
 data class FFAStructPanelViewspace(
@@ -249,7 +264,7 @@ data class FFAStructPanelViewspace(
         val topJustification: Int,
         val tickWidth: Int,
         val layerHeights: Map<IFFALayer,IntRange>,
-        val naturalWidth: Int)
+        val frameMap: Map<IFFAFrame,IFFAStructView>)
 {
     fun rectForRangeInLayer( layer: IFFALayer, range: IntRange) : Rect
     {
@@ -257,6 +272,19 @@ data class FFAStructPanelViewspace(
         return Rect(
                 leftJustification + tickWidth*range.first, heightRange?.first?:0,
                 tickWidth*(range.last-range.first), heightRange?.run { last-first } ?:0)
+    }
+
+    fun getViewFromCoordinates( x: Int, y: Int) : IFFAStructView?
+    {
+        if( x < leftJustification) return null
+        if( y < topJustification) return null
+        val met = (x - leftJustification) / tickWidth
+        val layer = layerHeights.entries.asSequence()
+                .firstOrNull { it.value.contains(y - topJustification) }
+                ?.key ?: return null
+        val frame = layer.getFrameFromLocalMet(met) ?: return null
+
+        return frameMap[frame]
     }
 }
 
@@ -331,7 +359,7 @@ private class AnimFFAStructPanelImp : SJPanel() {
     }
 
     private fun drawForeground( g: Graphics2D) {
-        context.dragStateManager.behavior?.draw(g)
+        context.dragBehavior?.draw(g)
     }
 }
 

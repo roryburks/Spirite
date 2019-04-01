@@ -17,6 +17,7 @@ import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.components.basic.events.MouseEvent.MouseEventType.RELEASED
 import spirite.gui.components.dialogs.IDialog
 import spirite.gui.resources.Skin
+import spirite.gui.views.animation.structureView.AnimFFAStructPanel
 import spirite.hybrid.Hybrid
 import spirite.hybrid.customGui.ArrowPanel
 import spirite.pc.graphics.ImageBI
@@ -52,7 +53,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
         override val component get() = imp
         override val height: Int get() = 32
         override val dragBrain = object : IAnimDragBrain {
-            override fun interpretMouseEvent(evtMouseEvent: MouseEvent): IAnimDragBehavior? {
+            override fun interpretMouseEvent(evtMouseEvent: MouseEvent, context : AnimFFAStructPanel): IAnimDragBehavior? {
                 if( evtMouseEvent.type == RELEASED)
                     label.requestFocus()
                 return null
@@ -78,7 +79,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
         override val component: IComponent get() = imp
         override val height: Int get() = 32
         override val dragBrain: IAnimDragBrain? get() = object : IAnimDragBrain {
-            override fun interpretMouseEvent(evtMouseEvent: MouseEvent): IAnimDragBehavior? {
+            override fun interpretMouseEvent(evtMouseEvent: MouseEvent, context : AnimFFAStructPanel): IAnimDragBehavior? {
                 if( evtMouseEvent.type == RELEASED)
                     label.requestFocus()
                 return null
