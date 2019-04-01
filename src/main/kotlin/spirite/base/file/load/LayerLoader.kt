@@ -8,6 +8,7 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.MediumType
+import spirite.base.util.StringUtil
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 
@@ -69,9 +70,13 @@ object SpriteLayerLoader : ILayerLoader
 
         val type = if( context.version >= 0x1_000A) MediumType.fromCode(ra.readByte().i) ?: MediumType.DYNAMIC else MediumType.DYNAMIC
 
+        val names = HashSet<String>()
+
         val partSize = ra.readUnsignedByte()
         val parts = List(partSize) {
-            val partName = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
+            val origName = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
+            val partName = StringUtil.getNonDuplicateName(names, origName)
+            names.add(partName)
             val transX = ra.readFloat()
             val transY = ra.readFloat()
             val scaleX = ra.readFloat()
