@@ -16,6 +16,8 @@ import spirite.base.util.linear.Rect
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.advanced.crossContainer.CrossRowInitializer
 import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
+import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.IScrollContainer
 import spirite.gui.resources.Skin
@@ -83,9 +85,7 @@ private constructor(
             emptyMap(),
             emptyMap())
 
-    //private val partLinks = mutableMapOf<SpritePart,MutableList<IFFAStructView>>()
-
-    var dragBehavior: IAnimDragBehavior? = null
+    private var dragBehavior: IAnimDragBehavior? = null
 
     private data class FrameLinkSet(
             val frameRange: IntRange,
@@ -240,9 +240,15 @@ private constructor(
             if( dragBehavior == null) {
                 val pt = evt.point.convert(this)
 
-                dragBehavior = viewspace.getViewFromCoordinates(pt.x, pt.y)
-                        ?.dragBrain
-                        ?.interpretMouseEvent(evt, this)
+                val brain = viewspace.getViewFromCoordinates(pt.x, pt.y)?.dragBrain
+
+                if( brain == null)
+                {
+                    setBasicCursor(DEFAULT)
+                    return
+                }
+
+                dragBehavior = brain.interpretMouseEvent(evt, this)
             }
 
             dragBehavior?.interpretMouseEvent(evt, nullingContract)
@@ -257,6 +263,36 @@ private constructor(
         onMouseRelease += {interpretEvt(it)}
     }
 
+
+    private class AnimFFAStructPanelImp : SJPanel() {
+        lateinit var context : AnimFFAStructPanel
+
+        fun setLayout( constructor: CrossInitializer.()->Unit) {
+            removeAll()
+            val list = mutableListOf<IComponent>()
+            layout = CrossLayout.buildCrossLayout(this, list, constructor)
+        }
+
+        init {
+        }
+
+        override fun paint(g: Graphics) {
+            val g2 = (g as Graphics2D)
+            g2.color = background
+            g2.fillRect(0,0,width,height)
+            drawBackground(g2)
+            super.paintChildren(g2)
+            drawForeground(g2)
+        }
+
+        private fun drawBackground(g: Graphics2D) {
+
+        }
+
+        private fun drawForeground( g: Graphics2D) {
+            context.dragBehavior?.draw(g)
+        }
+    }
 }
 
 data class FFAStructPanelViewspace(
@@ -287,81 +323,3 @@ data class FFAStructPanelViewspace(
         return frameMap[frame]
     }
 }
-
-internal class AnimDragStateManager(val context: AnimFFAStructPanel)
-{
-    var behavior: IAnimStateBehavior? = null
-        set(value) {field = value; context.redraw()}
-
-    interface IAnimStateBehavior {
-        fun move(x: Int, y: Int)
-        fun release(x: Int, y: Int)
-        fun draw( gc: Graphics2D)   // TODO: This really should be GraphicsContext, but right now we haven't re-implemented AWTGraphicsContext
-    }
-
-
-    class ResizingFrameBehavior(
-            val frame: IFFAFrame,
-            val context: AnimDragStateManager,
-            val viewspace: FFAStructPanelViewspace)
-        : IAnimStateBehavior
-    {
-        val start = frame.start
-        var len = frame.length
-
-        override fun move(x: Int, y: Int) {
-            len = max(0, (x - viewspace.leftJustification + viewspace.tickWidth/2) / viewspace.tickWidth - start)
-            val endBox = viewspace.rectForRangeInLayer(frame.layer, IntRange(start+len-1, start+len))
-            context.context.stretchWidth = endBox.x2
-            context.context.scrollContext.makeAreaVisible(endBox)
-            context.context.redraw()
-        }
-
-        override fun release(x: Int, y: Int) {
-            frame.length = len
-            context.behavior = null
-        }
-
-        override fun draw(gc: Graphics2D) {
-            val range = viewspace.layerHeights[frame.layer]?: return
-            val x = (start + len)* viewspace.tickWidth + viewspace.leftJustification
-            gc.stroke = BasicStroke(2f)
-            gc.color = Color.BLACK
-            gc.drawLine(x, range.first, x, range.last)
-        }
-    }
-}
-
-// region Custom Panels
-private class AnimFFAStructPanelImp : SJPanel() {
-    lateinit var context : AnimFFAStructPanel
-
-    fun setLayout( constructor: CrossInitializer.()->Unit) {
-        removeAll()
-        val list = mutableListOf<IComponent>()
-        layout = CrossLayout.buildCrossLayout(this, list, constructor)
-    }
-
-    init {
-    }
-
-    override fun paint(g: Graphics) {
-        val g2 = (g as Graphics2D)
-        g2.color = background
-        g2.fillRect(0,0,width,height)
-        drawBackground(g2)
-        super.paintChildren(g2)
-        drawForeground(g2)
-    }
-
-    private fun drawBackground(g: Graphics2D) {
-
-    }
-
-    private fun drawForeground( g: Graphics2D) {
-        context.dragBehavior?.draw(g)
-    }
-}
-
-
-// endregion

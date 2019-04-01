@@ -76,7 +76,7 @@ class FFALayerLexical(
         sharedExplicitMap.values.removeIf { !remainingNodes.contains(it) } // Note: doesn't behave super elegantly with Undo
 
         if( removedAny)
-            context.triggerFFAChange(this)
+            anim.triggerFFAChange(this)
     }
     // endregion
 
@@ -96,7 +96,7 @@ class FFALayerLexical(
                 }
                 .forEach { _frames.add(FFAFrame(it)) }
 
-        context.triggerFFAChange(this)
+        anim.triggerFFAChange(this)
     }
 
 

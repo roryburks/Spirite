@@ -13,10 +13,10 @@ interface IFFALayerLinked {
     fun shouldUpdate(contract: FFAUpdateContract) : Boolean
 }
 
-abstract class FFALayer( internal val context : FixedFrameAnimation)
+abstract class FFALayer( override val anim : FixedFrameAnimation)
     :IFFALayer
 {
-    private val undoEngine get() = context.workspace.undoEngine
+    private val undoEngine get() = anim.workspace.undoEngine
 
     abstract fun moveFrame( frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean)
     abstract fun addGapFrameAfter( frameBefore: FFAFrame?, gapLength: Int = 1)
@@ -39,8 +39,8 @@ abstract class FFALayer( internal val context : FixedFrameAnimation)
         return caret
     }
 
-    override var asynchronous by UndoableChangeDelegate(false, context.workspace.undoEngine,
-            "Toggled Frame Layer Asynchronousness", {context.triggerFFAChange(this)})
+    override var asynchronous by UndoableChangeDelegate(false, anim.workspace.undoEngine,
+            "Toggled Frame Layer Asynchronousness", {anim.triggerFFAChange(this)})
 
     protected val _frames = mutableListOf<FFAFrame>()
     override val frames : List<IFFAFrame> get() = _frames
@@ -139,8 +139,8 @@ abstract class FFALayer( internal val context : FixedFrameAnimation)
         {
             val oldStucture = structure
 
-            override fun performAction() {structure = newStructure ; context.triggerFFAChange(this@FFALayer)}
-            override fun undoAction() {structure = oldStucture ; context.triggerFFAChange(this@FFALayer)}
+            override fun performAction() {structure = newStructure ; anim.triggerFFAChange(this@FFALayer)}
+            override fun undoAction() {structure = oldStucture ; anim.triggerFFAChange(this@FFALayer)}
         }
         // endregion
     }

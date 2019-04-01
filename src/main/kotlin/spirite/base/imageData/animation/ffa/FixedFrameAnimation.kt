@@ -9,6 +9,7 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.MediumBasedAnimation
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.undo.NullAction
 
 class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     : MediumBasedAnimation(name, workspace)
@@ -74,7 +75,14 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     }
 
     fun removeLayer( layer: IFFALayer) {
-        _layers.remove(layer)
+        val spot = _layers.indexOf(layer)
+        if( spot == -1) return
+
+        workspace.undoEngine.performAndStore(object : NullAction() {
+            override val description: String get() = "Remove Layer"
+            override fun performAction() { _layers.remove(layer)}
+            override fun undoAction() {_layers.add(spot, layer)}
+        })
     }
 
     fun addLinkedLayer(

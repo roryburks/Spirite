@@ -15,6 +15,7 @@ interface IFFAFrame {
 }
 
 interface IFFALayer {
+    val anim : FixedFrameAnimation
     val start: Int
     val end: Int
 
