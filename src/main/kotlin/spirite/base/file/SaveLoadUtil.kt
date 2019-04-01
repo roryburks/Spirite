@@ -10,7 +10,7 @@ object SaveLoadUtil {
     val header : ByteArray get() =ByteArray(4).apply {
         System.arraycopy("SIFF".toByteArray(charset("UTF-8")), 0, this, 0, 4)
     }
-    const val version = 0x0001_0008
+    const val version = 0x0001_000A
 
 
     // :::: Node Type Identifiers for the SIFF GroupTree Section

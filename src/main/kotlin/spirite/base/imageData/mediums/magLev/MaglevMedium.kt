@@ -6,31 +6,28 @@ import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
-import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.IMedium.MediumType
-import spirite.base.imageData.mediums.IMedium.MediumType.MAGLEV
-import spirite.base.imageData.undo.ImageAction
+import spirite.base.imageData.mediums.MediumType
+import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.util.Colors
 import spirite.pc.gui.SColor
 
 
 class MaglevMedium
-private constructor(
+constructor(
         private val workspace: MImageWorkspace,
         internal val things: MutableList<IMaglevThing>,
-        private val builtImage : DynamicImage = DynamicImage())
+        val builtImage : DynamicImage)
     :IMedium
 {
     constructor(
             workspace: MImageWorkspace,
             things: List<IMaglevThing>? = null)
-            : this(workspace, things?.toMutableList() ?: mutableListOf())
+            : this(workspace, things?.toMutableList() ?: mutableListOf(), DynamicImage())
 
     fun getThings() = things.toList()
 
@@ -45,12 +42,12 @@ private constructor(
     //  do not need to worry about removing Things from the Medium, instead the duplication of medium snapshots
     //  handles the thing lifecycle w.r.t. the undo engine
     internal fun addThing(thing : IMaglevThing, arranged: ArrangedMediumData, description: String) {
-        arranged.handle.workspace.undoEngine.performAndStore(object : ImageAction(arranged){
-            override val description: String get() = description
-            override fun performImageAction(built: BuiltMediumData) {
-                things.add(thing)
+        arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged){
+            override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
+                maglev.things.add(thing)
                 thing.draw(built)
             }
+            override val description: String get() = description
         })
     }
 

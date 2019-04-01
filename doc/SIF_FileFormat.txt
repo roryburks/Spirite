@@ -1,4 +1,4 @@
-Version 0x0001_0008
+Version 0x0001_000A
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -28,6 +28,7 @@ Header
     0x01 : Simple Layer
         [4, int] : ID of linked MediumData
     0x02 : Sprite Layer
+        [1, byte] : Sprite Layer Type
         [1, byte] : Number of Parts
         Per Part:
             [n, UTF8 str] : Part Type name
@@ -95,7 +96,10 @@ Header
 					[4, Int] : reference to stroke
 					[4, Int] : start point of stroke
 					[4, Int] : end point of stroke
-		Per Stroke :
+		[4, int] : Size of Image Data
+        [2, short] : Dynamic offsetX
+        [2, short] : Dynamic offsetY
+		[n, RAW] : PNG-saved Image File
 
 ---- ANIM - Animation Data Chunk
 Per Animation:

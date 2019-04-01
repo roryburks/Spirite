@@ -1,6 +1,5 @@
 package spirite.base.brains.commands
 
-import rb.extendo.dataStructures.SinglySequence
 import rb.extendo.dataStructures.SinglySet
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
@@ -23,7 +22,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.layers.Layer
-import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.Colors

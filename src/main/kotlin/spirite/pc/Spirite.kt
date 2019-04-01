@@ -1,7 +1,7 @@
 package spirite.pc
 
 import spirite.base.brains.MasterControl
-import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.hybrid.EngineLaunchpoint
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL

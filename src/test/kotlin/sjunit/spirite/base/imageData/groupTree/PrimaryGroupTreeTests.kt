@@ -6,7 +6,7 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
-import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
+import spirite.base.imageData.mediums.MediumType.FLAT
 import kotlin.test.assertEquals
 import org.junit.Test as test
 

@@ -2,16 +2,14 @@ package spirite.base.imageData.groupTree
 
 import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.IImage
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
-import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
-import spirite.base.imageData.mediums.IMedium.MediumType
-import spirite.base.imageData.mediums.IMedium.MediumType.*
+import spirite.base.imageData.mediums.MediumType
+import spirite.base.imageData.mediums.MediumType.*
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
 import spirite.base.util.debug.SpiriteException
@@ -20,7 +18,7 @@ import spirite.hybrid.Hybrid
 class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTree( workspace.undoEngine) {
     override val treeDescription: String get() = "Primary Group Tree"
 
-    fun addNewSimpleLayer( contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null, select: Boolean = true) : LayerNode{
+    fun addNewSimpleLayer(contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null, select: Boolean = true) : LayerNode{
         val medium = when( type) {
             DYNAMIC -> DynamicMedium(workspace, DynamicImage())
             FLAT -> FlatMedium( Hybrid.imageCreator.createImage( width ?: workspace.width, height ?: workspace.height), workspace.mediumRepository)
@@ -38,8 +36,8 @@ class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTre
         val handle = workspace.mediumRepository.addMedium(med)
         return importLayer(contextNode, name, SimpleLayer(handle), select)
     }
-    fun addNewSpriteLayer( contextNode: Node?, name: String, select: Boolean = true) : LayerNode {
-        return importLayer(contextNode, name, SpriteLayer(workspace), select)
+    fun addNewSpriteLayer( contextNode: Node?, name: String, select: Boolean = true, type: MediumType = DYNAMIC) : LayerNode {
+        return importLayer(contextNode, name, SpriteLayer(workspace, type), select)
     }
 
     fun importLayer( contextNode: Node?, name: String, layer:Layer, select: Boolean = true) : LayerNode {

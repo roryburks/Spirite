@@ -3,7 +3,7 @@ package demonstration.realComponents
 import demonstration.DemoLauncher
 import sjunit.TestHelper
 import spirite.base.brains.MasterControl
-import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
+import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.gui.views.groupView.GroupView

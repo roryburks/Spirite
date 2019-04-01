@@ -8,6 +8,7 @@ import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readFloatArray
+import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.magLev.IMaglevThing
 import spirite.base.imageData.mediums.magLev.MaglevFill
@@ -23,6 +24,7 @@ import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC
 import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.toColor
+import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
@@ -74,7 +76,19 @@ object MagneticMediumLoader : IMediumLoader
             }
         }.filterNotNull()
 
-        return MaglevMedium(context.workspace, things)
+        val imgSize = if( context.version >= 0x0001_0009) ra.readInt() else 0
+        val xoffset = if( context.version >= 0x0001_0009) ra.readUnsignedShort() else 0
+        val yoffset = if( context.version >= 0x0001_0009) ra.readUnsignedShort() else 0
+
+        val img = when( imgSize) {
+            0 -> null
+            else -> {
+                val imgData = ByteArray(imgSize).apply { ra.read( this) }
+                Hybrid.imageIO.loadImage(imgData)
+            }
+        }
+
+        return MaglevMedium(context.workspace, things.toMutableList(), DynamicImage(img, xoffset, yoffset))
     }
 }
 
@@ -191,7 +205,7 @@ object Legacy_pre_1_0000_MaglevMediumLoader : IMediumLoader {
     }
 }
 
-object MagneticMediumIgnorer : IMediumLoader
+object Legacy_pre_1_000_MagneticMediumIgnorer : IMediumLoader
 {
     override fun loadMedium(context: LoadContext): IMedium? {
         val ra = context.ra

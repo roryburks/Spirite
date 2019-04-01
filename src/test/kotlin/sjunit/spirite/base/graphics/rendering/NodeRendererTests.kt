@@ -9,7 +9,7 @@ import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
-import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
+import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.base.util.Colors
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
