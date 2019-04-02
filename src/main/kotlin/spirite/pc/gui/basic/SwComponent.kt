@@ -126,7 +126,7 @@ abstract class ASwComponent : ISwComponent {
                 PRESSED ->  pressStack.triggers.forEach { it(evt) }
                 RELEASED -> {
                     releaseStack.triggers.forEach { it(evt) }
-                    clickStack.triggers.forEach {it(evt)}
+                    clickStack.triggers.forEach {it(evt.copy(type = CLICKED))}
                 }
                 CLICKED -> {}
                 ENTERED -> enterStack.triggers.forEach { it(evt) }

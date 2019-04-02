@@ -16,7 +16,7 @@ interface IAnimDragBehavior {
 }
 
 interface IAnimDragBrain {
-    fun interpretMouseEvent(evtMouseEvent: MouseEvent, context : AnimFFAStructPanel) : IAnimDragBehavior?
+    fun interpretMouseEvent(evt: MouseEvent, context : AnimFFAStructPanel) : IAnimDragBehavior?
 }
 
 interface IFFAStructView {

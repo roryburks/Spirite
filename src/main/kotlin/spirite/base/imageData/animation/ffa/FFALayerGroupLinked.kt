@@ -28,7 +28,7 @@ class FFALayerGroupLinked(
         groupLinkImported(frameMap, unlinkedClusters)
     }
 
-    override fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {
+    fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {
         val tree = anim.workspace.groupTree
         val nodeToMove = frameToMove.node ?: return
         when {
@@ -38,7 +38,7 @@ class FFALayerGroupLinked(
         }
     }
 
-    override fun addGapFrameAfter(frameBefore: FFAFrame?, gapLength: Int) {
+    fun addGapFrameAfter(frameBefore: IFFAFrame?, gapLength: Int) {
         val index = if( frameBefore == null) 0 else (_frames.indexOf(frameBefore) + 1)
         _frames.add(index, FFAFrame(FFAFrameStructure(null, GAP,gapLength)))
         anim.triggerFFAChange(this)

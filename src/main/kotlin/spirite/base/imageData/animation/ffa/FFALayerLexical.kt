@@ -98,11 +98,4 @@ class FFALayerLexical(
 
         anim.triggerFFAChange(this)
     }
-
-
-    // region FFALayer
-    // (no need to implement these as the lexicon will just reconstruct itself dynamically in the get)
-    override fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {}
-    override fun addGapFrameAfter(frameBefore: FFAFrame?, gapLength: Int) {}
-    // endregion
 }

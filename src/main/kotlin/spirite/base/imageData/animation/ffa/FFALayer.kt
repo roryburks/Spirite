@@ -18,9 +18,6 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
 {
     private val undoEngine get() = anim.workspace.undoEngine
 
-    abstract fun moveFrame( frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean)
-    abstract fun addGapFrameAfter( frameBefore: FFAFrame?, gapLength: Int = 1)
-
     override val start = 0
     override val end : Int get() {
         var caret = 0
@@ -40,7 +37,7 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
     }
 
     override var asynchronous by UndoableChangeDelegate(false, anim.workspace.undoEngine,
-            "Toggled Frame Layer Asynchronousness", {anim.triggerFFAChange(this)})
+            "Toggled Frame Layer Asynchronousness") {anim.triggerFFAChange(this)}
 
     protected val _frames = mutableListOf<FFAFrame>()
     override val frames : List<IFFAFrame> get() = _frames
@@ -59,7 +56,7 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
                 loopLen += frame.length
                 if( offset - caret < frame.length) {
                     return when( frame.marker) {
-                        GAP -> null
+                        GAP -> frame
                         START_LOCAL_LOOP -> _sub(index, offset - caret)
                         FRAME -> frame
                         END_LOCAL_LOOP -> {MDebug.handleWarning(STRUCTURAL, "Malformed Animation (END_LOCAL_LOOP with length > 0)"); null}

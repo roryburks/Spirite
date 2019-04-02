@@ -5,6 +5,7 @@ import spirite.base.imageData.animation.ffa.IFFAFrame
 import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
 import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.components.basic.events.MouseEvent.MouseEventType.*
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
 import java.awt.BasicStroke
@@ -22,7 +23,7 @@ abstract class ResizeableBrain(
 
         if( evt.type == MOVED)
             context.setBasicCursor(if( isDragEdge) E_RESIZE else DEFAULT)
-        if( evt.type == PRESSED && isDragEdge)
+        if( evt.type == PRESSED && evt.button == LEFT && isDragEdge)
         {
             return ResizeBehavior(context)
         }

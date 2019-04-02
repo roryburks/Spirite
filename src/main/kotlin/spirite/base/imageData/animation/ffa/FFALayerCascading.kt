@@ -9,6 +9,8 @@ class FFALayerCascading(
         lexicon: String = "")
     :IFFALayer
 {
+    override val anim: FixedFrameAnimation
+        get() = TODO("not implemented")
     override val start: Int
         get() = TODO("not implemented")
     override val end: Int
