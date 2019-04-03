@@ -30,12 +30,26 @@ class MaglevImageDrawer(
         arranged: ArrangedMediumData,
         maglev: MaglevMedium)
     :IImageDrawer,
+        IClearModule by MaglevClearModule(arranged),
         IStrokeModule by MaglevStrokeModule(arranged),
-        ITransformModule by MaglevTransformModule(arranged, maglev),
-        IColorChangeModule by MaglevColorChangeModule(arranged, maglev),
+        ITransformModule by MaglevTransformModule(arranged),
+        IColorChangeModule by MaglevColorChangeModule(arranged),
         IMagneticFillModule by MaglevMagneticFillModule(arranged, maglev),
         IDeformDrawer by MaglevDeformationModule(arranged, maglev)
-{
+
+class MaglevClearModule( val arranged: ArrangedMediumData) : IClearModule {
+    override fun clear() {
+        arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged) {
+            override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
+                maglev.things.clear()
+                built.rawAccessComposite { it.graphics.clear() }
+            }
+
+            override val description: String get() = "Clear Maglev Layer"
+
+        })
+    }
+
 }
 
 class MaglevStrokeModule(val arranged: ArrangedMediumData) : IStrokeModule {
@@ -76,9 +90,7 @@ class MaglevStrokeModule(val arranged: ArrangedMediumData) : IStrokeModule {
     }
 }
 
-class MaglevTransformModule(
-        val arranged: ArrangedMediumData,
-        val maglev: MaglevMedium)
+class MaglevTransformModule(val arranged: ArrangedMediumData)
     : ITransformModule
 {
     val workspace get() = arranged.handle.workspace
@@ -143,7 +155,7 @@ class MaglevTransformModule(
 
 }
 
-class MaglevColorChangeModule(val arranged: ArrangedMediumData, val maglev: MaglevMedium) : IColorChangeModule
+class MaglevColorChangeModule(val arranged: ArrangedMediumData) : IColorChangeModule
 {
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
         arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged) {
@@ -172,8 +184,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
             val strokeId: Int,
             val pivotPoint: Int,
             var travel: Int = 0)
-    {
-    }
+
     var ss : BuildingStrokeSegment? =  null
     val segments by lazy { mutableListOf<BuildingStrokeSegment>()}
 
