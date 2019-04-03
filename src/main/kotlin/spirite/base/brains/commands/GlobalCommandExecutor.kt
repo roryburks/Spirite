@@ -102,7 +102,7 @@ object GlobalCommands
                 master.dialog.pickFile(FilePickType.EXPORT) ?: throw CommandNotValidException)
 
     }
-    val ExportAs = GlobalCommand("exportAs") {master, workspaceSet ->  }
+    val ExportAs = GlobalCommand("exportAs", Export.action)
     val Copy = GlobalCommand("copy") {master, workspaceSet ->
         val workspace = workspaceSet.currentMWorkspace ?: throw CommandNotValidException
         copy(master, workspace, false)

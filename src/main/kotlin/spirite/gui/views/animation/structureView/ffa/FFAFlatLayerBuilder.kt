@@ -78,10 +78,10 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
         override val height: Int get() = 32
         override val dragBrain = object : IAnimDragBrain {
             override fun interpretMouseEvent(evt: MouseEvent, context : AnimFFAStructPanel): IAnimDragBehavior? {
-                if( evt.type == RELEASED)
-                    label.requestFocus()
                 if( evt.type == RELEASED && evt.button == RIGHT)
                     contextMenu.launchContextMenuFor(evt.point, layer)
+                else if( evt.type == RELEASED)
+                    label.requestFocus()
 
                 return null
             }
@@ -108,10 +108,10 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
         override val height: Int get() = 32
         override val dragBrain: IAnimDragBrain? get() = object : IAnimDragBrain {
             override fun interpretMouseEvent(evt: MouseEvent, context : AnimFFAStructPanel): IAnimDragBehavior? {
-                if( evt.type == RELEASED)
-                    label.requestFocus()
                 if( evt.type == RELEASED && evt.button == RIGHT)
                     contextMenu.launchContextMenuFor(evt.point, layer)
+                else if( evt.type == RELEASED)
+                    label.requestFocus()
 
                 return null
             }
