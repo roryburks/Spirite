@@ -2,7 +2,7 @@ package spirite.base.brains
 
 import rb.extendo.dataStructures.MutableOneToManyMap
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
-import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
+import spirite.base.brains.commands.GlobalCommands
 import spirite.base.brains.commands.IsolationCommandExecuter.IsolationCommand
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand
 import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand
@@ -97,14 +97,17 @@ private val defaultHotkeys = mapOf(
         SelectCommand.Invert.keyCommand to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
         SelectCommand.LiftInPlace.keyCommand to (Hotkey( KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK)),
 
-        GlobalCommand.SAVE_WORKSPACE.keyCommand to (Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)),
-        GlobalCommand.COPY.keyCommand to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),
-        GlobalCommand.COPY_VISIBLE.keyCommand to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
-        GlobalCommand.PASTE.keyCommand to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK)),
-        GlobalCommand.PASTE_AS_LAYER.keyCommand to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
-        GlobalCommand.CUT.keyCommand to (Hotkey( KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK)),
-        GlobalCommand.OPEN.keyCommand to (Hotkey( KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK)),
-        GlobalCommand.NEW_WORKSPACE.keyCommand to (Hotkey( KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommands.SaveWorkspace.keyCommand to (Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommands.Copy.keyCommand to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommands.CopyVisible.keyCommand to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+        GlobalCommands.Paste.keyCommand to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommands.PasteAsLayer.keyCommand to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+        GlobalCommands.Cut.keyCommand to (Hotkey( KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommands.Open.keyCommand to (Hotkey( KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommands.NewWorkspace.keyCommand to (Hotkey( KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK)),
+
+        // DEBUG
+        GlobalCommands.PurgeUndoHistory.keyCommand to (Hotkey(KeyEvent.VK_F11, InputEvent.ALT_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
 
         // TODO: This should really be animation., but that might require restructuring/rethinking of
         //	command execution system.

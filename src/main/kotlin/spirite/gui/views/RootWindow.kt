@@ -5,7 +5,7 @@ import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.FrameCommandExecuter.FrameCommand
-import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
+import spirite.base.brains.commands.GlobalCommands
 import spirite.base.brains.commands.SelectCommand
 import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
@@ -40,15 +40,15 @@ class RootWindow( val master: IMasterControl) : JFrame() {
     init /* Menu */ {
         val scheme = listOf(
                 MenuItem("&File"),
-                MenuItem(".&New Image", GlobalCommand.NEW_WORKSPACE),
+                MenuItem(".&New Image", GlobalCommands.NewWorkspace),
                 MenuItem(".-"),
-                MenuItem(".&Open", GlobalCommand.OPEN),
+                MenuItem(".&Open", GlobalCommands.Open),
                 MenuItem(".-"),
-                MenuItem(".&Save Workspace", GlobalCommand.SAVE_WORKSPACE),
-                MenuItem(".Save Workspace &As...", GlobalCommand.SAVE_WORKSPACE_AS),
+                MenuItem(".&Save Workspace", GlobalCommands.SaveWorkspace),
+                MenuItem(".Save Workspace &As...", GlobalCommands.SaveWorkspaceAs),
                 MenuItem(".-"),
-                MenuItem(".Export Image", GlobalCommand.EXPORT),
-                MenuItem(".Export Image As...", GlobalCommand.EXPORT_AS),
+                MenuItem(".Export Image", GlobalCommands.Export),
+                MenuItem(".Export Image As...", GlobalCommands.ExportAs),
 
                 MenuItem("&Edit"),
                 MenuItem(".&Undo", DrawCommand.UNDO),
