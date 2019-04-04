@@ -80,8 +80,14 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
 
         workspace.undoEngine.performAndStore(object : NullAction() {
             override val description: String get() = "Remove Layer"
-            override fun performAction() { _layers.remove(layer)}
-            override fun undoAction() {_layers.add(spot, layer)}
+            override fun performAction() {
+                _layers.remove(layer)
+                triggerFFAChange(layer)
+            }
+            override fun undoAction() {
+                _layers.add(spot, layer)
+                triggerFFAChange(layer)
+            }
         })
     }
 

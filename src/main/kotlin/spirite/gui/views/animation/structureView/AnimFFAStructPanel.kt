@@ -20,6 +20,7 @@ import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
 import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.IScrollContainer
+import spirite.gui.components.basic.events.MouseEvent.MouseEventType.PRESSED
 import spirite.gui.resources.Skin
 import spirite.gui.views.animation.structureView.ffa.FfaStructBuilderFactory
 import spirite.gui.views.animation.structureView.ffa.IAnimDragBehavior
@@ -83,6 +84,7 @@ private constructor(
             0,
             TICK_WIDTH,
             emptyMap(),
+            emptyMap(),
             emptyMap())
 
     private var dragBehavior: IAnimDragBehavior? = null
@@ -95,12 +97,13 @@ private constructor(
     private data class LayerBuildSet(
             val height: Int,
             val layout: CrossRowInitializer.() -> Unit,
-            val frameData: List<FrameLinkSet>)
+            val frameData: List<FrameLinkSet>,
+            val nameComponent: IFFAStructView)
 
     // region Building
     private fun rebuild() {
         val frameLinks = mutableMapOf<IFFAFrame,IFFAStructView>()
-
+        val layerLinks = mutableMapOf<IFFALayer, IFFAStructView>()
         val viewMap = mutableMapOf<IFFALayer,IntRange>()
         var wy = 0
 
@@ -113,6 +116,7 @@ private constructor(
                 val built = buildLayer(layer, NAME_WIDTH, TICK_WIDTH)
                 rows += built.layout
                 viewMap[layer] = IntRange(wy, wy+built.height)
+                layerLinks[layer] = built.nameComponent
                 wy += built.height
 
                 built.frameData.forEach {frameLinks[it.frame] = it.view}
@@ -131,7 +135,8 @@ private constructor(
                 0,
                 TICK_WIDTH,
                 HashMap(viewMap),
-                frameLinks)
+                frameLinks,
+                layerLinks)
         anim.workspace.groupTree.selectedNode?.also {setBordersForNode(it) }
     }
 
@@ -178,7 +183,8 @@ private constructor(
         return LayerBuildSet(
                 layerHeight,
                 initializer,
-                frameMap)
+                frameMap,
+                nameView)
     }
     // endregion
 
@@ -240,6 +246,9 @@ private constructor(
             if( dragBehavior == null) {
                 val pt = evt.point.convert(this)
 
+                if( evt.type == PRESSED)
+                    print("brkpt")
+
                 val brain = viewspace.getViewFromCoordinates(pt.x, pt.y)?.dragBrain
 
                 if( brain == null)
@@ -300,7 +309,8 @@ data class FFAStructPanelViewspace(
         val topJustification: Int,
         val tickWidth: Int,
         val layerHeights: Map<IFFALayer,IntRange>,
-        val frameMap: Map<IFFAFrame,IFFAStructView>)
+        val frameMap: Map<IFFAFrame,IFFAStructView>,
+        val layerMap: Map<IFFALayer, IFFAStructView>)
 {
     fun rectForRangeInLayer( layer: IFFALayer, range: IntRange) : Rect
     {
@@ -312,12 +322,14 @@ data class FFAStructPanelViewspace(
 
     fun getViewFromCoordinates( x: Int, y: Int) : IFFAStructView?
     {
-        if( x < leftJustification) return null
         if( y < topJustification) return null
-        val met = (x - leftJustification) / tickWidth
         val layer = layerHeights.entries.asSequence()
                 .firstOrNull { it.value.contains(y - topJustification) }
                 ?.key ?: return null
+
+        if( x < leftJustification)
+            return layerMap[layer]
+        val met = (x - leftJustification) / tickWidth
         val frame = layer.getFrameFromLocalMet(met) ?: return null
 
         return frameMap[frame]
