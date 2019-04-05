@@ -10,9 +10,6 @@ interface IFFAFrame {
     val length: Int
     val end: Int get() = start + length
 
-    val next: IFFAFrame?
-    val previous : IFFAFrame?
-
     fun getDrawList() : List<TransformedHandle>
 }
 

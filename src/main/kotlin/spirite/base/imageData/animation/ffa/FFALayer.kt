@@ -117,8 +117,8 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
             return 0
         }
 
-        override val next: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) + 1)
-        override val previous: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) - 1)
+        val next: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) + 1)
+        val previous: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) - 1)
 
         // endregion
 

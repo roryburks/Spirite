@@ -3,6 +3,7 @@ package spirite.base.imageData.animation.ffa
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupTree.LayerNode
 
 class FFALayerCascading(
         override val anim: FixedFrameAnimation,
@@ -43,25 +44,14 @@ class FFALayerCascading(
     var groups = listOf<GroupNode>()
 
     inner class CascadingFrame(
-
-
+            override val start: Int,
+            val layers : List<LayerNode>
     )
         :IFFAFrame
     {
         override val layer: IFFALayer get() = this@FFALayerCascading
-        override val start: Int get() = TODO("not implemented")
-        override var length: Int
-            get() = TODO("not implemented")
-            set(value) {}
-        override val next: IFFAFrame?
-            get() = TODO("not implemented")
-        override val previous: IFFAFrame?
-            get() = TODO("not implemented")
-
-        override fun getDrawList(): List<TransformedHandle> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
+        override val length: Int get() = 1
+        override fun getDrawList() = layers.flatMap { it.getDrawList() }
     }
 
 }

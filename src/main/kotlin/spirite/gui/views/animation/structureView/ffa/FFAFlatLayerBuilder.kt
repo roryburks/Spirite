@@ -41,7 +41,7 @@ fun ContextMenus.launchContextMenuFor( point: UIPoint, frame: IFFAFrame) {
     when(layer) {
         is FFALayerGroupLinked -> {
             schema.add(MenuItem("Add &Gap After", customAction = {layer.addGapFrameAfter(frame, 1)}))
-            schema.add(MenuItem("Add Gap &Before", customAction = {layer.addGapFrameAfter(frame.previous, 1)}))
+            schema.add(MenuItem("Add Gap &Before", customAction = {layer.addGapFrameAfter((frame as FFAFrame).previous, 1)}))
         }
     }
     this.LaunchContextMenu(point, schema)
