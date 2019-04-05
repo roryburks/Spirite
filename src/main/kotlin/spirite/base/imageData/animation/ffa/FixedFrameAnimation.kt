@@ -32,15 +32,13 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     override fun getDrawList(t: Float): List<TransformedHandle> {
         val _t = t.floor
         val met = MathUtil.cycle(start, end, _t)
-        val drawList = mutableListOf<TransformedHandle>()
 
-        _layers
+        val drawList = _layers
                 .filter { it.frames.any() }
-                .map { layer ->
+                .flatMap { layer ->
                     val localMet = if( layer.asynchronous) MathUtil.cycle(layer.start, layer.end, _t) else met
-                    layer.getFrameFromLocalMet(localMet)?.structure?.node }
-                .filterIsInstance<LayerNode>()
-                .forEach { drawList.addAll(it.getDrawList()) }
+                    layer.getFrameFromLocalMet(localMet)?.getDrawList()?: emptyList()
+                }
 
         return drawList
     }
