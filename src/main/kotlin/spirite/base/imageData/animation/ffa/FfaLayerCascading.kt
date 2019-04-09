@@ -9,10 +9,10 @@ import kotlin.math.min
 
 class FfaLayerCascading(
         override val anim: FixedFrameAnimation,
-        val groupLink: GroupNode,
-        lexicon: String = "")
+        val groupLink: GroupNode)
     :IFfaLayer, IFFALayerLinked
 {
+
     var lexicon: String? = null
         set(value) {
             if( field != value) {
@@ -41,6 +41,8 @@ class FfaLayerCascading(
     // region exposed functionality
     // endregion
 
+    init {update()}
+
     private data class IndexedSublayer(val start: Int, val info: FFACascadingSublayerInfo?)
 
     private fun update()
@@ -68,7 +70,7 @@ class FfaLayerCascading(
         lexicon = oldLexicon?.asSequence()
                 ?.mapNotNull { oldLexicalMap[it]?.run { newLexicalInvMap[this] } }
                 ?.joinToString()
-        val newLexicon = lexicon ?: newLexicalInvMap.values.joinToString()
+        val newLexicon = lexicon ?: String(CharArray(newGroupNodes.size) {'A' + it})
 
         var met = 0
         val sublayers = newLexicon.mapNotNull {
@@ -90,7 +92,7 @@ class FfaLayerCascading(
         frames = (0 until end).map { i -> CascadingFrame(
                 i,
                 sublayers
-                        .filter {it.info != null && it.start <= i && (it.start + it.info.primaryLen ) > i }
+                        .filter {it.info != null && it.start <= i && (it.start + it.info.len ) > i }
                         .map { Pair(i - it.start, it.info!!) }
                 )
         }
@@ -111,13 +113,15 @@ class FfaLayerCascading(
 }
 
 
-data class FFACascadingSublayerInfo (
+data class FFACascadingSublayerInfo
+constructor(
         val group: GroupNode,
         val lexicalKey: Char,
         val layers: List<LayerNode>,
-        val primaryLen: Int,
+        private val _primaryLen: Int? = null,
         val lexicon: String? = null )
 {
+    val primaryLen: Int get() = _primaryLen ?: len
     val len: Int get() = lexicon?.length ?: layers.count()
 
     fun copyUpdated(newLexicalKey: Char) : FFACascadingSublayerInfo? {
@@ -125,11 +129,13 @@ data class FFACascadingSublayerInfo (
                 .asReversed()
         if(!newLayerNodes.any())
             return null
-        val plen = min(primaryLen, newLayerNodes.size)
+        val plen =
+                if( _primaryLen == null) null
+                else min(_primaryLen, newLayerNodes.size)
 
         // TODO: Remap Lexicon
 
-        return this.copy(layers = newLayerNodes, lexicalKey = newLexicalKey, primaryLen =  plen)
+        return this.copy(layers = newLayerNodes, lexicalKey = newLexicalKey, _primaryLen =  plen)
     }
 
     fun getLayerFromLocalMet(met: Int) : LayerNode? = when {
@@ -150,8 +156,7 @@ data class FFACascadingSublayerInfo (
             return FFACascadingSublayerInfo(
                     group,
                     lexicalKey,
-                    layerNodes,
-                    layerNodes.count())
+                    layerNodes)
         }
     }
 }

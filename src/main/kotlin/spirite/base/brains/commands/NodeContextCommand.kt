@@ -56,7 +56,7 @@ class NodeCommand(
     init {commands[name] = this}
 
     override val commandString: String get() = "node.$name"
-    override val keyCommand: KeyCommand get() = KeyCommand(commandString)
+    override val keyCommand: KeyCommand get() = KeyCommand(commandString) {it.workspaceSet.currentWorkspace?.groupTree?.selectedNode}
 }
 
 object NodeCommands {
