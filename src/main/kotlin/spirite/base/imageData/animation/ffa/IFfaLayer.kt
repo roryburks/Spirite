@@ -1,10 +1,9 @@
 package spirite.base.imageData.animation.ffa
 
 import spirite.base.graphics.rendering.TransformedHandle
-import sun.security.util.Length
 
 interface IFFAFrame {
-    val layer: IFFALayer
+    val layer: IFfaLayer
 
     val start: Int
     val length: Int
@@ -13,7 +12,7 @@ interface IFFAFrame {
     fun getDrawList() : List<TransformedHandle>
 }
 
-interface IFFALayer {
+interface IFfaLayer {
     val anim : FixedFrameAnimation
     val start: Int
     val end: Int
@@ -27,7 +26,7 @@ interface IFFALayer {
 
 interface  IFFAFramev2
 {
-    val layer: IFFALayer
+    val layer: IFfaLayer
 
     val start: Int
     val length: Int

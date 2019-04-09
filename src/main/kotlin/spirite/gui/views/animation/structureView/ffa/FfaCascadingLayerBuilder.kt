@@ -4,7 +4,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.FfaLayerCascading
 import spirite.base.imageData.animation.ffa.FfaLayerCascading.CascadingFrame
 import spirite.base.imageData.animation.ffa.IFFAFrame
-import spirite.base.imageData.animation.ffa.IFFALayer
+import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
@@ -17,12 +17,12 @@ import java.io.InvalidClassException
 
 class FfaCascadingLayerBuilder(val _master: IMasterControl) : IFFAStructViewBuilder
 {
-    override fun buildNameComponent(layer: IFFALayer): IFFAStructView = when(layer) {
+    override fun buildNameComponent(layer: IFfaLayer): IFFAStructView = when(layer) {
         is FfaLayerCascading -> NameView(layer, _master.contextMenus, _master.dialog)
         else -> throw InvalidClassException("Trying to build FfaCascadingLayer view on other kind of layer")
     }
 
-    override fun buildFrameComponent(layer: IFFALayer, frame: IFFAFrame) : IFFAStructView = when {
+    override fun buildFrameComponent(layer: IFfaLayer, frame: IFFAFrame) : IFFAStructView = when {
         layer !is FfaLayerCascading || frame !is CascadingFrame -> throw InvalidClassException("Bad Frame type for FfaCascadingBuilder")
         else -> FrameView(frame)
     }

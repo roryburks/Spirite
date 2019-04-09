@@ -11,7 +11,7 @@ class FfaLayerCascading(
         override val anim: FixedFrameAnimation,
         val groupLink: GroupNode,
         lexicon: String = "")
-    :IFFALayer, IFFALayerLinked
+    :IFfaLayer, IFFALayerLinked
 {
     var lexicon: String? = null
         set(value) {
@@ -24,7 +24,7 @@ class FfaLayerCascading(
     var sublayerInfo = mutableMapOf<GroupNode, FFACascadingSublayerInfo>()
     //var sublayers : List<Pair<Int, FFACascadingSublayerInfo?>> = emptyList()
 
-    // region IFFALayer
+    // region IFfaLayer
     override val start: Int get() = 0
     override var end: Int = 0 ; private set
     override var asynchronous: Boolean = false
@@ -102,7 +102,7 @@ class FfaLayerCascading(
             val points: List<Pair<Int, FFACascadingSublayerInfo>>)
         :IFFAFrame
     {
-        override val layer: IFFALayer get() = this@FfaLayerCascading
+        override val layer: IFfaLayer get() = this@FfaLayerCascading
         override val length: Int get() = 1
         override fun getDrawList() = points
                 .mapNotNull { it.second.getLayerFromLocalMet(it.first) }

@@ -1,6 +1,5 @@
 package spirite.base.imageData.animation.ffa
 
-import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
@@ -16,7 +15,7 @@ interface IFFALayerLinked {
 }
 
 abstract class FFALayer( override val anim : FixedFrameAnimation)
-    :IFFALayer
+    :IFfaLayer
 {
     private val undoEngine get() = anim.workspace.undoEngine
 

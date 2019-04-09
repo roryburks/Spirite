@@ -8,7 +8,7 @@ import rb.owl.IContract
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
-import spirite.base.imageData.animation.ffa.IFFALayer
+import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.animation.ffa.IFFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.Node
@@ -17,7 +17,6 @@ import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.advanced.crossContainer.CrossRowInitializer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
-import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.IScrollContainer
 import spirite.gui.components.basic.events.MouseEvent.MouseEventType.PRESSED
@@ -28,26 +27,22 @@ import spirite.gui.views.animation.structureView.ffa.IFFAStructView
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SJPanel
 import spirite.pc.gui.basic.SwComponent
-import java.awt.BasicStroke
-import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
-import java.awt.event.MouseEvent
 import java.lang.ref.WeakReference
-import kotlin.math.max
 
 private object RememberedStates {
     // Not sure if this is how I want to do this, but I'm fine with it for now.
     data class RememberedState(val expanded: Boolean = false)
 
-    private val map = mutableMapOf<Int,Pair<WeakReference<IFFALayer>,RememberedState>>()
+    private val map = mutableMapOf<Int,Pair<WeakReference<IFfaLayer>,RememberedState>>()
 
-    fun setState( layer: IFFALayer, state: RememberedState)
+    fun setState(layer: IFfaLayer, state: RememberedState)
     {
         map.values.removeIf { it.first.get() == null }
         map[layer.hashCode()] = Pair(WeakReference(layer), state)
     }
-    fun getState( layer: IFFALayer) : RememberedState?
+    fun getState( layer: IFfaLayer) : RememberedState?
     {
         map.values.removeIf { it.first.get() == null }
         val maybeMatch = map[layer.hashCode()] ?: return null
@@ -103,8 +98,8 @@ private constructor(
     // region Building
     private fun rebuild() {
         val frameLinks = mutableMapOf<IFFAFrame,IFFAStructView>()
-        val layerLinks = mutableMapOf<IFFALayer, IFFAStructView>()
-        val viewMap = mutableMapOf<IFFALayer,IntRange>()
+        val layerLinks = mutableMapOf<IFfaLayer, IFFAStructView>()
+        val viewMap = mutableMapOf<IFfaLayer,IntRange>()
         var wy = 0
 
         imp.setLayout {
@@ -141,7 +136,7 @@ private constructor(
     }
 
     private fun buildLayer(
-            layer: IFFALayer,
+            layer: IFfaLayer,
             nameWidth: Int,
             tickWidth: Int)
             : LayerBuildSet
@@ -308,11 +303,11 @@ data class FFAStructPanelViewspace(
         val leftJustification: Int,
         val topJustification: Int,
         val tickWidth: Int,
-        val layerHeights: Map<IFFALayer,IntRange>,
+        val layerHeights: Map<IFfaLayer,IntRange>,
         val frameMap: Map<IFFAFrame,IFFAStructView>,
-        val layerMap: Map<IFFALayer, IFFAStructView>)
+        val layerMap: Map<IFfaLayer, IFFAStructView>)
 {
-    fun rectForRangeInLayer( layer: IFFALayer, range: IntRange) : Rect
+    fun rectForRangeInLayer(layer: IFfaLayer, range: IntRange) : Rect
     {
         val heightRange = layerHeights[layer]
         return Rect(

@@ -6,10 +6,9 @@ import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
-import spirite.base.imageData.animation.ffa.FFALayer
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked
-import spirite.base.imageData.animation.ffa.FFALayerLexical
+import spirite.base.imageData.animation.ffa.FfaLayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.*
@@ -363,7 +362,7 @@ object SaveEngine {
                                         ra.writeShort(frame.length)    // [2]: Length
                                     }
                                 }
-                                is FFALayerLexical -> {
+                                is FfaLayerLexical -> {
                                     ra.writeByte(FFALAYER_LEXICAL)  // [1] : Layer TypeId
                                     ra.writeInt(context.nodeMap[layer.groupLink] ?: -1) // [4] NodeIf of GroupNode
                                     ra.writeUFT8NT(layer.lexicon)   // [n] : Lexicon

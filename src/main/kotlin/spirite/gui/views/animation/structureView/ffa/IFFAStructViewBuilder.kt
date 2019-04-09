@@ -1,9 +1,8 @@
 package spirite.gui.views.animation.structureView.ffa
 
-import org.jetbrains.annotations.Contract
 import rb.owl.IContract
 import spirite.base.imageData.animation.ffa.IFFAFrame
-import spirite.base.imageData.animation.ffa.IFFALayer
+import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
@@ -31,6 +30,6 @@ interface IFFAStructView {
 }
 
 interface IFFAStructViewBuilder {
-    fun buildNameComponent(layer: IFFALayer) : IFFAStructView
-    fun buildFrameComponent(layer: IFFALayer, frame: IFFAFrame) : IFFAStructView
+    fun buildNameComponent(layer: IFfaLayer) : IFFAStructView
+    fun buildFrameComponent(layer: IFfaLayer, frame: IFFAFrame) : IFFAStructView
 }

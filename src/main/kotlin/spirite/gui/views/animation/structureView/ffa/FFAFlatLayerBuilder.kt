@@ -4,7 +4,6 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
-import spirite.base.imageData.undo.NullAction
 import spirite.gui.Direction
 import spirite.gui.UIPoint
 import spirite.gui.components.basic.IComponent
@@ -26,7 +25,7 @@ import spirite.pc.gui.basic.SwComponent
 import java.awt.image.BufferedImage
 import java.io.InvalidClassException
 
-fun ContextMenus.launchContextMenuFor( point: UIPoint, layer: IFFALayer) {
+fun ContextMenus.launchContextMenuFor( point: UIPoint, layer: IFfaLayer) {
     val schema = mutableListOf<MenuItem>()
 
     schema.add(MenuItem("&Delete Layer", customAction = {layer.anim.removeLayer(layer)}))
@@ -49,13 +48,13 @@ fun ContextMenus.launchContextMenuFor( point: UIPoint, frame: IFFAFrame) {
 
 class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewBuilder
 {
-    override fun buildNameComponent(layer: IFFALayer) = when(layer) {
-        is FFALayerLexical -> LexicalNameView(layer, _master.contextMenus, _master.dialog)
+    override fun buildNameComponent(layer: IFfaLayer) = when(layer) {
+        is FfaLayerLexical -> LexicalNameView(layer, _master.contextMenus, _master.dialog)
         is FFALayer -> NameView(layer, _master.contextMenus)
         else -> throw InvalidClassException("Layer is not FFALayer")
     }
 
-    override fun buildFrameComponent(layer: IFFALayer, frame: IFFAFrame): IFFAStructView {
+    override fun buildFrameComponent(layer: IFfaLayer, frame: IFFAFrame): IFFAStructView {
         frame as? FFAFrame ?: throw InvalidClassException("Frame is not FFAFrame")
         layer as? FFALayer ?: throw InvalidClassException("Layer is not FFALayer")
 
@@ -96,7 +95,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
     }
 
     private class LexicalNameView(
-            val layer: FFALayerLexical,
+            val layer: FfaLayerLexical,
             val contextMenu: ContextMenus,
             val dialog: IDialog,
             private val imp: ICrossPanel = Hybrid.ui.CrossPanel())

@@ -17,12 +17,12 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     constructor(name: String, workspace: IImageWorkspace, node : GroupNode) : this(name, workspace){
         addLinkedLayer(node, true)
     }
-    constructor(name: String, workspace: IImageWorkspace, layers: List<IFFALayer>) : this(name, workspace){
+    constructor(name: String, workspace: IImageWorkspace, layers: List<IFfaLayer>) : this(name, workspace){
         _layers.addAll(layers)
     }
 
-    private val _layers = mutableListOf<IFFALayer>()
-    val layers : List<IFFALayer> get() = _layers
+    private val _layers = mutableListOf<IFfaLayer>()
+    val layers : List<IFfaLayer> get() = _layers
 
     val start : Int get() = _layers.map { it.start }.min() ?: 0
     val end : Int get() = _layers.map { it.end }.max() ?: 0
@@ -51,7 +51,7 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         // Remove All Layers referencing nonexistent Groups
 //        val toRemove = _layers.asSequence()
 //                .mapNotNull { Pair(when(it) {
-//                    is FFALayerLexical -> it.groupLink
+//                    is FfaLayerLexical -> it.groupLink
 //                    is FFALayerGroupLinked -> it.groupLink
 //                    else -> return@mapNotNull null
 //                }, it) }
@@ -68,11 +68,11 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
                 .forEach { it.groupLinkUpdated() }
     }
 
-    internal fun triggerFFAChange( layer: IFFALayer?) {
+    internal fun triggerFFAChange( layer: IFfaLayer?) {
         triggerStructureChange()
     }
 
-    fun removeLayer( layer: IFFALayer) {
+    fun removeLayer( layer: IFfaLayer) {
         val spot = _layers.indexOf(layer)
         if( spot == -1) return
 
@@ -96,21 +96,41 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
             unlinkedClusters: List<UnlinkedFrameCluster>? = null)
     {
         val layer = FFALayerGroupLinked(this, group, includeSubtrees, frameMap, unlinkedClusters)
-        _layers.add(layer)
-        triggerFFAChange(layer)
+        addLayer(layer)
     }
 
     fun addLexicalLayer(group: GroupNode, lexicon: String = "", map: Map<Char,Node>? = null)
     {
         val existingMap = _layers.asSequence()
-                .filterIsInstance<FFALayerLexical>()
+                .filterIsInstance<FfaLayerLexical>()
                 .filter { it.groupLink == group }
                 .firstOrNull()?.sharedExplicitMap
         val mapToUse = existingMap ?: (map?.toMutableMap()) ?: mutableMapOf()
-        val layer = FFALayerLexical(this, group, lexicon, mapToUse)
-        _layers.add(layer)
-        triggerFFAChange(layer)
+        val layer = FfaLayerLexical(this, group, lexicon, mapToUse)
+        addLayer(layer)
     }
+
+    fun addCascadingLayer( group: GroupNode) {
+        addLayer( FfaLayerCascading(this, group))
+    }
+
+    fun addLayer( layer: IFfaLayer) {
+        if( layer.anim != this) throw IllegalArgumentException("Frames have to be hard linked to their Animation")
+        val spot = _layers.size
+
+        workspace.undoEngine.performAndStore( object : NullAction() {
+            override val description: String get() = "Added Layer to Fixed Frame Animation"
+            override fun performAction() {
+                _layers.add(spot, layer)
+                triggerFFAChange(layer)
+            }
+            override fun undoAction() {
+                _layers.remove(layer)
+                triggerFFAChange(layer)
+            }
+        })
+    }
+
 
     override fun dupe(): Animation {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
