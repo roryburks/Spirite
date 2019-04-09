@@ -76,15 +76,13 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
     {
         override val component get() = imp
         override val height: Int get() = 32
-        override val dragBrain = object : IAnimDragBrain {
-            override fun interpretMouseEvent(evt: MouseEvent, context : AnimFFAStructPanel): IAnimDragBehavior? {
-                if( evt.type == RELEASED && evt.button == RIGHT)
-                    contextMenu.launchContextMenuFor(evt.point, layer)
-                else if( evt.type == RELEASED)
-                    label.requestFocus()
+        override val dragBrain = AnimDragBrain {evt: MouseEvent, context : AnimFFAStructPanel ->
+            if( evt.type == RELEASED && evt.button == RIGHT)
+                contextMenu.launchContextMenuFor(evt.point, layer)
+            else if( evt.type == RELEASED)
+                label.requestFocus()
 
-                return null
-            }
+            null
         }
 
         val label = Hybrid.ui.EditableLabel("layer")
@@ -106,15 +104,13 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
     {
         override val component: IComponent get() = imp
         override val height: Int get() = 32
-        override val dragBrain: IAnimDragBrain? get() = object : IAnimDragBrain {
-            override fun interpretMouseEvent(evt: MouseEvent, context : AnimFFAStructPanel): IAnimDragBehavior? {
-                if( evt.type == RELEASED && evt.button == RIGHT)
-                    contextMenu.launchContextMenuFor(evt.point, layer)
-                else if( evt.type == RELEASED)
-                    label.requestFocus()
+        override val dragBrain: IAnimDragBrain? = AnimDragBrain {evt: MouseEvent, context : AnimFFAStructPanel ->
+            if( evt.type == RELEASED && evt.button == RIGHT)
+                contextMenu.launchContextMenuFor(evt.point, layer)
+            else if( evt.type == RELEASED)
+                label.requestFocus()
 
-                return null
-            }
+             null
         }
 
         val label = Hybrid.ui.EditableLabel("layer")
@@ -123,7 +119,6 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
         init {
             imp.setBasicBorder(BEVELED_LOWERED)
 
-            val label = Hybrid.ui.EditableLabel("layer")
             imp.setLayout {
                 rows.add(label)
                 rows.add(lexiconButton)
@@ -146,7 +141,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
             rows.add(SwComponent(DashedOutPanel(Skin.Global.Bg.jcolor, Skin.Global.Fg.jcolor)), width = 32)
         }
         override val height: Int get() = 32
-        override val dragBrain: IAnimDragBrain? get() = object : ResizeableBrain(frame) {
+        override val dragBrain: IAnimDragBrain? = object : ResizeableBrain(frame) {
             override fun interpretMouseEvent(evt: MouseEvent, context: AnimFFAStructPanel): IAnimDragBehavior? {
                 val behavior = super.interpretMouseEvent(evt, context)
                 if( behavior != null) return behavior
@@ -172,7 +167,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewB
             }
         }
         override val height: Int get() = tickLen
-        override val dragBrain: IAnimDragBrain? get() = object : ResizeableBrain(frame) {
+        override val dragBrain: IAnimDragBrain? = object : ResizeableBrain(frame) {
             override fun interpretMouseEvent(evt: MouseEvent, context: AnimFFAStructPanel): IAnimDragBehavior? {
                 val behavior = super.interpretMouseEvent(evt, context)
                 if( behavior != null) return behavior

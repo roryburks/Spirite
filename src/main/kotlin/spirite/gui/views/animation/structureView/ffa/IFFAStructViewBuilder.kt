@@ -15,8 +15,13 @@ interface IAnimDragBehavior {
     fun draw( gc: Graphics2D) {}
 }
 
+
 interface IAnimDragBrain {
     fun interpretMouseEvent(evt: MouseEvent, context : AnimFFAStructPanel) : IAnimDragBehavior?
+}
+class AnimDragBrain(val lambda: (evt: MouseEvent, context : AnimFFAStructPanel) -> IAnimDragBehavior?) : IAnimDragBrain
+{
+    override fun interpretMouseEvent(evt: MouseEvent, context: AnimFFAStructPanel) = lambda(evt, context)
 }
 
 interface IFFAStructView {

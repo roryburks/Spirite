@@ -7,7 +7,7 @@ import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import kotlin.math.min
 
-class FFALayerCascading(
+class FfaLayerCascading(
         override val anim: FixedFrameAnimation,
         val groupLink: GroupNode,
         lexicon: String = "")
@@ -15,8 +15,10 @@ class FFALayerCascading(
 {
     var lexicon: String? = null
         set(value) {
-            field = value
-            update()
+            if( field != value) {
+                field = value
+                update()
+            }
         }
 
     var sublayerInfo = mutableMapOf<GroupNode, FFACascadingSublayerInfo>()
@@ -43,7 +45,7 @@ class FFALayerCascading(
 
     private fun update()
     {
-        val newGroupNodes = groupLink.children.filterIsInstance<GroupNode>()
+        val newGroupNodes = groupLink.children.filterIsInstance<GroupNode>().asReversed()
 
         val oldSublayerInfo = sublayerInfo
         val newSublayerInfo = newGroupNodes
@@ -100,7 +102,7 @@ class FFALayerCascading(
             val points: List<Pair<Int, FFACascadingSublayerInfo>>)
         :IFFAFrame
     {
-        override val layer: IFFALayer get() = this@FFALayerCascading
+        override val layer: IFFALayer get() = this@FfaLayerCascading
         override val length: Int get() = 1
         override fun getDrawList() = points
                 .mapNotNull { it.second.getLayerFromLocalMet(it.first) }
