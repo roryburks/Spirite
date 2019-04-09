@@ -1,6 +1,5 @@
 package spirite.base.imageData.deformation
 
-import rb.extendo.extensions.cross
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d

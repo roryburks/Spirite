@@ -2,7 +2,6 @@ package spirite.base.imageData.undo
 
 import rb.extendo.dataStructures.SinglySet
 import spirite.base.imageData.MImageWorkspace
-import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData

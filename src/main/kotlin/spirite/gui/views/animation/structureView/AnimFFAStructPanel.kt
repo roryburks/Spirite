@@ -8,9 +8,9 @@ import rb.owl.IContract
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
-import spirite.base.imageData.animation.ffa.IFfaLayer
-import spirite.base.imageData.animation.ffa.IFFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.base.imageData.animation.ffa.IFFAFrame
+import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.util.linear.Rect
 import spirite.gui.components.advanced.crossContainer.CrossInitializer

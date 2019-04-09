@@ -7,7 +7,6 @@ import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
-import spirite.base.imageData.animation.ffa.FFAFrameStructure
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode

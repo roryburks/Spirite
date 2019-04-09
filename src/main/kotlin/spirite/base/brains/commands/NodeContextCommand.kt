@@ -17,7 +17,6 @@ import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
 
 interface ICommandExecuter {
     val validCommands: List<String>

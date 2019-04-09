@@ -8,7 +8,8 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.MediumBasedAnimation
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.undo.NullAction
 
 class FixedFrameAnimation(name: String, workspace: IImageWorkspace)

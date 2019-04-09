@@ -1,7 +1,10 @@
 package spirite.base.imageData.mediums.magLev
 
 import rb.hydra.miniTiamatGrindSync
-import rb.vectrix.linear.*
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Vec2f
+import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
 import spirite.base.brains.toolset.ColorChangeMode

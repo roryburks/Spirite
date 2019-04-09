@@ -2,15 +2,11 @@ package spirite.base.pen.behaviors
 
 import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.interpolation.CubicSplineInterpolator2D
-import rb.vectrix.mathUtil.MathUtil
 import spirite.base.graphics.GraphicsContext
-import spirite.base.imageData.deformation.StrokeDeformation
 import spirite.base.imageData.deformation.StrokeDeformationPiece
 import spirite.base.imageData.deformation.StrokeDeformationV2
 import spirite.base.imageData.drawer.IImageDrawer.IDeformDrawer
-import spirite.base.pen.PenState
 import spirite.base.pen.Penner
-import spirite.base.pen.stroke.DrawPointsBuilder
 import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
 import spirite.gui.components.basic.events.MouseEvent.MouseButton

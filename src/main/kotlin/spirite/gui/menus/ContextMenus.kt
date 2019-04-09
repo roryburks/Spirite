@@ -8,7 +8,6 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.gui.UIPoint
 import spirite.gui.resources.IIcon
 

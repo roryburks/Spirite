@@ -19,7 +19,6 @@ import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.Hybrid
-import java.io.File
 
 interface ISelectionEngine {
     val selectionChangeObserver: IObservable<(SelectionChangeEvent)->Any?>

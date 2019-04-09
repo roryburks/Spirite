@@ -12,8 +12,11 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.floor
 import spirite.base.graphics.rendering.TransformedHandle
-import spirite.base.imageData.*
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
+import spirite.base.imageData.IIsolator
+import spirite.base.imageData.ISpriteLayerIsolator
+import spirite.base.imageData.MImageWorkspace
+import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
@@ -22,7 +25,6 @@ import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.MediumType
-import spirite.base.imageData.mediums.magLev.MaglevImageAction
 import spirite.base.imageData.mediums.magLev.MaglevImageDrawer
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.undo.NullAction

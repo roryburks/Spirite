@@ -6,7 +6,6 @@ import spirite.gui.components.basic.ITextArea
 import spirite.gui.resources.Skin.BevelBorder.Dark
 import spirite.gui.resources.Skin.BevelBorder.Light
 import spirite.gui.resources.Skin.TextField.Background
-import spirite.hybrid.Hybrid
 import spirite.hybrid.SwHybrid
 import spirite.pc.gui.adaptMouseSystem
 import java.awt.event.FocusEvent
@@ -17,7 +16,6 @@ import javax.swing.JTextArea
 import javax.swing.border.BevelBorder
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
-import javax.swing.event.HyperlinkEvent
 
 
 class SwTextArea

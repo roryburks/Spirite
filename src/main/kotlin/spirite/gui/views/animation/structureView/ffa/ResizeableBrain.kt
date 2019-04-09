@@ -2,7 +2,6 @@ package spirite.gui.views.animation.structureView.ffa
 
 import rb.owl.IContract
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
-import spirite.base.imageData.animation.ffa.IFFAFrame
 import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
 import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.events.MouseEvent
