@@ -10,6 +10,8 @@ import spirite.base.brains.toolset.FlipMode.*
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.drawer.IImageDrawer.*
+import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
 import spirite.base.util.Colors
@@ -117,6 +119,14 @@ class Penner(
                 val color = paletteManager.activeBelt.getColor(if( button == LEFT) 0 else 1)
                 val offColor = paletteManager.activeBelt.getColor(if( button == LEFT) 1 else 0)
 
+                // Shortcut level controls
+                if( holdingCtrl && holdingAlt) {
+                    val layer = (workspace.groupTree.selectedNode as? GroupTree.LayerNode)?.layer
+                    if( layer is SpriteLayer)  behavior = SpriteSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
+                }
+
+                if( behavior != null) return
+
                 when {
                     holdingSpace -> context.currentView?.also { behavior =  MovingViewBehavior(this,it )}
                     tool is Pen -> when {
@@ -176,7 +186,7 @@ class Penner(
                     tool is ColorPicker ->
                         behavior = PickBehavior( this, button == LEFT)
                     tool is Rigger ->
-                        behavior = RigSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
+                        behavior = SpriteSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
                     tool is MagneticFillTool ->
                         if( drawer is IMagneticFillModule) behavior = MagneticFillBehavior(this, drawer, color)
                         else Hybrid.beep()

@@ -16,7 +16,7 @@ import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.pen.Penner
 
 
-class RigSelectionBehavior(
+class SpriteSelectionBehavior(
         penner: Penner,
         private val scope: WorkspaceScope)
     : PennerBehavior(penner)

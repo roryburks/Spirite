@@ -369,7 +369,7 @@ class SpriteLayer : Layer {
     val cScaleYBind = Bindable(1f).also{it.addObserver { new, _ -> activePart?.scaleY = new }}
     val cRotBind = Bindable(0f).also{it.addObserver { new, _ -> activePart?.rot = new }}
 
-    private fun getAllLinkedLayers() : Sequence<SpriteLayer> {
+    fun getAllLinkedLayers() : Sequence<SpriteLayer> {
         return workspace.groupTree.root.traverse()
                 .firstOrNull { (it as? LayerNode)?.layer == this@SpriteLayer }
                 ?.parent?.children?.asSequence()

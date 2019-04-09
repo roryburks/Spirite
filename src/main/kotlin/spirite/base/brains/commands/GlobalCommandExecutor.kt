@@ -20,8 +20,10 @@ import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
+import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.layers.Layer
+import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
@@ -165,6 +167,18 @@ object GlobalCommands
     }
     val PurgeUndoHistory = GlobalCommand("purgeUndoHistory") {_, workspaceSet ->
         workspaceSet.currentWorkspace?.undoEngine?.reset()
+    }
+    val CopyAllLayer = GlobalCommand("almightyDebug") {master, workspaceSet ->
+        val workspace = workspaceSet.currentMWorkspace ?: throw CommandNotValidException
+        val spriteLayer = ((workspace.groupTree.selectedNode as? GroupTree.LayerNode)?.layer as? SpriteLayer) ?: throw CommandNotValidException
+        val partName = spriteLayer.activePart?.partName ?: throw CommandNotValidException
+        val med = spriteLayer.activePart?.handle?.medium ?: throw CommandNotValidException
+
+        spriteLayer
+                .getAllLinkedLayers()
+                .flatMap { it.parts.asSequence().filter { it.partName == partName } }
+                .filter { it.handle.medium != med }
+                .forEach { workspace.mediumRepository.replaceMediumDirect(it.handle, med.dupe(workspace)) }
     }
 
 
