@@ -105,7 +105,7 @@ private val defaultHotkeys = mapOf(
         GlobalCommands.Cut.keyCommand to (Hotkey( KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK)),
         GlobalCommands.Open.keyCommand to (Hotkey( KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK)),
         GlobalCommands.NewWorkspace.keyCommand to (Hotkey( KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK)),
-☺
+
         // DEBUG
         GlobalCommands.PurgeUndoHistory.keyCommand to (Hotkey(KeyEvent.VK_F11, InputEvent.ALT_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
         GlobalCommands.CopyAllLayer.keyCommand to (Hotkey(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
