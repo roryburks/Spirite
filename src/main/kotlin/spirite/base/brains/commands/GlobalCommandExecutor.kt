@@ -263,5 +263,7 @@ object GlobalCommands
 
             }
         }
+
+        Hybrid.clipboard.postToClipboard(image)
     }
 }

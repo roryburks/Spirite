@@ -2,7 +2,8 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
-import spirite.base.brains.commands.NodeContextCommand.NodeCommand.*
+import spirite.base.exceptions.CommandNotValidException
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.MovableGroupTree
@@ -16,7 +17,6 @@ import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
 
 interface ICommandExecuter {
     val validCommands: List<String>
@@ -29,151 +29,156 @@ class NodeContextCommand(
         val dialogs: IDialog)
     : ICommandExecuter
 {
+    override fun executeCommand(string: String, extra: Any?) : Boolean{
+        try
+        {
+            val workspace = workspaceSet.currentMWorkspace ?: return false
+            val node = extra as? Node
 
-    enum class NodeCommand(val string: String) : ICommand {
-        NEW_GROUP( "newGroup"),
-        NEW_SIMPLE_LAYER("newSimpleLayer"),
-        NEW_SPRITE_LAYER("newSpriteLayer"),
-        NEW_PUPPET_LAYER("newPuppetLayer"),
-        QUICK_NEW_LAYER("newLayer"),
-        DUPLICATE("duplicate"),
-        COPY("copy"),
-        DELETE("delete"),
-
-        ANIM_FROM_GROUP("animationFromGroup"),
-        INSERT_GROUP_IN_ANIMATION("addGroupToAnim"),
-        INSERT_GROUP_IN_ANIMATION_LEXICAL("addGroupToAnim_lexical"),
-        GIF_FROM_FROUP("gifFromGroup"),
-        MERGE_DOWN("mergeDown"),
-        NEW_RIG_ANIMATION("newRigAnimation"),
-        MOVE_UP("moveUp"),
-        MOVE_DOWN("moveDown"),
-
-        CONVERT_LAYER_TO_SPRITE("converSimpleLayerToSpirite")
-        ;
-
-        override val commandString: String get() = "node.$string"
-        override val keyCommand: KeyCommand get() = KeyCommand(commandString) {it.workspaceSet.currentWorkspace?.groupTree?.selectedNode}
+            commands[string]?.action?.invoke(workspace, node, dialogs) ?: return false
+            return true
+        }catch (e : CommandNotValidException)
+        {
+            return false
+        }
     }
 
-    override val validCommands: List<String> get() = NodeCommand.values().map {  it.string }
+    override val validCommands: List<String> get() = commands.values.map { it.commandString }
     override val domain: String get() = "node"
-    val currentWorkspace get() = workspaceSet.currentMWorkspace
+}
 
-    override fun executeCommand(string: String, extra: Any?) : Boolean{
-        val workspace = currentWorkspace ?: return false
-        val node = extra as? Node
+private val commands = HashMap<String,NodeCommand>()
+class NodeCommand(
+        val name: String,
+        val action: (workspace: MImageWorkspace, node: Node?, dialogs: IDialog)->Unit)
+    :ICommand
+{
+    init {commands[name] = this}
 
-        when(string) {
-            NEW_GROUP.string -> workspace.groupTree.selectedNode = workspace.groupTree.addGroupNode( node, "New Group")
-            DELETE.string -> node?.delete()
-            NEW_SIMPLE_LAYER.string -> {
-                dialogs.invokeNewSimpleLayer(workspace)?.apply {
-                    workspace.groupTree.addNewSimpleLayer(node, name, mediumType, width, height, true)
-                }
-            }
-            QUICK_NEW_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Layer", DYNAMIC)
-            DUPLICATE.string -> node?.also { workspace.groupTree.duplicateNode(it) }
-            ANIM_FROM_GROUP.string -> {
-                val groupNode = node as? GroupNode ?: return false
-                val name = StringUtil.getNonDuplicateName(workspace.animationManager.animations.map { it.name },"New Animation")
-                val animation = FixedFrameAnimation(name, workspace, groupNode)
-                workspace.animationManager.addAnimation(animation, true)
-            }
-            INSERT_GROUP_IN_ANIMATION.string -> {
-                val animation = workspace.animationManager.currentAnimation as? FixedFrameAnimation ?: return false
-                animation.addLinkedLayer( node as? GroupNode ?: return false, true)
-            }
-            INSERT_GROUP_IN_ANIMATION_LEXICAL.string -> {
-                val animation = workspace.animationManager.currentAnimation as? FixedFrameAnimation ?: return false
-                val group = node as? GroupNode ?: return false
-                animation.addLexicalLayer(group)
-            }
-            GIF_FROM_FROUP.string -> TODO()
-            MERGE_DOWN.string -> TODO()
-            NEW_RIG_ANIMATION.string -> TODO()
-            MOVE_UP.string -> {
-                node ?: return false
+    override val commandString: String get() = "node.$name"
+    override val keyCommand: KeyCommand get() = KeyCommand(commandString) {it.workspaceSet.currentWorkspace?.groupTree?.selectedNode}
+}
 
-                val tree : MovableGroupTree = when {
-                    node.isChildOf(workspace.groupTree.root) -> workspace.groupTree
-                    else -> return false
-                }
+object NodeCommands {
+    val NewGroup = NodeCommand("newGroup") {workspace, node, dialogs ->
+        workspace.groupTree.selectedNode = workspace.groupTree.addGroupNode( node, "New Group") }
+    val NewSimpleLayer = NodeCommand("newSimpleLayer") {workspace, node, dialogs ->
+        dialogs.invokeNewSimpleLayer(workspace)
+                ?.apply {workspace.groupTree.addNewSimpleLayer(node, name, mediumType, width, height, true)}
+    }
+    val NewSpriteLayer = NodeCommand("newSpriteLayer") {workspace, node, _ ->
+        if( node is LayerNode && node.layer is SpriteLayer) {
+            val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
+            val layer = SpriteLayer(structure, workspace, node.layer.type)
+            workspace.groupTree.importLayer(node, node.name, layer)
+        }
+        else workspace.groupTree.addNewSpriteLayer(node, "Sprite Layer", true)
+    }
+    val NewPuppetLayer = NodeCommand("newPuppetLayer") {workspace, node, _ ->
+        if( node is LayerNode && node.layer is SpriteLayer) {
+            val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
+            val layer = SpriteLayer(structure, workspace, MAGLEV)
+            workspace.groupTree.importLayer(node, node.name, layer)
+        }
+        else workspace.groupTree.addNewSpriteLayer(node, "Puppet Layer", true, MAGLEV)
+    }
 
-                val previousNode = node.previousNode
-                when(previousNode) {
-                    null -> {
-                        val parent = node.parent ?: return false
-                        parent.parent ?: return false
-                        tree.moveAbove( node, parent)
-                    }
-                    is GroupNode -> tree.moveInto(node, previousNode, false)
-                    else -> tree.moveAbove(node, previousNode)
-                }
-            }
-            MOVE_DOWN.string -> {
-                node ?: return false
+    val QuickNewLayer = NodeCommand("newLayer") {workspace, _, _ ->
+        workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Layer", DYNAMIC)}
 
-                val tree : MovableGroupTree = when {
-                    node.isChildOf(workspace.groupTree.root) -> workspace.groupTree
-                    else -> return false
-                }
+    val Duplicate = NodeCommand("duplicate") {workspace, node, _ ->
+        node?.also { workspace.groupTree.duplicateNode(it) }}
+    val Copy = NodeCommand("copy") { _, node, _ ->
+        val layerNode = node as? LayerNode ?: throw CommandNotValidException
+        Hybrid.clipboard.postToClipboard(layerNode.layer)
+    }
+    val Delete = NodeCommand("delete") {_, node, _ -> node?.delete()}
 
-                val nextNode = node.nextNode
-                when(nextNode) {
-                    null -> {
-                        val parent = node.parent ?: return false
-                        parent.parent ?: return false
-                        tree.moveBelow( node, parent)
-                    }
-                    is GroupNode -> tree.moveInto(node, nextNode, true)
-                    else -> tree.moveBelow(node, nextNode)
-                }
-            }
-            NEW_SPRITE_LAYER.string -> {
-                if( node is LayerNode && node.layer is SpriteLayer) {
-                    val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
-                    val layer = SpriteLayer(structure, workspace, node.layer.type)
-                    workspace.groupTree.importLayer(node, node.name, layer)
-                }
-                else workspace.groupTree.addNewSpriteLayer(node, "Sprite Layer", true)
-            }
-            NEW_PUPPET_LAYER.string -> {
-                if( node is LayerNode && node.layer is SpriteLayer) {
-                    val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
-                    val layer = SpriteLayer(structure, workspace, MAGLEV)
-                    workspace.groupTree.importLayer(node, node.name, layer)
-                }
-                else workspace.groupTree.addNewSpriteLayer(node, "Puppet Layer", true, MAGLEV)
-            }
-            COPY.string-> {
-                val layerNode = node as? LayerNode ?: return false
-                Hybrid.clipboard.postToClipboard(layerNode.layer)
-            }
-            CONVERT_LAYER_TO_SPRITE.string -> {
-                if( node?.tree != workspace.groupTree) return false
-                val simpleLayer = (node as? LayerNode)?.layer as? SimpleLayer ?: return false
-                val medium = simpleLayer.medium
-                val type = when( medium.medium) {
-                    is MaglevMedium -> MAGLEV
-                    is DynamicMedium -> DYNAMIC
-                    else -> return false
-                }
+    val AnimFromGroup = NodeCommand("animationFromGroup") {workspace, node, dialogs ->
+        val groupNode = node as? GroupNode ?: throw CommandNotValidException
+        val name = StringUtil.getNonDuplicateName(workspace.animationManager.animations.map { it.name },"New Animation")
+        val animation = FixedFrameAnimation(name, workspace, groupNode)
+        workspace.animationManager.addAnimation(animation, true)
+    }
+    val InsertGroupInAnim = NodeCommand("addGroupToAnim") {workspace, node, dialogs ->
+        val animation = workspace.animationManager.currentAnimation as? FixedFrameAnimation ?: throw CommandNotValidException
+        val group = node as? GroupNode ?: throw CommandNotValidException
+        animation.addLinkedLayer( group, true)
+    }
+    val InsertLexicalLayer = NodeCommand("addGroupToAnim:Lexical") {workspace, node, dialogs ->
+        val animation = workspace.animationManager.currentAnimation as? FixedFrameAnimation ?: throw CommandNotValidException
+        val group = node as? GroupNode ?: throw CommandNotValidException
+        animation.addLexicalLayer(group)
+    }
+    val InsertCascadingLayer = NodeCommand("addGroupToAnim:Cascading") {workspace, node, dialogs ->
+        val animation = workspace.animationManager.currentAnimation as? FixedFrameAnimation ?: throw CommandNotValidException
+        val group = node as? GroupNode ?: throw CommandNotValidException
+        animation.addCascadingLayer(group)
+    }
 
-                val spriteLayer = SpriteLayer(
-                        workspace,
-                        listOf(Pair(medium, SpritePartStructure(0, "base"))),
-                        type)
-                workspace.undoEngine.doAsAggregateAction("Convert Simple Layer to Sprite Layer") {
-                    workspace.groupTree.importLayer(node, node.name, spriteLayer, workspace.groupTree.selectedNode == node)
-                    node.delete()
-                }
-            }
+    val GifFromGroup = NodeCommand("gifFromGroup") {workspace, node, dialogs ->
+        TODO() }
+    val MergeDown = NodeCommand("mergeDown") {workspace, node, dialogs ->
+        TODO()}
+    val NewRigAnimation = NodeCommand("newRigAnimation") {workspace, node, dialogs ->
+        TODO()}
 
-            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: node.$string")
+    val MoveUp = NodeCommand("moveUp") {workspace, node, dialogs ->
+        node ?: throw CommandNotValidException
+
+        val tree : MovableGroupTree = when {
+            node.isChildOf(workspace.groupTree.root) -> workspace.groupTree
+            else ->throw CommandNotValidException
         }
 
-        return true
+        val previousNode = node.previousNode
+        when(previousNode) {
+            null -> {
+                val parent = node.parent ?: throw CommandNotValidException
+                parent.parent ?: throw CommandNotValidException
+                tree.moveAbove( node, parent)
+            }
+            is GroupNode -> tree.moveInto(node, previousNode, false)
+            else -> tree.moveAbove(node, previousNode)
+        }
+    }
+    val MoveDown = NodeCommand("moveDown") {workspace, node, dialogs ->
+        node ?: throw CommandNotValidException
+
+        val tree : MovableGroupTree = when {
+            node.isChildOf(workspace.groupTree.root) -> workspace.groupTree
+            else -> throw CommandNotValidException
+        }
+
+        val nextNode = node.nextNode
+        when(nextNode) {
+            null -> {
+                val parent = node.parent ?: throw CommandNotValidException
+                parent.parent ?: throw CommandNotValidException
+                tree.moveBelow( node, parent)
+            }
+            is GroupNode -> tree.moveInto(node, nextNode, true)
+            else -> tree.moveBelow(node, nextNode)
+        }
     }
 
+    val ConvertLayerToSprite = NodeCommand("converSimpleLayerToSprite") {workspace, node, dialogs ->
+        if( node?.tree != workspace.groupTree) throw CommandNotValidException
+        val simpleLayer = (node as? LayerNode)?.layer as? SimpleLayer ?: throw CommandNotValidException
+        val medium = simpleLayer.medium
+        val type = when( medium.medium) {
+            is MaglevMedium -> MAGLEV
+            is DynamicMedium -> DYNAMIC
+            else -> throw CommandNotValidException
+        }
+
+        val spriteLayer = SpriteLayer(
+                workspace,
+                listOf(Pair(medium, SpritePartStructure(0, "base"))),
+                type)
+        workspace.undoEngine.doAsAggregateAction("Convert Simple Layer to Sprite Layer") {
+            workspace.groupTree.importLayer(node, node.name, spriteLayer, workspace.groupTree.selectedNode == node)
+            node.delete()
+        }
+    }
 }

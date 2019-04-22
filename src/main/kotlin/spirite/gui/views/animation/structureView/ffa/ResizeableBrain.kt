@@ -1,7 +1,7 @@
 package spirite.gui.views.animation.structureView.ffa
 
 import rb.owl.IContract
-import spirite.base.imageData.animation.ffa.IFFAFrame
+import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
 import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.events.MouseEvent
@@ -14,7 +14,7 @@ import java.awt.Graphics2D
 import kotlin.math.max
 
 abstract class ResizeableBrain(
-        val frame: IFFAFrame)
+        val frame: FFAFrame)
     :IAnimDragBrain
 {
     override fun interpretMouseEvent(evt: MouseEvent, context: AnimFFAStructPanel): IAnimDragBehavior? {

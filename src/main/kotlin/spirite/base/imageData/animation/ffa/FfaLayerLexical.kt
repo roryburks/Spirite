@@ -5,7 +5,7 @@ import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.GAP
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.*
 
-class FFALayerLexical(
+class FfaLayerLexical(
         context: FixedFrameAnimation,
         val groupLink: GroupNode,
         lexicon: String = "",

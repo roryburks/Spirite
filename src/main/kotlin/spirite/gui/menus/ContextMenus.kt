@@ -2,13 +2,12 @@ package spirite.gui.menus
 
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.base.brains.commands.ICommand
-import spirite.base.brains.commands.NodeContextCommand.NodeCommand
+import spirite.base.brains.commands.NodeCommands
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.gui.UIPoint
 import spirite.gui.resources.IIcon
 
@@ -48,10 +47,10 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
 
         val scheme = mutableListOf(
                 MenuItem("&New..."),
-                MenuItem(".New Simple &Layer", NodeCommand.NEW_SIMPLE_LAYER),
-                MenuItem(".New Layer &Group", NodeCommand.NEW_GROUP),
-                MenuItem(".New &Sprite Layer", NodeCommand.NEW_SPRITE_LAYER),
-                MenuItem(".New &Puppet Layer", NodeCommand.NEW_PUPPET_LAYER)
+                MenuItem(".New Simple &Layer", NodeCommands.NewSimpleLayer),
+                MenuItem(".New Layer &Group", NodeCommands.NewGroup),
+                MenuItem(".New &Sprite Layer", NodeCommands.NewSpriteLayer),
+                MenuItem(".New &Puppet Layer", NodeCommands.NewPuppetLayer)
         )
 
         if( node != null) {
@@ -62,28 +61,30 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
             }
 
             scheme.add(MenuItem("-"))
-            scheme.add(MenuItem("D&uplicate $descriptor", NodeCommand.DUPLICATE))
-            scheme.add(MenuItem("&Copy $descriptor", NodeCommand.COPY))
-            scheme.add(MenuItem("&Delete $descriptor", NodeCommand.DELETE))
+            scheme.add(MenuItem("D&uplicate $descriptor", NodeCommands.Duplicate))
+            scheme.add(MenuItem("&Copy $descriptor", NodeCommands.Copy))
+            scheme.add(MenuItem("&Delete $descriptor", NodeCommands.Delete))
 
             when( node) {
                 is GroupNode -> {
                     val ffaEnabled = workspace.animationManager.currentAnimation is FixedFrameAnimation
 
                     scheme.add(MenuItem("-"))
-                    scheme.add(MenuItem("&Construct Simple Animation From Group", NodeCommand.ANIM_FROM_GROUP))
-                    scheme.add(MenuItem("&Add Group To Animation As New Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION, enabled = ffaEnabled))
-                    if( ffaEnabled)
-                        scheme.add(MenuItem("Add Group To Animation As New &Lexical Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION_LEXICAL))
-                    scheme.add(MenuItem("Write Group To GIF Animation", NodeCommand.GIF_FROM_FROUP))
+                    scheme.add(MenuItem("&Make Simple Animation From Group", NodeCommands.AnimFromGroup))
+                    scheme.add(MenuItem("&Add Group To Animation As New Layer", NodeCommands.InsertGroupInAnim, enabled = ffaEnabled))
+                    if( ffaEnabled) {
+                        scheme.add(MenuItem("Add Group To Animation As New &Lexical Layer", NodeCommands.InsertLexicalLayer))
+                        scheme.add(MenuItem("Add Group To Animation As New &Cascading Layer", NodeCommands.InsertCascadingLayer))
+                    }
+                    scheme.add(MenuItem("Write Group To GIF Animation", NodeCommands.GifFromGroup))
                 }
                 is LayerNode -> {
                     scheme.add(MenuItem("-"))
-                    scheme.add(MenuItem("&Merge Layer Down", NodeCommand.MERGE_DOWN))
+                    scheme.add(MenuItem("&Merge Layer Down", NodeCommands.MergeDown))
                     val layer = node.layer
                     when( layer) {
-                        is SimpleLayer -> scheme.add(MenuItem(("Con&vert Simple Layer To Sprite Layer"), NodeCommand.CONVERT_LAYER_TO_SPRITE))
-                        is SpriteLayer -> scheme.add(MenuItem("Construct &Rig Animation From Sprite", NodeCommand.NEW_RIG_ANIMATION))
+                        is SimpleLayer -> scheme.add(MenuItem(("Con&vert Simple Layer To Sprite Layer"), NodeCommands.ConvertLayerToSprite))
+                        is SpriteLayer -> scheme.add(MenuItem("Construct &Rig Animation From Sprite", NodeCommands.NewRigAnimation))
                         //is PuppetLayer -> scheme.add(MenuItem("Add &Derived Puppet Layer", customAction = {TODO()}))
                     }
 

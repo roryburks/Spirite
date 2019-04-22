@@ -2,6 +2,7 @@ package spirite.base.imageData.animation.ffa
 
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
+import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.UndoableChangeDelegate
 import spirite.hybrid.MDebug
@@ -14,7 +15,7 @@ interface IFFALayerLinked {
 }
 
 abstract class FFALayer( override val anim : FixedFrameAnimation)
-    :IFFALayer
+    :IFfaLayer
 {
     private val undoEngine get() = anim.workspace.undoEngine
 
@@ -102,7 +103,6 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
             }
             return Integer.MIN_VALUE
         }
-        override val end get() = start + length
 
         val loopDepth: Int get() {
             var depth = 0
@@ -116,13 +116,13 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
             return 0
         }
 
-        override val next: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) + 1)
-        override val previous: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) - 1)
+        val next: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) + 1)
+        val previous: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) - 1)
 
         // endregion
 
         // region Structure
-        override var structure = structure ; internal  set
+        var structure = structure ; internal  set
 
         val node get() = structure.node
         val marker get() = structure.marker
@@ -140,6 +140,8 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
             override fun undoAction() {structure = oldStucture ; anim.triggerFFAChange(this@FFALayer)}
         }
         // endregion
+
+        override fun getDrawList() = (node as? LayerNode)?.getDrawList() ?: emptyList()
     }
 
 }

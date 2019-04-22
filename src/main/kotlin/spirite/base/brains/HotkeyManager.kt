@@ -4,7 +4,7 @@ import rb.extendo.dataStructures.MutableOneToManyMap
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.GlobalCommands
 import spirite.base.brains.commands.IsolationCommandExecuter.IsolationCommand
-import spirite.base.brains.commands.NodeContextCommand.NodeCommand
+import spirite.base.brains.commands.NodeCommands
 import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand
 import spirite.base.brains.commands.SelectCommand
 import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand
@@ -68,12 +68,12 @@ private val defaultHotkeys = mapOf(
         PaletteCommand.SWAP.keyCommand to (Hotkey( KeyEvent.VK_X, 0)),
         PaletteCommand.SWAP_BACK.keyCommand to (Hotkey( KeyEvent.VK_Z, 0)),
 
-        NodeCommand.QUICK_NEW_LAYER.keyCommand to (Hotkey( KeyEvent.VK_INSERT, 0)),
-        NodeCommand.NEW_SPRITE_LAYER.keyCommand to Hotkey( KeyEvent.VK_INSERT, InputEvent.SHIFT_DOWN_MASK),
-        NodeCommand.NEW_GROUP.keyCommand to (Hotkey(KeyEvent.VK_INSERT, InputEvent.CTRL_DOWN_MASK)),
-        NodeCommand.MOVE_DOWN.keyCommand to (Hotkey(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK)),
-        NodeCommand.MOVE_UP.keyCommand to (Hotkey(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK)),
-        NodeCommand.DUPLICATE.keyCommand to (Hotkey(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK)),
+        NodeCommands.QuickNewLayer.keyCommand to (Hotkey( KeyEvent.VK_INSERT, 0)),
+        NodeCommands.NewSpriteLayer.keyCommand to Hotkey( KeyEvent.VK_INSERT, InputEvent.SHIFT_DOWN_MASK),
+        NodeCommands.NewGroup.keyCommand to (Hotkey(KeyEvent.VK_INSERT, InputEvent.CTRL_DOWN_MASK)),
+        NodeCommands.MoveDown.keyCommand to (Hotkey(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK)),
+        NodeCommands.MoveUp.keyCommand to (Hotkey(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK)),
+        NodeCommands.Duplicate.keyCommand to (Hotkey(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK)),
 
         IsolationCommand.TOGGLE_ISOLATION.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, 0)),
         IsolationCommand.ISOLATE_LAYER.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, InputEvent.CTRL_DOWN_MASK)),

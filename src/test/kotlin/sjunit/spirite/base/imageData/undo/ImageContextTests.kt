@@ -1,7 +1,6 @@
 package sjunit.spirite.base.imageData.undo
 
 import io.mockk.mockk
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle

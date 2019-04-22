@@ -3,13 +3,7 @@ package spirite.hybrid
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.gl.GLImage
-import spirite.hybrid.Transferables.IImageDataFlavor
-import spirite.hybrid.Transferables.TransferableImage
 import spirite.pc.graphics.ImageBI
-import java.awt.Image
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
-import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
