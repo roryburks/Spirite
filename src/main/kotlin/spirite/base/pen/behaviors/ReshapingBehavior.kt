@@ -191,7 +191,9 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
                 val sy = if (overlap == 1 || overlap == 3) scale.yf else pn.yf / ps.yf * oldScaleY
 
                 // Preserve Ratio
-                scale = when {
+                scale =  scalePreservingRatio(scale, sx, sy)
+
+                        when {
                     penner.holdingShift -> scalePreservingRatio(scale, sx, sy)
                     else -> Vec2f(sx,sy)
                 }

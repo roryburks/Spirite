@@ -1,5 +1,6 @@
 package spirite.base.imageData.mediums.magLev
 
+import rb.extendo.dataStructures.SinglyList
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.DynamicImage
@@ -8,10 +9,7 @@ import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.mediums.ArrangedMediumData
-import spirite.base.imageData.mediums.BuiltMediumData
-import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.MediumType
+import spirite.base.imageData.mediums.*
 import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.util.Colors
 import spirite.pc.gui.SColor
@@ -22,7 +20,7 @@ constructor(
         private val workspace: MImageWorkspace,
         internal val things: MutableList<IMaglevThing>,
         val builtImage : DynamicImage)
-    :IMedium
+    :IMedium, IImageMedium
 {
     constructor(
             workspace: MImageWorkspace,
@@ -58,9 +56,11 @@ constructor(
     override val height: Int get() = builtImage.height
     override val type: MediumType get() = MAGLEV
 
-    override fun render(gc: GraphicsContext, render: RenderRubric?) {
-        builtImage.base?.also { gc.renderImage(it, x, y, render)}
+    override fun getImages() = when( val img = builtImage.base) {
+        null -> emptyList<IImageMedium.ShiftedImage>()
+        else -> SinglyList(IImageMedium.ShiftedImage(img, x, y))
     }
+
 
     override fun getColor(x: Int, y: Int): SColor {
         val img = builtImage
