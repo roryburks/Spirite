@@ -9,9 +9,11 @@ import kotlin.math.min
 
 class FfaLayerCascading(
         override val anim: FixedFrameAnimation,
-        val groupLink: GroupNode)
+        val groupLink: GroupNode,
+        override var name: String = groupLink.name)
     :IFfaLayer, IFFALayerLinked
 {
+
 
     var lexicon: String? = null
         set(value) {

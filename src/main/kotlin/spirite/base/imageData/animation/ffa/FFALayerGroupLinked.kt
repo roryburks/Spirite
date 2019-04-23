@@ -10,6 +10,7 @@ class FFALayerGroupLinked(
         context: FixedFrameAnimation,
         val groupLink : GroupNode,
         includeSubtrees: Boolean,
+        override var name: String = groupLink.name,
         frameMap : Map<Node,FFAFrameStructure>? = null,
         unlinkedClusters: List<UnlinkedFrameCluster>? = null)
     : FFALayer(context), IFFALayerLinked

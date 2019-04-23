@@ -1,15 +1,15 @@
-0004: added Dynamic [Image Type]
+0x000_0004: added Dynamic [Image Type]
     : added Expanded bitflag to Nodes
-0005: added Scale and Rotation to Rig Parts
-0006: added Prismatic [Image Type]
-0007: added RigAnimLayers [Animation Type]
-0008: Updated FixedFrame [Animation Type] saving/loading (full backwards compatibility not implemented for unusual animations)
-0009: added Maglev [Image Type]
-000A: added PuppetLayer [Layer Type]
-000B: changed pivot/travel of MagLev Images from ints to floats representing relative distance
-000C: Added FillMode to MagLevFill in MagLev Mediums
-000D: Added PLTT Chunk
-000E: Changed Indexing in MagLevFills in MagLev Mediums
+0x000_0005: added Scale and Rotation to Rig Parts
+0x000_0006: added Prismatic [Image Type]
+0x000_0007: added RigAnimLayers [Animation Type]
+0x000_0008: Updated FixedFrame [Animation Type] saving/loading (full backwards compatibility not implemented for unusual animations)
+0x000_0009: added Maglev [Image Type]
+0x000_000A: added PuppetLayer [Layer Type]
+0x000_000B: changed pivot/travel of MagLev Images from ints to floats representing relative distance
+0x000_000C: Added FillMode to MagLevFill in MagLev Mediums
+0x000_000D: Added PLTT Chunk
+0x000_000E: Changed Indexing in MagLevFills in MagLev Mediums
 
 0x0001_0000:
     -NodeTypeID changed from Int (which it incorrectly was) to byte
@@ -39,3 +39,5 @@
     (this will be optional in the file format, option might not be exposed in saving
 0x0001_000A:
     - Added saving and loading different Sprite Layer types (different underlying mediums)
+0x0001_000B:
+    - Added Names to FFA Layers

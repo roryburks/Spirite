@@ -93,26 +93,27 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     fun addLinkedLayer(
             group: GroupNode,
             includeSubtrees: Boolean,
+            name : String = group.name,
             frameMap: Map<Node, FFAFrameStructure>? = null,
             unlinkedClusters: List<UnlinkedFrameCluster>? = null)
     {
-        val layer = FFALayerGroupLinked(this, group, includeSubtrees, frameMap, unlinkedClusters)
+        val layer = FFALayerGroupLinked(this, group, includeSubtrees, name, frameMap, unlinkedClusters)
         addLayer(layer)
     }
 
-    fun addLexicalLayer(group: GroupNode, lexicon: String = "", map: Map<Char,Node>? = null)
+    fun addLexicalLayer(group: GroupNode, name : String = group.name, lexicon: String = "", map: Map<Char,Node>? = null)
     {
         val existingMap = _layers.asSequence()
                 .filterIsInstance<FfaLayerLexical>()
                 .filter { it.groupLink == group }
                 .firstOrNull()?.sharedExplicitMap
         val mapToUse = existingMap ?: (map?.toMutableMap()) ?: mutableMapOf()
-        val layer = FfaLayerLexical(this, group, lexicon, mapToUse)
+        val layer = FfaLayerLexical(this, group, lexicon, name, mapToUse)
         addLayer(layer)
     }
 
-    fun addCascadingLayer( group: GroupNode) {
-        addLayer( FfaLayerCascading(this, group))
+    fun addCascadingLayer( group: GroupNode, name : String = group.name) {
+        addLayer( FfaLayerCascading(this, group, name))
     }
 
     fun addLayer( layer: IFfaLayer) {

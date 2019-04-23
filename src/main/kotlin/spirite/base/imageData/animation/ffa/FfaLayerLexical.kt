@@ -9,9 +9,12 @@ class FfaLayerLexical(
         context: FixedFrameAnimation,
         val groupLink: GroupNode,
         lexicon: String = "",
+        override var name: String = groupLink.name,
         val sharedExplicitMap: MutableMap<Char, Node> = mutableMapOf())
     : FFALayer(context), IFFALayerLinked
 {
+
+
     private val lexicalMap : MutableMap<Char, Node> = mutableMapOf()
     var lexicon: String = lexicon
         get() {

@@ -13,6 +13,7 @@ interface IFFAFrame {
 }
 
 interface IFfaLayer {
+    var name : String
     val anim : FixedFrameAnimation
     val start: Int
     val end: Int
@@ -22,15 +23,4 @@ interface IFfaLayer {
     val frames: List<IFFAFrame>
 
     fun getFrameFromLocalMet(met : Int, loop: Boolean = true) : IFFAFrame?
-}
-
-interface  IFFAFramev2
-{
-    val layer: IFfaLayer
-
-    val start: Int
-    val length: Int
-    val end: Int get() = start + length
-
-
 }
