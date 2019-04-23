@@ -52,6 +52,17 @@ class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTre
 
     fun duplicateNode( node: Node)  {
         workspace.undoEngine.doAsAggregateAction("Duplicate Node"){
+            fun insertAndDupeProperties(toInsert: Node, duping: Node, contextNode: Node?)
+            {
+                toInsert.x = duping.x
+                toInsert.y = duping.y
+                toInsert.alpha = duping.alpha
+                toInsert.method = duping.method
+                toInsert.visible = duping.visible
+                toInsert.expanded = duping.expanded
+                insertNode(contextNode, toInsert)
+            }
+
             when( node) {
                 is LayerNode ->
                     LayerNode(null, getNonDuplicateName(node.name), node.layer.dupe(workspace))
@@ -66,13 +77,13 @@ class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTre
                     while (dupeQueue.any()) {
                         val next = dupeQueue.removeAt(0)
 
-                        val dupe : Node? = when (next.toDupe) {
-                            is GroupNode -> addGroupNode(next.parentInDuper, getNonDuplicateName(next.toDupe.name))
+                        val toInsert= when (next.toDupe) {
+                            is GroupNode -> GroupNode(null, getNonDuplicateName(next.toDupe.name))
                                     .apply { next.toDupe.children.forEach { dupeQueue.add( NodeContext( it, this )) } }
                             is LayerNode -> LayerNode( null, getNonDuplicateName(next.toDupe.name), next.toDupe.layer.dupe(workspace))
-                                    .apply { insertNode( next.parentInDuper, this) }
                             else -> null
                         }
+                        toInsert?.apply { insertAndDupeProperties(toInsert, next.toDupe, next.parentInDuper) }
                     }
                 }
             }

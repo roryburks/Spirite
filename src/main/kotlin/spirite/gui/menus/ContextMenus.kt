@@ -98,6 +98,4 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
         return scheme
     }
 
-
-
 }
