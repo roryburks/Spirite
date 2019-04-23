@@ -217,10 +217,8 @@ open class GroupTree( val undoEngine: IUndoEngine?)
 
             fun sub(nodes: List<Node>) {
                 nodes.forEach {
-                    when {
-                        predicate.invoke(it) -> list.add(it)
-                        (it is GroupNode && (checkChildren?.invoke(it) ?: true)) -> sub(it.children)
-                    }
+                    if( predicate.invoke(it)) list.add(it)
+                    if(it is GroupNode && (checkChildren?.invoke(it) ?: true)) sub(it.children)
                 }
             }
             sub(listOf(this))

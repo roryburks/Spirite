@@ -90,7 +90,10 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
 
                 }
             }
+            scheme.add(MenuItem("-"))
+            scheme.add(MenuItem("Clear All &View Settings", NodeCommands.ClearViewSettings))
         }
+
 
         return scheme
     }

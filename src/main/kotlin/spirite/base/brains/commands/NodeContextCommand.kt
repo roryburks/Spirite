@@ -3,6 +3,7 @@ package spirite.base.brains.commands
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.exceptions.CommandNotValidException
+import spirite.base.graphics.RenderMethod
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
@@ -162,7 +163,7 @@ object NodeCommands {
         }
     }
 
-    val ConvertLayerToSprite = NodeCommand("converSimpleLayerToSprite") {workspace, node, dialogs ->
+    val ConvertLayerToSprite = NodeCommand("convertSimpleLayerToSprite") {workspace, node, dialogs ->
         if( node?.tree != workspace.groupTree) throw CommandNotValidException
         val simpleLayer = (node as? LayerNode)?.layer as? SimpleLayer ?: throw CommandNotValidException
         val medium = simpleLayer.medium
@@ -179,6 +180,15 @@ object NodeCommands {
         workspace.undoEngine.doAsAggregateAction("Convert Simple Layer to Sprite Layer") {
             workspace.groupTree.importLayer(node, node.name, spriteLayer, workspace.groupTree.selectedNode == node)
             node.delete()
+        }
+    }
+    val ClearViewSettings = NodeCommand("clearViewSettings") {workspace, node, dialogs ->
+        node ?: throw CommandNotValidException
+        workspace.undoEngine.doAsAggregateAction("Clear View Settings") {
+            node.descendants.forEach {
+                it.alpha = 1f
+                it.method = RenderMethod()
+            }
         }
     }
 }
