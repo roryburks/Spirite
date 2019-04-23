@@ -17,6 +17,8 @@ interface ISettingsManager {
     var defaultWidth : Int
     var defaultHeight : Int
 
+    var allowDrawOnInvisibleLayers : Boolean
+
     var lastUsedWorkspace : Boolean
     var workspaceFilePath : File
     var imageFilePath : File
@@ -51,6 +53,7 @@ class SettingsManager (
     override var defaultWidth: Int by PreferenceIntDelegate("DefaultWidth", 640)
     override var defaultHeight: Int by PreferenceIntDelegate("DefaultHeight", 480)
 
+    override var allowDrawOnInvisibleLayers by PreferenceBooleanDelegate("DrawOnInvisible", false)
     // endregion
 
     override var thumbnailCacheCheckFrequency: Int by PreferenceIntDelegate("ThumbnailCacheCheckFrequency", 10000)

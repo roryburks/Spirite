@@ -165,8 +165,11 @@ class ImageWorkspace(
     }
 
     override val activeDrawer: IImageDrawer get() {
+        val currentLayerNode = (currentNode as? LayerNode)
+        if( !settingsManager.allowDrawOnInvisibleLayers && currentLayerNode?.isVisible == false)
+            return NillImageDrawer
         selectionEngine.liftedData?.also { return it.getImageDrawer(this) }
-        (currentNode as? LayerNode)?.also { return it.layer.getDrawer(arrangeActiveDataForNode(it)) }
+        currentLayerNode?.also { return it.layer.getDrawer(arrangeActiveDataForNode(it)) }
         return NillImageDrawer
     }
     override val anchorDrawer: IImageDrawer get() {

@@ -182,7 +182,7 @@ object NodeCommands {
             node.delete()
         }
     }
-    val ClearViewSettings = NodeCommand("clearViewSettings") {workspace, node, dialogs ->
+        val ClearViewSettings = NodeCommand("clearViewSettings") {workspace, node, dialogs ->
         node ?: throw CommandNotValidException
         workspace.undoEngine.doAsAggregateAction("Clear View Settings") {
             node.descendants.forEach {
