@@ -1,5 +1,6 @@
 package spirite.gui.views.groupView
 
+import com.sun.corba.se.impl.io.InputStreamHook
 import rb.jvm.owl.addWeakObserver
 import rb.owl.IContract
 import rb.owl.bindable.addObserver
@@ -81,7 +82,13 @@ private constructor(
             val visibilityButton = Hybrid.ui.ToggleButton( t.visible)
             visibilityButton.checkBind.addObserver {new, _ ->  t.visible = new}
             visibilityButton.setOnIcon( SwIcons.BigIcons.VisibleOn)
+
+            // This hook prevents the main hook of the Group Tree from being executed
+            //  (in particular, it prevents automatic selection of nodes you're toggling the visibility of)
             visibilityButton.setOffIcon( SwIcons.BigIcons.VisibleOff)
+            Hybrid.mouseSystem.attachHook( object : IGlobalMouseHook {
+                override fun processMouseEvent(evt: MouseEvent) {evt.consume()}
+            }, visibilityButton)
 
             comp.setLayout {
                 rows.addGap(4)
@@ -212,7 +219,6 @@ private constructor(
             }
             else if(evt.button == LEFT && evt.type == RELEASED) {
                 val node = tree.getNodeFromY(point.y)?.value
-                println("${evt.point.y}, ${point.y}, $node")
                 tree.selected = node ?: tree.selected
             }
         }

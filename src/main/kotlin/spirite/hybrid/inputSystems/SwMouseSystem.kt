@@ -16,11 +16,17 @@ import javax.swing.SwingUtilities
 /**
  * The SwMouseSystem gives components a semi-direct access to the Mouse Events broadcast by various components.  It gets
  * called regardless of what sub-panel is consuming it
+ *
+ * Priority vs non-priority hooks:
+ *  The Mouse System will execute hooks in this order:
+ *      -Priority Hooks, root-first
+ *      -Non-priority Hooks, leaf-first
  */
 interface IMouseSystem
 {
     fun broadcastMouseEvent( mouseEvent: MouseEvent, root: Any)
 
+    fun attachPriorityHook(hook: IGlobalMouseHook, component: IComponent) : IContract
     fun attachHook(hook: IGlobalMouseHook, component: IComponent) : IContract
 }
 
@@ -39,7 +45,7 @@ class SwMouseSystem : IMouseSystem
      * If the drops out
      */
 
-    private inner class Contract
+    private abstract inner  class AbstractContract
     constructor(
             val hook: IGlobalMouseHook,
             component: IComponent)
@@ -48,12 +54,27 @@ class SwMouseSystem : IMouseSystem
         val hc = component.component.hashCode()
         val compRef = WeakReference(component)
         var root : Any? = null
+    }
+
+    private inner class Contract
+    constructor(hook: IGlobalMouseHook, component: IComponent)
+        : AbstractContract(hook, component)
+    {
         init {_hooks.append(hc, this)}
         override fun void() {_hooks.deref(hc, this)}
     }
 
+    private inner class PriorityContract
+    constructor(hook: IGlobalMouseHook, component: IComponent)
+        : AbstractContract(hook, component)
+    {
+        init {_priorityHooks.append(hc, this)}
+        override fun void() {_priorityHooks.deref(hc, this)}
+    }
+
     private val _hooks = mutableMapOf<Int,MutableList<Contract>>()
-    private var _grabbedComponents : Set<Contract>? = null
+    private val _priorityHooks = mutableMapOf<Int,MutableList<PriorityContract>>()
+    private var _grabbedComponents : Set<AbstractContract>? = null
 
     override fun broadcastMouseEvent(mouseEvent: MouseEvent, root: Any) {
         _hooks.forEach { _, u -> u.removeIf { it.compRef.get() == null } }
@@ -68,10 +89,12 @@ class SwMouseSystem : IMouseSystem
 
         val deepestComponent = SwingUtilities.getDeepestComponentAt(root, systemCoordinates.x, systemCoordinates.y)
 
-        val ancestry = mutableListOf<Component>()
+        val rootFirstAncestry = mutableListOf<Component>()
+        val leafFirstAncestry = mutableListOf<Component>()
         var curComp: Component? = deepestComponent
         while (curComp != null) {
-            ancestry.add(0, curComp)
+            rootFirstAncestry.add(0, curComp)
+            leafFirstAncestry.add(curComp)
             curComp = curComp.parent
         }
 
@@ -86,10 +109,21 @@ class SwMouseSystem : IMouseSystem
                 _grabbedComponents = null
         }
         else {
-            val triggeredContracts = mutableListOf<Contract>()
+            val triggeredContracts = mutableListOf<AbstractContract>()
 
             var consumed = false
-            ancestry.forEach {
+            rootFirstAncestry.forEach {
+                val triggers = _priorityHooks.lookup(it.hashCode())
+
+                val localMouseEvent by lazy { mouseEvent.converted(SwComponent(it)) }
+
+                val triggerContractsForThis  = triggers.filter { !consumed || it.hook.overridesConsume(localMouseEvent) }
+                triggeredContracts.addAll(triggerContractsForThis)
+                triggerContractsForThis.forEach { it.hook.processMouseEvent(localMouseEvent) }
+
+                consumed = consumed || localMouseEvent.consumed
+            }
+            leafFirstAncestry.forEach {
                 val triggers = _hooks.lookup(it.hashCode())
 
                 val localMouseEvent by lazy { mouseEvent.converted(SwComponent(it)) }
@@ -112,6 +146,16 @@ class SwMouseSystem : IMouseSystem
 
     override fun attachHook(hook: IGlobalMouseHook, component: IComponent) : IContract {
         val contract = Contract(hook, component)
+
+        SwingUtilities.invokeLater {
+            contract.root = SwingUtilities.getRoot(component.component  as Component)
+        }
+
+        return contract
+    }
+
+    override fun attachPriorityHook(hook: IGlobalMouseHook, component: IComponent): IContract {
+        val contract = PriorityContract(hook, component)
 
         SwingUtilities.invokeLater {
             contract.root = SwingUtilities.getRoot(component.component  as Component)

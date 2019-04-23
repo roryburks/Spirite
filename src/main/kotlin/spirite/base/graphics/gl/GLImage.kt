@@ -8,6 +8,8 @@ import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Rect
 import spirite.base.util.toColor
 import spirite.base.util.toColorPremultiplied
+import spirite.hybrid.MDebug
+import spirite.hybrid.MDebug.WarningType.INITIALIZATION
 import spirite.pc.JOGL.JOGL
 import spirite.pc.JOGL.JOGL.JOGLTexture
 
@@ -47,7 +49,7 @@ class GLImage : RawImage {
 
         if( ! (gl as JOGL).gl.glIsTexture((_tex as JOGLTexture).texId))
         {
-            println("bad")
+            MDebug.handleWarning(INITIALIZATION, "Failed to initialize GL Image")
         }
         GLImageTracker.glImageLoaded(this)
     }

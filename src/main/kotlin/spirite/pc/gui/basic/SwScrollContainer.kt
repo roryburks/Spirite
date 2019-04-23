@@ -37,7 +37,7 @@ private constructor( private val imp: SwScrollContainerImp)
 
     }
 
-    val mouseHookK = Hybrid.mouseSystem.attachHook(object : IGlobalMouseHook {
+    val mouseHookK = Hybrid.mouseSystem.attachPriorityHook(object : IGlobalMouseHook {
         var currentX : Int? = null    // Note: if null, not scroll-dragging
         var currentY = 0
 

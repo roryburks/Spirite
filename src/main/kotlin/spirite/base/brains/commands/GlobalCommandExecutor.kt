@@ -134,7 +134,6 @@ object GlobalCommands
                         else -> {
                             val workview = master.frameManager.workView?.tScreenToWorkspace ?: ImmutableTransformF.Identity
                             val pt = workview.apply(Vec2f.Zero)
-                            println("$pt")
                             val x = MathUtil.clip(0, pt.x.floor, workspace.width - image.width)
                             val y = MathUtil.clip(0, pt.y.floor, workspace.height - image.height)
                             workspace.selectionEngine.setSelectionWithLifted(

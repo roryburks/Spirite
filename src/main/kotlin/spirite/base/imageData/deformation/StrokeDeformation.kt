@@ -34,10 +34,6 @@ class StrokeDeformation(
             offset += piece.len
         }
 
-        if( MathUtil.distance(x, y, newX, newY) > 30) {
-            println("BAD")
-        }
-
         return Vec2f(newX, newY)
     }
 }
