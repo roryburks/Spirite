@@ -141,7 +141,7 @@ private constructor(
             tickWidth: Int)
             : LayerBuildSet
     {
-        val builder = _structBuilderFactory.GetFactoryForFfaLayer(layer)
+        val builder = _structBuilderFactory.getFactoryForFfaLayer(layer)
 
         val nameView = builder.buildNameComponent(layer)
 
@@ -240,9 +240,6 @@ private constructor(
         fun interpretEvt( evt: spirite.gui.components.basic.events.MouseEvent) {
             if( dragBehavior == null) {
                 val pt = evt.point.convert(this)
-
-                if( evt.type == PRESSED)
-                    print("brkpt")
 
                 val brain = viewspace.getViewFromCoordinates(pt.x, pt.y)?.dragBrain
 

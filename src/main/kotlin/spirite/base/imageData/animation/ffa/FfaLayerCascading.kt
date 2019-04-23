@@ -1,5 +1,6 @@
 package spirite.base.imageData.animation.ffa
 
+import rb.extendo.delegates.OnChangeDelegate
 import rb.extendo.extensions.toHashMap
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
@@ -10,18 +11,12 @@ import kotlin.math.min
 class FfaLayerCascading(
         override val anim: FixedFrameAnimation,
         val groupLink: GroupNode,
-        override var name: String = groupLink.name)
+        name: String = groupLink.name)
     :IFfaLayer, IFFALayerLinked
 {
+    override var name by OnChangeDelegate(name) { anim.triggerFFAChange(this)}
 
-
-    var lexicon: String? = null
-        set(value) {
-            if( field != value) {
-                field = value
-                update()
-            }
-        }
+    var lexicon by OnChangeDelegate<String?>(null) {update()}
 
     var sublayerInfo = mutableMapOf<GroupNode, FFACascadingSublayerInfo>()
     //var sublayers : List<Pair<Int, FFACascadingSublayerInfo?>> = emptyList()

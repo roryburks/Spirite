@@ -38,14 +38,14 @@ class FfaCascadingLayerBuilder(val _master: IMasterControl) : IFFAStructViewBuil
         override val height: Int get() = 32
         override val dragBrain = AnimDragBrain { evt, context ->
             if( evt.type == RELEASED && evt.button == RIGHT)
-                contextMenus.launchContextMenuFor(evt.point, layer)
+                contextMenus.launchContextMenuFor(evt.point, layer, dialog)
             else if( evt.type == RELEASED)
                 label.requestFocus()
 
             null
         }
 
-        val label = Hybrid.ui.EditableLabel("Cascading Layer")
+        val label = Hybrid.ui.EditableLabel(layer.name)
         val button = Hybrid.ui.Button("Lexicon")
 
         init {

@@ -1,5 +1,6 @@
 package spirite.base.imageData.animation.ffa
 
+import rb.extendo.delegates.OnChangeDelegate
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.*
@@ -10,11 +11,13 @@ class FFALayerGroupLinked(
         context: FixedFrameAnimation,
         val groupLink : GroupNode,
         includeSubtrees: Boolean,
-        override var name: String = groupLink.name,
+        name: String = groupLink.name,
         frameMap : Map<Node,FFAFrameStructure>? = null,
         unlinkedClusters: List<UnlinkedFrameCluster>? = null)
     : FFALayer(context), IFFALayerLinked
 {
+    override var name by OnChangeDelegate(name) { anim.triggerFFAChange(this)}
+
     override fun shouldUpdate(contract: FFAUpdateContract): Boolean {
         return contract.changedNodes.contains(groupLink) || (includeSubtrees && contract.ancestors.contains(groupLink))
     }

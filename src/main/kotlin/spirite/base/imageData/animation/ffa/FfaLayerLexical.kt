@@ -1,5 +1,6 @@
 package spirite.base.imageData.animation.ffa
 
+import rb.extendo.delegates.OnChangeDelegate
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.FRAME
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.GAP
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
@@ -9,10 +10,11 @@ class FfaLayerLexical(
         context: FixedFrameAnimation,
         val groupLink: GroupNode,
         lexicon: String = "",
-        override var name: String = groupLink.name,
+        name: String = groupLink.name,
         val sharedExplicitMap: MutableMap<Char, Node> = mutableMapOf())
     : FFALayer(context), IFFALayerLinked
 {
+    override var name by OnChangeDelegate(name) { anim.triggerFFAChange(this)}
 
 
     private val lexicalMap : MutableMap<Char, Node> = mutableMapOf()
