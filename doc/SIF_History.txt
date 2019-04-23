@@ -41,3 +41,4 @@
     - Added saving and loading different Sprite Layer types (different underlying mediums)
 0x0001_000B:
     - Added Names to FFA Layers
+    - Added IsAsynchronous to FFA Layers

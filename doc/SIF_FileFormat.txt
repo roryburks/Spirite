@@ -110,6 +110,7 @@ Per Animation:
         [2, ushort] : Number of Layers
         Per Layer:
             [n, UTF8 str] : Part Type name
+            [1, byte] : IsAsynchronous
             [1, byte] : Type of FFA Layer
                 0x01 : Group Linked Layer
                     [4, int] : NodeId of GroupNode Bound

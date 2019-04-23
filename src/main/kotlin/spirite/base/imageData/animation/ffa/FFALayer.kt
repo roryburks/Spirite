@@ -27,10 +27,11 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
             caret += _frames[i].length
             if( _frames[i].marker == START_LOCAL_LOOP) {
                 var inll = 1
-                while(inll > 0)when(_frames[++i].marker) {
-                    END_LOCAL_LOOP -> inll--
-                    START_LOCAL_LOOP -> inll++
-                }
+                while(inll > 0)
+                    when(_frames[++i].marker) {
+                        END_LOCAL_LOOP -> inll--
+                        START_LOCAL_LOOP -> inll++
+                    }
             }
             ++i
         }

@@ -341,6 +341,7 @@ object SaveEngine {
                         ra.writeShort( min(anim.layers.size, MaxFFALayers))  // [2] : Number of layers
                         for (layer in anim.layers.asSequence().take(MaxFFALayers)){
                             ra.writeUFT8NT(layer.name)  // [n] : Layer Name
+                            ra.writeByte( if(layer.asynchronous) 1 else 0)  // [1] : IsAsynchronous
                             when(layer) {
                                 is FFALayerGroupLinked -> {
                                     ra.writeByte(FFALAYER_GROUPLINKED)  // [1] : Layer TypeId

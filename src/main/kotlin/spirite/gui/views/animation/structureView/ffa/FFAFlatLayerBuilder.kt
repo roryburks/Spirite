@@ -29,7 +29,12 @@ import java.io.InvalidClassException
 fun ContextMenus.launchContextMenuFor( point: UIPoint, layer: IFfaLayer, dialog: IDialog) {
     val schema = mutableListOf<MenuItem>()
 
+
     schema.add(MenuItem("&Delete Layer", customAction = {layer.anim.removeLayer(layer)}))
+    when( layer.asynchronous) {
+        true -> schema.add(MenuItem("Make Layer &Synchronous", customAction = { layer.asynchronous = false }))
+        false -> schema.add(MenuItem("Make Layer A&synchronous", customAction = { layer.asynchronous = true }))
+    }
 
     this.LaunchContextMenu(point, schema)
 }

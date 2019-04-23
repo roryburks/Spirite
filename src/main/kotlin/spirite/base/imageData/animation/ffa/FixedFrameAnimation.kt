@@ -95,13 +95,13 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
             includeSubtrees: Boolean,
             name : String = group.name,
             frameMap: Map<Node, FFAFrameStructure>? = null,
-            unlinkedClusters: List<UnlinkedFrameCluster>? = null)
+            unlinkedClusters: List<UnlinkedFrameCluster>? = null) : FFALayerGroupLinked
     {
-        val layer = FFALayerGroupLinked(this, group, includeSubtrees, name, frameMap, unlinkedClusters)
-        addLayer(layer)
+        return FFALayerGroupLinked(this, group, includeSubtrees, name, frameMap, unlinkedClusters)
+                .also { addLayer(it)}
     }
 
-    fun addLexicalLayer(group: GroupNode, name : String = group.name, lexicon: String = "", map: Map<Char,Node>? = null)
+    fun addLexicalLayer(group: GroupNode, name : String = group.name, lexicon: String = "", map: Map<Char,Node>? = null) : FfaLayerLexical
     {
         val existingMap = _layers.asSequence()
                 .filterIsInstance<FfaLayerLexical>()
@@ -110,13 +110,15 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         val mapToUse = existingMap ?: (map?.toMutableMap()) ?: mutableMapOf()
         val layer = FfaLayerLexical(this, group, lexicon, name, mapToUse)
         addLayer(layer)
+        return  layer
     }
 
-    fun addCascadingLayer( group: GroupNode, name : String = group.name) {
-        addLayer( FfaLayerCascading(this, group, name))
+    fun addCascadingLayer( group: GroupNode, name : String = group.name) : FfaLayerCascading{
+        return FfaLayerCascading(this, group, name)
+                .also { addLayer(it) }
     }
 
-    fun addLayer( layer: IFfaLayer) {
+    private fun addLayer( layer: IFfaLayer) {
         if( layer.anim != this) throw IllegalArgumentException("Frames have to be hard linked to their Animation")
         val spot = _layers.size
 
