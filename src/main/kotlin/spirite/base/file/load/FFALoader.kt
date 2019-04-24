@@ -68,7 +68,7 @@ object FFALexicalLayerLoader : IFFALayerLoader {
                         .toMap()
 
         if( group != null)
-            return ffa.addLexicalLayer(group, ame, lexicon, map)
+            return ffa.addLexicalLayer(group, name, lexicon, map)
         return null
     }
 }
