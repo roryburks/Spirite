@@ -49,6 +49,8 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
 
             val effectedNodes = _viewMap.keys.toHashSet()
                     .union(_viewMapMap[value]?.keys ?: emptySet())
+            if( _viewMapMap[value] == null)
+                _viewMapMap[_currentViewMap]?.also { _viewMapMap[value] = it.toMutableMap()}
             _currentViewMap = value
             effectedNodes.forEach { it.triggerChange() }
         }
