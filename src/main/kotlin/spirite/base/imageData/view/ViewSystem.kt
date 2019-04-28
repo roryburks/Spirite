@@ -1,5 +1,6 @@
 package spirite.base.imageData.view
 
+import rb.owl.bindable.Bindable
 import spirite.base.graphics.RenderMethod
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.undo.IUndoEngine
@@ -13,10 +14,15 @@ interface IViewSystem
     fun set(node: Node, newProperties: NodeViewProperties)
 
     var view : Int
+    val currentNodeBind : Bindable<Node?>
+    var currentNode: Node?
 }
 
 class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
 {
+    override val currentNodeBind = Bindable<Node?>(null)
+    override var currentNode by currentNodeBind
+
     private val _viewMap get() = _viewMapMap[_currentViewMap]
             ?: (mutableMapOf<Node,NodeViewProperties>().also { _viewMapMap[_currentViewMap] = it })
     private var _currentViewMap = 0

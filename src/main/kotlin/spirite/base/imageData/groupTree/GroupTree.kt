@@ -3,10 +3,8 @@ package spirite.base.imageData.groupTree
 import rb.extendo.dataStructures.Dequeue
 import rb.owl.IObservable
 import rb.owl.Observable
-import rb.owl.bindable.Bindable
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.MutableTransformF
-import spirite.base.graphics.RenderMethod
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
@@ -14,7 +12,6 @@ import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.*
 import spirite.base.imageData.view.IViewSystem
-import spirite.base.imageData.view.ViewSystem
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -34,7 +31,8 @@ open class GroupTree(
     val root = GroupNode(null, "ROOT")
     open val treeDescription = "Abstract Group Tree"
 
-    var selectedNodeBind = Bindable<Node?>(null)
+    // TODO: right now this is coupled to the view system in an unpleasant way
+    val selectedNodeBind get() = viewSystem.currentNodeBind
     var selectedNode
         get() = selectedNodeBind.field
         set(value) {
