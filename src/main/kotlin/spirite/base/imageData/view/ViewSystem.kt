@@ -20,13 +20,30 @@ interface IViewSystem
 
 class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
 {
-    override val currentNodeBind = Bindable<Node?>(null)
-    override var currentNode by currentNodeBind
-
     private val _viewMap get() = _viewMapMap[_currentViewMap]
             ?: (mutableMapOf<Node,NodeViewProperties>().also { _viewMapMap[_currentViewMap] = it })
     private var _currentViewMap = 0
     private val _viewMapMap = mutableMapOf<Int, MutableMap<Node, NodeViewProperties>>()
+    private val _selectedNodeMap = mutableMapOf<Int, Node?>()
+
+    override val currentNodeBind = Bindable<Node?>(null)
+    override var currentNode by currentNodeBind
+
+    override var view: Int
+        get() = _currentViewMap
+        set(value) {
+            if( value == _currentViewMap) return
+
+            val effectedNodes = _viewMap.keys.toHashSet()
+                    .union(_viewMapMap[value]?.keys ?: emptySet())
+            if( _viewMapMap[value] == null) {
+                _viewMapMap[_currentViewMap]?.also { _viewMapMap[value] = it.toMutableMap() }
+                _selectedNodeMap[value] = _selectedNodeMap[_currentViewMap]
+            }
+            _currentViewMap = value
+            effectedNodes.forEach { it.triggerChange() }
+            currentNode = _selectedNodeMap[value]
+        }
 
     override fun get(node: Node) = _viewMap[node] ?: NodeViewProperties()
 
@@ -48,18 +65,6 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
         _undoEngine.performAndStore(action)
     }
 
-    override var view: Int
-        get() = _currentViewMap
-        set(value) {
-            if( value == _currentViewMap) return
-
-            val effectedNodes = _viewMap.keys.toHashSet()
-                    .union(_viewMapMap[value]?.keys ?: emptySet())
-            if( _viewMapMap[value] == null)
-                _viewMapMap[_currentViewMap]?.also { _viewMapMap[value] = it.toMutableMap()}
-            _currentViewMap = value
-            effectedNodes.forEach { it.triggerChange() }
-        }
 
 
     private inner class GenericNodeViewPropertyAction(
