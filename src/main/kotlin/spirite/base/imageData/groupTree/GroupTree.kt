@@ -13,6 +13,8 @@ import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.*
+import spirite.base.imageData.view.IViewSystem
+import spirite.base.imageData.view.ViewSystem
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -22,7 +24,12 @@ import kotlin.reflect.KProperty
  * The GroupTree is an abstract Container Structure used by several components to organize ImageData in a hierarchical
  * tree structure.
  */
-open class GroupTree( val undoEngine: IUndoEngine?)
+open class GroupTree(
+        val undoEngine: IUndoEngine?,
+
+        // Note: Could potentially de-couple the Group tree from the view system, but that would require re-doing
+        // everything that accesses view properties direct from the node
+        val viewSystem: IViewSystem)
 {
     val root = GroupNode(null, "ROOT")
     open val treeDescription = "Abstract Group Tree"
@@ -52,21 +59,18 @@ open class GroupTree( val undoEngine: IUndoEngine?)
     // endregion
 
     abstract inner class Node( parent: GroupNode?, name: String) {
-        // Properties
-        var visible by NodePropertyDelegate(true, undoEngine, "Changed $treeDescription Node's Visibility")
-        var alpha by NodePropertyDelegate(1.0f, undoEngine, "Changed $treeDescription Node's Alpha")
-        var method by NodePropertyDelegate(RenderMethod(), undoEngine, "Changed $treeDescription Node's Method")
+        fun triggerChange( renderChanged: Boolean = true) = triggerNodeAttributeChanged(this, renderChanged)
+        // region Properties
+        private var view get() = viewSystem.get(this) ; set(value) {viewSystem.set(this, value)}
 
-        private val pos = NodePosition()
-        var x
-            get() = pos.x
-            set(value) {pos.changeX(value)}
-        var y
-            get() = pos.y
-            set(value) {pos.changeY(value)}
+        var visible get() = view.visible ; set(value)  {view = view.copy(visible = value)}
+        var alpha get() = view.alpha ; set(value) {view = view.copy(alpha = value)}
+        var method  get() = view.method ; set(value) { view = view.copy(method = value)}
+        var x get() = view.ox ; set(value) {view = view.copy(ox = value)}
+        var y get() = view.oy ; set(value) {view = view.copy(oy = value)}
+
         var expanded : Boolean by NodePropertyDelegate( true, undoEngine,"Expanded/Contracted $treeDescription Node", false)
         var name : String by NodePropertyDelegate( name, undoEngine,"Changed $treeDescription Node's Name", false)
-
         val isVisible : Boolean get() = visible && alpha > 0f
 
         val tNodeToContext get() = ImmutableTransformF.Translation(x+0f, y+0f)
@@ -74,51 +78,9 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             ancestors.foldRight(tNodeToContext.toMutable()) {node,trans->
                 trans.also { it.preConcatenate(node.tNodeToContext) }
             }
+        // endregion
 
         // region Delegates
-        private inner class NodePosition {
-            var x = 0
-                private set(value) {
-                    field = value
-                    triggerNodeAttributeChanged( this@Node, true)
-                }
-            var y = 0 ; private set
-
-            fun changeX( new: Int) {
-                if( undoEngine == null) x = new
-                else if( new != x) undoEngine.performAndStore(NodePositionChangeAction(x,y,new,y))
-            }
-            fun changeY( new: Int) {
-                if( undoEngine == null) y = new
-                else if( new != y) undoEngine.performAndStore(NodePositionChangeAction(x,y,x,new))
-            }
-
-
-            inner class NodePositionChangeAction(val oldX: Int, val oldY: Int, var newX: Int, var newY: Int)
-                : NullAction(), StackableAction
-            {
-                override val description: String get() = "Changed ${treeDescription} Node's Position"
-                val context : Node get() = this@Node
-
-                override fun performAction() {
-                    x = newX
-                    y = newY
-                }
-
-                override fun undoAction() {
-                    x = oldX
-                    y = oldY
-                }
-
-                override fun canStack(other: UndoableAction) = other is NodePositionChangeAction && other.context == context
-                override fun stackNewAction(other: UndoableAction) {
-                    val other = other as NodePositionChangeAction
-                    newX = other.newX
-                    newY = other.newY
-                }
-            }
-        }
-
         inner class NodePropertyDelegate<T>(
                 defaultValue : T,
                 val undoEngine: IUndoEngine?,

@@ -28,6 +28,8 @@ import spirite.base.imageData.selection.SelectionEngine
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
 import spirite.base.imageData.undo.UndoableDelegate
+import spirite.base.imageData.view.IViewSystem
+import spirite.base.imageData.view.ViewSystem
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import java.io.File
 
@@ -57,6 +59,7 @@ interface IImageWorkspace {
     val undoEngine : IUndoEngine
     val selectionEngine : ISelectionEngine
     val paletteSet : PaletteSet
+    val viewSystem: IViewSystem
 //	public StagingManager getStageManager() {return stagingManager;}
 
     // Super-Components
@@ -97,7 +100,8 @@ class ImageWorkspace(
     override val mediumRepository = MediumRepository( this)
     override val undoEngine = UndoEngine(this, mediumRepository)
     override val imageObservatory: IImageObservatory = ImageObservatory()
-    override val groupTree = PrimaryGroupTree(this)
+    override val viewSystem: IViewSystem = ViewSystem(undoEngine)
+    override val groupTree = PrimaryGroupTree(this) // Needs to be after ViewSystem, UndoEngine
     override val animationManager: IAnimationManager = AnimationManager(this)
     override val selectionEngine: ISelectionEngine = SelectionEngine(this)
     override val referenceManager: ReferenceManager = ReferenceManager()

@@ -1,10 +1,14 @@
 package spirite.base.imageData.groupTree
 
 import spirite.base.imageData.undo.IUndoEngine
+import spirite.base.imageData.view.IViewSystem
+import spirite.base.imageData.view.ViewSystem
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 
-open class MovableGroupTree(undoEngine: IUndoEngine?) : GroupTree(undoEngine) {
+open class MovableGroupTree(
+        undoEngine: IUndoEngine?,
+        viewSystem: IViewSystem) : GroupTree(undoEngine, viewSystem) {
 
     fun parentFromContext(context: Node?) = when(context) {
         null -> root

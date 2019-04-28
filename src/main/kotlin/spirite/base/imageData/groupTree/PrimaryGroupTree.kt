@@ -15,7 +15,7 @@ import spirite.base.util.StringUtil
 import spirite.base.util.debug.SpiriteException
 import spirite.hybrid.Hybrid
 
-class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTree( workspace.undoEngine) {
+class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTree( workspace.undoEngine, workspace.viewSystem) {
     override val treeDescription: String get() = "Primary Group Tree"
 
     fun addNewSimpleLayer(contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null, select: Boolean = true) : LayerNode{
