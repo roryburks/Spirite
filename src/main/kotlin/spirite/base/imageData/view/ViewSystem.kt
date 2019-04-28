@@ -11,11 +11,16 @@ interface IViewSystem
 {
     fun get(node: Node) : NodeViewProperties
     fun set(node: Node, newProperties: NodeViewProperties)
+
+    var view : Int
 }
 
 class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
 {
-    private val _viewMap = mutableMapOf<Node, NodeViewProperties>()
+    private val _viewMap get() = _viewMapMap[_currentViewMap]
+            ?: (mutableMapOf<Node,NodeViewProperties>().also { _viewMapMap[_currentViewMap] = it })
+    private var _currentViewMap = 0
+    private val _viewMapMap = mutableMapOf<Int, MutableMap<Node, NodeViewProperties>>()
 
     override fun get(node: Node) = _viewMap[node] ?: NodeViewProperties()
 
@@ -36,6 +41,17 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
         }
         _undoEngine.performAndStore(action)
     }
+
+    override var view: Int
+        get() = _currentViewMap
+        set(value) {
+            if( value == _currentViewMap) return
+
+            val effectedNodes = _viewMap.keys.toHashSet()
+                    .union(_viewMapMap[value]?.keys ?: emptySet())
+            _currentViewMap = value
+            effectedNodes.forEach { it.triggerChange() }
+        }
 
 
     private inner class GenericNodeViewPropertyAction(

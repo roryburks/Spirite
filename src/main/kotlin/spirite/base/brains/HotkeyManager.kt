@@ -75,6 +75,8 @@ private val defaultHotkeys = mapOf(
         NodeCommands.MoveUp.keyCommand to (Hotkey(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK)),
         NodeCommands.Duplicate.keyCommand to (Hotkey(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK)),
 
+        NodeCommands.ToggleView.keyCommand to (Hotkey(KeyEvent.VK_TAB,0)),
+
         IsolationCommand.TOGGLE_ISOLATION.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, 0)),
         IsolationCommand.ISOLATE_LAYER.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, InputEvent.CTRL_DOWN_MASK)),
         IsolationCommand.CLEAR_ALL_ISOLATION.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
