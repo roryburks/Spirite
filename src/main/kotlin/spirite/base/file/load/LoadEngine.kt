@@ -113,7 +113,7 @@ object LoadEngine {
             workspace.finishBuilding()
 
             return workspace
-        }catch( e: IOException) {
+        }catch( e: Exception) {
             throw BadSifFileException("Error Reading File: " + e.stackTrace)
         }
     }

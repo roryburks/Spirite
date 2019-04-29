@@ -1,6 +1,7 @@
 package spirite.base.imageData.view
 
 import rb.owl.bindable.Bindable
+import rb.owl.bindable.addObserver
 import spirite.base.graphics.RenderMethod
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.undo.IUndoEngine
@@ -27,6 +28,7 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
     private val _selectedNodeMap = mutableMapOf<Int, Node?>()
 
     override val currentNodeBind = Bindable<Node?>(null)
+            .also { it.addObserver { new, _ -> _selectedNodeMap[_currentViewMap] = new } }
     override var currentNode by currentNodeBind
 
     override var view: Int
