@@ -63,10 +63,10 @@ private val defaultHotkeys = mapOf(
         ToolCommand.Rigger.keyCommand to (Hotkey( KeyEvent.VK_R, InputEvent.SHIFT_DOWN_MASK)),
         ToolCommand.MagneticFill.keyCommand to (Hotkey(KeyEvent.VK_F, 0)),
 
-        ToolCommand.SetMode_1.keyCommand to (Hotkey(KeyEvent.VK_1, InputEvent.ALT_DOWN_MASK)),
-        ToolCommand.SetMode_2.keyCommand to (Hotkey(KeyEvent.VK_2, InputEvent.ALT_DOWN_MASK)),
-        ToolCommand.SetMode_3.keyCommand to (Hotkey(KeyEvent.VK_3, InputEvent.ALT_DOWN_MASK)),
-        ToolCommand.SetMode_4.keyCommand to (Hotkey(KeyEvent.VK_4, InputEvent.ALT_DOWN_MASK)),
+        ToolCommand.SetMode_1.keyCommand to (Hotkey(KeyEvent.VK_1, InputEvent.SHIFT_DOWN_MASK)),
+        ToolCommand.SetMode_2.keyCommand to (Hotkey(KeyEvent.VK_2, InputEvent.SHIFT_DOWN_MASK)),
+        ToolCommand.SetMode_3.keyCommand to (Hotkey(KeyEvent.VK_3, InputEvent.SHIFT_DOWN_MASK)),
+        ToolCommand.SetMode_4.keyCommand to (Hotkey(KeyEvent.VK_4, InputEvent.SHIFT_DOWN_MASK)),
 
         ToolCommand.DecreasePenSize.keyCommand to (Hotkey( KeyEvent.VK_OPEN_BRACKET, 0)),
         ToolCommand.IncreasePenSize.keyCommand to (Hotkey( KeyEvent.VK_CLOSE_BRACKET, 0)),
