@@ -15,7 +15,7 @@ import javax.swing.JPanel
 import kotlin.math.floor
 
 class AnimationPlayView
-private constructor(val imp: Imp) : IComponent by SwComponent(imp)
+private constructor(private val imp: Imp) : IComponent by SwComponent(imp)
 {
     //TODO: Add bindings such that if Animation Structure Changes, redraw.
 

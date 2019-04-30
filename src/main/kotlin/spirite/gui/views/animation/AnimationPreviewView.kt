@@ -88,7 +88,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     private fun tick() {
         if( !btnPlay.checked) return
         val anim = animation ?: return
-        anim.state.met = MathUtil.cycle(anim.startFrame, anim.endFrame, anim.state.met + anim.state.speed/66.666f)
+        anim.state.met = anim.state.met + anim.state.speed/66.666f
     }
 
 
@@ -115,14 +115,14 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
     private val metBind = Bindable(0f)
             .also { it.addObserver { new, _ ->
-                sliderMet.value = (new * 100).floor
+                sliderMet.value = ((new % (animation?.endFrame ?: 0f)) * 100).floor
                 viewPanel.redraw()
             } }
     init {
         sliderMet.onMouseDrag += {  metBind.field = sliderMet.value / 100f }
         sliderMet.onMouseRelease +=  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
         btnPlay.checkBind.addObserver { new, _ -> if(!new) metBind.field = floor(metBind.field) }
-        metBind.addObserver { new, _ ->ifMet.value = new.floor}
+        metBind.addObserver { new, _ ->ifMet.value = (new  % (animation?.endFrame ?: 0f)) .floor}
     }
 
     private var _fpsK : IContract? = null

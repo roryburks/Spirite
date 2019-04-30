@@ -45,6 +45,9 @@ private constructor(
 
     private fun rebuild() {
         _nodeMap.clear()
+        _hangingContracts.forEach { it.void() }
+        _hangingContracts.clear()
+
         tree.buildingPaused = true
         tree.clearRoots()
         val pTree = workspace?.groupTree ?: return
@@ -82,16 +85,23 @@ private constructor(
             comp.opaque = false
 
             val visibilityButton = Hybrid.ui.ToggleButton( t.visible)
-            visibilityButton.checkBind.addObserver {new, _ ->  t.visible = new}
+            visibilityButton.checkBind.addObserver {new, _ ->
+                t.visible = new
+                if( workspace?.groupTree?.selectedNode?.isVisible == false) {
+                    workspace?.groupTree?.selectedNode = t
+                }
+            }
             visibilityButton.setOnIcon( SwIcons.BigIcons.VisibleOn)
             _nodeMap[t] = visibilityButton
 
             // This hook prevents the main hook of the Group Tree from being executed
             //  (in particular, it prevents automatic selection of nodes you're toggling the visibility of)
             visibilityButton.setOffIcon( SwIcons.BigIcons.VisibleOff)
-            Hybrid.mouseSystem.attachHook( object : IGlobalMouseHook {
+            val k = Hybrid.mouseSystem.attachHook( object : IGlobalMouseHook {
                 override fun processMouseEvent(evt: MouseEvent) {evt.consume()}
             }, visibilityButton)
+
+            _hangingContracts.add(k)
 
             comp.setLayout {
                 rows.addGap(4)
@@ -105,6 +115,7 @@ private constructor(
     }
     // NOTE: I hate this pattern, but it gets me out the door quicker and is technically efficient (just heavily coupled / hidden complexity)
     private val _nodeMap = mutableMapOf<Node, IToggleButton>()
+    private val _hangingContracts = mutableListOf<IContract>()
 
     private inner class NormalNodeComponent( t: Node) : BaseNodeTreeComponent(t) {
         override val component = NodeLayerPanel(t,master)
