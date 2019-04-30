@@ -1,5 +1,7 @@
 package spirite.base.file.load
 
+import rb.clicker.telemetry.TelemetryEvent
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.i
 import spirite.base.brains.IMasterControl
 import spirite.base.file.SaveLoadUtil
@@ -27,6 +29,7 @@ class LoadContext(
     val chunkInfo = mutableListOf<ChunkInfo>()
     val nodes = mutableListOf<Node>()
     val animations = mutableListOf<Animation>()
+    val telemetry = TelemetryEvent()
     lateinit var reindexingMap : Map<Int,Int>
 
     fun reindex( index : Int) = reindexingMap[index] ?: throw BadSifFileException("Medium Id $index does not correspond to any Medium Data")
@@ -71,31 +74,46 @@ object LoadEngine {
 
             // Medium Data (Required)
             context.chunkInfo.single { it.header == "IMGD" }.apply {
-                ra.seek(startPointer)
-                parseImageDataSection(context, size)
+                context.telemetry.runAction("Load IMGD") {
+                    ra.seek(startPointer)
+                    parseImageDataSection(context, size)
+                    context.telemetry.mark("size", size.d)
+                }
             }
 
             // Group Data (Required), Dependent on Image Data
             context.chunkInfo.single { it.header == "GRPT" }.apply {
-                ra.seek(startPointer)
-                parseGroupTreeSection(context, size)
+                context.telemetry.runAction("Load GRPT") {
+                    ra.seek(startPointer)
+                    parseGroupTreeSection(context, size)
+                    context.telemetry.mark("size", size.d)
+                }
             }
 
             // Animation Data (optional), dependent on Group Data and Image Data
             context.chunkInfo.singleOrNull { it.header == "ANIM" }?.apply {
-                ra.seek(startPointer)
-                parseAnimationData(context, size)
+                context.telemetry.runAction("Load ANIM") {
+                    ra.seek(startPointer)
+                    parseAnimationData(context, size)
+                    context.telemetry.mark("size", size.d)
+                }
             }
             // Animation Space Data (optional)
             context.chunkInfo.singleOrNull { it.header == "ANSP" }?.apply {
-                ra.seek(startPointer)
-                parseAnimationSpaceData(context, size)
+                context.telemetry.runAction("Load ANSP") {
+                    ra.seek(startPointer)
+                    parseAnimationSpaceData(context, size)
+                    context.telemetry.mark("size", size.d)
+                }
             }
 
             // Palette Data (optional)
             context.chunkInfo.singleOrNull { it.header == "PLTT" }?.apply {
-                ra.seek(startPointer)
-                parsePaletteData(context, size)
+                context.telemetry.runAction("Load PLTT") {
+                    ra.seek(startPointer)
+                    parsePaletteData(context, size)
+                    context.telemetry.mark("size", size.d)
+                }
             }
 
             if( context.version <= 2) {

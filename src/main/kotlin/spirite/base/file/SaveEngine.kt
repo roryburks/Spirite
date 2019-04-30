@@ -1,6 +1,8 @@
 package spirite.base.file
 
+import rb.clicker.telemetry.TelemetryEvent
 import rb.vectrix.linear.Vec2i
+import rb.vectrix.mathUtil.d
 import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
 import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
 import spirite.base.imageData.IImageWorkspace
@@ -31,33 +33,38 @@ class SaveContext(
 {
     val nodeMap = mutableMapOf<Node, Int>()
     val animationMap = mutableMapOf<Animation,Int>()
+    val telemetry = TelemetryEvent()
 
     val root = workspace.groupTree.root
     val floatingData = workspace.mediumRepository.dataList
             .mapNotNull { workspace.mediumRepository.floatData(it) { medium -> MediumPreparer.prepare(medium)} }
 
 
-    inline fun writeChunk( tag: String, writer : (RandomAccessFile)->Unit) {
-        if( tag.length != 4) {
-            // Perhaps overkill, but this really should be a hard truth
-            MDebug.handleError(ErrorType.FATAL, "Chunk types must be 4-length")
+    inline fun writeChunk(tag: String, crossinline writer : (RandomAccessFile)->Unit) {
+        telemetry.runAction("Write Chunk: $tag") {
+            if (tag.length != 4) {
+                // Perhaps overkill, but this really should be a hard truth
+                MDebug.handleError(ErrorType.FATAL, "Chunk types must be 4-length")
+            }
+
+            // [4] : Chunk Tag
+            ra.write(tag.toByteArray(charset("UTF-8")))
+
+            val start = ra.filePointer
+            // [4] : ChunkLength (placeholder for now
+            ra.writeInt(0)
+
+            writer.invoke(ra)
+
+            val end = ra.filePointer
+            ra.seek(start)
+            if (end - start > Integer.MAX_VALUE)
+                MDebug.handleError(ErrorType.OUT_OF_BOUNDS, "Image Data Too Big (>2GB).")
+            ra.writeInt((end - start - 4).toInt())
+            ra.seek(end)
+
+            telemetry.mark("size", (end - start).d)
         }
-
-        // [4] : Chunk Tag
-        ra.write( tag.toByteArray(charset("UTF-8")))
-
-        val start = ra.filePointer
-        // [4] : ChunkLength (placeholder for now
-        ra.writeInt(0)
-
-        writer.invoke(ra)
-
-        val end = ra.filePointer
-        ra.seek(start)
-        if( end - start > Integer.MAX_VALUE)
-            MDebug.handleError(ErrorType.OUT_OF_BOUNDS, "Image Data Too Big (>2GB).")
-        ra.writeInt((end - start - 4).toInt())
-        ra.seek(end)
     }
 }
 
