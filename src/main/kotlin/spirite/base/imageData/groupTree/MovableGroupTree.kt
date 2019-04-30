@@ -1,5 +1,6 @@
 package spirite.base.imageData.groupTree
 
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.view.IViewSystem
 import spirite.base.imageData.view.ViewSystem
@@ -7,8 +8,7 @@ import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 
 open class MovableGroupTree(
-        undoEngine: IUndoEngine?,
-        viewSystem: IViewSystem) : GroupTree(undoEngine, viewSystem) {
+        val workspace: MImageWorkspace) : GroupTree(workspace.undoEngine, workspace.viewSystem) {
 
     fun parentFromContext(context: Node?) = when(context) {
         null -> root
@@ -53,7 +53,7 @@ open class MovableGroupTree(
         moveNode( nodeToMove, nodeInto, if( top) nodeInto.children.firstOrNull() else null)
     }
 
-    protected fun insertNode(contextNode: Node?, nodeToInsert: Node) {
+    internal fun insertNode(contextNode: Node?, nodeToInsert: Node) {
         val parent = parentFromContext(contextNode)
         val before = beforeFromContext(contextNode)
         parent.add(nodeToInsert, before)

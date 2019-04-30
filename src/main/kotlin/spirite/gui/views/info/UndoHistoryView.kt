@@ -48,7 +48,7 @@ class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
 //        if( history != null) {
 //            tree.clearRoots()
 //            tree.constructTree {
-//                history.forEach { Node(it, attributes) }
+//                history.forEach { GroupNode(it, attributes) }
 //            }
 //        }
 //    }.run { master.workspaceSet.currentWorkspaceBind.addListener(this) }

@@ -75,7 +75,7 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
             val newViewProperties: NodeViewProperties)
         : NullAction()
     {
-        override val description: String get() = "Change Node View Settings"
+        override val description: String get() = "Change GroupNode View Settings"
 
         override fun performAction() {
             _viewMap[node] = newViewProperties
@@ -94,7 +94,7 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
             var newAlpha: Float)
         :NullAction(), StackableAction
     {
-        override val description: String get() = "Change Node Alpha"
+        override val description: String get() = "Change GroupNode Alpha"
 
         override fun performAction() {
             _viewMap[node] = get(node).copy(alpha = newAlpha)
@@ -116,7 +116,7 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
             var newX: Int, var newY: Int)
         :NullAction(), StackableAction
     {
-        override val description: String get() = "Change Node Position"
+        override val description: String get() = "Change GroupNode Position"
 
         override fun performAction() {
             _viewMap[node] = get(node).copy(ox = newX, oy = newY)

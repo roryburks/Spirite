@@ -1,6 +1,6 @@
 package spirite.base.imageData.groupTree
 
-import rb.extendo.dataStructures.Dequeue
+import rb.extendo.dataStructures.Deque
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.vectrix.linear.ImmutableTransformF
@@ -67,8 +67,8 @@ open class GroupTree(
         var x get() = view.ox ; set(value) {view = view.copy(ox = value)}
         var y get() = view.oy ; set(value) {view = view.copy(oy = value)}
 
-        var expanded : Boolean by NodePropertyDelegate( true, undoEngine,"Expanded/Contracted $treeDescription Node", false)
-        var name : String by NodePropertyDelegate( name, undoEngine,"Changed $treeDescription Node's Name", false)
+        var expanded : Boolean by NodePropertyDelegate( true, undoEngine,"Expanded/Contracted $treeDescription GroupNode", false)
+        var name : String by NodePropertyDelegate( name, undoEngine,"Changed $treeDescription GroupNode's Name", false)
         val isVisible : Boolean get() = visible && alpha > 0f
 
         val tNodeToContext get() = ImmutableTransformF.Translation(x+0f, y+0f)
@@ -224,7 +224,7 @@ open class GroupTree(
         fun delete() {
             val p = parent
             if( p == null) {
-                MDebug.handleError(ErrorType.STRUCTURAL, "Tried to Delete Node that has no parent (root node or floating node).")
+                MDebug.handleError(ErrorType.STRUCTURAL, "Tried to Delete GroupNode that has no parent (root node or floating node).")
                 return
             }
             p.remove(this)
@@ -239,7 +239,7 @@ open class GroupTree(
         }
 
         val children: List<Node> get() = _children
-        var flatenned : Boolean by UndoableDelegate(false, undoEngine, "Toggled Group Node Flattened")
+        var flatenned : Boolean by UndoableDelegate(false, undoEngine, "Toggled Group GroupNode Flattened")
 
         private val _children = mutableListOf<Node>()
 
@@ -262,7 +262,7 @@ open class GroupTree(
                 val oldBefore = toMove.nextNode
 
                 undoEngine.performAndStore(object: NullAction() {
-                    override val description: String get() = "Add Node to $treeDescription "
+                    override val description: String get() = "Add GroupNode to $treeDescription "
                     override fun performAction() = _move(toMove, newParent, newBefore)
                     override fun undoAction() = newParent._move(toMove, oldParent, oldBefore)
                 })
@@ -280,7 +280,7 @@ open class GroupTree(
             if( undoEngine == null) _add(toAdd, before)
             else {
                 undoEngine.performAndStore(object: NullAction() {
-                    override val description: String get() = "Add Node to $treeDescription "
+                    override val description: String get() = "Add GroupNode to $treeDescription "
 
                     override fun performAction() = _add(toAdd, before)
 
@@ -313,7 +313,7 @@ open class GroupTree(
             else {
                 val before = toRemove.nextNode
                 undoEngine.performAndStore(object: NullAction() {
-                    override val description: String get() = "Remove Node from $treeDescription "
+                    override val description: String get() = "Remove GroupNode from $treeDescription "
 
                     override fun performAction() {
                         _remove(toRemove)
@@ -356,7 +356,7 @@ private class GroupNodeTraversalSequence(
     override fun iterator() = Imp()
 
     private inner class Imp() : Iterator<Node> {
-        val iteratorDequeue = Dequeue<Iterator<Node>>()
+        val iteratorDequeue = Deque<Iterator<Node>>()
         var childrenIterator : Iterator<Node>
         var next: Node? = null
 

@@ -1,6 +1,6 @@
 package rb.vectrix.linear
 
-import rb.extendo.dataStructures.Dequeue
+import rb.extendo.dataStructures.Deque
 import rb.vectrix.linear.ImmutableTransformF.Companion
 
 /**
@@ -43,7 +43,7 @@ class MatrixSpace(
 
         // Bredth-first search for a groupLink
         val remaining = keys.filter { it != from }
-        val recurseQueue = Dequeue<MapNavigationState>()
+        val recurseQueue = Deque<MapNavigationState>()
         recurseQueue.addBack(
                 MapNavigationState(from,remaining.toMutableList())
         )

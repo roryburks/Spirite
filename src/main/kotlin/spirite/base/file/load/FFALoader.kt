@@ -118,7 +118,7 @@ object FFAFixedGroupLayerLoader : IFFALayerLoader {
         val groupNode = node as? GroupNode
         when( groupNode) {
             null -> {
-                MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group Node marked as its Link")
+                MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group GroupNode marked as its Link")
                 return null
             }
             else -> return ffa.addLinkedLayer(groupNode, includeSubtrees, name, frameMap, unlinkedFrameClusters)
@@ -205,7 +205,7 @@ object LegacyFFALoader_8_TO_1_0000 : IAnimationLoader {
 
             val groupNode = node as? GroupNode
             when( groupNode) {
-                null -> MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group Node marked as its Link")
+                null -> MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group GroupNode marked as its Link")
                 else -> ffa.addLinkedLayer(groupNode, includeSubtrees, frameMap = frameMap, unlinkedClusters = unlinkedFrameClusters)
             }
         }

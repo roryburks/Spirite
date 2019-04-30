@@ -23,7 +23,7 @@
 //
 //    @test fun buildsDataCorrectly() {
 //        val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20), mockWorkspace.mediumRepository)
-//        val built = flatMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
+//        val built = flatMedium.buildInto(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
 //
 //        built.drawOnComposite { gc ->
 //            gc.color = Colors.RED
@@ -50,7 +50,7 @@
 //        //  rather than counterclockwise
 //        transform.preRotate(-0.785398163f)
 //        transform.preTranslate(30f,30f)
-//        val built = flatMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), transform))
+//        val built = flatMedium.buildInto(ArrangedMediumData(MediumHandle(mockWorkspace, 0), transform))
 //
 //        built.drawOnComposite { gc ->
 //            gc.color = Colors.RED
@@ -77,7 +77,7 @@
 //        //  rather than counterclockwise
 //        transform.preRotate(-0.785398163f)
 //        transform.preTranslate(30f,30f)
-//        val built = flatMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), transform))
+//        val built = flatMedium.buildInto(ArrangedMediumData(MediumHandle(mockWorkspace, 0), transform))
 //
 //        built.drawOnComposite { gc ->
 //            gc.color = Colors.RED

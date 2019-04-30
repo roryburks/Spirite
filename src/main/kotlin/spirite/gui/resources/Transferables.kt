@@ -17,7 +17,7 @@ object Transferables {
         override fun isDataFlavorSupported(flavor: DataFlavor) = flavor.equals(FLAVOR)
 
         companion object {
-            val FLAVOR = DataFlavor(NodeTransferable::class.java, "Group Tree Node")
+            val FLAVOR = DataFlavor(NodeTransferable::class.java, "Group Tree GroupNode")
             val flavors = arrayOf(FLAVOR)
         }
     }

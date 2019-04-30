@@ -1,7 +1,7 @@
 package rb.extendo.dataStructures
 
 
-class Dequeue<T> : Iterable<T> {
+class Deque<T> : Iterable<T> {
     private var frontNode: Node<T>? = null
     private var backNode: Node<T>? = null
 

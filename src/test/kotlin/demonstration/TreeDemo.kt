@@ -46,18 +46,18 @@
 //
 //        val tree2 = SwTreeView<String>()
 //        tree2.constructTree {
-//            Node("A", STNAtt())
-//            Node("B", STNAtt())
+//            GroupNode("A", STNAtt())
+//            GroupNode("B", STNAtt())
 //            Branch("C", STNAtt(), {
-//                Node("D", STNAtt())
-//                Node("E", STNAtt())
+//                GroupNode("D", STNAtt())
+//                GroupNode("E", STNAtt())
 //                Branch("F", STNAtt(), {
-//                    Node("G", STNAtt())
-//                    Node("H", STNAtt())
-//                    Node("I", STNAtt())
+//                    GroupNode("G", STNAtt())
+//                    GroupNode("H", STNAtt())
+//                    GroupNode("I", STNAtt())
 //                })
 //            })
-//            Node("J")
+//            GroupNode("J")
 //        }
 //
 //        val resizeContainer = ResizeContainerPanel(tree, VERTICAL)

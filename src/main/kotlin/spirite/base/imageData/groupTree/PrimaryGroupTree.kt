@@ -15,7 +15,7 @@ import spirite.base.util.StringUtil
 import spirite.base.util.debug.SpiriteException
 import spirite.hybrid.Hybrid
 
-class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTree( workspace.undoEngine, workspace.viewSystem) {
+class PrimaryGroupTree(workspace: MImageWorkspace) : MovableGroupTree( workspace) {
     override val treeDescription: String get() = "Primary Group Tree"
 
     fun addNewSimpleLayer(contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null, select: Boolean = true) : LayerNode{
@@ -32,7 +32,7 @@ class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTre
     }
 
     fun addSimpleLayerFromImage( contextNode: Node?, name: String, image: IImage, select: Boolean = true) : LayerNode {
-        val med = FlatMedium(image.deepCopy(), workspace.mediumRepository)
+        val med = DynamicMedium(workspace, DynamicImage(image.deepCopy()))
         val handle = workspace.mediumRepository.addMedium(med)
         return importLayer(contextNode, name, SimpleLayer(handle), select)
     }
@@ -48,46 +48,6 @@ class PrimaryGroupTree(private val workspace: MImageWorkspace) : MovableGroupTre
             selectedNode = layerNode
 
         return layerNode
-    }
-
-    fun duplicateNode( node: Node)  {
-        workspace.undoEngine.doAsAggregateAction("Duplicate Node"){
-            fun insertAndDupeProperties(toInsert: Node, duping: Node, contextNode: Node?)
-            {
-                toInsert.x = duping.x
-                toInsert.y = duping.y
-                toInsert.alpha = duping.alpha
-                toInsert.method = duping.method
-                toInsert.visible = duping.visible
-                toInsert.expanded = duping.expanded
-                insertNode(contextNode, toInsert)
-            }
-
-            when( node) {
-                is LayerNode ->
-                    LayerNode(null, getNonDuplicateName(node.name), node.layer.dupe(workspace))
-                            .apply { insertNode(node, this) }
-                is GroupNode -> {
-                    data class NodeContext( val toDupe: Node, val parentInDuper: GroupNode)
-                    val dupeQueue = mutableListOf<NodeContext>()
-                    val dupeRoot = this.addGroupNode(node.parent, getNonDuplicateName(node.name))
-
-                    node.children.forEach { dupeQueue.add(NodeContext(it, dupeRoot))}
-
-                    while (dupeQueue.any()) {
-                        val next = dupeQueue.removeAt(0)
-
-                        val toInsert= when (next.toDupe) {
-                            is GroupNode -> GroupNode(null, getNonDuplicateName(next.toDupe.name))
-                                    .apply { next.toDupe.children.forEach { dupeQueue.add( NodeContext( it, this )) } }
-                            is LayerNode -> LayerNode( null, getNonDuplicateName(next.toDupe.name), next.toDupe.layer.dupe(workspace))
-                            else -> null
-                        }
-                        toInsert?.apply { insertAndDupeProperties(toInsert, next.toDupe, next.parentInDuper) }
-                    }
-                }
-            }
-        }
     }
 
 

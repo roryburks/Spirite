@@ -8,10 +8,12 @@ import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
 
 
-val SpiriteLayerDataFlavor = DataFlavor(IImage::class.java, "SpiriteInternalImage")
+val SpiriteLayerDataFlavor = DataFlavor(Layer::class.java, "SpiriteInternalImage")
 
 interface  ILayerBuilder {
     fun buildLayer(workspace: MImageWorkspace) : Layer
+    val width: Int
+    val height: Int
 }
 
 class TransferableSpiriteLayer(layer: Layer) : Transferable {
@@ -19,6 +21,8 @@ class TransferableSpiriteLayer(layer: Layer) : Transferable {
 
     private val _layerBuilder = object  : ILayerBuilder {
         override fun buildLayer(workspace: MImageWorkspace) = _layer.dupe(workspace)
+        override val height: Int get() = _layer.height
+        override val width: Int get() = _layer.width
     }
 
     override fun getTransferData(flavor: DataFlavor?): Any {

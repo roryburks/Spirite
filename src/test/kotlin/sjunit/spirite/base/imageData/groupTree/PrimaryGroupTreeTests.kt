@@ -4,6 +4,7 @@ package sjunit.spirite.base.imageData.groupTree
 import sjunit.TestHelper
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.base.imageData.groupTree.duplicateInto
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
@@ -328,7 +329,7 @@ open class PrimaryGroupTreeTests {
     @test fun DuplicateLayerNode() {
         val layer1 = tree.addNewSimpleLayer(null, "Layer1",FLAT,30,30)
 
-        tree.duplicateNode(layer1)
+        tree.duplicateInto(layer1)
 
         assertEquals(2, tree.root.children.size)
         assertEquals(layer1, tree.root.children.last())
@@ -354,7 +355,7 @@ open class PrimaryGroupTreeTests {
         val layer2 = tree.addNewSimpleLayer(subGroup, "Layer2",FLAT,30,30)
         val layer3 = tree.addNewSimpleLayer(group, "Layer3",FLAT,30,30)
 
-        tree.duplicateNode(group)
+        tree.duplicateInto(group)
 
         assertEquals(3, tree.root.children.size)
         assertEquals(7, tree.root.getLayerNodes().count())

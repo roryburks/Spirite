@@ -19,12 +19,14 @@ import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
+import spirite.base.imageData.mutations.ImportInto
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.Colors
@@ -34,6 +36,7 @@ import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
 import spirite.hybrid.Transferables.IClipboard.ClipboardThings.Image
 import spirite.hybrid.Transferables.ILayerBuilder
+import spirite.hybrid.Transferables.INodeBuilder
 
 class GlobalCommandExecutor(
         val master: IMasterControl,
@@ -120,9 +123,7 @@ object GlobalCommands
     val Paste = GlobalCommand("paste") {master, workspaceSet ->
         val workspace = workspaceSet.currentMWorkspace
 
-        val thing = Hybrid.clipboard.getFromClipboard()
-
-        when( thing) {
+        when(val thing = Hybrid.clipboard.getFromClipboard()) {
             is IImage -> {
                 val image : IImage = thing
                 if( workspace == null)
@@ -144,14 +145,14 @@ object GlobalCommands
                 }
             }
             is ILayerBuilder -> {
-
-                if(workspace == null)
-                    TODO()
-                else {
-                    val layer : Layer = thing.buildLayer(workspace)
-                    val selected = workspace.groupTree.selectedNode
-                    workspace.groupTree.importLayer(selected, "ImportedLayer", layer)
-                }
+                val wsToImport = workspace
+                        ?: (master.createWorkspace(thing.width, thing.height).also { workspaceSet.addWorkspace(it) })
+                wsToImport.ImportInto(thing)
+            }
+            is INodeBuilder -> {
+                val wsToImport = workspace
+                        ?: (master.createWorkspace(thing.width, thing.height).also { workspaceSet.addWorkspace(it) })
+                thing.buildInto(wsToImport.groupTree)
             }
             else -> throw CommandNotValidException
         }

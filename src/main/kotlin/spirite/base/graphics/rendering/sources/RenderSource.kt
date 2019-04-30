@@ -30,6 +30,6 @@ fun getRenderSourceForNode( node: Node, workspace: IImageWorkspace) : RenderSour
     when( node) {
         is GroupNode -> return GroupNodeSource(node, workspace)
         is LayerNode -> return LayerSource(node.layer, workspace)
-        else -> throw Exception("Unrecognizd Node Type")
+        else -> throw Exception("Unrecognizd GroupNode Type")
     }
 }

@@ -114,7 +114,7 @@ object SaveEngine {
                 (node as? GroupNode)?.children?.forEach { buildReferences(it, depth+1) }
             }
             fun writeNode( node: Node, depth: Int) {
-                // [1] : Depth of Node in GroupTree
+                // [1] : Depth of GroupNode in GroupTree
                 ra.writeByte(depth)
 
                 // [4] : alpha
@@ -137,7 +137,7 @@ object SaveEngine {
                         // [1] : NodeTypeId
                         ra.writeByte( SaveLoadUtil.NODE_GROUP)
 
-                        // Go through each of the Group Node's children recursively and save them
+                        // Go through each of the Group GroupNode's children recursively and save them
                         when( depth) {
                             0xFF -> if( node.children.any()) MDebug.handleWarning(STRUCTURAL, "Too many nested groups (255 limit), some nodes ignored.")
                             else -> node.children.forEach { writeNode(it, depth+1) }

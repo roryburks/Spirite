@@ -28,7 +28,7 @@ object LayerLoaderFactory
             }
             SaveLoadUtil.NODE_REFERENCE_LAYER -> ReferenceLayerIgnorer
             SaveLoadUtil.NODE_PUPPET_LAYER -> PuppetLayerIgnorer
-            else -> throw BadSifFileException("Unrecognized Node Type ID: $typeId (version mismatch or corrupt file?)")
+            else -> throw BadSifFileException("Unrecognized GroupNode Type ID: $typeId (version mismatch or corrupt file?)")
         }
     }
 }

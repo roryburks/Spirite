@@ -19,7 +19,7 @@ class FfaCascadingLayerBuilder(val _master: IMasterControl) : IFFAStructViewBuil
 {
     override fun buildNameComponent(layer: IFfaLayer): IFFAStructView = when(layer) {
         is FfaLayerCascading -> NameView(layer, _master.contextMenus, _master.dialog)
-        else -> throw InvalidClassException("Trying to build FfaCascadingLayer view on other kind of layer")
+        else -> throw InvalidClassException("Trying to buildInto FfaCascadingLayer view on other kind of layer")
     }
 
     override fun buildFrameComponent(layer: IFfaLayer, frame: IFFAFrame) : IFFAStructView = when {

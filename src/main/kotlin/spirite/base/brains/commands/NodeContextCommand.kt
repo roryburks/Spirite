@@ -8,6 +8,7 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.MovableGroupTree
+import spirite.base.imageData.groupTree.duplicateInto
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
@@ -88,10 +89,13 @@ object NodeCommands {
         workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Layer", DYNAMIC)}
 
     val Duplicate = NodeCommand("duplicate") {workspace, node, _ ->
-        node?.also { workspace.groupTree.duplicateNode(it) }}
+        node?.also { workspace.groupTree.duplicateInto(it) }}
     val Copy = NodeCommand("copy") { _, node, _ ->
-        val layerNode = node as? LayerNode ?: throw CommandNotValidException
-        Hybrid.clipboard.postToClipboard(layerNode.layer)
+        when( node) {
+            is LayerNode -> Hybrid.clipboard.postToClipboard(node.layer)
+            is GroupNode -> Hybrid.clipboard.postToClipboard(node)
+            else -> throw CommandNotValidException
+        }
     }
     val Delete = NodeCommand("delete") {_, node, _ -> node?.delete()}
 
@@ -192,7 +196,7 @@ object NodeCommands {
         }
     }
 
-    // TODO: Should this really be a Node command.  more like a generic "Workspace Command" but currently the
+    // TODO: Should this really be a GroupNode command.  more like a generic "Workspace Command" but currently the
     //  "WorkspaceCommandExecuter" is not up to the task
     val ToggleView = NodeCommand("toggleView") {workspace, node, dialogs ->
         when(workspace.viewSystem.view) {

@@ -1,6 +1,7 @@
 package spirite.hybrid.Transferables
 
 import spirite.base.graphics.IImage
+import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.layers.Layer
 import spirite.hybrid.Hybrid
 import spirite.hybrid.Transferables.IClipboard.ClipboardThings
@@ -15,7 +16,8 @@ interface IClipboard
     enum class ClipboardThings
     {
         Image,
-        Layer
+        Layer,
+        GroupNode
     }
 
     fun postToClipboard( any: Any)
@@ -26,6 +28,7 @@ object SwClipboard : IClipboard
 {
     override fun postToClipboard(any: Any) {
         val transferable = when(any) {
+            is GroupNode -> TransferableGroupNode(any)
             is Layer ->  TransferableSpiriteLayer(any)
             is IImage -> TransferableImage(any)
             else -> throw NotImplementedError("Don't know how to convert object into a Transferable")
@@ -43,19 +46,23 @@ object SwClipboard : IClipboard
             }
             if( clip.isDataFlavorAvailable( DataFlavor.imageFlavor)) {
                 val image = (clip.getData(DataFlavor.imageFlavor) as java.awt.Image)
-                if( image is BufferedImage)
-                    return Hybrid.imageConverter.convertToInternal(ImageBI(image))
+                return if( image is BufferedImage)
+                    Hybrid.imageConverter.convertToInternal(ImageBI(image))
                 else {
                     val bi = BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB)
                     bi.graphics.drawImage(image, 0, 0, null)
-                    return Hybrid.imageConverter.convertToInternal(ImageBI(bi))
+                    Hybrid.imageConverter.convertToInternal(ImageBI(bi))
                 }
             }
         }
-        if( things?.contains(ClipboardThings.Layer) ?: true) {
-            if( clip.isDataFlavorAvailable(SpiriteLayerDataFlavor)) return clip.getData(SpiriteLayerDataFlavor)
-        }
 
-        return null
+        return when
+        {
+            (things?.contains(ClipboardThings.Layer) ?: true) && clip.isDataFlavorAvailable(SpiriteLayerDataFlavor) ->
+                clip.getData(SpiriteLayerDataFlavor)
+            (things?.contains(ClipboardThings.GroupNode) ?: true) && clip.isDataFlavorAvailable(SpiriteGroupNodeFlavor) ->
+                clip.getData(SpiriteGroupNodeFlavor)
+            else -> null
+        }
     }
 }

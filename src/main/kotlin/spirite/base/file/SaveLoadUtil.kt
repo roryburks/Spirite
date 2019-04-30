@@ -13,7 +13,7 @@ object SaveLoadUtil {
     const val version = 0x0001_000B
 
 
-    // :::: Node Type Identifiers for the SIFF GroupTree Section
+    // :::: GroupNode Type Identifiers for the SIFF GroupTree Section
     const val NODE_GROUP = 0x00
     const val NODE_SIMPLE_LAYER = 0x01
     const val NODE_SPRITE_LAYER = 0x02
@@ -46,7 +46,7 @@ object SaveLoadUtil {
     const val FFALAYER_GROUPLINKED = 0x01
     const val FFALAYER_LEXICAL = 0x02
 
-    // Node Attribute Masks
+    // GroupNode Attribute Masks
     const val VISIBLE_MASK = 0x01
     const val EXPANDED_MASK = 0x02
 

@@ -32,7 +32,7 @@ class LayerPropertiesPanel( val master: IMasterControl) : IOmniComponent
                     is SpriteLayer -> spriteProperties.also { it.linkedSprite = new.layer }
                     else -> Hybrid.ui.Label("Unknown")
                 }
-                else -> Hybrid.ui.Label("Unknown Node Type")
+                else -> Hybrid.ui.Label("Unknown GroupNode Type")
             })
         }
     }

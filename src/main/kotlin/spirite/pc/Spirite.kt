@@ -1,6 +1,5 @@
 package spirite.pc
 
-import rb.extendo.dataStructures.Dequeue
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.hybrid.EngineLaunchpoint
@@ -8,7 +7,6 @@ import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
 import spirite.pc.util.RasterHelper
 import java.awt.image.BufferedImage
-import java.util.*
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 

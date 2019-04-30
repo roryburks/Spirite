@@ -31,7 +31,7 @@
 //    @test fun buildsDataAndDrawsToWSCorrectly() {
 //
 //        val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage(), mockWorkspace.mediumRepository)
-//        val built = dynamicMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
+//        val built = dynamicMedium.buildInto(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
 //
 //        built.drawOnComposite { gc ->
 //            gc.color = Colors.RED
@@ -56,7 +56,7 @@
 //    @test fun buildsTransformedDataCorrectly() {
 //        val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage(),mockWorkspace.mediumRepository)
 //        val tMediumToWorkspace = MutableTransformF.TranslationMatrix(-10f, -10f)
-//        val built = dynamicMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), tMediumToWorkspace))
+//        val built = dynamicMedium.buildInto(ArrangedMediumData(MediumHandle(mockWorkspace, 0), tMediumToWorkspace))
 //
 //        built.drawOnComposite { gc ->
 //            // Draw at WS 5,5 = Medium 15,15
