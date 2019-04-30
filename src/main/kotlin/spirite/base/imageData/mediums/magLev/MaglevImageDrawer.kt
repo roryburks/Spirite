@@ -1,5 +1,6 @@
 package spirite.base.imageData.mediums.magLev
 
+import rb.extendo.extensions.then
 import rb.hydra.anyTiamatGrind
 import rb.hydra.anyTiamatGrindSync
 import rb.hydra.miniTiamatGrindSync
@@ -309,19 +310,33 @@ class MaglevDeformationModule(val arranged: ArrangedMediumData, val maglev: Magl
 class MaglevMagneticEraseModule( val arranged: ArrangedMediumData, val maglev: MaglevMedium) : IMagneticEraseModule
 {
     override fun erase(x: Float, y: Float) {
-        val thingsToRemove = maglev.things.filter { thing ->
-            when(thing) {
-                is MaglevStroke -> thing.drawPoints.run {
-                    val strokeWidth = thing.params.width
-                    (0 until length).asSequence()
-                            .anyTiamatGrindSync {MathUtil.distance(this.x[it], this.y[it], x, y) < this.w[it] * strokeWidth}
-                }
-                is MaglevFill -> false
-                else -> false
-            }
-        }
+        val things = maglev.things
+        val removedThings = HashSet<IMaglevThing>()
 
-        if( thingsToRemove.any())
-            maglev.removeThings(thingsToRemove, arranged, "Maglev Erase Action")
+        val strokesToRemove = things
+                .filterIsInstance<MaglevStroke>()
+                .filter {stroke ->
+                    val strokeWidth = stroke.params.width
+                    stroke.drawPoints.run {
+                        (0 until length).asSequence()
+                                .anyTiamatGrindSync { MathUtil.distance(this.x[it], this.y[it], x, y) < this.w[it] * strokeWidth }}}
+
+        removedThings.addAll(strokesToRemove)
+
+        val removedIds = (0 until things.size)
+                .filter { removedThings.contains(things[it]) }
+                .toSet()
+
+
+        val fillsToRemove = maglev.things
+                .filterIsInstance<MaglevFill>()
+                .filter { fill -> fill.segments.any{removedIds.contains(it.strokeId)} }
+
+        // Could also do Polygon contains logic
+
+        removedThings.addAll(fillsToRemove)
+
+        if( removedThings.any())
+            maglev.removeThings(removedThings, arranged, "Maglev Erase Action")
     }
 }

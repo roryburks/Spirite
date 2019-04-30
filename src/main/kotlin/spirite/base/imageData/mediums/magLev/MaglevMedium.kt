@@ -1,6 +1,7 @@
 package spirite.base.imageData.mediums.magLev
 
 import rb.extendo.dataStructures.SinglyList
+import rb.extendo.extensions.replace
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.DynamicImage
@@ -50,9 +51,10 @@ constructor(
     }
 
     internal fun removeThings( things: Collection<IMaglevThing>, arranged: ArrangedMediumData, description: String) {
+        val toRemoveSet= things.toSet()
         arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged){
             override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
-                maglev.things.removeAll(things)
+                maglev.things.replaceAll { if( toRemoveSet.contains(it)) DeadMaglevThing else it }
                 builtImage.flush() // BAD: using things after flush is intended to be undefined behavior, I'm using internal knowledge.  bad
                 maglev.things.forEach { it.draw(built) }
             }
