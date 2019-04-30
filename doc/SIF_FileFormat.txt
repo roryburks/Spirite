@@ -1,4 +1,4 @@
-Version 0x0001_000B
+Version 0x0001_000C
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -105,6 +105,7 @@ Header
 Per Animation:
 [n, UTF8 str] : Animation Name
 [4, Float] : Animation play speed
+[2, Short] : Animation zoom factor
 [1, byte] : Animation Type ID:
     0x01 : FixedFrameAnimation
         [2, ushort] : Number of Layers

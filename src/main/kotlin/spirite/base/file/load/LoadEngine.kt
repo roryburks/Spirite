@@ -227,6 +227,7 @@ object LoadEngine {
         while( ra.filePointer < endPointer) {
             val name = if( context.version == 0x1_0000) "animation" else SaveLoadUtil.readNullTerminatedStringUTF8(ra)
             val speed = if( context.version < 0x1_0005) 8.0f else ra.readFloat()
+            val zoom = if( context.version < 0x1_000C) 1 else ra.readShort().i
             val type = ra.readByte().i
 
             val animation = AnimationLoaderFactory
@@ -237,6 +238,7 @@ object LoadEngine {
                 context.animations.add(animation)
                 context.workspace.animationManager.addAnimation(animation)
                 animation.state.speed = speed
+                animation.state.zoom = zoom
             }
         }
     }

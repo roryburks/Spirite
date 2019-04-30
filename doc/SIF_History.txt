@@ -42,3 +42,5 @@
 0x0001_000B:
     - Added Names to FFA Layers
     - Added IsAsynchronous to FFA Layers
+0x0001_000C:
+    - Added Zoom Factor to Animation similar to Speed
