@@ -73,6 +73,10 @@ object NodeCommands {
             val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
             val layer = SpriteLayer(structure, workspace, node.layer.type)
             workspace.groupTree.importLayer(node, node.name, layer)
+
+            // Note: Because Parts are only "linked" after it is imported to the group tree, the Sprite Layer can't handle itself
+            //   Could presumably do it in the getter, but that might not trigger
+            layer.activePart = layer.parts.firstOrNull { it.partName == node.layer.activePart?.partName} ?: layer.activePart
         }
         else workspace.groupTree.addNewSpriteLayer(node, "Sprite Layer", true)
     }
@@ -81,6 +85,9 @@ object NodeCommands {
             val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
             val layer = SpriteLayer(structure, workspace, MAGLEV)
             workspace.groupTree.importLayer(node, node.name, layer)
+
+            // Note: Because Parts are only "linked" after it is imported to the group tree, the Sprite Layer can't handle itself
+            layer.activePart = layer.parts.firstOrNull { it.partName == node.layer.activePart?.partName} ?: layer.activePart
         }
         else workspace.groupTree.addNewSpriteLayer(node, "Puppet Layer", true, MAGLEV)
     }

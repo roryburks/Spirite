@@ -47,7 +47,7 @@ class SpriteLayer : Layer {
         this.type = type
         this.workspace = workspace
         _parts.add(SpritePart(SpritePartStructure(0, "base"), workspace.mediumRepository.addMedium(makeThing(workspace)), workingId++))
-        activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
+        activePart = _parts.first()
     }
 
     constructor(
@@ -59,7 +59,7 @@ class SpriteLayer : Layer {
         this.workspace = workspace
         toImport.forEach {_parts.add(SpritePart(it.second, it.first, workingId++))}
         _sort()
-        activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
+        activePart = _parts.first()
     }
 
     constructor(
@@ -73,7 +73,7 @@ class SpriteLayer : Layer {
             _parts.add(SpritePart(it, workspace.mediumRepository.addMedium(makeThing(workspace)), workingId++))
         }
         _sort()
-        activePart = getAllLinkedLayers().firstOrNull()?.activePart?.partName?.run { parts.firstOrNull { it.partName == this}} ?: parts.firstOrNull()
+        activePart = _parts.first()
     }
 
     val workspace: MImageWorkspace
