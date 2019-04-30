@@ -43,7 +43,9 @@ sealed class ToolProperty<T>( default: T) {
 class SliderProperty(override val hrName: String, default: Float, val min: Float, val max: Float) : ToolProperty<Float>(default)
 class SizeProperty( override val hrName: String, default: Float) : ToolProperty<Float>(default)
 class CheckBoxProperty( override val hrName: String, default: Boolean) : ToolProperty<Boolean>(default)
-class DropDownProperty<T>( override val hrName: String, default: T, val values: Array<T>) : ToolProperty<T>(default)
+class DropDownProperty<T>( override val hrName: String, default: T, val values: Array<T>) : ToolProperty<T>(default) {
+    fun setNthOption(n: Int) {value = values.getOrNull(n) ?: value}
+}
 class RadioButtonProperty<T>( override val hrName: String, default: T, val values: Array<T>) : ToolProperty<T>(default)
 class ButtonProperty(override val hrName: String, val command: ICommand) : ToolProperty<Boolean>(false)
 class FloatBoxProperty(override val hrName: String, default: Float) : ToolProperty<Float>(default)

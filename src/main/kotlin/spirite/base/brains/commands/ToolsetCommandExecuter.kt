@@ -2,7 +2,9 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand.*
+import spirite.base.brains.toolset.DropDownProperty
 import spirite.base.brains.toolset.IToolsetManager
+import spirite.base.brains.toolset.Tool
 import spirite.hybrid.MDebug
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -23,9 +25,15 @@ class ToolsetCommandExecuter(val toolsetManager: IToolsetManager) : ICommandExec
         Reshape( "Reshape"),
         Rigger("Rigger"),
         ShapeSelection("ShapeSelection"),
+        MagneticFill("MagneticFill"),
 
         DecreasePenSize("decreaseSize"),
         IncreasePenSize("increaseSize"),
+
+        SetMode_1("setMode:1"),
+        SetMode_2("setMode:2"),
+        SetMode_3("setMode:3"),
+        SetMode_4("setMode:4"),
         ;
 
         override val commandString: String get() = "tool.$string"
@@ -33,6 +41,13 @@ class ToolsetCommandExecuter(val toolsetManager: IToolsetManager) : ICommandExec
     }
     override val validCommands: List<String> get() = ToolCommand.values().map { it.string }
     override val domain: String get() = "tool"
+
+    fun setMode(i: Int) {
+        toolsetManager.selectedTool.properties
+                .filterIsInstance<DropDownProperty<*>>()
+                .firstOrNull()
+                ?.setNthOption(i)
+    }
 
     override fun executeCommand(string: String, extra: Any?): Boolean {
         when(string) {
@@ -49,6 +64,12 @@ class ToolsetCommandExecuter(val toolsetManager: IToolsetManager) : ICommandExec
             Reshape.string -> toolsetManager.selectedTool = toolsetManager.toolset.Reshape
             Rigger.string -> toolsetManager.selectedTool = toolsetManager.toolset.Rigger
             ShapeSelection.string -> toolsetManager.selectedTool = toolsetManager.toolset.ShapeSelection
+            MagneticFill.string -> toolsetManager.selectedTool = toolsetManager.toolset.MagneticFill
+
+            SetMode_1.string -> setMode(0)
+            SetMode_2.string -> setMode(1)
+            SetMode_3.string -> setMode(2)
+            SetMode_4.string -> setMode(3)
 
             DecreasePenSize.string -> {
                 val selected = toolsetManager.selectedTool

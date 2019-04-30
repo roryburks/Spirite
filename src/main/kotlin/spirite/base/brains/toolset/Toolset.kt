@@ -23,6 +23,8 @@ class Toolset( internal val manager: ToolsetManager) {
     val MagneticFill = MagneticFillTool(this)
     val Deformer = DeformTool(this)
 
+    val allTools = listOf(Pen, Eraser, Fill, ShapeSelection, FreeSelection, Move, Pixel, Crop, Rigger, Flip,
+            Reshape, ColorChanger, ColorPicker, Stencil, MagneticFill, Deformer)
 
     private val defaultTools = listOf(
             Pen, Eraser, Fill, ShapeSelection, FreeSelection, Rigger, Move, Pixel, Crop, Flip, Reshape,
