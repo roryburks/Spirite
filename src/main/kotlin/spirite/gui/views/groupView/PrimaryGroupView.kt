@@ -17,6 +17,7 @@ import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.basic.IToggleButton
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
@@ -43,6 +44,7 @@ private constructor(
     val workspace get() = master.workspaceSet.currentWorkspace
 
     private fun rebuild() {
+        _nodeMap.clear()
         tree.buildingPaused = true
         tree.clearRoots()
         val pTree = workspace?.groupTree ?: return
@@ -82,6 +84,7 @@ private constructor(
             val visibilityButton = Hybrid.ui.ToggleButton( t.visible)
             visibilityButton.checkBind.addObserver {new, _ ->  t.visible = new}
             visibilityButton.setOnIcon( SwIcons.BigIcons.VisibleOn)
+            _nodeMap[t] = visibilityButton
 
             // This hook prevents the main hook of the Group Tree from being executed
             //  (in particular, it prevents automatic selection of nodes you're toggling the visibility of)
@@ -100,6 +103,8 @@ private constructor(
             }
         }
     }
+    // NOTE: I hate this pattern, but it gets me out the door quicker and is technically efficient (just heavily coupled / hidden complexity)
+    private val _nodeMap = mutableMapOf<Node, IToggleButton>()
 
     private inner class NormalNodeComponent( t: Node) : BaseNodeTreeComponent(t) {
         override val component = NodeLayerPanel(t,master)
@@ -192,7 +197,7 @@ private constructor(
 
     private val groupTreeObserver = object: TreeObserver {
         override fun treeStructureChanged(evt : TreeChangeEvent) {rebuild()}
-        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {}
+        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {_nodeMap[node]?.checked = node.isVisible}
     }
 
     private var treeObsK : IContract? = null
