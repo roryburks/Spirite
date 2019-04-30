@@ -1,12 +1,10 @@
 package spirite.base.brains
 
 import rb.extendo.dataStructures.MutableOneToManyMap
+import spirite.base.brains.commands.*
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
-import spirite.base.brains.commands.GlobalCommands
 import spirite.base.brains.commands.IsolationCommandExecutor.IsolationCommand
-import spirite.base.brains.commands.NodeCommands
 import spirite.base.brains.commands.PaletteCommandExecutor.PaletteCommand
-import spirite.base.brains.commands.SelectCommand
 import spirite.base.brains.commands.ToolsetCommandExecutor.ToolCommand
 import spirite.base.brains.commands.ViewCommandExecutor.ViewCommand
 import spirite.base.brains.settings.IPreferences
@@ -81,7 +79,7 @@ private val defaultHotkeys = mapOf(
         NodeCommands.MoveUp.keyCommand to (Hotkey(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK)),
         NodeCommands.Duplicate.keyCommand to (Hotkey(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK)),
 
-        NodeCommands.ToggleView.keyCommand to (Hotkey(KeyEvent.VK_TAB,0)),
+        WorkspaceCommands.ToggleView.keyCommand to (Hotkey(KeyEvent.VK_TAB,0)),
 
         IsolationCommand.TOGGLE_ISOLATION.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, 0)),
         IsolationCommand.ISOLATE_LAYER.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, InputEvent.CTRL_DOWN_MASK)),

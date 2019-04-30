@@ -4,14 +4,14 @@ import spirite.base.brains.IMasterControl
 import spirite.gui.components.basic.ICrossPanel
 import spirite.hybrid.Hybrid
 
-class NewWorkspacePanel(
+class WorkspaceSizePanel(
         private val master: IMasterControl
  ) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
     val settings get() = master.settingsManager
     val MAX_DIM get() = settings.MaxDimension
 
-    data class NewWorkspaceReturn(
+    data class WorkspaceSizeReturn(
             val width: Int,
             val height: Int)
 
@@ -39,5 +39,5 @@ class NewWorkspacePanel(
         }
     }
 
-    val result: NewWorkspaceReturn get() = NewWorkspaceReturn(widthField.value, heightField.value)
+    val result: WorkspaceSizeReturn get() = WorkspaceSizeReturn(widthField.value, heightField.value)
 }

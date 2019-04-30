@@ -6,7 +6,7 @@ import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.*
 import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
-import spirite.gui.components.dialogs.NewWorkspacePanel.NewWorkspaceReturn
+import spirite.gui.components.dialogs.WorkspaceSizePanel.WorkspaceSizeReturn
 import spirite.gui.resources.Skin.Global
 import spirite.gui.resources.SwIcons
 import spirite.pc.gui.SColor
@@ -22,7 +22,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 
 interface IDialog {
     fun invokeNewSimpleLayer( workspace: IImageWorkspace) : NewSimpleLayerReturn?
-    fun invokeNewWorkspace(): NewWorkspaceReturn?
+    fun invokeWorkspaceSizeDialog(description: String): WorkspaceSizeReturn?
 
     fun invokeDisplayOptions(title: String = "Display Options", default: DisplayOptions? = null) : DisplayOptions?
 
@@ -81,13 +81,13 @@ class JDialog(private val master: IMasterControl) : IDialog
         }
     }
 
-    override fun invokeNewWorkspace(): NewWorkspaceReturn? {
-        val panel = NewWorkspacePanel(master)
+    override fun invokeWorkspaceSizeDialog(description: String): WorkspaceSizeReturn? {
+        val panel = WorkspaceSizePanel(master)
 
         val result =JOptionPane.showConfirmDialog(
                 null,
                 panel.jcomponent,
-                "New Layer",
+                description,
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE,
                 SwIcons.BigIcons.NewLayer.icon)

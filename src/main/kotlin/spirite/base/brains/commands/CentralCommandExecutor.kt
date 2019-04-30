@@ -27,7 +27,8 @@ class CentralCommandExecutor(
             SelectionCommandExecutor(workspaceSet),
             FrameCommandExecutor(master.frameManager),
             IsolationCommandExecutor(workspaceSet),
-            AnimationCommandExecutor(master)
+            AnimationCommandExecutor(master),
+            WorkspaceCommandExecutor(workspaceSet, dialog)
     )
 
 

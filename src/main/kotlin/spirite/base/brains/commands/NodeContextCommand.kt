@@ -20,12 +20,6 @@ import spirite.base.util.StringUtil
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.Hybrid
 
-interface ICommandExecutor {
-    val validCommands: List<String>
-    val domain: String
-    fun executeCommand( string: String, extra: Any?) : Boolean
-}
-
 class NodeContextCommand(
         val workspaceSet: MWorkspaceSet,
         val dialogs: IDialog)
@@ -220,12 +214,4 @@ object NodeCommands {
     }
     //endregion
 
-    // TODO: Should this really be a GroupNode command.  more like a generic "Workspace Command" but currently the
-    //  "ViewCommandExecutor" is not up to the task
-    val ToggleView = NodeCommand("toggleView") {workspace, node, dialogs ->
-        when(workspace.viewSystem.view) {
-            0 -> workspace.viewSystem.view = 1
-            else -> workspace.viewSystem.view = 0
-        }
-    }
 }

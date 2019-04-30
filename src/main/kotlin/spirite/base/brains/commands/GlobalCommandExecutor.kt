@@ -72,7 +72,7 @@ class GlobalCommand(
 object GlobalCommands
 {
     val NewWorkspace  = GlobalCommand("newWorkspace") { master, workspaceSet ->
-        val result = master.dialog.invokeNewWorkspace() ?: throw CommandNotValidException
+        val result = master.dialog.invokeWorkspaceSizeDialog("New Workspace") ?: throw CommandNotValidException
         val newWorkspace = master.createWorkspace(result.width, result.height)
         newWorkspace.groupTree.addNewSimpleLayer(null, "Background", DYNAMIC)
         newWorkspace.finishBuilding()

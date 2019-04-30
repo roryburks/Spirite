@@ -7,6 +7,7 @@ import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.FrameCommandExecutor.FrameCommand
 import spirite.base.brains.commands.GlobalCommands
 import spirite.base.brains.commands.SelectCommand
+import spirite.base.brains.commands.WorkspaceCommands
 import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
 import spirite.gui.components.advanced.omniContainer.OmniTab
@@ -67,7 +68,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem("&Image"),
                 MenuItem(".&Invert", DrawCommand.INVERT),
                 MenuItem(".&To Color"),
-                MenuItem(".&Resize Workspace"),
+                MenuItem(".&Resize Workspace", WorkspaceCommands.ResizeWorkspace),
 
                 MenuItem("&Window"),
                 MenuItem(".&Dialogs"),
