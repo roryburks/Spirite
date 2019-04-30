@@ -1,12 +1,12 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.KeyCommand
-import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand.SWAP
-import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand.SWAP_BACK
+import spirite.base.brains.commands.PaletteCommandExecutor.PaletteCommand.SWAP
+import spirite.base.brains.commands.PaletteCommandExecutor.PaletteCommand.SWAP_BACK
 import spirite.base.brains.palette.IPaletteManager
 import spirite.hybrid.MDebug
 
-class PaletteCommandExecuter(val paletteManager: IPaletteManager) : ICommandExecuter
+class PaletteCommandExecutor(val paletteManager: IPaletteManager) : ICommandExecutor
 {
     enum class PaletteCommand(val string: String) : ICommand {
         SWAP( "swap"),

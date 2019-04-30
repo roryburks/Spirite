@@ -4,7 +4,7 @@ import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
-import spirite.base.brains.commands.FrameCommandExecuter.FrameCommand
+import spirite.base.brains.commands.FrameCommandExecutor.FrameCommand
 import spirite.base.brains.commands.GlobalCommands
 import spirite.base.brains.commands.SelectCommand
 import spirite.gui.components.advanced.omniContainer.OmniContainer

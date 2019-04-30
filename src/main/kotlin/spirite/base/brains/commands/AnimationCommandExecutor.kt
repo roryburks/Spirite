@@ -9,7 +9,7 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.dialogs.IDialog.FilePickType.AAF
 
 class AnimationCommandExecutor (val master: IMasterControl)
-    : ICommandExecuter
+    : ICommandExecutor
 {
     override val domain: String get() = "anim"
     override val validCommands: List<String> get() = executors.map { "anim.${it.name}" }

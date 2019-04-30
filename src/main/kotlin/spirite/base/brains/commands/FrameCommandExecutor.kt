@@ -3,11 +3,11 @@ package spirite.base.brains.commands
 import spirite.base.brains.IFrameManager
 import spirite.base.brains.IFrameManager.Views.*
 import spirite.base.brains.KeyCommand
-import spirite.base.brains.commands.FrameCommandExecuter.FrameCommand.*
+import spirite.base.brains.commands.FrameCommandExecutor.FrameCommand.*
 import spirite.hybrid.MDebug
 
 
-class FrameCommandExecuter(val frameManager: IFrameManager) : ICommandExecuter
+class FrameCommandExecutor(val frameManager: IFrameManager) : ICommandExecutor
 {
 
     enum class FrameCommand(val string: String) : ICommand {

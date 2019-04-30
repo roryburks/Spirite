@@ -17,22 +17,22 @@ class CentralCommandExecutor(
         val dialog: IDialog)
     : ICentralCommandExecutor
 {
-    private val commandExecuters : List<ICommandExecuter> = listOf(
+    private val commandExecutors : List<ICommandExecutor> = listOf(
             NodeContextCommand(workspaceSet, dialog),
             DrawCommandExecutor(workspaceSet, master.toolsetManager),
             GlobalCommandExecutor(master, workspaceSet),
-            WorkspaceCommandExecuter(master),
-            ToolsetCommandExecuter(master.toolsetManager),
-            PaletteCommandExecuter(master.paletteManager),
-            SelectionCommandExecuter(workspaceSet),
-            FrameCommandExecuter(master.frameManager),
-            IsolationCommandExecuter(workspaceSet),
+            ViewCommandExecutor(master),
+            ToolsetCommandExecutor(master.toolsetManager),
+            PaletteCommandExecutor(master.paletteManager),
+            SelectionCommandExecutor(workspaceSet),
+            FrameCommandExecutor(master.frameManager),
+            IsolationCommandExecutor(workspaceSet),
             AnimationCommandExecutor(master)
     )
 
 
-    override val commandDomains: List<String> get() = commandExecuters.map { it.domain }
-    override val validCommands: List<String> get() = commandExecuters.fold(mutableListOf()) { agg, executor ->
+    override val commandDomains: List<String> get() = commandExecutors.map { it.domain }
+    override val validCommands: List<String> get() = commandExecutors.fold(mutableListOf()) { agg, executor ->
         agg.addAll(executor.validCommands)
         agg
     }
@@ -45,7 +45,7 @@ class CentralCommandExecutor(
         var executed = false
 
         // Note: It's probably a bad idea to have multiple executers with the same domain, but at least here it will be supported
-        commandExecuters
+        commandExecutors
                 .filter { it.domain == space }
                 .forEach {
                     attempted = true

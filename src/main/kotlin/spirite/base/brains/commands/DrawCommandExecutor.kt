@@ -13,7 +13,7 @@ import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.hybrid.MDebug
 
-class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: IToolsetManager) : ICommandExecuter
+class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: IToolsetManager) : ICommandExecutor
 {
 
     enum class DrawCommand(val string: String) : ICommand {

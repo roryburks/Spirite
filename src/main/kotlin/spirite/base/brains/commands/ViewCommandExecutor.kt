@@ -2,10 +2,10 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
-import spirite.base.brains.commands.WorkspaceCommandExecuter.ViewCommand.*
+import spirite.base.brains.commands.ViewCommandExecutor.ViewCommand.*
 import spirite.hybrid.MDebug
 
-class WorkspaceCommandExecuter(val master: IMasterControl) : ICommandExecuter
+class ViewCommandExecutor(val master: IMasterControl) : ICommandExecutor
 {
     val view get() = master.frameManager.workView
 

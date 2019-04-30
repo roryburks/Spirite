@@ -1,15 +1,14 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.KeyCommand
-import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand.*
+import spirite.base.brains.commands.ToolsetCommandExecutor.ToolCommand.*
 import spirite.base.brains.toolset.DropDownProperty
 import spirite.base.brains.toolset.IToolsetManager
-import spirite.base.brains.toolset.Tool
 import spirite.hybrid.MDebug
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class ToolsetCommandExecuter(val toolsetManager: IToolsetManager) : ICommandExecuter
+class ToolsetCommandExecutor(val toolsetManager: IToolsetManager) : ICommandExecutor
 {
     enum class ToolCommand(val string: String) : ICommand {
         Pen( "Pen"),

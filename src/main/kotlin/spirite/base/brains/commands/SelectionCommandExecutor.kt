@@ -6,7 +6,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Rect
 
-class SelectionCommandExecuter( val workspaceSet: IWorkspaceSet) : ICommandExecuter
+class SelectionCommandExecutor(val workspaceSet: IWorkspaceSet) : ICommandExecutor
 {
     val workspace get() = workspaceSet.currentWorkspace
 

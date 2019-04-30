@@ -19,11 +19,9 @@ import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.base.imageData.mutations.ImportInto
@@ -41,7 +39,7 @@ import spirite.hybrid.Transferables.INodeBuilder
 class GlobalCommandExecutor(
         val master: IMasterControl,
         val workspaceSet : MWorkspaceSet)
-    : ICommandExecuter
+    : ICommandExecutor
 {
     override fun executeCommand(string: String, extra: Any?): Boolean {
         try
