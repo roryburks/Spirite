@@ -335,9 +335,23 @@ class SpriteLayer : Layer {
     }
 
 
+    // endregion
+
+    // region Depth Remapping
+    fun remapDepth(newDepths: Map<SpritePart,Int>)
+    {
+        val oldMap = _parts
+                .map {Pair(it.partName, it.depth)}
+                .toMap()
+        val newMap = _parts
+                .map {Pair(it.partName, newDepths[it] ?: it.depth)}
+                .toMap()
+        undoEngine.performAndStore(DepthRemappingAction(newMap, oldMap))
+    }
+
     inner class DepthRemappingAction(
-            val newMap: HashMap<String,Int>,
-            val oldMap: HashMap<String,Int>) : NullAction()
+            val newMap: Map<String,Int>,
+            val oldMap: Map<String,Int>) : NullAction()
     {
         override val description: String get() = "Sprite Part Depth Change"
         override fun performAction() {

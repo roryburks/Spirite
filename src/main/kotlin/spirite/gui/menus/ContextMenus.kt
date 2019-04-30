@@ -84,7 +84,12 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
                     val layer = node.layer
                     when( layer) {
                         is SimpleLayer -> scheme.add(MenuItem(("Con&vert Simple Layer To Sprite Layer"), NodeCommands.ConvertLayerToSprite))
-                        is SpriteLayer -> scheme.add(MenuItem("Construct &Rig Animation From Sprite", NodeCommands.NewRigAnimation))
+                        is SpriteLayer -> {
+                            scheme.add(MenuItem("&Sprite Layer Commands"))
+                            scheme.add(MenuItem(".Diffuse Sprite Layer", NodeCommands.DiffuseSpriteLayer))
+                            scheme.add(MenuItem(".Shift Sprite Layer Depth", NodeCommands.ShiftSpriteLayerDepth))
+                            scheme.add(MenuItem("Construct &Rig Animation From Sprite", NodeCommands.NewRigAnimation))
+                        }
                         //is PuppetLayer -> scheme.add(MenuItem("Add &Derived Puppet Layer", customAction = {TODO()}))
                     }
 

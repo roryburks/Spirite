@@ -186,7 +186,7 @@ object NodeCommands {
             node.delete()
         }
     }
-    val ClearViewSettings = NodeCommand("clearViewSettings") {workspace, node, dialogs ->
+    val ClearViewSettings = NodeCommand("clearViewSettings") {workspace, node, _ ->
         node ?: throw CommandNotValidException
         workspace.undoEngine.doAsAggregateAction("Clear View Settings") {
             node.descendants.forEach {
@@ -195,6 +195,23 @@ object NodeCommands {
             }
         }
     }
+
+    //region Sprite Layer
+    val DiffuseSpriteLayer = NodeCommand("diffuseSpriteLayer") {_, node, dialogs ->
+        val spriteLayer = (node as? LayerNode)?.layer as? SpriteLayer ?: throw CommandNotValidException
+        val diffuseFactor = dialogs.promptForString("Enter diffuse factor", "10")?.toIntOrNull() ?: throw CommandNotValidException
+        if( diffuseFactor != 1) {
+            spriteLayer.remapDepth(spriteLayer.parts.map { Pair(it, it.depth * diffuseFactor) }.toMap())
+        }
+    }
+    val ShiftSpriteLayerDepth = NodeCommand("shiftSpriteLayerDepth") {_, node, dialogs ->
+        val spriteLayer = (node as? LayerNode)?.layer as? SpriteLayer ?: throw CommandNotValidException
+        val shiftFactor = dialogs.promptForString("Enter diffuse factor", "10")?.toIntOrNull() ?: throw CommandNotValidException
+        if( shiftFactor != 0) {
+            spriteLayer.remapDepth(spriteLayer.parts.map { Pair(it, it.depth + shiftFactor) }.toMap())
+        }
+    }
+    //endregion
 
     // TODO: Should this really be a GroupNode command.  more like a generic "Workspace Command" but currently the
     //  "WorkspaceCommandExecuter" is not up to the task
