@@ -266,3 +266,9 @@ class DeformTool(toolset: Toolset) : Tool(toolset) {
     val applyBind by scheme.Property(ButtonProperty("Apply Deformation", DrawCommand.APPLY_TRANFORM))
     var apply by applyBind
 }
+
+class MagEraser( toolset: Toolset) : Tool(toolset){
+    override val iconX get() = 4
+    override val iconY get() = 0
+    override val description = "Magnetic Eraser"
+}

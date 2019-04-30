@@ -193,6 +193,9 @@ class Penner(
                     tool is DeformTool ->
                         if( drawer is IDeformDrawer) behavior = StrokeDeformComposingBehavior(this, drawer)
                         else Hybrid.beep()
+                    tool is MagEraser ->
+                        if( drawer is IMagneticEraseModule) behavior = MagneticEraseBehavior(this, drawer)
+                        else Hybrid.beep()
                 }
             }
         }

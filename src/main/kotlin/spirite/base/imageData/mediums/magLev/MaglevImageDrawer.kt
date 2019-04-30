@@ -1,5 +1,7 @@
 package spirite.base.imageData.mediums.magLev
 
+import rb.hydra.anyTiamatGrind
+import rb.hydra.anyTiamatGrindSync
 import rb.hydra.miniTiamatGrindSync
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
@@ -38,7 +40,8 @@ class MaglevImageDrawer(
         ITransformModule by MaglevTransformModule(arranged),
         IColorChangeModule by MaglevColorChangeModule(arranged),
         IMagneticFillModule by MaglevMagneticFillModule(arranged, maglev),
-        IDeformDrawer by MaglevDeformationModule(arranged, maglev)
+        IDeformDrawer by MaglevDeformationModule(arranged, maglev),
+        IMagneticEraseModule by MaglevMagneticEraseModule(arranged, maglev)
 
 class MaglevClearModule( val arranged: ArrangedMediumData) : IClearModule {
     override fun clear() {
@@ -301,4 +304,24 @@ class MaglevDeformationModule(val arranged: ArrangedMediumData, val maglev: Magl
 
     }
 
+}
+
+class MaglevMagneticEraseModule( val arranged: ArrangedMediumData, val maglev: MaglevMedium) : IMagneticEraseModule
+{
+    override fun erase(x: Float, y: Float) {
+        val thingsToRemove = maglev.things.filter { thing ->
+            when(thing) {
+                is MaglevStroke -> thing.drawPoints.run {
+                    val strokeWidth = thing.params.width
+                    (0 until length).asSequence()
+                            .anyTiamatGrindSync {MathUtil.distance(this.x[it], this.y[it], x, y) < this.w[it] * strokeWidth}
+                }
+                is MaglevFill -> false
+                else -> false
+            }
+        }
+
+        if( thingsToRemove.any())
+            maglev.removeThings(thingsToRemove, arranged, "Maglev Erase Action")
+    }
 }

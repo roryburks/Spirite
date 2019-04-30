@@ -93,6 +93,10 @@ interface IImageDrawer {
         fun erasePoints(x: Float, y: Float, r: Float)
     }
 
+    interface IMagneticEraseModule {
+        fun erase( x: Float, y: Float)
+    }
+
     interface ILiftSelectionModule {
         fun liftSelection(selection: Selection, clearLifted: Boolean = true): ILiftedData
     }

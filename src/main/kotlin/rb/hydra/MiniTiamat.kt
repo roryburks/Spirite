@@ -15,7 +15,7 @@ fun <T> Sequence<T>.miniTiamatGrindSync(headCount: Int = 4, minimizer: (T)->Doub
 suspend fun <T> Sequence<T>.miniTiamatGrind(
         headCount: Int = 4, minimizer: (T)->Double) : Pair<Double,T>?
 {
-    val heads = List(headCount) { TiamatHead<T>() }
+    val heads = List(headCount) { MiniTiamatHead<T>() }
     val channel = Channel<T>()
 
     val tasks = heads
@@ -41,7 +41,7 @@ suspend fun <T> Sequence<T>.miniTiamatGrind(
     return if( min?.t == null) null else Pair(min.size, min.t!!)
 }
 
-private class TiamatHead<T> : CoroutineScope{
+private class MiniTiamatHead<T> : CoroutineScope{
     var t: T? = null
     var size: Double = Double.MAX_VALUE
 

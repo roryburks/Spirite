@@ -49,6 +49,17 @@ constructor(
         })
     }
 
+    internal fun removeThings( things: Collection<IMaglevThing>, arranged: ArrangedMediumData, description: String) {
+        arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged){
+            override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
+                maglev.things.removeAll(things)
+                builtImage.flush() // BAD: using things after flush is intended to be undefined behavior, I'm using internal knowledge.  bad
+                maglev.things.forEach { it.draw(built) }
+            }
+            override val description: String get() = description
+        })
+    }
+
     // region IMedium
     override val x: Int get() = builtImage.xOffset
     override val y: Int get() = builtImage.yOffset
