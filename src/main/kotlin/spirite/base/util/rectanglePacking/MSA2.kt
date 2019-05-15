@@ -4,9 +4,13 @@ package spirite.base.util.rectanglePacking
 import rb.extendo.extensions.removeFirst
 import rb.extendo.extensions.removeToList
 import rb.vectrix.linear.Vec2i
+import rb.vectrix.mathUtil.MathUtil
+import rb.vectrix.mathUtil.d
+import rb.vectrix.mathUtil.floor
 import spirite.base.util.linear.Rect
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sqrt
 
 // TODO: Merge into Vectrix once spirite.Rect is replaced with Vectrix.RectI
 data class PackedRectangle (
@@ -20,9 +24,11 @@ private val NilPacked get() = PackedRectangle(emptyList())
 
 fun ModifiedSleatorAlgorithm2(toPack: List<Vec2i>) : PackedRectangle {
     val cropped = toPack.filter { it.xi > 0 && it.yi > 0 }.sortedBy { -it.xi }
-    val minWidth = toPack.asSequence().map { it.xi }.max() ?: return NilPacked
+    if(!cropped.any())
+        return NilPacked
+    val minWidth = sqrt(cropped.asSequence().map { it.xi * it.yi }.sum().d).floor
 
-    val maxWidth = minWidth*2
+    val maxWidth = minWidth
     val inc = max(1, (maxWidth-minWidth + 5)/10)
 
     return (minWidth..maxWidth step inc).asSequence()

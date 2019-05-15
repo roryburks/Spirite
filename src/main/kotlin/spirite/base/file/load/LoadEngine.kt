@@ -128,6 +128,8 @@ object LoadEngine {
             workspace.width = width
             workspace.height = height
 
+            print(context.telemetry)
+
             workspace.finishBuilding()
 
             return workspace

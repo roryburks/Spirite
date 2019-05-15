@@ -87,9 +87,6 @@ private constructor(
             val visibilityButton = Hybrid.ui.ToggleButton( t.visible)
             visibilityButton.checkBind.addObserver {new, _ ->
                 t.visible = new
-                if( workspace?.groupTree?.selectedNode?.isVisible == false) {
-                    workspace?.groupTree?.selectedNode = t
-                }
             }
             visibilityButton.setOnIcon( SwIcons.BigIcons.VisibleOn)
             _nodeMap[t] = visibilityButton

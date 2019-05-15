@@ -4,6 +4,7 @@ import rb.extendo.extensions.toHashMap
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MWorkspaceSet
 import spirite.gui.components.dialogs.IDialog
+import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 
 interface ICentralCommandExecutor {
@@ -37,22 +38,24 @@ class CentralCommandExecutor(
     override val validCommands: List<String> get() = commandExecutors.values.flatMap { it.validCommands }
 
     override fun executeCommand(command: String, extra: Any?) : Boolean {
-        val space = command.substring(0, command.indexOf("."))
-        val subCommand = command.substring(space.length+1)
-
-        var attempted = false
         var executed = false
+        Hybrid.gle.runInGLContext {
+            val space = command.substring(0, command.indexOf("."))
+            val subCommand = command.substring(space.length + 1)
 
-        commandExecutors[space]?.run {
-            attempted = true
-            if( executeCommand(subCommand, extra))
-                executed = true
+            var attempted = false
+
+            commandExecutors[space]?.run {
+                attempted = true
+                if (executeCommand(subCommand, extra))
+                    executed = true
+            }
+
+            if (!attempted) {
+                MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command domain: $space")
+            }
         }
-
-        if (!attempted) {
-            MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command domain: $space")
-        }
-
         return executed
+
     }
 }

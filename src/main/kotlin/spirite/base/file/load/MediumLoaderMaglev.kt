@@ -28,6 +28,7 @@ import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
+import java.lang.Exception
 
 
 object MagneticMediumLoader : IMediumLoader
@@ -36,45 +37,46 @@ object MagneticMediumLoader : IMediumLoader
         val ra = context.ra
 
         val numThings = ra.readUnsignedShort()
+
         val things = List<IMaglevThing?>(numThings) {
-            val thingType = ra.readByte()
-            when( thingType.i) {
-                SaveLoadUtil.MAGLEV_THING_STROKE -> {
-                    val color = ra.readInt().toColor()
-                    val strokeMethod = StrokeParams.Method.fromFileId(ra.readByte().i) ?: BASIC
-                    val strokeWidth = ra.readFloat()
-                    val mode = PenDrawMode.fromFileId(ra.readUnsignedByte())
+                val thingType = ra.readByte()
+                when (thingType.i) {
+                    SaveLoadUtil.MAGLEV_THING_STROKE -> {
+                        val color = ra.readInt().toColor()
+                        val strokeMethod = StrokeParams.Method.fromFileId(ra.readByte().i) ?: BASIC
+                        val strokeWidth = ra.readFloat()
+                        val mode = PenDrawMode.fromFileId(ra.readUnsignedByte())
 
-                    val numVertices = ra.readInt()
+                        val numVertices = ra.readInt()
 
-                    val x = ra.readFloatArray(numVertices)
-                    val y = ra.readFloatArray(numVertices)
-                    val w = ra.readFloatArray(numVertices)
+                        val x = ra.readFloatArray(numVertices)
+                        val y = ra.readFloatArray(numVertices)
+                        val w = ra.readFloatArray(numVertices)
 
-                    MaglevStroke(
-                            StrokeParams(color, strokeMethod, width = strokeWidth, mode = mode),
-                            DrawPoints(x,y,w))
-                }
-                SaveLoadUtil.MAGLEV_THING_FILL -> {
-                    val color = ColorARGB32Normal(ra.readInt())
-                    val mode = MagneticFillMode.fromFileId(ra.readByte().i)!!
-
-                    val numSeqments = ra.readUnsignedShort()
-                    val segments = List(numSeqments) {
-                        val strokeId = ra.readInt()
-                        val start = ra.readInt()
-                        val end = ra.readInt()
-                        StrokeSegment(strokeId, start, end)
+                        MaglevStroke(
+                                StrokeParams(color, strokeMethod, width = strokeWidth, mode = mode),
+                                DrawPoints(x, y, w))
                     }
-                    MaglevFill(segments, mode, color)
-                }
-                else -> {
-                    MDebug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
-                    null
-                }
+                    SaveLoadUtil.MAGLEV_THING_FILL -> {
+                        val color = ColorARGB32Normal(ra.readInt())
+                        val mode = MagneticFillMode.fromFileId(ra.readByte().i)!!
 
-            }
-        }.filterNotNull()
+                        val numSeqments = ra.readUnsignedShort()
+                        val segments = List(numSeqments) {
+                            val strokeId = ra.readInt()
+                            val start = ra.readInt()
+                            val end = ra.readInt()
+                            StrokeSegment(strokeId, start, end)
+                        }
+                        MaglevFill(segments, mode, color)
+                    }
+                    else -> {
+                        MDebug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
+                        null
+                    }
+
+                }
+            }.filterNotNull()
 
         val imgSize = if( context.version >= 0x0001_0009) ra.readInt() else 0
         val xoffset = if( context.version >= 0x0001_0009) ra.readUnsignedShort() else 0
