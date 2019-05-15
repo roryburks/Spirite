@@ -16,7 +16,7 @@ data class PackedRectangle (
     val height: Int = packedRects.map{ it.y + it.height}.max() ?: 0
 }
 
-private val NilPacked get() = PackedRectangle(emptyList())
+val NilPacked get() = PackedRectangle(emptyList())
 
 fun ModifiedSleatorAlgorithm2(toPack: List<Vec2i>) : PackedRectangle {
     val cropped = toPack.filter { it.xi > 0 && it.yi > 0 }.sortedBy { -it.xi }

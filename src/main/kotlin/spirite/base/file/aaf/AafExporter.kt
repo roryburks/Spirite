@@ -13,6 +13,7 @@ import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.mediums.IImageMedium
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.util.linear.Rect
+import spirite.base.util.rectanglePacking.LeftRightPacker
 import spirite.base.util.rectanglePacking.ModifiedSleatorAlgorithm2
 import spirite.base.util.rectanglePacking.PackedRectangle
 import spirite.hybrid.Hybrid
@@ -47,7 +48,7 @@ class AafExporter(
         val deduplicated = deDuplicateImages(images)
 
         // Step 3: Use Rectangle Packing Algorithm to pack them.
-        val packed = ModifiedSleatorAlgorithm2(
+        val packed = LeftRightPacker.pack(
                 deduplicated.flatMap { (0 until it.value.size).map { _ -> it.key } })
 
         // Step 4: Construct packed Image and map from Image -> Rect
