@@ -99,7 +99,7 @@ class CrossList<A,B>(
         private var a = startIndex / bSize
         private var b = startIndex % bSize
 
-        override fun hasNext() = size < a*bSize + b-1
+        override fun hasNext() = size > a*bSize + b-1
         override fun hasPrevious() = a*bSize + b > 0
 
         override fun nextIndex() = bSize*a + b + 1
