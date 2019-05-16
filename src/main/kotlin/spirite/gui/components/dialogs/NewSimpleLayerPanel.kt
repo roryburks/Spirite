@@ -9,11 +9,12 @@ import spirite.base.util.Colors
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
 import spirite.hybrid.Hybrid
 
 class NewSimpleLayerPanel(
         private val master: IMasterControl,
-        workspace: IImageWorkspace) : ICrossPanel by Hybrid.ui.CrossPanel()
+        workspace: IImageWorkspace) : ICrossPanel by Hybrid.ui.CrossPanel(), IDialogPanel<NewSimpleLayerReturn>
 {
     data class NewSimpleLayerReturn(
             val width: Int,
@@ -119,7 +120,7 @@ class NewSimpleLayerPanel(
         }
     }
 
-    val result : NewSimpleLayerReturn get() =
+    override val result : NewSimpleLayerReturn get() =
         NewSimpleLayerReturn(
                 widthField.value,
                 heightField.value,

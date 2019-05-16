@@ -1,6 +1,7 @@
 package spirite.gui.components.dialogs
 
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 
@@ -8,7 +9,7 @@ class DisplayOptionsPanel(
         val defaultOptions : DisplayOptions? = null
 
 )
-    : ICrossPanel by Hybrid.ui.CrossPanel()
+    : ICrossPanel by Hybrid.ui.CrossPanel(), IDialogPanel<DisplayOptions>
 {
     data class DisplayOptions(
             val alpha: Float,
@@ -34,5 +35,5 @@ class DisplayOptionsPanel(
         }
     }
 
-    val result get() = DisplayOptions(alpha, isVisible)
+    override val result get() = DisplayOptions(alpha, isVisible)
 }

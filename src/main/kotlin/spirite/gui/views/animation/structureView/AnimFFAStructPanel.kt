@@ -71,7 +71,7 @@ private constructor(
     var TICK_WIDTH = 32
     var TICK_HEIGHT = 16
 
-    private val _structBuilderFactory = FfaStructBuilderFactory(master)
+    private val _structBuilderFactory = FfaStructBuilderFactory(master) {rebuild()}
 
 
     var viewspace = FFAStructPanelViewspace(

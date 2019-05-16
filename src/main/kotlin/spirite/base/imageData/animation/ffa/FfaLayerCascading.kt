@@ -6,6 +6,7 @@ import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.hybrid.Hybrid
 import kotlin.math.min
 
 class FfaLayerCascading(
@@ -18,8 +19,7 @@ class FfaLayerCascading(
 
     var lexicon by OnChangeDelegate<String?>(null) {update()}
 
-    var sublayerInfo = mutableMapOf<GroupNode, FFACascadingSublayerInfo>()
-    //var sublayers : List<Pair<Int, FFACascadingSublayerInfo?>> = emptyList()
+    var sublayerInfo = mutableMapOf<GroupNode, FfaCascadingSublayerInfo>()
 
     // region IFfaLayer
     override val start: Int get() = 0
@@ -36,11 +36,28 @@ class FfaLayerCascading(
     // Endregion
 
     // region exposed functionality
+    fun getAllSublayers() = sublayerInfo.entries.map { FfaCascadingSublayerContract(it.value.group, it.value.lexicalKey, it.value.primaryLen) }
+    fun getSublayerInfo(node: GroupNode) = sublayerInfo[node]?.run { FfaCascadingSublayerContract(group, lexicalKey, primaryLen) }
+    fun setSublayerInfo(info: FfaCascadingSublayerContract) {
+        if( sublayerInfo.entries.asSequence()
+                        .filter { it.key != info.group }
+                        .any { it.value.lexicalKey == info.lexicalKey })
+        {
+            Hybrid.beep()
+        }
+
+        val mapped = FfaCascadingSublayerInfo.FromGroup(info.group, info.lexicalKey, info.primaryLen)
+        if( mapped != null) {
+            sublayerInfo[info.group] = mapped
+            anim.triggerFFAChange(this)
+        }
+    }
     // endregion
 
     init {update()}
 
-    private data class IndexedSublayer(val start: Int, val info: FFACascadingSublayerInfo?)
+    // region Internal
+    private data class IndexedSublayer(val start: Int, val info: FfaCascadingSublayerInfo?)
 
     private fun update()
     {
@@ -51,7 +68,7 @@ class FfaLayerCascading(
                 .mapIndexedNotNull { index, groupNode ->
                     val key = 'A' + index
                     val info = oldSublayerInfo[groupNode]?.copyUpdated(key)
-                            ?: FFACascadingSublayerInfo.FromGroup(groupNode, key)
+                            ?: FfaCascadingSublayerInfo.FromGroup(groupNode, key)
                             ?: return@mapIndexedNotNull  null
                     Pair(groupNode, info)
                 }
@@ -66,7 +83,7 @@ class FfaLayerCascading(
         val oldLexicon = lexicon
         lexicon = oldLexicon?.asSequence()
                 ?.mapNotNull { oldLexicalMap[it]?.run { newLexicalInvMap[this] } }
-                ?.joinToString()
+                ?.joinToString("")
         val newLexicon = lexicon ?: String(CharArray(newGroupNodes.size) {'A' + it})
 
         var met = 0
@@ -98,7 +115,7 @@ class FfaLayerCascading(
 
     inner class CascadingFrame(
             override val start: Int,
-            val points: List<Pair<Int, FFACascadingSublayerInfo>>)
+            val points: List<Pair<Int, FfaCascadingSublayerInfo>>)
         :IFFAFrame
     {
         override val layer: IFfaLayer get() = this@FfaLayerCascading
@@ -107,10 +124,15 @@ class FfaLayerCascading(
                 .mapNotNull { it.second.getLayerFromLocalMet(it.first) }
                 .flatMap { it.getDrawList() }
     }
+    // endregion
 }
 
+data class FfaCascadingSublayerContract(
+        val group: GroupNode,
+        val lexicalKey: Char,
+        val primaryLen: Int)
 
-data class FFACascadingSublayerInfo
+data class FfaCascadingSublayerInfo
 constructor(
         val group: GroupNode,
         val lexicalKey: Char,
@@ -121,7 +143,7 @@ constructor(
     val primaryLen: Int get() = _primaryLen ?: len
     val len: Int get() = lexicon?.length ?: layers.count()
 
-    fun copyUpdated(newLexicalKey: Char) : FFACascadingSublayerInfo? {
+    fun copyUpdated(newLexicalKey: Char) : FfaCascadingSublayerInfo? {
         val newLayerNodes = group.children.filterIsInstance<LayerNode>()
                 .asReversed()
         if(!newLayerNodes.any())
@@ -145,15 +167,17 @@ constructor(
     }
 
     companion object {
-        fun FromGroup(group: GroupNode, lexicalKey: Char) : FFACascadingSublayerInfo? {
+        fun FromGroup(group: GroupNode, lexicalKey: Char, primaryLen: Int? = null, lexicon: String? = null) : FfaCascadingSublayerInfo? {
             val layerNodes = group.children.filterIsInstance<LayerNode>()
                     .asReversed()
             if( !layerNodes.any())
                 return null
-            return FFACascadingSublayerInfo(
+            return FfaCascadingSublayerInfo(
                     group,
                     lexicalKey,
-                    layerNodes)
+                    layerNodes,
+                    primaryLen,
+                    lexicon)
         }
     }
 }

@@ -2,11 +2,11 @@ package spirite.gui.components.dialogs
 
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.*
 import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
-import spirite.gui.components.dialogs.WorkspaceSizePanel.WorkspaceSizeReturn
 import spirite.gui.resources.Skin.Global
 import spirite.gui.resources.SwIcons
 import spirite.pc.gui.SColor
@@ -23,6 +23,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 interface IDialog {
     fun invokeNewSimpleLayer( workspace: IImageWorkspace) : NewSimpleLayerReturn?
     fun invokeWorkspaceSizeDialog(description: String): WorkspaceSizeReturn?
+    fun invokeNewFfaCascadingLayerDetails(defaultInfo: FfaCascadingSublayerContract) : FfaCascadingSublayerContract?
 
     fun invokeDisplayOptions(title: String = "Display Options", default: DisplayOptions? = null) : DisplayOptions?
 
@@ -64,9 +65,7 @@ class JDialog(private val master: IMasterControl) : IDialog
         JOptionPane.showConfirmDialog(null, message,"",JOptionPane.OK_OPTION)
     }
 
-    override fun invokeNewSimpleLayer(workspace: IImageWorkspace): NewSimpleLayerReturn? {
-        val panel = NewSimpleLayerPanel(master,workspace)
-
+    fun <T> runDialogPanel(panel: IDialogPanel<T>) : T? {
         val result =JOptionPane.showConfirmDialog(
                 null,
                 panel.jcomponent,
@@ -81,38 +80,17 @@ class JDialog(private val master: IMasterControl) : IDialog
         }
     }
 
-    override fun invokeWorkspaceSizeDialog(description: String): WorkspaceSizeReturn? {
-        val panel = WorkspaceSizePanel(master)
+    override fun invokeNewSimpleLayer(workspace: IImageWorkspace)
+            = runDialogPanel(NewSimpleLayerPanel(master,workspace))
 
-        val result =JOptionPane.showConfirmDialog(
-                null,
-                panel.jcomponent,
-                description,
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE,
-                SwIcons.BigIcons.NewLayer.icon)
+    override fun invokeWorkspaceSizeDialog(description: String)
+            = runDialogPanel(WorkspaceSizePanel(master))
 
-        return when(result) {
-            JOptionPane.OK_OPTION -> panel.result
-            else -> null
-        }
-    }
+    override fun invokeNewFfaCascadingLayerDetails(defaultInfo: FfaCascadingSublayerContract)
+            = runDialogPanel(FfaCascadingLayerDetailsPanel(defaultInfo))
 
-    override fun invokeDisplayOptions(title: String, default: DisplayOptions?): DisplayOptions? {
-        val panel= DisplayOptionsPanel(default)
-        val result =JOptionPane.showConfirmDialog(
-                null,
-                panel.jcomponent,
-                title,
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE,
-                SwIcons.BigIcons.VisibleOn.icon)
-
-        return when(result) {
-            JOptionPane.OK_OPTION -> panel.result
-            else -> null
-        }
-    }
+    override fun invokeDisplayOptions(title: String, default: DisplayOptions?)
+            = runDialogPanel(DisplayOptionsPanel(default))
 
     override fun pickFile(type: FilePickType): File? {
         val fc = JFileChooser()
