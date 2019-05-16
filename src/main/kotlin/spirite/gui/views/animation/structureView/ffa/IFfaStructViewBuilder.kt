@@ -29,7 +29,7 @@ interface IFFAStructView {
     val dragBrain : IAnimDragBrain?
 }
 
-interface IFFAStructViewBuilder {
+interface IFfaStructViewBuilder {
     fun buildNameComponent(layer: IFfaLayer) : IFFAStructView
     fun buildFrameComponent(layer: IFfaLayer, frame: IFFAFrame) : IFFAStructView
 }

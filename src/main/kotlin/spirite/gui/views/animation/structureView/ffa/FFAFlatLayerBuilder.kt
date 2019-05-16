@@ -52,7 +52,7 @@ fun ContextMenus.launchContextMenuFor( point: UIPoint, frame: IFFAFrame) {
     this.LaunchContextMenu(point, schema)
 }
 
-class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFFAStructViewBuilder
+class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewBuilder
 {
     override fun buildNameComponent(layer: IFfaLayer) = when(layer) {
         is FfaLayerLexical -> LexicalNameView(layer, _master.contextMenus, _master.dialog)

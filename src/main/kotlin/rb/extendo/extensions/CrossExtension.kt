@@ -50,8 +50,8 @@ class CrossList<A,B>(
     : List<Pair<A,B>>
 {
     override val size: Int get() = aSize * bSize
-    private val aSize by lazy { aList.size}
-    private val bSize by lazy { bList.size}
+    private val aSize get() = aList.size
+    private val bSize get() = bList.size
 
     override fun contains(element: Pair<A, B>) =
         aList.contains(element.first) && bList.contains(element.second)
