@@ -46,6 +46,10 @@ object WorkspaceCommands {
             else -> workspace.viewSystem.view = 0
         }
     }
+    val ResetOtherView = WorkspaceCommand("resetOtherViews") {workspace, _ ->
+        workspace.viewSystem.resetOtherViews()
+
+    }
     val ResizeWorkspace = WorkspaceCommand("resize") {workspace, dialog ->
         val size = dialog.invokeWorkspaceSizeDialog("New Workspace") ?: return@WorkspaceCommand
         workspace.undoEngine.doAsAggregateAction("Resize Workspace") {

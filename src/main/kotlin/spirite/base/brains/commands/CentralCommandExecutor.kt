@@ -23,7 +23,7 @@ class CentralCommandExecutor(
             NodeContextCommand(workspaceSet, dialog),
             DrawCommandExecutor(workspaceSet, master.toolsetManager),
             GlobalCommandExecutor(master, workspaceSet),
-            ViewCommandExecutor(master),
+            WorkViewCommandExecutor(master),
             ToolsetCommandExecutor(master.toolsetManager),
             PaletteCommandExecutor(master.paletteManager),
             SelectionCommandExecutor(workspaceSet),

@@ -6,7 +6,7 @@ import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.IsolationCommandExecutor.IsolationCommand
 import spirite.base.brains.commands.PaletteCommandExecutor.PaletteCommand
 import spirite.base.brains.commands.ToolsetCommandExecutor.ToolCommand
-import spirite.base.brains.commands.ViewCommandExecutor.ViewCommand
+import spirite.base.brains.commands.WorkViewCommandExecutor.WorkViewCommand
 import spirite.base.brains.settings.IPreferences
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
@@ -45,11 +45,11 @@ interface IHotkeyManager {
 }
 
 private val defaultHotkeys = mapOf(
-        ViewCommand.ZOOM_IN.keyCommand to (Hotkey( KeyEvent.VK_ADD, 0)),
-        ViewCommand.ZOOM_OUT.keyCommand to (Hotkey( KeyEvent.VK_SUBTRACT, 0)),
-        ViewCommand.ZOOM_IN_SLOW.keyCommand to (Hotkey( KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK)),
-        ViewCommand.ZOOM_OUT_SLOW.keyCommand to (Hotkey( KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK)),
-        ViewCommand.ZOOM_0.keyCommand to (Hotkey( KeyEvent.VK_NUMPAD0, InputEvent.CTRL_DOWN_MASK)),
+        WorkViewCommand.ZOOM_IN.keyCommand to (Hotkey( KeyEvent.VK_ADD, 0)),
+        WorkViewCommand.ZOOM_OUT.keyCommand to (Hotkey( KeyEvent.VK_SUBTRACT, 0)),
+        WorkViewCommand.ZOOM_IN_SLOW.keyCommand to (Hotkey( KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK)),
+        WorkViewCommand.ZOOM_OUT_SLOW.keyCommand to (Hotkey( KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK)),
+        WorkViewCommand.ZOOM_0.keyCommand to (Hotkey( KeyEvent.VK_NUMPAD0, InputEvent.CTRL_DOWN_MASK)),
 
         ToolCommand.Pen.keyCommand to (Hotkey( KeyEvent.VK_B, 0)),
         ToolCommand.Eraser.keyCommand to (Hotkey( KeyEvent.VK_E, 0)),
@@ -80,6 +80,7 @@ private val defaultHotkeys = mapOf(
         NodeCommands.Duplicate.keyCommand to (Hotkey(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK)),
 
         WorkspaceCommands.ToggleView.keyCommand to (Hotkey(KeyEvent.VK_TAB,0)),
+        WorkspaceCommands.ResetOtherView.keyCommand to (Hotkey(KeyEvent.VK_TAB, InputEvent.ALT_DOWN_MASK)),
 
         IsolationCommand.TOGGLE_ISOLATION.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, 0)),
         IsolationCommand.ISOLATE_LAYER.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, InputEvent.CTRL_DOWN_MASK)),

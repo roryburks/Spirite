@@ -2,15 +2,15 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
-import spirite.base.brains.commands.ViewCommandExecutor.ViewCommand.*
+import spirite.base.brains.commands.WorkViewCommandExecutor.WorkViewCommand.*
 import spirite.hybrid.MDebug
 
-class ViewCommandExecutor(val master: IMasterControl) : ICommandExecutor
+class WorkViewCommandExecutor(val master: IMasterControl) : ICommandExecutor
 {
     val view get() = master.frameManager.workView
 
 
-    enum class ViewCommand(val string: String) : ICommand {
+    enum class WorkViewCommand(val string: String) : ICommand {
         ZOOM_IN( "zoomIn"),
         ZOOM_OUT("zoomOut"),
         ZOOM_IN_SLOW("zoomInSlow"),
@@ -21,7 +21,7 @@ class ViewCommandExecutor(val master: IMasterControl) : ICommandExecutor
         override val commandString: String get() = "view.$string"
         override val keyCommand: KeyCommand get() = KeyCommand(commandString)
     }
-    override val validCommands: List<String> get() = ViewCommand.values().map { it.string }
+    override val validCommands: List<String> get() = WorkViewCommand.values().map { it.string }
     override val domain: String get() = "view"
 
     override fun executeCommand(string: String, extra: Any?): Boolean {

@@ -17,6 +17,8 @@ interface IViewSystem
     var view : Int
     val currentNodeBind : Bindable<Node?>
     var currentNode: Node?
+
+    fun resetOtherViews()
 }
 
 class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
@@ -65,6 +67,14 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
             else -> GenericNodeViewPropertyAction(node, current, newProperties)
         }
         _undoEngine.performAndStore(action)
+    }
+
+    override fun resetOtherViews() {
+        val mainMap = _viewMap
+
+        _viewMapMap.keys.asSequence()
+                .filter { it != _currentViewMap }
+                .forEach { _viewMapMap[it] = _viewMap.toMutableMap() }
     }
 
 
