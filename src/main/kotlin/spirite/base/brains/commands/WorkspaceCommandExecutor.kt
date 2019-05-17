@@ -48,7 +48,9 @@ object WorkspaceCommands {
     }
     val ResetOtherView = WorkspaceCommand("resetOtherViews") {workspace, _ ->
         workspace.viewSystem.resetOtherViews()
-
+    }
+    val CycleView = WorkspaceCommand("cycleView")  {workspace, dialog ->
+        workspace.viewSystem.run { view = (view + 1 ) % numActiveViews }
     }
     val ResizeWorkspace = WorkspaceCommand("resize") {workspace, dialog ->
         val size = dialog.invokeWorkspaceSizeDialog("New Workspace") ?: return@WorkspaceCommand

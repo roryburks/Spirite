@@ -81,6 +81,7 @@ private val defaultHotkeys = mapOf(
 
         WorkspaceCommands.ToggleView.keyCommand to (Hotkey(KeyEvent.VK_TAB,0)),
         WorkspaceCommands.ResetOtherView.keyCommand to (Hotkey(KeyEvent.VK_TAB, InputEvent.ALT_DOWN_MASK)),
+        WorkspaceCommands.ResetOtherView.keyCommand to (Hotkey(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK)),
 
         IsolationCommand.TOGGLE_ISOLATION.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, 0)),
         IsolationCommand.ISOLATE_LAYER.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, InputEvent.CTRL_DOWN_MASK)),

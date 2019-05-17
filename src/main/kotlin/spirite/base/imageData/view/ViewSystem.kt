@@ -14,6 +14,7 @@ interface IViewSystem
     fun get(node: Node) : NodeViewProperties
     fun set(node: Node, newProperties: NodeViewProperties)
 
+    var numActiveViews: Int
     var view : Int
     val currentNodeBind : Bindable<Node?>
     var currentNode: Node?
@@ -32,6 +33,8 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
     override val currentNodeBind = Bindable<Node?>(null)
             .also { it.addObserver { new, _ -> _selectedNodeMap[_currentViewMap] = new } }
     override var currentNode by currentNodeBind
+
+    override var numActiveViews = 3
 
     override var view: Int
         get() = _currentViewMap
