@@ -82,7 +82,7 @@ class FfaLayerCascading(
         // Remap lexicon
         val oldLexicon = lexicon
         lexicon = oldLexicon?.asSequence()
-                ?.mapNotNull { oldLexicalMap[it]?.run { newLexicalInvMap[this] } }
+                ?.mapNotNull { if(it == ' ') ' ' else oldLexicalMap[it]?.run { newLexicalInvMap[this] } }
                 ?.joinToString("")
         val newLexicon = lexicon ?: String(CharArray(newGroupNodes.size) {'A' + it})
 
