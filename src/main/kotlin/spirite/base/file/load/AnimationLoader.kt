@@ -17,7 +17,7 @@ object AnimationLoaderFactory
             SaveLoadUtil.ANIM_FFA -> when( version) {
                 in 0..7 -> LegacyFFALoader_X_To_7
                 in 8..0x1_0000 -> LegacyFFALoader_8_TO_1_0000
-                else -> FFALoader
+                else -> FfaLoader
             }
             SaveLoadUtil.ANIM_RIG ->RigAnimationIgnorer
             else -> throw BadSifFileException("Unrecognized Animation Type ID: $animationTypeId (version mismatch or corrupt file?)")

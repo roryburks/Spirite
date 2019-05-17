@@ -45,6 +45,7 @@ object SaveLoadUtil {
     // :::: FFALayerType
     const val FFALAYER_GROUPLINKED = 0x01
     const val FFALAYER_LEXICAL = 0x02
+    const val FFALAYER_CASCADING = 0x03
 
     // GroupNode Attribute Masks
     const val VISIBLE_MASK = 0x01

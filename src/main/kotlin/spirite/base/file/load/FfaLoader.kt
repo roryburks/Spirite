@@ -3,21 +3,18 @@ package spirite.base.file.load
 import rb.vectrix.mathUtil.i
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readNullTerminatedStringUTF8
-import spirite.base.imageData.animation.ffa.FFAFrameStructure
+import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 
 
-object FFALoader : IAnimationLoader {
+object FfaLoader : IAnimationLoader {
     override fun loadAnimation(context: LoadContext, name: String): FixedFrameAnimation {
         val ra = context.ra
-        val nodes = context.nodes
         val ffa = FixedFrameAnimation(name, context.workspace)
 
         val numLayers = ra.readUnsignedShort()
@@ -34,8 +31,9 @@ object FFALoader : IAnimationLoader {
                     else ra.readUnsignedByte()
 
             val layerLoader = when(layerType) {
-                SaveLoadUtil.FFALAYER_GROUPLINKED -> FFAFixedGroupLayerLoader
-                SaveLoadUtil.FFALAYER_LEXICAL -> FFALexicalLayerLoader
+                SaveLoadUtil.FFALAYER_GROUPLINKED -> FfaFixedGroupLayerLoader
+                SaveLoadUtil.FFALAYER_LEXICAL -> FfaLexicalLayerLoader
+                SaveLoadUtil.FFALAYER_CASCADING -> FfaCascadingLayerLoader
                 else -> null
             }
             if( layerLoader == null) MDebug.handleWarning( UNSUPPORTED,"Unknown FFA Layer Type: $layerType.  Attempting to skip, but likely Corrupting")
@@ -47,12 +45,35 @@ object FFALoader : IAnimationLoader {
     }
 }
 
-interface IFFALayerLoader {
+interface IFfaLayerLoader {
     fun load(context: LoadContext, ffa: FixedFrameAnimation, name: String) : IFfaLayer?
 
 }
 
-object FFALexicalLayerLoader : IFFALayerLoader {
+object FfaCascadingLayerLoader : IFfaLayerLoader {
+    override fun load(context: LoadContext, ffa: FixedFrameAnimation, name: String): IFfaLayer? {
+        val ra = context.ra
+        val nodes = context.nodes
+
+        val group = nodes.getOrNull(ra.readInt()) as? GroupNode
+        val lexicon = ra.readNullTerminatedStringUTF8()
+
+        val subinfoCount = ra.readUnsignedByte()
+        val subinfos = (0 until subinfoCount).mapNotNull {
+            val infoGroup= nodes.getOrNull(ra.readInt()) as? GroupNode
+            val plen = ra.readUnsignedShort()
+            val key = ra.readByte().toChar()
+
+            if( infoGroup == null) null
+            else FfaCascadingSublayerContract(infoGroup, key, plen)
+        }
+
+        return if( group == null) null
+            else FfaLayerCascading(ffa, group, name, subinfos, lexicon)
+    }
+}
+
+object FfaLexicalLayerLoader : IFfaLayerLoader {
     override fun load(context: LoadContext, ffa: FixedFrameAnimation, name: String) : IFfaLayer? {
         val ra = context.ra
         val nodes = context.nodes
@@ -73,7 +94,7 @@ object FFALexicalLayerLoader : IFFALayerLoader {
     }
 }
 
-object FFAFixedGroupLayerLoader : IFFALayerLoader {
+object FfaFixedGroupLayerLoader : IFfaLayerLoader {
     override fun load(context: LoadContext, ffa: FixedFrameAnimation, name: String) : IFfaLayer? {
         val ra = context.ra
         val nodes = context.nodes
@@ -88,7 +109,7 @@ object FFAFixedGroupLayerLoader : IFFALayerLoader {
         var workingNode : Node? = null
         var workingUnlinkedFrames = mutableListOf<FFAFrameStructure>()
 
-        repeat(numFrames) {_->
+        repeat(numFrames) {
             val frameType =  ra.readByte().i
             val frameNode = nodes.getOrNull(ra.readInt())
             val length = ra.readUnsignedShort()
@@ -115,13 +136,12 @@ object FFAFixedGroupLayerLoader : IFFALayerLoader {
         }
 
 
-        val groupNode = node as? GroupNode
-        when( groupNode) {
+        return when(val groupNode = node as? GroupNode) {
             null -> {
                 MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group GroupNode marked as its Link")
-                return null
+                null
             }
-            else -> return ffa.addLinkedLayer(groupNode, includeSubtrees, name, frameMap, unlinkedFrameClusters)
+            else -> ffa.addLinkedLayer(groupNode, includeSubtrees, name, frameMap, unlinkedFrameClusters)
         }
     }
 
@@ -203,8 +223,7 @@ object LegacyFFALoader_8_TO_1_0000 : IAnimationLoader {
             }
 
 
-            val groupNode = node as? GroupNode
-            when( groupNode) {
+            when(val groupNode = node as? GroupNode) {
                 null -> MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group GroupNode marked as its Link")
                 else -> ffa.addLinkedLayer(groupNode, includeSubtrees, frameMap = frameMap, unlinkedClusters = unlinkedFrameClusters)
             }

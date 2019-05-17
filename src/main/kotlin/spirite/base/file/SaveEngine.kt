@@ -3,6 +3,7 @@ package spirite.base.file
 import rb.clicker.telemetry.TelemetryEvent
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
+import spirite.base.file.SaveLoadUtil.FFALAYER_CASCADING
 import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
 import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
 import spirite.base.imageData.IImageWorkspace
@@ -10,6 +11,7 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked
+import spirite.base.imageData.animation.ffa.FfaLayerCascading
 import spirite.base.imageData.animation.ffa.FfaLayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
@@ -387,7 +389,19 @@ object SaveEngine {
                                             ra.writeInt(context.nodeMap[explicit.value] ?: -1) // [4] : NodeId
                                         }
                                     }
+                                }
+                                is FfaLayerCascading -> {
+                                    ra.writeByte(FFALAYER_CASCADING)    // [1] : Layer TypeId
+                                    ra.writeInt(context.nodeMap[layer.groupLink] ?: -1) // [4] NodeId of GroupNode
+                                    ra.writeUFT8NT(layer.lexicon ?: "") // [n] : Lexicon
 
+                                    val subinfos = layer.sublayerInfo.values.toList()
+                                    ra.writeByte(min(255, subinfos.size)) // [1] : Group Subinfos
+                                    subinfos.forEach {
+                                        ra.writeInt(context.nodeMap[it.group] ?: -1)    // [4] NodeId
+                                        ra.writeShort(it.primaryLen)                        // [2] PrimaryLen
+                                        ra.writeByte(it.lexicalKey.toByte().toInt())        // [1] Lexical Key
+                                    }
                                 }
                             }
 

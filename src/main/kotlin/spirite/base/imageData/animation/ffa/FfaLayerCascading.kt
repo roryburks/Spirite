@@ -12,12 +12,14 @@ import kotlin.math.min
 class FfaLayerCascading(
         override val anim: FixedFrameAnimation,
         val groupLink: GroupNode,
-        name: String = groupLink.name)
+        name: String = groupLink.name,
+        infoToImport: List<FfaCascadingSublayerContract>? = null,
+        lexicon: String? = null)
     :IFfaLayer, IFFALayerLinked
 {
     override var name by OnChangeDelegate(name) { anim.triggerFFAChange(this)}
 
-    var lexicon by OnChangeDelegate<String?>(null) {update()}
+    var lexicon by OnChangeDelegate<String?>(lexicon) {update()}
 
     var sublayerInfo = mutableMapOf<GroupNode, FfaCascadingSublayerInfo>()
 
@@ -51,10 +53,16 @@ class FfaLayerCascading(
             sublayerInfo[info.group] = mapped
             anim.triggerFFAChange(this)
         }
+        update()
     }
     // endregion
 
-    init {update()}
+    init {
+        infoToImport
+                ?.mapNotNull { FfaCascadingSublayerInfo.FromGroup(it.group, it.lexicalKey, it.primaryLen) }
+                ?.forEach { sublayerInfo[it.group] =  it }
+        update()
+    }
 
     // region Internal
     private data class IndexedSublayer(val start: Int, val info: FfaCascadingSublayerInfo?)
