@@ -41,20 +41,20 @@ class AafExporter(
         val (pngFilename, aafFilename) = getFilenames(filename)
 
         // Step 1: Gather all flat image segments needed by the animation
-        val images = getAllImages(animation)
+        val logicalImages = getAllImages(animation)
 
-        // Step 2: Check to see which (if any) are exact duplicates, re-mapping them if they are
-        val deduplicated = deDuplicateImages(images)
+        // Step 2: Check to see which (if any) are repeated images (not a deep search)
+        val uniqueImages = logicalImages.map { it.image }.distinct().toList()
 
         // Step 3: Use Rectangle Packing Algorithm to pack them.
         val packed = BottomUpPacker.pack(
-                deduplicated.flatMap { (0 until it.value.size).map { _ -> it.key } })
+                uniqueImages.map { Vec2i(it.width, it.height) })
 
         // Step 4: Construct packed Image and map from Image -> Rect
-        val (outputImg, imgMap) = drawAndMap(packed, deduplicated)
+        val aafInfo = drawAndMap(packed, uniqueImages)
 
         // Step 5: Save Png
-        imageExporter.saveImage(outputImg, File(pngFilename))
+        imageExporter.saveImage(aafInfo.img, File(pngFilename))
 
         // Step 6: Save Aaf
         val file = File(aafFilename)
@@ -63,7 +63,7 @@ class AafExporter(
         file.createNewFile()
 
         val ra = RandomAccessFile(file, "rw")
-        AafFileSaver.saveAAF(ra, animation, imgMap)
+        AafFileSaver.saveAAF(ra, animation, aafInfo)
     }
 
     val regex = Regex("""\.([^.\\/]+)${'$'}""")
@@ -88,65 +88,73 @@ class AafExporter(
                 .flatMap { it.getImages().asSequence() }
     }
 
-    fun deDuplicateImages(images: Sequence<ShiftedImage>) : Map<Vec2i,MutableList<ShiftedImage>>
-    {
-        val imagesByDimension = images.toLookup { Vec2i(it.image.width, it.image.height) }
-
-        fun checkImagesIdentical(image1: IImage, image2: IImage) : Boolean {
-            if( image1 == image2) return true
-            if( image1.width != image2.width) return false
-            if( image1.height != image2.height) return false
-
-            for (x in 0 until image1.width) {
-                for( y in 0 until image1.height) {
-                    if( image1.getARGB(x,y) != image2.getARGB(x,y)) {
-                        return false
-                    }
-                }
-            }
-            return true
-        }
-//        for( e in imagesByDimension) {
-//            if( e.value.size <= 1) continue
-//            val toRemove = mutableListOf<ShiftedImage>()
-//            val byHash = e.value
-//                    .toLookup { hasher.getHash(it.image.byteStream) }
+//    fun deDuplicateImages(images: Sequence<ShiftedImage>) : Map<ShiftedImage,MutableList<ShiftedImage>>
+//    {
+//        val imagesByDimension = images.toLookup { Vec2i(it.image.width, it.image.height) }
 //
-//            for( hashed in  byHash) {
-//                var knownUnique = 1
-//                val list = hashed.value
+//        val existingImages = hashSetOf<IImage>()
 //
-//                while (list.size > knownUnique) {
-//                    list
-//                            .subList(knownUnique+1,list.lastIndex)
-//                            .removeIf {check -> checkImagesIdentical(list[knownUnique].image, check.image)
-//                                    .also { if( it) toRemove.add(check) }}
-//                    knownUnique++
+//        fun checkImagesIdentical(image1: IImage, image2: IImage) : Boolean {
+//            if( image1 == image2) return true
+//            if( image1.width != image2.width) return false
+//            if( image1.height != image2.height) return false
+//
+//            for (x in 0 until image1.width) {
+//                for( y in 0 until image1.height) {
+//                    if( image1.getARGB(x,y) != image2.getARGB(x,y)) {
+//                        return false
+//                    }
 //                }
 //            }
-//            e.value.removeAll(toRemove)
+//            return true
 //        }
+////        for( e in imagesByDimension) {
+////            if( e.value.size <= 1) continue
+////            val toRemove = mutableListOf<ShiftedImage>()
+////            val byHash = e.value
+////                    .toLookup { hasher.getHash(it.image.byteStream) }
+////
+////            for( hashed in  byHash) {
+////                var knownUnique = 1
+////                val list = hashed.value
+////
+////                while (list.size > knownUnique) {
+////                    list
+////                            .subList(knownUnique+1,list.lastIndex)
+////                            .removeIf {check -> checkImagesIdentical(list[knownUnique].image, check.image)
+////                                    .also { if( it) toRemove.add(check) }}
+////                    knownUnique++
+////                }
+////            }
+////            e.value.removeAll(toRemove)
+////        }
+//
+//        imagesByDimension.values.removeIf { it.none() }
+//        return imagesByDimension
+//    }
 
-        imagesByDimension.values.removeIf { it.none() }
-        return imagesByDimension
-    }
 
-    internal data class ImageLink(
-            val img: ShiftedImage,
-            val rect: Rect,
-            val id: Int)
+    internal data class AafInfo(
+            val img: RawImage,
+            val chunks: List<Rect>,
+            val chunkMap: Map<IImage,Int>)
 
-    private fun drawAndMap(packed: PackedRectangle, images: Map<Vec2i, MutableList<ShiftedImage>>) : Pair<RawImage, List<ImageLink>>
+    private fun drawAndMap(packed: PackedRectangle,uniqueImages: List<IImage>)
+            : AafInfo
     {
         val img = imageCreator.createImage(packed.width, packed.height)
 
-        val map = packed.packedRects
-                .mapIndexed { index, rect ->
-                    val image = images[Vec2i(rect.width, rect.height)]!!.pop()
-                    img.graphics.renderImage(image.image, rect.x, rect.y)
-                    ImageLink(image, rect, index)
-                }
+        val imagesByDimension = uniqueImages.toLookup { Vec2i(it.width, it.height) }
 
-        return Pair(img,map)
+        val chunkMap = packed.packedRects
+                .mapIndexed { index, rect ->
+                    val image= imagesByDimension[Vec2i(rect.width, rect.height)]!!.pop()
+                    img.graphics.renderImage(image, rect.x, rect.y)
+                    Pair(image, index)
+                }.toMap()
+
+        val chunks = packed.packedRects
+
+        return AafInfo(img, chunks, chunkMap)
     }
 }
