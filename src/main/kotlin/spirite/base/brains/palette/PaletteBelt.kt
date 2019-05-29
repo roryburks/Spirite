@@ -7,6 +7,8 @@ import spirite.base.util.Colors
 
 class PaletteBelt
 {
+    val size get() = 4
+
     private val activeColorBinds = mutableListOf(
             Bindable<Color>(Colors.BLACK),
             Bindable<Color>(Colors.WHITE),

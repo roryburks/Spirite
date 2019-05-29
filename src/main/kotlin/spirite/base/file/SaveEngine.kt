@@ -8,9 +8,9 @@ import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
 import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
+import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
-import spirite.base.imageData.animation.ffa.FFALayerGroupLinked
+import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked
 import spirite.base.imageData.animation.ffa.FfaLayerCascading
 import spirite.base.imageData.animation.ffa.FfaLayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -73,12 +73,16 @@ class SaveContext(
 object SaveEngine {
 
     fun saveWorkspace( file : File, workspace: IImageWorkspace) {
-        val overwrite = file.exists()
-        val saveFile = if(overwrite) File(file.absolutePath + "~") else file
+        if( file.exists())
+        {
+            val backup = File(file.absolutePath+"~")
+            if( backup.exists())
+                backup.delete()
+            file.renameTo(backup)
+            file.delete()
+        }
 
-        if( saveFile.exists())
-            saveFile.delete()
-        saveFile.createNewFile()
+        file.createNewFile()
 
         val ra = RandomAccessFile(file, "rw")
         val context = SaveContext(workspace, ra)
@@ -353,7 +357,7 @@ object SaveEngine {
                             ra.writeUFT8NT(layer.name)  // [n] : Layer Name
                             ra.writeByte( if(layer.asynchronous) 1 else 0)  // [1] : IsAsynchronous
                             when(layer) {
-                                is FFALayerGroupLinked -> {
+                                is FfaLayerGroupLinked -> {
                                     ra.writeByte(FFALAYER_GROUPLINKED)  // [1] : Layer TypeId
 
                                     ra.writeInt(context.nodeMap[layer.groupLink] ?: -1)    // [4] : NodeId of GroupNode Bount
@@ -401,6 +405,7 @@ object SaveEngine {
                                         ra.writeInt(context.nodeMap[it.group] ?: -1)    // [4] NodeId
                                         ra.writeShort(it.primaryLen)                        // [2] PrimaryLen
                                         ra.writeByte(it.lexicalKey.toByte().toInt())        // [1] Lexical Key
+                                        ra.writeUFT8NT(it.lexicon ?: "")
                                     }
                                 }
                             }

@@ -6,8 +6,12 @@ import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
+import spirite.base.brains.ICentralObservatory
+import spirite.base.brains.ITopLevelFeedbackSystem
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.palette.IPaletteManager.*
+import spirite.base.brains.palette.PaletteSwapDriver.IPaletteSwapDriver
+import spirite.base.brains.palette.PaletteSwapDriver.TrackingPaletteSwapDriver
 import spirite.base.brains.settings.ISettingsManager
 import spirite.gui.components.dialogs.IDialog
 
@@ -18,9 +22,12 @@ interface IPaletteManager {
     val currentPalette: Palette
     val globalPalette: Palette
 
+    var driver : IPaletteSwapDriver
+
     fun makePaletteSet() : PaletteSet
     fun savePaletteInPrefs(name: String, palette: Palette)
 
+    // Events
     interface PaletteObserver {
         fun paletteChanged( evt: PaletteChangeEvent)
         fun paletteSetChanged( evt: PaletteSetChangeEvent)
@@ -32,9 +39,11 @@ interface IPaletteManager {
 }
 
 class PaletteManager(
-        private val workspaceSet: IWorkspaceSet,
-        private val settings: ISettingsManager,
-        private val dialog: IDialog) : IPaletteManager {
+        private val _workspaceSet: IWorkspaceSet,
+        private val _settings: ISettingsManager,
+        private val _dialog: IDialog,
+        private val _centralObservatory: ICentralObservatory) : IPaletteManager
+{
 
     override val activeBelt: PaletteBelt = PaletteBelt()
 
@@ -47,6 +56,8 @@ class PaletteManager(
     override val currentPaletteBind = Bindable(globalPalette)
     override val currentPalette: Palette by currentPaletteBind
 
+    override var driver : IPaletteSwapDriver = TrackingPaletteSwapDriver
+
     override fun makePaletteSet(): PaletteSet {
         val newPaletteSet = object : PaletteSet() {
             override val onPaletteSetChangeTrigger: (PaletteSetChangeEvent) -> Unit = { triggerPaletteSetChange(it) }
@@ -55,7 +66,7 @@ class PaletteManager(
 
         // DuckTape way of getting PaletteManager.currentPalette to track CurrentWorkspace.PaletteSet.CurrentPalette
         newPaletteSet.currentPaletteBind.addObserver { new, old ->
-            if( workspaceSet.currentWorkspace?.paletteSet == newPaletteSet)
+            if( _workspaceSet.currentWorkspace?.paletteSet == newPaletteSet)
                 currentPaletteBind.field = new ?: globalPalette
         }
 
@@ -63,19 +74,23 @@ class PaletteManager(
     }
 
     override fun savePaletteInPrefs(name: String, palette: Palette) {
-        val palettes = settings.paletteList
+        val palettes = _settings.paletteList
 
         if( palettes.contains(name))
         {
-            if( !dialog.promptVerify("Palette $name already exists.  Overwrite?"))
+            if( !_dialog.promptVerify("Palette $name already exists.  Overwrite?"))
                 return
         }
-        settings.saveRawPalette(name, palette.compress())
+        _settings.saveRawPalette(name, palette.compress())
     }
 
     // region Observer Bindings
-    private val wsObsK = workspaceSet.currentWorkspaceBind.addWeakObserver {new, _ ->
+    private val _wsObsK = _workspaceSet.currentWorkspaceBind.addWeakObserver { new, _ ->
         currentPaletteBind.field = new?.paletteSet?.currentPalette ?: globalPalette
+    }
+
+    private val _activePartK = _centralObservatory.activeDataBind.addWeakObserver { new, _ ->
+        if( new != null) driver.onMediumChenge(new)
     }
 
     private fun triggerPaletteChange(evt: PaletteChangeEvent)

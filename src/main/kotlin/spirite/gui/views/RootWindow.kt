@@ -8,10 +8,12 @@ import spirite.base.brains.commands.FrameCommandExecutor.FrameCommand
 import spirite.base.brains.commands.GlobalCommands
 import spirite.base.brains.commands.SelectCommand
 import spirite.base.brains.commands.WorkspaceCommands
+import spirite.base.util.Colors
 import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
 import spirite.gui.components.advanced.omniContainer.OmniTab
 import spirite.gui.components.advanced.omniContainer.SubContainer
+import spirite.gui.implementations.topLevelFeedback.TopLevelPopupView
 import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.views.animation.AnimationListView
 import spirite.gui.views.animation.structureView.AnimationStructureView
@@ -97,6 +99,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
     }
 
     val groupView = GroupView(master)
+    val topLevelView = TopLevelPopupView()
 
     private val omni = OmniContainer {
         left += OmniSegment(groupView, 100, 300)
@@ -121,7 +124,18 @@ class RootWindow( val master: IMasterControl) : JFrame() {
 
         this.title = "Spirite"
 
-        this.add( omni.jcomponent)
+        val multiLevel = Hybrid.ui.CrossPanel {
+            // TODO: Fix with mouse input
+//            rows.addFlatGroup {
+//                add(topLevelView, flex = 1f)
+//                flex = 1f
+//            }
+            rows.addFlatGroup {
+                add(omni, flex = 1f)
+                flex = 1f
+            }
+        }
+        this.add( multiLevel.jcomponent)
 
         SwingUtilities.invokeLater {this.size = Dimension(800,600) }
         SwingUtilities.invokeLater {groupView.component.jcomponent.requestFocus() }

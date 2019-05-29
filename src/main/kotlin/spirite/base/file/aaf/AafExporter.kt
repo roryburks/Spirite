@@ -41,22 +41,20 @@ class AafExporter(
         val (pngFilename, aafFilename) = getFilenames(filename)
 
         // Step 1: Gather all flat image segments needed by the animation
-        val logicalImages = getAllImages(animation)
+        val uniqueImages = getAllImages(animation)
+                .toList()
 
-        // Step 2: Check to see which (if any) are repeated images (not a deep search)
-        val uniqueImages = logicalImages.map { it.image }.distinct().toList()
-
-        // Step 3: Use Rectangle Packing Algorithm to pack them.
+        // Step 2: Use Rectangle Packing Algorithm to pack them.
         val packed = BottomUpPacker.pack(
                 uniqueImages.map { Vec2i(it.width, it.height) })
 
-        // Step 4: Construct packed Image and map from Image -> Rect
+        // Step 3: Construct packed Image and map from Image -> Rect
         val aafInfo = drawAndMap(packed, uniqueImages)
 
-        // Step 5: Save Png
+        // Step 4: Save Png
         imageExporter.saveImage(aafInfo.img, File(pngFilename))
 
-        // Step 6: Save Aaf
+        // Step 5: Save Aaf
         val file = File(aafFilename)
         if( file.exists())
             file.delete()
@@ -79,16 +77,18 @@ class AafExporter(
         }
     }
 
-    fun getAllImages(animation: FixedFrameAnimation) : Sequence<ShiftedImage> {
+    fun getAllImages(animation: FixedFrameAnimation) : Sequence<IImage> {
         return animation.layers.asSequence()
                 .flatMap { it.frames.asSequence().filterIsInstance<FFAFrame>().map { it.node }.filterIsInstance<LayerNode>() }
                 .flatMap { it.getDrawList().asSequence() }
                 .map { it.handle.medium }
                 .filterIsInstance<IImageMedium>()
                 .flatMap { it.getImages().asSequence() }
+                .map { it.image }
+                .distinct()
     }
 
-//    fun deDuplicateImages(images: Sequence<ShiftedImage>) : Map<ShiftedImage,MutableList<ShiftedImage>>
+//    fun deDuplicateImages(images: Sequence<IImage>) : Map<IImage,MutableList<IImage>>
 //    {
 //        val imagesByDimension = images.toLookup { Vec2i(it.image.width, it.image.height) }
 //

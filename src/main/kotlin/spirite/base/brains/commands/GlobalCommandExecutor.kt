@@ -58,7 +58,8 @@ class GlobalCommandExecutor(
 }
 
 private val commands  = HashMap<String,GlobalCommand>()
-class GlobalCommand(
+class GlobalCommand
+internal constructor(
         val name: String,
         val action: (master: IMasterControl, workspaceSet: MWorkspaceSet)->Unit)
     : ICommand

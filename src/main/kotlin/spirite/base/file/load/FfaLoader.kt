@@ -4,8 +4,8 @@ import rb.vectrix.mathUtil.i
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readNullTerminatedStringUTF8
 import spirite.base.imageData.animation.ffa.*
-import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
-import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
+import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
+import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
@@ -63,13 +63,14 @@ object FfaCascadingLayerLoader : IFfaLayerLoader {
             val infoGroup= nodes.getOrNull(ra.readInt()) as? GroupNode
             val plen = ra.readUnsignedShort()
             val key = ra.readByte().toChar()
+            val subLexicon = if( context.version < 0x0001_000D) "" else ra.readNullTerminatedStringUTF8()
 
             if( infoGroup == null) null
-            else FfaCascadingSublayerContract(infoGroup, key, plen)
+            else FfaCascadingSublayerContract(infoGroup, key, plen, if( subLexicon == "") null else subLexicon)
         }
 
         return if( group == null) null
-            else FfaLayerCascading(ffa, group, name, subinfos, lexicon)
+            else ffa.addCascadingLayer(group,name, subinfos, lexicon)
     }
 }
 
@@ -103,11 +104,11 @@ object FfaFixedGroupLayerLoader : IFfaLayerLoader {
 
         val numFrames = ra.readUnsignedShort()
 
-        val frameMap = mutableMapOf<Node, FFAFrameStructure>()
+        val frameMap = mutableMapOf<Node, FfaFrameStructure>()
         val unlinkedFrameClusters = mutableListOf<UnlinkedFrameCluster>()
 
         var workingNode : Node? = null
-        var workingUnlinkedFrames = mutableListOf<FFAFrameStructure>()
+        var workingUnlinkedFrames = mutableListOf<FfaFrameStructure>()
 
         repeat(numFrames) {
             val frameType =  ra.readByte().i
@@ -125,10 +126,10 @@ object FfaFixedGroupLayerLoader : IFfaLayerLoader {
             }
 
             if( frameNode == null) {
-                workingUnlinkedFrames.add(FFAFrameStructure(null, marker, length))
+                workingUnlinkedFrames.add(FfaFrameStructure(null, marker, length))
             }
             else {
-                frameMap[frameNode] = FFAFrameStructure(frameNode, marker, length)
+                frameMap[frameNode] = FfaFrameStructure(frameNode, marker, length)
                 if (workingUnlinkedFrames.any()) unlinkedFrameClusters.add(UnlinkedFrameCluster(workingNode, workingUnlinkedFrames))
                 workingUnlinkedFrames = mutableListOf()
                 workingNode = frameNode
@@ -160,7 +161,7 @@ object LegacyFFALoader_X_To_7 : IAnimationLoader {
             val framecount = ra.readUnsignedShort()
 
             val groupNode = if( groupNodeId == 0) null else context.nodes.getOrNull(groupNodeId)
-            val nodeMap = mutableMapOf<Node, FFAFrameStructure>()
+            val nodeMap = mutableMapOf<Node, FfaFrameStructure>()
 
             repeat(framecount) {
                 val marker = ra.readByte().i
@@ -168,7 +169,7 @@ object LegacyFFALoader_X_To_7 : IAnimationLoader {
                 val nodeLink = if( marker == 0) ra.readInt() else 0
                 if( nodeLink > 0) {
                     val node = context.nodes[nodeLink]
-                    nodeMap[node] = FFAFrameStructure(node, FRAME, length.i)
+                    nodeMap[node] = FfaFrameStructure(node, FRAME, length.i)
                 }
             }
 
@@ -211,15 +212,15 @@ object LegacyFFALoader_8_TO_1_0000 : IAnimationLoader {
                         }
 
                         when( frameNode) {
-                            is LayerNode -> Pair(frameNode, FFAFrameStructure(frameNode, FRAME, innerLength))
-                            is GroupNode -> Pair(frameNode, FFAFrameStructure(frameNode, START_LOCAL_LOOP, innerLength))
+                            is LayerNode -> Pair(frameNode, FfaFrameStructure(frameNode, FRAME, innerLength))
+                            is GroupNode -> Pair(frameNode, FfaFrameStructure(frameNode, START_LOCAL_LOOP, innerLength))
                             else -> null
                         }
                     }
                     .toMap()
 
             val unlinkedFrameClusters = indexToGapMap.map{entry ->
-                UnlinkedFrameCluster(nodeList.getOrNull(entry.key), List(entry.value) { FFAFrameStructure(null, GAP, 1) })
+                UnlinkedFrameCluster(nodeList.getOrNull(entry.key), List(entry.value) { FfaFrameStructure(null, GAP, 1) })
             }
 
 

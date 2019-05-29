@@ -21,6 +21,7 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.gui.components.dialogs.IDialog
 import spirite.gui.components.dialogs.JDialog
+import spirite.gui.implementations.topLevelFeedback.SwTopLevelFeedbackSystem
 import spirite.gui.menus.ContextMenus
 import spirite.hybrid.Hybrid
 import spirite.hybrid.NativeImage
@@ -48,6 +49,7 @@ interface IMasterControl {
     val frameManager: IFrameManager
     val contextMenus : ContextMenus
     val dialog : IDialog
+    val topLevelFeedbackSystem : ITopLevelFeedbackSystem
 
     val thumbnailStore: IThumbnailStore<IImage>
     val nativeThumbnailStore : IThumbnailStore<NativeImage>
@@ -56,17 +58,19 @@ interface IMasterControl {
 }
 
 class MasterControl : IMasterControl {
+    // Unfortunately this is a bit of a cluster of order-dependence.  No proper DI library.
 
     private val gle = Hybrid.gle
     private val preferences = JPreferences(MasterControl::class.java)
     override val dialog: IDialog = JDialog(this)
+    override val topLevelFeedbackSystem = SwTopLevelFeedbackSystem()
 
     override val hotkeyManager = HotkeyManager(preferences)
     override val settingsManager = SettingsManager(preferences)
 
     override val workspaceSet = WorkspaceSet()
-    override val paletteManager = PaletteManager(workspaceSet, settingsManager, dialog)
     override val centralObservatory = CentralObservatory(workspaceSet)
+    override val paletteManager = PaletteManager(workspaceSet, settingsManager, dialog, centralObservatory)
 
     override val strokeDrawerProvider = GLStrokeDrawerProvider(gle)
     override val toolsetManager = ToolsetManager()
@@ -75,6 +79,7 @@ class MasterControl : IMasterControl {
 
     override val frameManager = SwFrameManager(this)
     override val fileManager = FileManager(this)
+
 
     override val commandExecutor = CentralCommandExecutor(this, workspaceSet, dialog)
 
@@ -88,6 +93,7 @@ class MasterControl : IMasterControl {
         val _thumbnailStore = ThumbnailStore(settingsManager, centralObservatory,workspaceSet)
         thumbnailStore = _thumbnailStore
         nativeThumbnailStore = DerivedNativeThumbnailStore(_thumbnailStore)
+        topLevelFeedbackSystem.frameManager = frameManager
     }
 
     override fun createWorkspace(width: Int, height: Int) = ImageWorkspace(

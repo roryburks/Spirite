@@ -9,7 +9,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.animation.ffa.IFFAFrame
+import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.util.linear.Rect
@@ -19,7 +19,6 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.IScrollContainer
-import spirite.gui.components.basic.events.MouseEvent.MouseEventType.PRESSED
 import spirite.gui.resources.Skin
 import spirite.gui.views.animation.structureView.ffa.FfaStructBuilderFactory
 import spirite.gui.views.animation.structureView.ffa.IAnimDragBehavior
@@ -86,7 +85,7 @@ private constructor(
 
     private data class FrameLinkSet(
             val frameRange: IntRange,
-            val frame: IFFAFrame,
+            val frame: IFfaFrame,
             val view: IFFAStructView)
 
     private data class LayerBuildSet(
@@ -97,7 +96,7 @@ private constructor(
 
     // region Building
     private fun rebuild() {
-        val frameLinks = mutableMapOf<IFFAFrame,IFFAStructView>()
+        val frameLinks = mutableMapOf<IFfaFrame,IFFAStructView>()
         val layerLinks = mutableMapOf<IFfaLayer, IFFAStructView>()
         val viewMap = mutableMapOf<IFfaLayer,IntRange>()
         var wy = 0
@@ -301,7 +300,7 @@ data class FFAStructPanelViewspace(
         val topJustification: Int,
         val tickWidth: Int,
         val layerHeights: Map<IFfaLayer,IntRange>,
-        val frameMap: Map<IFFAFrame,IFFAStructView>,
+        val frameMap: Map<IFfaFrame,IFFAStructView>,
         val layerMap: Map<IFfaLayer, IFFAStructView>)
 {
     fun rectForRangeInLayer(layer: IFfaLayer, range: IntRange) : Rect

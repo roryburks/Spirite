@@ -113,6 +113,7 @@ class SpriteLayer : Layer {
                         workspace.groupTree.root.getAllNodesSuchThat({(it as? LayerNode)?.layer == this}),
                         workspace)
         )
+        workspace.triggerInternalMediumChanged()
     }
 
     fun makeThing(workspace: MImageWorkspace) = when(type) {

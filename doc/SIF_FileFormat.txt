@@ -1,4 +1,4 @@
-Version 0x0001_000C
+Version 0x0001_000D
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -128,6 +128,15 @@ Per Animation:
                     Per Explicit Mapping:
                         [1, char] : Char Map
                         [4, int] : NodeId of Mapping
+                0x03 : Cascading Layer
+                    [4, int] : NodeId of GroupNode Bound
+                    [n, UTF8 str] : Lexicon
+                    [1, ubyte] : Number of SubLayer
+                    Per SubLayer:
+                        [4, int] : Node Id
+                        [2, ushort] : Primary Len
+                        [1, ASCII Char] : Lexical Key
+                        [n, UTF8 str] : Lexicon
     0x02 : RigAnimation
         [2, ushort] : Number of Sprites
         Per Sprite:

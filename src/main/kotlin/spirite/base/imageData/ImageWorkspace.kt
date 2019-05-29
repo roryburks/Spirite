@@ -86,6 +86,8 @@ interface MImageWorkspace : IImageWorkspace
 {
     override val mediumRepository : MMediumRepository
     override var hasChanged: Boolean
+
+    fun triggerInternalMediumChanged()
 }
 
 class ImageWorkspace(
@@ -187,6 +189,10 @@ class ImageWorkspace(
     }
 
     // endregion
+
+    override fun triggerInternalMediumChanged() {
+        activeMediumBind.field = (groupTree.selectedNode as? LayerNode)?.run { layer.activeData.handle }
+    }
 
 
     // region Internal Cross-Component Listeners

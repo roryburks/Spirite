@@ -1,6 +1,6 @@
 package spirite.base.imageData.animation.ffa
 
-import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
+import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.undo.NullAction
@@ -14,7 +14,9 @@ interface IFFALayerLinked {
     fun shouldUpdate(contract: FFAUpdateContract) : Boolean
 }
 
-abstract class FFALayer( override val anim : FixedFrameAnimation)
+abstract class FFALayer(
+        override val anim : FixedFrameAnimation,
+        asynchronous: Boolean = false)
     :IFfaLayer
 {
     private val undoEngine get() = anim.workspace.undoEngine
@@ -38,11 +40,13 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
         return caret
     }
 
-    override var asynchronous by UndoableChangeDelegate(false, anim.workspace.undoEngine,
+    override var asynchronous by UndoableChangeDelegate(
+            asynchronous,
+            anim.workspace.undoEngine,
             "Toggled Frame Layer Asynchronousness") {anim.triggerFFAChange(this)}
 
     protected val _frames = mutableListOf<FFAFrame>()
-    override val frames : List<IFFAFrame> get() = _frames
+    override val frames : List<IFfaFrame> get() = _frames
 
     override fun getFrameFromLocalMet(met: Int, loop: Boolean) : FFAFrame? {
         if( !_frames.any())
@@ -83,8 +87,8 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
         return  _sub(0, met)
     }
 
-    inner class FFAFrame(structure: FFAFrameStructure)
-        :IFFAFrame
+    inner class FFAFrame(structure: FfaFrameStructure)
+        :IFfaFrame
     {
         // region Calculations
         override val layer get() = this@FFALayer
@@ -131,7 +135,7 @@ abstract class FFALayer( override val anim : FixedFrameAnimation)
             set(value) { undoEngine.performAndStore(FFAStructureChangeAction(structure.copy(length = value),"Changed Frame Length"))}
 
         private inner class FFAStructureChangeAction(
-                val newStructure: FFAFrameStructure,
+                val newStructure: FfaFrameStructure,
                 override val description: String)
             : NullAction()
         {

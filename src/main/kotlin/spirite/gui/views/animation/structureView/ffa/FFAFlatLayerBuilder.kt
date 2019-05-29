@@ -3,7 +3,7 @@ package spirite.gui.views.animation.structureView.ffa
 import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.*
-import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
+import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.gui.Direction
 import spirite.gui.UIPoint
@@ -35,16 +35,17 @@ fun ContextMenus.launchContextMenuFor( point: UIPoint, layer: IFfaLayer, dialog:
         true -> schema.add(MenuItem("Make Layer &Synchronous", customAction = { layer.asynchronous = false }))
         false -> schema.add(MenuItem("Make Layer A&synchronous", customAction = { layer.asynchronous = true }))
     }
+    schema.add(MenuItem("&Rename Layer", customAction = {layer.name = dialog.promptForString("Rename Layer", layer.name) ?: layer.name}))
 
     this.LaunchContextMenu(point, schema)
 }
 
-fun ContextMenus.launchContextMenuFor( point: UIPoint, frame: IFFAFrame) {
+fun ContextMenus.launchContextMenuFor( point: UIPoint, frame: IFfaFrame) {
     val schema = mutableListOf<MenuItem>()
     val layer = frame.layer
 
     when(layer) {
-        is FFALayerGroupLinked -> {
+        is FfaLayerGroupLinked -> {
             schema.add(MenuItem("Add &Gap After", customAction = {layer.addGapFrameAfter(frame, 1)}))
             schema.add(MenuItem("Add Gap &Before", customAction = {layer.addGapFrameAfter((frame as FFAFrame).previous, 1)}))
         }
@@ -60,7 +61,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
         else -> throw InvalidClassException("Layer is not FFALayer")
     }
 
-    override fun buildFrameComponent(layer: IFfaLayer, frame: IFFAFrame): IFFAStructView {
+    override fun buildFrameComponent(layer: IFfaLayer, frame: IFfaFrame): IFFAStructView {
         frame as? FFAFrame ?: throw InvalidClassException("Frame is not FFAFrame")
         layer as? FFALayer ?: throw InvalidClassException("Layer is not FFALayer")
 

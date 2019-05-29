@@ -1,21 +1,24 @@
 package spirite.base.imageData.animation.ffa
 
 import rb.extendo.delegates.OnChangeDelegate
-import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.FRAME
-import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.GAP
+import spirite.base.file.load.FfaLexicalLayerLoader
+import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.FRAME
+import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.GAP
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.*
 
-class FfaLayerLexical(
+class FfaLayerLexical
+constructor(
         context: FixedFrameAnimation,
         val groupLink: GroupNode,
         lexicon: String = "",
         name: String = groupLink.name,
-        val sharedExplicitMap: MutableMap<Char, Node> = mutableMapOf())
-    : FFALayer(context), IFFALayerLinked
+        val sharedExplicitMap: MutableMap<Char, Node> = mutableMapOf(),
+        asynchronous: Boolean = false)
+    : FFALayer(context, asynchronous), IFFALayerLinked
 {
+    // TODO: Make Undoable?
     override var name by OnChangeDelegate(name) { anim.triggerFFAChange(this)}
-
 
     private val lexicalMap : MutableMap<Char, Node> = mutableMapOf()
     var lexicon: String = lexicon
@@ -92,10 +95,10 @@ class FfaLayerLexical(
         lexicon.asSequence()
                 .mapNotNull {
                     when( it) {
-                        ' ', '_', '-' -> FFAFrameStructure(null, GAP, 1)
+                        ' ', '_', '-' -> FfaFrameStructure(null, GAP, 1)
                         else -> {
                             val node = lexicalMap[it] ?: return@mapNotNull null
-                            FFAFrameStructure(node, FRAME, 1)
+                            FfaFrameStructure(node, FRAME, 1)
                         }
                     }
                 }
@@ -103,4 +106,12 @@ class FfaLayerLexical(
 
         anim.triggerFFAChange(this)
     }
+
+    override fun dupe(context: FixedFrameAnimation) = FfaLayerLexical(
+            context,
+            groupLink,
+            lexicon,
+            name,
+            sharedExplicitMap.toMutableMap(),
+            asynchronous)
 }

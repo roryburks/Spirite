@@ -2,7 +2,7 @@ package spirite.base.imageData.animation.ffa
 
 import spirite.base.graphics.rendering.TransformedHandle
 
-interface IFFAFrame {
+interface IFfaFrame {
     val layer: IFfaLayer
 
     val start: Int
@@ -10,6 +10,7 @@ interface IFFAFrame {
     val end: Int get() = start + length
 
     fun getDrawList() : List<TransformedHandle>
+
 }
 
 interface IFfaLayer {
@@ -20,7 +21,9 @@ interface IFfaLayer {
 
     var asynchronous : Boolean
 
-    val frames: List<IFFAFrame>
+    val frames: List<IFfaFrame>
 
-    fun getFrameFromLocalMet(met : Int, loop: Boolean = true) : IFFAFrame?
+    fun getFrameFromLocalMet(met : Int, loop: Boolean = true) : IFfaFrame?
+
+    fun dupe(context: FixedFrameAnimation) : IFfaLayer
 }
