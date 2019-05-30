@@ -44,3 +44,6 @@
     - Added IsAsynchronous to FFA Layers
 0x0001_000C:
     - Added Zoom Factor to Animation similar to Speed
+    - Added in Cascade Layer Save-Load
+0x0001_000D:
+    - Added in Lexicon to Cascade FFA Layer

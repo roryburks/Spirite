@@ -2,7 +2,7 @@ package spirite.base.imageData.animation.ffa
 
 import spirite.base.imageData.groupTree.GroupTree.Node
 
-data class FFAFrameStructure(
+data class FfaFrameStructure(
         val node: Node?,
         val marker: Marker,
         val length: Int

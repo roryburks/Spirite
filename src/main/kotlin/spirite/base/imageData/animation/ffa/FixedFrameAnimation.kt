@@ -5,9 +5,8 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.MediumBasedAnimation
-import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
+import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.undo.NullAction
@@ -18,8 +17,8 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     constructor(name: String, workspace: IImageWorkspace, node : GroupNode) : this(name, workspace){
         addLinkedLayer(node, true)
     }
-    constructor(name: String, workspace: IImageWorkspace, layers: List<IFfaLayer>) : this(name, workspace){
-        _layers.addAll(layers)
+    constructor(name: String, workspace: IImageWorkspace, layerBuilders: List<(FixedFrameAnimation)->IFfaLayer>) : this(name, workspace){
+        _layers.addAll(layerBuilders.map { it(this) })
     }
 
     private val _layers = mutableListOf<IFfaLayer>()
@@ -34,14 +33,12 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         val _t = t.floor
         val met = MathUtil.cycle(start, end, _t)
 
-        val drawList = _layers
+        return _layers
                 .filter { it.frames.any() }
                 .flatMap { layer ->
                     val localMet = if( layer.asynchronous) MathUtil.cycle(layer.start, layer.end, _t) else met
                     layer.getFrameFromLocalMet(localMet)?.getDrawList()?: emptyList()
                 }
-
-        return drawList
     }
 
     class FFAUpdateContract(val changedNodes: Set<Node>)
@@ -53,7 +50,7 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
 //        val toRemove = _layers.asSequence()
 //                .mapNotNull { Pair(when(it) {
 //                    is FfaLayerLexical -> it.groupLink
-//                    is FFALayerGroupLinked -> it.groupLink
+//                    is FfaLayerGroupLinked -> it.groupLink
 //                    else -> return@mapNotNull null
 //                }, it) }
 //                .map { it.second }
@@ -94,10 +91,10 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
             group: GroupNode,
             includeSubtrees: Boolean,
             name : String = group.name,
-            frameMap: Map<Node, FFAFrameStructure>? = null,
-            unlinkedClusters: List<UnlinkedFrameCluster>? = null) : FFALayerGroupLinked
+            frameMap: Map<Node, FfaFrameStructure>? = null,
+            unlinkedClusters: List<UnlinkedFrameCluster>? = null) : FfaLayerGroupLinked
     {
-        return FFALayerGroupLinked(this, group, includeSubtrees, name, frameMap, unlinkedClusters)
+        return FfaLayerGroupLinked(this, group, includeSubtrees, name, frameMap, unlinkedClusters)
                 .also { addLayer(it)}
     }
 
@@ -113,8 +110,14 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         return  layer
     }
 
-    fun addCascadingLayer( group: GroupNode, name : String = group.name) : FfaLayerCascading{
-        return FfaLayerCascading(this, group, name)
+    fun addCascadingLayer(
+            group: GroupNode,
+            name : String = group.name,
+            infoToImport: List<FfaCascadingSublayerContract>? = null,
+            lexicon: String? = null)
+            : FfaLayerCascading
+    {
+        return FfaLayerCascading(this, group, name,infoToImport, lexicon)
                 .also { addLayer(it) }
     }
 
@@ -136,9 +139,10 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     }
 
 
-    override fun dupe(): Animation {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun dupe() = FixedFrameAnimation(
+            name + "_dupe",
+            workspace,
+            layers.map {{context: FixedFrameAnimation -> it.dupe(context)}})
 }
 
 object FFALayerCache {

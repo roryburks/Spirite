@@ -8,8 +8,6 @@ import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.components.basic.events.MouseEvent.MouseEventType.RELEASED
-import spirite.gui.components.dialogs.IDialog
-import spirite.gui.menus.ContextMenus
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import java.io.InvalidClassException
@@ -36,7 +34,7 @@ class FfaCascadingLayerBuilder(
         else -> throw InvalidClassException("Trying to buildInto FfaCascadingLayer view on other kind of layer")
     }
 
-    override fun buildFrameComponent(layer: IFfaLayer, frame: IFFAFrame) : IFFAStructView = when {
+    override fun buildFrameComponent(layer: IFfaLayer, frame: IFfaFrame) : IFFAStructView = when {
         layer !is FfaLayerCascading || frame !is CascadingFrame -> throw InvalidClassException("Bad Frame type for FfaCascadingBuilder")
         else -> FrameView(frame, layer, SettingStore.getExpanded(layer))
     }

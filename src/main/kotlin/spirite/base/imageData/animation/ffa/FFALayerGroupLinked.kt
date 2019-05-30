@@ -1,21 +1,23 @@
 package spirite.base.imageData.animation.ffa
 
 import rb.extendo.delegates.OnChangeDelegate
-import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
+import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.undo.UndoableChangeDelegate
 
 
-class FFALayerGroupLinked(
+class FfaLayerGroupLinked(
         context: FixedFrameAnimation,
         val groupLink : GroupNode,
         includeSubtrees: Boolean,
         name: String = groupLink.name,
-        frameMap : Map<Node,FFAFrameStructure>? = null,
-        unlinkedClusters: List<UnlinkedFrameCluster>? = null)
-    : FFALayer(context), IFFALayerLinked
+        frameMap : Map<Node,FfaFrameStructure>? = null,
+        unlinkedClusters: List<UnlinkedFrameCluster>? = null,
+        asynchronous: Boolean = false)
+    : FFALayer(context, asynchronous), IFFALayerLinked
 {
+    // TODO: Make Undoable?
     override var name by OnChangeDelegate(name) { anim.triggerFFAChange(this)}
 
     override fun shouldUpdate(contract: FFAUpdateContract): Boolean {
@@ -42,13 +44,13 @@ class FFALayerGroupLinked(
         }
     }
 
-    fun addGapFrameAfter(frameBefore: IFFAFrame?, gapLength: Int) {
+    fun addGapFrameAfter(frameBefore: IFfaFrame?, gapLength: Int) {
         val index = if( frameBefore == null) 0 else (_frames.indexOf(frameBefore) + 1)
-        _frames.add(index, FFAFrame(FFAFrameStructure(null, GAP,gapLength)))
+        _frames.add(index, FFAFrame(FfaFrameStructure(null, GAP,gapLength)))
         anim.triggerFFAChange(this)
     }
 
-    private fun constructFrameMap() : Map<Node,FFAFrameStructure> =
+    private fun constructFrameMap() : Map<Node,FfaFrameStructure> =
         _frames.mapNotNull {
             val node = it.node
             when(node) {
@@ -59,18 +61,18 @@ class FFALayerGroupLinked(
 
     data class UnlinkedFrameCluster(
             val nodeBefore: Node?,
-            val unlinkedFrames: List<FFAFrameStructure>)
+            val unlinkedFrames: List<FfaFrameStructure>)
 
     private data class UnlinkedFrameClusterDetailed(
             val nodeBefore: Node?,
             val nodeAfter: Node?,
             val parentNode: Node?,
-            val unlinkedFrames: List<FFAFrameStructure>)
+            val unlinkedFrames: List<FfaFrameStructure>)
 
     private fun getUnlinkedNodeClusters() : List<UnlinkedFrameClusterDetailed> {
         val clusters = mutableListOf<UnlinkedFrameClusterDetailed>()
         var currentNode: Node? = null
-        var activeCluster: MutableList<FFAFrameStructure>? = null
+        var activeCluster: MutableList<FfaFrameStructure>? = null
         var currentParent: Node? = null
 
         // Update this as needed
@@ -102,7 +104,7 @@ class FFALayerGroupLinked(
     }
 
     private fun groupLinkImported(
-            links: Map<Node,FFAFrameStructure>? = null,
+            links: Map<Node,FfaFrameStructure>? = null,
             clusters: List<UnlinkedFrameCluster>? = null)
     {
         buildFramesFromGroupTree(links ?: mapOf())
@@ -145,25 +147,25 @@ class FFALayerGroupLinked(
         anim.triggerFFAChange(this)
     }
 
-    private fun buildFramesFromGroupTree(map: Map<Node,FFAFrameStructure>) {
+    private fun buildFramesFromGroupTree(map: Map<Node,FfaFrameStructure>) {
         _frames.clear()
         fun bffgtRec(node: GroupNode) : Int {
             var len = 0
             node.children.asReversed().forEach {
                 when {
                     it is GroupNode && includeSubtrees -> {
-                        val solFrame = FFAFrame(map[it] ?: FFAFrameStructure(it, START_LOCAL_LOOP, 0))
+                        val solFrame = FFAFrame(map[it] ?: FfaFrameStructure(it, START_LOCAL_LOOP, 0))
 
                         _frames.add(solFrame)
                         val subLen = bffgtRec(it)
                         if( solFrame.length < subLen)
                             solFrame.structure = solFrame.structure.copy(length =  subLen)
-                        _frames.add( FFAFrame(FFAFrameStructure(null, END_LOCAL_LOOP, 0)))
+                        _frames.add( FFAFrame(FfaFrameStructure(null, END_LOCAL_LOOP, 0)))
 
                         len += solFrame.length
                     }
                     it is LayerNode -> {
-                        val newFrame =  FFAFrame(map[it] ?:FFAFrameStructure(it, FRAME, 1))
+                        val newFrame =  FFAFrame(map[it] ?:FfaFrameStructure(it, FRAME, 1))
                         _frames.add(newFrame)
 
                         len += newFrame.length
@@ -175,4 +177,15 @@ class FFALayerGroupLinked(
         bffgtRec( groupLink)
     }
 
+    override fun dupe(context: FixedFrameAnimation) = FfaLayerGroupLinked(
+            context,
+            groupLink,
+            includeSubtrees,
+            name,
+            _frames.mapNotNull { when( val node = it.node) {
+                null -> null
+                else -> Pair(node, it.structure)
+            }}.toMap(),
+            null,
+            asynchronous)
 }
