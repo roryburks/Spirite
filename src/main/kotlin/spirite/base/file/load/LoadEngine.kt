@@ -8,6 +8,7 @@ import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readNullTerminatedStringUTF8
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.mediums.IMedium
@@ -116,6 +117,7 @@ object LoadEngine {
                 }
             }
 
+
             if( context.version <= 2) {
                 width = workspace.mediumRepository.dataList
                         .map { workspace.mediumRepository.getData(it)?.width ?: 0}
@@ -131,6 +133,8 @@ object LoadEngine {
             print(context.telemetry)
 
             workspace.finishBuilding()
+            workspace.mediumRepository.clearUnusedCache(emptySet())
+
 
             return workspace
         }catch( e: Exception) {

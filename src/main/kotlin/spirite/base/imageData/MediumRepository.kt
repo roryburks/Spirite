@@ -87,12 +87,11 @@ class MediumRepository(private val imageWorkspace: IImageWorkspace)
         val externalImageIds = externalDataUsed.map { it.id }
 
         val layerImages =  imageWorkspace.groupTree.root.getLayerNodes()
-                .map { it.layer.imageDependencies }
-                .reduce { acc, list ->  acc.union(list).toList()}
+                .flatMap { it.layer.imageDependencies }
         val layerImageIds = layerImages.map { it.id }.distinct()
 
         val unused = mediumData.keys
-                .filter {externalImageIds.contains( it) || layerImageIds.contains(it)}
+                .filter {!externalImageIds.contains( it) && !layerImageIds.contains(it)}
 
         // Make sure all used entries are tracked
         if( layerImages.any { it.workspace != imageWorkspace || mediumData[it.id] == null })

@@ -73,12 +73,13 @@ class SaveContext(
 object SaveEngine {
 
     fun saveWorkspace( file : File, workspace: IImageWorkspace) {
-        val overwrite = file.exists()
-        val saveFile = if(overwrite) File(file.absolutePath + "~") else file
+        if( file.exists()) {
+            val oldTemp = File(file.absolutePath + "~")
+            if( oldTemp.exists()) oldTemp.delete()
+            file.renameTo(oldTemp)
+        }
 
-        if( saveFile.exists())
-            saveFile.delete()
-        saveFile.createNewFile()
+        file.createNewFile()
 
         val ra = RandomAccessFile(file, "rw")
         val context = SaveContext(workspace, ra)
