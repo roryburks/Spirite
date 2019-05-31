@@ -1,6 +1,5 @@
 package spirite.gui.views.groupView
 
-import com.sun.corba.se.impl.io.InputStreamHook
 import rb.jvm.owl.addWeakObserver
 import rb.owl.IContract
 import rb.owl.bindable.addObserver

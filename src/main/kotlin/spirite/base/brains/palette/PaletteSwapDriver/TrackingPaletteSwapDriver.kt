@@ -33,20 +33,16 @@ object TrackingPaletteSwapDriver
                 if( activePart != null) {
                     _oldSpritePart = Pair(spriteContext, activePart)
                     val mapped = _spritePartMap[Pair(spriteContext, activePart.partName)]
-                    if( mapped != null) {
-                        println("Remembered: sprite")
+                    if( mapped != null)
                         (0 until min(mapped.size, belt.size)).forEach { belt.setColor(it, mapped[it]) }
-                    }
                 }
             }
             else
             {
                 _oldNode = selectedNode
                 val mapped = _nodeMap[selectedNode]
-                if( mapped != null) {
-                    println("Remembered: node")
+                if( mapped != null)
                     (0 until min(mapped.size, belt.size)).forEach { belt.setColor(it, mapped[it]) }
-                }
 
             }
         }
@@ -57,17 +53,14 @@ object TrackingPaletteSwapDriver
         val belt = mediumHandle.workspace.paletteManager.activeBelt
 
         val oldNode = _oldNode
-        if( oldNode != null) {
-            println("Logged to memory: node")
+        if( oldNode != null)
             _nodeMap[oldNode] = (0 until belt.size).map { belt.getColor(it) }
-        }
+
         _oldNode = null
 
         val oldSpritePart = _oldSpritePart
-        if( oldSpritePart != null){
-            println("Logged to memory: sprite")
+        if( oldSpritePart != null)
             _spritePartMap[Pair(oldSpritePart.first, oldSpritePart.second.partName)] = (0 until belt.size).map { belt.getColor(it) }
-        }
         _oldSpritePart = null
 
     }

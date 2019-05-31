@@ -85,6 +85,7 @@ class FfaCascadingLayerBuilder(
     {
         val label = Hybrid.ui.EditableLabel(layer.name)
         val lexiconButton = Hybrid.ui.Button("Lexicon")
+        val jsonButton = Hybrid.ui.Button("JSON")
         val expandButton = Hybrid.ui.Button().also {
             it.setIcon(if( expanded)SwIcons.SmallIcons.Unexpanded else SwIcons.SmallIcons.Expanded)
         }
@@ -92,6 +93,7 @@ class FfaCascadingLayerBuilder(
         init {
             imp.setBasicBorder(BEVELED_LOWERED)
             lexiconButton.action = {layer.lexicon = _master.dialog.promptForString("Enter new Lexicon:", layer.lexicon ?: "") ?: layer.lexicon}
+            jsonButton.action = {_master.dialog.invokeNewFfaJsonImport(layer)}
             expandButton.action = {
                 SettingStore.setExpanded(layer, !expanded)
                 _rebuildTrigger()
@@ -102,7 +104,10 @@ class FfaCascadingLayerBuilder(
                     add(expandButton, ButtonDims, ButtonDims)
                     add(label)
                 }
-                rows.add(lexiconButton)
+                rows += {
+                    add(lexiconButton)
+                    add(jsonButton)
+                }
             }
         }
     }

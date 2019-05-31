@@ -1,18 +1,17 @@
-package spirite.base.imageData
+package spirite.base.graphics.isolation
 
-import rb.extendo.extensions.then
 import rb.jvm.owl.addWeakObserver
+import rb.owl.IContract
+import rb.owl.bindable.addObserver
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
-import spirite.base.imageData.IIsolationManager.IsolationState
-import spirite.base.imageData.IsolationManager.SpriteIsolationStruct
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.graphics.isolation.IIsolationManager.IsolationState
+import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 
-/**
- *
- */
+
 interface IIsolationManager
 {
     data class IsolationState( val isDrawn: Boolean, val alpha: Float)
@@ -62,15 +61,18 @@ class IsolationManager(
             }
         }
 
-    override val currentIsolator: IIsolator?
-        get() = when(isolationIsActive) {
-            true -> when {
-                isolateCurrentNode -> workspace.groupTree.selectedNode?.let { SingleNodeIsolator(it)}
-                _spriteIsolations.any() -> SpriteIsolator(HashMap(_spriteIsolations), workspace.groupTree.root)
-                else -> null
-            }
-            false -> null
-        }
+    override val currentIsolator: IIsolator? get() = when( isolationIsActive) {
+        true -> workspace.groupTree.selectedNode?.run { SpritePartOnlyIsolator(this)}
+        false -> null
+    }
+//        get() = when(isolationIsActive) {
+//            true -> when {
+//                isolateCurrentNode -> workspace.groupTree.selectedNode?.let { SingleNodeIsolator(it) }
+//                _spriteIsolations.any() -> SpriteIsolator(HashMap(_spriteIsolations), workspace.groupTree.root)
+//                else -> null
+//            }
+//            false -> null
+//        }
 
 
     override fun clearAllIsolation() {
@@ -116,76 +118,19 @@ class IsolationManager(
         triggerIsolationChange()
     }
 
-}
+    private val _k = workspace.groupTree.selectedNodeBind.addObserver { newNode, _ ->
+        _spriteK?.void()
+        _spriteK = null
 
-internal class SpriteIsolator(
-        private val map: HashMap<Pair<GroupNode,String?>, SpriteIsolationStruct>,
-        val node: Node) : ISpriteLayerIsolator
-{
-    override fun getIsolatorForNode(node: Node): IIsolator {
-        return SpriteIsolator(map, node)
-    }
-    override fun getIsolationForPart(part: SpritePart): IIsolator {
-        val ancestors = if(node is GroupNode) node.ancestors.then(node) else node.ancestors
-
-        var isDrawn = true
-        var alpha = 1f
-        for (ancestor in ancestors) {
-            val isolation = map[Pair(ancestor,part.partName)]
-
-            if( isolation != null && (isolation.includeSubtree || ancestor == node.parent)) {
-                if( !isolation.isDrawn) {
-                    isDrawn = false
-                    break
-                }
-                alpha *= isolation.alpha
-            }
-
-            val invertIsolation = map[Pair(ancestor,null)]
-            if( invertIsolation != null &&
-                    (invertIsolation.includeSubtree || ancestor == node.parent) &&
-                    (invertIsolation.partName != part.partName))
-            {
-                if( !invertIsolation.isDrawn) {
-                    isDrawn = false
-                    break
-                }
-                alpha *= invertIsolation.alpha
+        _spriteK = ((newNode as? LayerNode)?.layer as? SpriteLayer)?.activePartBind?.addObserver { _, _ ->
+            if( isolationIsActive) {
+                triggerIsolationChange()
             }
         }
 
-        return when {
-            !isDrawn -> NilNodeIsolator
-            alpha == 1f -> TrivialNodeIsolator
-            else -> ExplicitIsolator(RenderRubric(alpha = alpha))
+        if( isolationIsActive) {
+            triggerIsolationChange()
         }
     }
-
-    override val isDrawn: Boolean get() = true
-    override val rubric: RenderRubric? get() = null
-}
-
-
-class SingleNodeIsolator( private val nodeToIsolate: Node) : IIsolator {
-    override fun getIsolatorForNode(node: Node) = when(node) {
-        nodeToIsolate -> TrivialNodeIsolator
-        else -> this
-    }
-
-    override val isDrawn: Boolean = false
-    override val rubric: RenderRubric? get() = null
-}
-object TrivialNodeIsolator : IIsolator {
-    override fun getIsolatorForNode(node: Node) = this
-    override val isDrawn: Boolean = true
-    override val rubric: RenderRubric? = null
-}
-class ExplicitIsolator(override val rubric: RenderRubric) : IIsolator {
-    override fun getIsolatorForNode(node: Node) = this
-    override val isDrawn: Boolean = true
-}
-object NilNodeIsolator : IIsolator {
-    override fun getIsolatorForNode(node: Node) = this
-    override val isDrawn: Boolean = false
-    override val rubric: RenderRubric? = null
+    private var _spriteK : IContract? = null
 }

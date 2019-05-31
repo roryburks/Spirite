@@ -3,7 +3,7 @@ package spirite.gui.views.groupView
 import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
-import spirite.base.imageData.IIsolationManager.IsolationState
+import spirite.base.graphics.isolation.IIsolationManager.IsolationState
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer

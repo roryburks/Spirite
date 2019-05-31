@@ -3,6 +3,7 @@ package spirite.gui.components.dialogs
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
+import spirite.base.imageData.animation.ffa.FfaLayerCascading
 import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.*
@@ -24,6 +25,7 @@ interface IDialog {
     fun invokeNewSimpleLayer( workspace: IImageWorkspace) : NewSimpleLayerReturn?
     fun invokeWorkspaceSizeDialog(description: String): WorkspaceSizeReturn?
     fun invokeNewFfaCascadingLayerDetails(defaultInfo: FfaCascadingSublayerContract) : FfaCascadingSublayerContract?
+    fun invokeNewFfaJsonImport(layer: FfaLayerCascading) : List<FfaCascadingSublayerContract>?
 
     fun invokeDisplayOptions(title: String = "Display Options", default: DisplayOptions? = null) : DisplayOptions?
 
@@ -91,6 +93,9 @@ class JDialog(private val master: IMasterControl) : IDialog
 
     override fun invokeDisplayOptions(title: String, default: DisplayOptions?)
             = runDialogPanel(DisplayOptionsPanel(default))
+
+    override fun invokeNewFfaJsonImport(layer: FfaLayerCascading)
+            = runDialogPanel(FfaCascadingJsonPanel(layer))
 
     override fun pickFile(type: FilePickType): File? {
         val fc = JFileChooser()

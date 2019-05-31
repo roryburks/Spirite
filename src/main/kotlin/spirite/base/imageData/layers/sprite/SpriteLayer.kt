@@ -13,8 +13,8 @@ import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.floor
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
-import spirite.base.imageData.IIsolator
-import spirite.base.imageData.ISpriteLayerIsolator
+import spirite.base.graphics.isolation.IIsolator
+import spirite.base.graphics.isolation.ISpriteLayerIsolator
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.drawer.DefaultImageDrawer

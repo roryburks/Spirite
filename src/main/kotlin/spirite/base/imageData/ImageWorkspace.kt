@@ -9,6 +9,8 @@ import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.toolset.Toolset
+import spirite.base.graphics.isolation.IIsolationManager
+import spirite.base.graphics.isolation.IsolationManager
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.animation.AnimationManager
