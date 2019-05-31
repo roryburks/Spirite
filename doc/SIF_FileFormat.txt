@@ -1,4 +1,4 @@
-Version 0x0001_000D
+Version 0x0001_000E
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -162,6 +162,13 @@ Per Palette:
 	//		(if first byte was 0x00),
 	//		[1] next byte represents consecutive empty datas
 	// ex: 00 FF 00 0A 3 [4] [4] [4], 265 whitespaces then 3 color data
+
+---- TPLT - Tracking Palette Data Chunk
+Per Tracked Palette Data:
+[4, int] : Node Id of palette
+[1, byte] : Size of belt
+Per belt entry:
+    [4, int] : Color
 
 NodeID: NodeIDs are IDs per node that only exist when saving and loading.  The number of the ID corresponds to the order in which it appears in the file
 ---ANSP - Animation Space Data
