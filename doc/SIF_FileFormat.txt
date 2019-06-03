@@ -8,7 +8,7 @@ Header
  [2, short] Image Width
  [2, short] Image Height
 
- Per Group:
+ Per Chunk:
  [4, UTF8 str] 4-character chunk identifier
  [4, int] n: size of chunk
  [n, RAW] chunk data
@@ -152,6 +152,7 @@ Per Animation:
 		            [4, float] : scaleX
 		            [4, float] : scaleY
 		            [4, float] : rotation
+
 ---- PLTT - Palette Data Chunk
 Per Palette:
 [n, UTF8 str] : Palette Name
