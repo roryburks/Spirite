@@ -3,10 +3,7 @@ package spirite.base.brains.commands
 import spirite.base.brains.ITopLevelFeedbackSystem
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.palette.IPaletteManager
-import spirite.base.brains.palette.PaletteSwapDriver.NilPaletteSwapDriver
-import spirite.base.brains.palette.PaletteSwapDriver.TrackingPaletteSwapDriver
 import spirite.base.exceptions.CommandNotValidException
-import spirite.hybrid.MDebug
 
 class PaletteCommandExecutor(
         val paletteManager: IPaletteManager,
@@ -54,14 +51,14 @@ object PaletteCommands
     val SwapBack : ICommand = PaletteCommand("swapBack") {it.paletteManager.activeBelt.cycleColors(-1)}
 
     val SwitchModes: ICommand = PaletteCommand("switchModes") {
-        when( it.paletteManager.driver) {
-            TrackingPaletteSwapDriver -> {
+        when( it.paletteManager.drivePalette) {
+            true -> {
                 it.topLevelFeedbackSystem.broadcastGeneralMessage("Tracking Palette Manager: Off")
-                it.paletteManager.driver = NilPaletteSwapDriver
+                it.paletteManager.drivePalette = false
             }
-            NilPaletteSwapDriver -> {
+            false -> {
                 it.topLevelFeedbackSystem.broadcastGeneralMessage("Tracking Palette Manager: On")
-                it.paletteManager.driver = TrackingPaletteSwapDriver
+                it.paletteManager.drivePalette = true
             }
         }
     }

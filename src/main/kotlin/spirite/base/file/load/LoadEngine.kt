@@ -12,6 +12,8 @@ import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.mediums.IMedium
+import spirite.base.util.Color
+import spirite.base.util.ColorARGB32Normal
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -53,6 +55,8 @@ object LoadEngine {
 
             val ra = RandomAccessFile(file, "r")
             val workspace = master.createWorkspace(1,1)
+            val paletteDriving = workspace.paletteManager.drivePalette
+            workspace.paletteManager.drivePalette = false
             val context = LoadContext(ra, workspace)
 
             // Verify Header
@@ -117,6 +121,15 @@ object LoadEngine {
                 }
             }
 
+            // Palette Map Data (optional)
+            context.chunkInfo.singleOrNull { it.header == "TPLT" }?.apply {
+                context.telemetry.runAction("Load TPLT") {
+                    ra.seek(startPointer)
+                    parsePaletteMapData(context, size)
+                    context.telemetry.mark("size", size.d)
+                }
+            }
+
 
             if( context.version <= 2) {
                 width = workspace.mediumRepository.dataList
@@ -134,6 +147,8 @@ object LoadEngine {
 
             workspace.finishBuilding()
             workspace.mediumRepository.clearUnusedCache(emptySet())
+
+            workspace.paletteManager.drivePalette = paletteDriving
 
 
             return workspace
@@ -279,6 +294,36 @@ object LoadEngine {
             context.workspace.paletteSet.addPalette(name, false, data)
             context.workspace.paletteSet.removePalette(0)
         }
+    }
+
+    private fun parsePaletteMapData(context: LoadContext, chunkSize: Int)
+    {
+        val ra = context.ra
+
+        val numMappedNodes = ra.readInt()
+        val nodeMap = List(numMappedNodes) {
+                    val node = context.nodes.getOrNull(ra.readInt())
+                    val colorSize = ra.readUnsignedByte()
+                    val colors = List<Color>(colorSize) {ColorARGB32Normal(ra.readInt())}
+
+                    node?.run { Pair(this,colors) }
+                }
+                .filterNotNull()
+                .toMap()
+
+        val numSpriteMaps = ra.readInt()
+        val spriteMap = List(numSpriteMaps) {
+                    val group = context.nodes.getOrNull(ra.readInt()) as? GroupNode
+                    val partName = ra.readNullTerminatedStringUTF8()
+                    val colorSize = ra.readUnsignedByte()
+                    val colors = List<Color>(colorSize) {ColorARGB32Normal(ra.readInt())}
+
+                    group?.run { Pair(Pair(group, partName), colors) }
+                }
+                .filterNotNull()
+                .toMap()
+
+        context.workspace.paletteMediumMap.import(nodeMap, spriteMap)
     }
 
     private fun parseAnimationSpaceData(context: LoadContext, chunkSize: Int)

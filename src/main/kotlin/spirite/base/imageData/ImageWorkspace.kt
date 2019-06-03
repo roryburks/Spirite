@@ -7,6 +7,8 @@ import rb.owl.bindable.addObserver
 import rb.owl.observer
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
+import spirite.base.brains.palette.paletteSwapDriver.IPaletteMediumMap
+import spirite.base.brains.palette.paletteSwapDriver.PaletteMediumMap
 import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.toolset.Toolset
 import spirite.base.graphics.isolation.IIsolationManager
@@ -62,6 +64,7 @@ interface IImageWorkspace {
     val selectionEngine : ISelectionEngine
     val paletteSet : PaletteSet
     val viewSystem: IViewSystem
+    val paletteMediumMap: IPaletteMediumMap
 //	public StagingManager getStageManager() {return stagingManager;}
 
     // Super-Components
@@ -113,6 +116,7 @@ class ImageWorkspace(
     override val isolationManager: IIsolationManager = IsolationManager(this)
     override val animationSpaceManager: IAnimationSpaceManager = AnimationSpaceManager(this)
     override val filterManager: IFilterManager = FilterManager()
+    override val paletteMediumMap: IPaletteMediumMap
 
     override val compositor = Compositor()
 
@@ -196,7 +200,6 @@ class ImageWorkspace(
         activeMediumBind.field = (groupTree.selectedNode as? LayerNode)?.run { layer.activeData.handle }
     }
 
-
     // region Internal Cross-Component Listeners
     init {
         groupTree.selectedNodeBind.addObserver { new, old ->
@@ -220,4 +223,8 @@ class ImageWorkspace(
         imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), emptySet(), this@ImageWorkspace, liftedChange = it.isLiftedChange))
     }.observer())
     // endregion
+
+    init {
+        paletteMediumMap = PaletteMediumMap(this)
+    }
 }

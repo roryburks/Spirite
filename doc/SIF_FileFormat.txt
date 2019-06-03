@@ -164,11 +164,19 @@ Per Palette:
 	// ex: 00 FF 00 0A 3 [4] [4] [4], 265 whitespaces then 3 color data
 
 ---- TPLT - Tracking Palette Data Chunk
-Per Tracked Palette Data:
-[4, int] : Node Id of palette
-[1, byte] : Size of belt
-Per belt entry:
-    [4, int] : Color
+[4, int] : Number of Mapped Nodes
+Per MappedNode:
+    [4, int] : Node Id
+    [1, byte] : Size of belt
+    Per belt entry:
+        [4, int] : Color ARGB
+[4, int] : Number of Mapped Sprite Parts
+Per Sprite Part:
+    [4, int] :Group Node Id
+    [n, UTF8 str] : Part Name
+    [1, byte] : Size of belt
+    PerBeltEntry:
+        [4, int] : Color ARGB
 
 NodeID: NodeIDs are IDs per node that only exist when saving and loading.  The number of the ID corresponds to the order in which it appears in the file
 ---ANSP - Animation Space Data

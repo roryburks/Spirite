@@ -7,11 +7,8 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
 import spirite.base.brains.ICentralObservatory
-import spirite.base.brains.ITopLevelFeedbackSystem
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.palette.IPaletteManager.*
-import spirite.base.brains.palette.PaletteSwapDriver.IPaletteSwapDriver
-import spirite.base.brains.palette.PaletteSwapDriver.TrackingPaletteSwapDriver
 import spirite.base.brains.settings.ISettingsManager
 import spirite.gui.components.dialogs.IDialog
 
@@ -22,7 +19,7 @@ interface IPaletteManager {
     val currentPalette: Palette
     val globalPalette: Palette
 
-    var driver : IPaletteSwapDriver
+    var drivePalette : Boolean
 
     fun makePaletteSet() : PaletteSet
     fun savePaletteInPrefs(name: String, palette: Palette)
@@ -56,7 +53,7 @@ class PaletteManager(
     override val currentPaletteBind = Bindable(globalPalette)
     override val currentPalette: Palette by currentPaletteBind
 
-    override var driver : IPaletteSwapDriver = TrackingPaletteSwapDriver
+    override var drivePalette: Boolean = true
 
     override fun makePaletteSet(): PaletteSet {
         val newPaletteSet = object : PaletteSet() {
@@ -87,10 +84,6 @@ class PaletteManager(
     // region Observer Bindings
     private val _wsObsK = _workspaceSet.currentWorkspaceBind.addWeakObserver { new, _ ->
         currentPaletteBind.field = new?.paletteSet?.currentPalette ?: globalPalette
-    }
-
-    private val _activePartK = _centralObservatory.activeDataBind.addWeakObserver { new, _ ->
-        if( new != null) driver.onMediumChenge(new)
     }
 
     private fun triggerPaletteChange(evt: PaletteChangeEvent)

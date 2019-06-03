@@ -95,6 +95,7 @@ object SaveEngine {
         if( workspace.animationSpaceManager.animationSpaces.any())
             saveAnimationSpaceChunk(context)
         savePaletteData(context)
+        savePaletteMapData(context)
 
         ra.close()
     }
@@ -211,6 +212,39 @@ object SaveEngine {
                 val raw = it.compress()
                 ra.writeShort(raw.size) // [2] Palette Data Size
                 ra.write(raw)           // [n] Compressed Palette Data
+            }
+        }
+    }
+
+    /** TPLT chunk containing Palette Mappings */
+    private fun savePaletteMapData(context: SaveContext) {
+        context.writeChunk("TPLT") {ra ->
+            val nodeMappings = context.workspace.paletteMediumMap.getNodeMappings()
+            val spriteMappings = context.workspace.paletteMediumMap.getSpriteMappings()
+
+            ra.writeInt(nodeMappings.size)  // [4] : Number of Mapped Nodes
+            nodeMappings.forEach { (node, palette) ->
+                ra.writeInt(context.nodeMap[node] ?: -1)    // [4] : Node Id
+
+                val colorsToWrite = min(palette.size, 255)
+                ra.writeByte(colorsToWrite)   // [1] : Num Colors
+                palette.take(colorsToWrite).forEach {
+                    ra.writeInt(it.argb32)  // [4] : Color ARGB
+                }
+            }
+
+            ra.writeInt(spriteMappings.size)
+            spriteMappings.forEach {(pair, palette) ->
+                val (group, partName) = pair
+
+                ra.writeInt(context.nodeMap[group] ?: -1)   // [4] : Group Node Id
+                ra.writeUFT8NT(partName)    // [n] : Part Name
+
+                val colorsToWrite = min(palette.size, 255)
+                ra.writeByte(colorsToWrite) // [1] : NumColors
+                palette.take(colorsToWrite).forEach {
+                    ra.writeInt(it.argb32)
+                }
             }
         }
     }
