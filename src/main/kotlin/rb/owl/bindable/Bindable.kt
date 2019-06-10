@@ -1,7 +1,7 @@
 package rb.owl.bindable
 
+import rb.IContract
 import rb.extendo.extensions.mapRemoveIfNull
-import rb.owl.IContract
 import kotlin.reflect.KProperty
 
 class Bindable<T>(default: T) : IBindable<T>
@@ -95,7 +95,7 @@ class Bindable<T>(default: T) : IBindable<T>
                 // Note: even though the subFun is short-circuiting on-true, on-false it will have completely filled derivedBinds
                 val newUnderlying = Underlying(underlying.value, this@Bindable)
                 val oldUnderlying = underlying
-                oldUnderlying.bindings.removeIf {derivedBinds.contains(it) }
+                oldUnderlying.bindings.removeAll {derivedBinds.contains(it) }
                 newUnderlying.bindings.addAll(derivedBinds)
                 underlying = newUnderlying
             }

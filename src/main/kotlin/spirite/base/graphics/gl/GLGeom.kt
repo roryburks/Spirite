@@ -1,7 +1,7 @@
 package spirite.base.graphics.gl
 
-import rb.vectrix.compaction.FloatCompactor
-import rb.vectrix.compaction.ReverseFloatCompactor
+import rb.jvm.vectrix.compaction.FloatCompactor
+import rb.jvm.vectrix.compaction.ReverseFloatCompactor
 
 class PrimitiveBuilder(
         val attrLengths: IntArray,

@@ -1,5 +1,7 @@
 package rb.owl
 
+import rb.IContract
+
 
 interface IObserver<T> {
     val trigger: T?
@@ -18,7 +20,7 @@ class Observable<T> : IObservable<T>
 
     fun trigger(lambda : (T)->Unit) {
         observers.forEach {it.observer.trigger?.apply(lambda)}
-        observers.removeIf { it.observer.trigger == null }
+        observers.removeAll { it.observer.trigger == null }
     }
 
     private val observers = mutableListOf<MetaContract>()

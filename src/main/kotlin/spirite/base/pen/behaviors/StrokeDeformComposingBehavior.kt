@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
-import rb.vectrix.compaction.FloatCompactor
-import rb.vectrix.interpolation.CubicSplineInterpolator2D
+import rb.jvm.vectrix.compaction.FloatCompactor
+import rb.jvm.vectrix.interpolation.CubicSplineInterpolator2D
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.deformation.StrokeDeformationPiece
 import spirite.base.imageData.deformation.StrokeDeformationV2

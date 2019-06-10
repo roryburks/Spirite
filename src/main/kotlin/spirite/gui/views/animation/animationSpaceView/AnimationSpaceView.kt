@@ -2,7 +2,7 @@ package spirite.gui.views.animation.animationSpaceView
 
 import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
-import rb.owl.IContract
+import rb.IContract
 import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace

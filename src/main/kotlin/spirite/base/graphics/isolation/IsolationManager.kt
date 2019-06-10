@@ -1,7 +1,7 @@
 package spirite.base.graphics.isolation
 
 import rb.jvm.owl.addWeakObserver
-import rb.owl.IContract
+import rb.IContract
 import rb.owl.bindable.addObserver
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent

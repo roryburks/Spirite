@@ -1,6 +1,6 @@
 package spirite.base.brains
 
-import rb.owl.IContract
+import rb.IContract
 import rb.owl.IObservable
 import rb.owl.IObserver
 import rb.owl.bindable.IBindObserver
@@ -85,7 +85,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
 
     private inner class TrackingObserver<T>(val finder : (IImageWorkspace) -> IObservable<T>) : IObservable<T>
     {
-        override fun addObserver(observer: IObserver<T>, trigger: Boolean) : IContract{
+        override fun addObserver(observer: IObserver<T>, trigger: Boolean) : IContract {
             current?.also { currentContracts.add(it.addObserver(observer, trigger)) }
             return ObserverContract(observer)
         }

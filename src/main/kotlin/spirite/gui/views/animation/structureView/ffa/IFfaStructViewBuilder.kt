@@ -1,6 +1,6 @@
 package spirite.gui.views.animation.structureView.ffa
 
-import rb.owl.IContract
+import rb.IContract
 import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.gui.components.basic.IComponent

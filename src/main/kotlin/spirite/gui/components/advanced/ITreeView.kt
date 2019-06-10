@@ -2,7 +2,7 @@ package spirite.gui.components.advanced
 
 import CrossLayout
 import rb.extendo.delegates.OnChangeDelegate
-import rb.owl.IContract
+import rb.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver

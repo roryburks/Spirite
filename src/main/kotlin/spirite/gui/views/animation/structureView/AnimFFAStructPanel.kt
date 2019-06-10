@@ -4,7 +4,7 @@ import CrossLayout
 import rb.extendo.dataStructures.SinglySequence
 import rb.extendo.extensions.then
 import rb.jvm.owl.addWeakObserver
-import rb.owl.IContract
+import rb.IContract
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver

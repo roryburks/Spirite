@@ -1,6 +1,6 @@
 package spirite.gui.views.animation
 
-import rb.owl.IContract
+import rb.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer

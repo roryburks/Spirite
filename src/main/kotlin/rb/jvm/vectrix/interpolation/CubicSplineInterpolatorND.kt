@@ -1,4 +1,4 @@
-package rb.vectrix.interpolation
+package rb.jvm.vectrix.interpolation
 
 import kotlin.math.max
 

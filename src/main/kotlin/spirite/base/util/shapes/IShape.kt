@@ -1,6 +1,6 @@
 package spirite.base.util.shapes
 
-import rb.vectrix.compaction.FloatCompactor
+import rb.jvm.vectrix.compaction.FloatCompactor
 import rb.vectrix.mathUtil.f
 import spirite.base.graphics.gl.GLPrimitive
 

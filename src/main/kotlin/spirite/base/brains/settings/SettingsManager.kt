@@ -1,7 +1,7 @@
 package spirite.base.brains.settings
 
 import rb.extendo.delegates.MutableLazy
-import rb.vectrix.interpolation.CubicSplineInterpolator
+import rb.jvm.vectrix.interpolation.CubicSplineInterpolator
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.i
 import java.io.File

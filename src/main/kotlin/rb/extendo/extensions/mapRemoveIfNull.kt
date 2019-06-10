@@ -11,35 +11,35 @@ private class MapRemoveIfNullSequence<From,To>(
     override fun iterator(): Iterator<To> = IteratorImp(mutableIterable.iterator())
 
     inner class IteratorImp( val iterator: MutableIterator<From>) : Iterator<To> {
-        var next : To? = null
+        var _next : To? = null
         var done = false
 
         override tailrec fun hasNext() : Boolean = when{
             done -> false
-            next != null -> true
+            _next != null -> true
             else -> {
                 spin()
                 hasNext()
             }
         }
         private fun spin() {
-            while(!done && next == null) {
+            while(!done && _next == null) {
                 if( !iterator.hasNext()) {
                     done = true
                     continue
                 }
-                next = mapping(iterator.next())
-                if( next == null) {
+                _next = mapping(iterator.next())
+                if( _next == null) {
                     iterator.remove()
                 }
             }
         }
 
         override fun next(): To {
-            // Return and consume the next
+            // Return and consume the _next
             spin()
-            val next = next
-            this.next = null
+            val next = _next
+            this._next = null
             return next ?: throw IndexOutOfBoundsException()
         }
 

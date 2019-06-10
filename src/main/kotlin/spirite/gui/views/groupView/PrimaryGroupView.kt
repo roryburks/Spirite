@@ -1,7 +1,7 @@
 package spirite.gui.views.groupView
 
 import rb.jvm.owl.addWeakObserver
-import rb.owl.IContract
+import rb.IContract
 import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver

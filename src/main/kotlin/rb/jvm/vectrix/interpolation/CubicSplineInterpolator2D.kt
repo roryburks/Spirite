@@ -1,4 +1,4 @@
-package rb.vectrix.interpolation
+package rb.jvm.vectrix.interpolation
 
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil

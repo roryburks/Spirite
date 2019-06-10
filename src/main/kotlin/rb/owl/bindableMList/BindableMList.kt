@@ -1,7 +1,7 @@
 package rb.owl.bindableMList
 
 import rb.extendo.extensions.mapRemoveIfNull
-import rb.owl.IContract
+import rb.IContract
 
 
 interface IBindableMList<T> {
@@ -105,7 +105,7 @@ class BindableMList<T>(col: Collection<T> = emptyList()) : IBindableMList<T>
                 // Note: even though the subFun is short-circuiting on-true, on-false it will have completely filled derivedBinds
                 val newUnderlying = Underlying(underlying.list, this@BindableMList)
                 val oldUnderlying = underlying
-                oldUnderlying.bindings.removeIf {derivedBinds.contains(it) }
+                oldUnderlying.bindings.removeAll {derivedBinds.contains(it) }
                 newUnderlying.bindings.addAll(derivedBinds)
             }
         }

@@ -1,4 +1,4 @@
-package rb.owl
+package rb
 
 interface IContract {
     fun void()

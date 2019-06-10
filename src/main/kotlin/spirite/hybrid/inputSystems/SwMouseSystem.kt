@@ -3,7 +3,7 @@ package spirite.hybrid.inputSystems
 import rb.extendo.extensions.append
 import rb.extendo.extensions.deref
 import rb.extendo.extensions.lookup
-import rb.owl.IContract
+import rb.IContract
 import spirite.gui.SUIPoint
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.events.MouseEvent

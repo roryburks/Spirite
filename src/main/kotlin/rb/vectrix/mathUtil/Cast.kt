@@ -25,6 +25,7 @@ inline val Double.ceil get() = kotlin.math.ceil(this).toInt()
 inline val Double.f get() = this.toFloat()
 
 inline val Short.i get() = this.toInt()
+inline val Short.d get() = this.toDouble()
 
 inline val Byte.i get() = this.toInt()
 inline val Byte.s get() = this.toShort()

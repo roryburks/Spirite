@@ -2,7 +2,7 @@ package spirite.gui.views.tool
 
 import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
-import rb.owl.IContract
+import rb.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.interprettedBindings.bindToX

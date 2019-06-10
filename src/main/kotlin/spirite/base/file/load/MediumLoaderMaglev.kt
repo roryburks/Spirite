@@ -1,6 +1,6 @@
 package spirite.base.file.load
 
-import rb.vectrix.interpolation.CubicSplineInterpolator2D
+import rb.jvm.vectrix.interpolation.CubicSplineInterpolator2D
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.round
@@ -28,7 +28,6 @@ import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
-import java.lang.Exception
 
 
 object MagneticMediumLoader : IMediumLoader

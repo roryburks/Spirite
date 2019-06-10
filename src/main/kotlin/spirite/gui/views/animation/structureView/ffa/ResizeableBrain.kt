@@ -1,6 +1,6 @@
 package spirite.gui.views.animation.structureView.ffa
 
-import rb.owl.IContract
+import rb.IContract
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
 import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE

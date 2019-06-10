@@ -1,7 +1,8 @@
-package rb.vectrix.interpolation
+package rb.jvm.vectrix.interpolation
 
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil
+import kotlin.math.sign
 
 /**
  * CubicSplineInterpolator uses Cubic Hermite Spline Interpolation to
@@ -32,7 +33,7 @@ class CubicSplineInterpolator
 
         points.sortWith(Comparator { o1, o2 ->
             val d = o1.xf - o2.xf
-            Math.signum(d).toInt()
+            sign(d).toInt()
         })
 
         k = FloatArray(points.size)
