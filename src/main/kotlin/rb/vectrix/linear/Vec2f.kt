@@ -38,11 +38,11 @@ data class Vec2d(
     override val y: Double)
     : Vec2()
 {
-    val mag by lazy { sqrt(x * x + y * y) }
+    val mag get() = sqrt(x * x + y * y)
 
-    override val normalized by lazy {
+    override val normalized : Vec2d get() {
         val isr = 1/ sqrt(x * x + y * y)
-        Vec2d(this.x * isr, this.y * isr)
+        return Vec2d(this.x * isr, this.y * isr)
     }
 
     override fun toString() = "<$x,$y>"
@@ -60,7 +60,7 @@ data class Vec2f(
     override val x: Double get() = xf.d
     override val y: Double get() = yf.d
 
-    val mag: Float by lazy { sqrt(xf * xf + yf * yf) }
+    val mag: Float get() = sqrt(xf * xf + yf * yf)
 
     operator fun minus( rhs: Vec2f) = Vec2f(xf - rhs.xf, yf - rhs.yf)
     operator fun plus( rhs: Vec2f) = Vec2f(xf + rhs.xf, yf + rhs.yf)
@@ -76,9 +76,9 @@ data class Vec2f(
         return Vec2f(xf * cs - yf * sn, xf * sn + yf * cs)
     }
 
-    override val normalized: Vec2f by lazy {
+    override val normalized: Vec2f get() {
         val isr = 1/ sqrt(xf * xf + yf * yf)
-        Vec2f(this.xf * isr, this.yf * isr)
+        return Vec2f(this.xf * isr, this.yf * isr)
     }
 
     override fun toString() = "<$x,$y>"
@@ -104,10 +104,10 @@ data class Vec2i (
     infix fun dot(rhs: Vec2i) : Int = this.xi * rhs.xi + this.yi * rhs.yi
     infix fun cross(rhs: Vec2i) : Int = xi * rhs.yi - yi * rhs.xi
 
-    val mag by lazy { sqrt(x * x + y * y) }
-    override val normalized: Vec2 by lazy {
+    val mag get() = sqrt(x * x + y * y)
+    override val normalized: Vec2 get() {
         val isr = 1/ sqrt(x * x + y * y)
-        Vec2d(this.x * isr, this.y * isr)
+        return Vec2d(this.x * isr, this.y * isr)
     }
 
     override fun toString() = "<$x,$y>"
