@@ -9,7 +9,7 @@
 //import spirite.base.imageData.MediumHandle
 //import spirite.base.imageData.mediums.ArrangedMediumData
 //import spirite.base.imageData.mediums.DynamicMedium
-//import spirite.base.util.Colors
+//import sgui.generic.color.Colors
 //import spirite.hybrid.EngineLaunchpoint
 //import spirite.hybrid.Hybrid
 //import spirite.hybrid.ImageConverter

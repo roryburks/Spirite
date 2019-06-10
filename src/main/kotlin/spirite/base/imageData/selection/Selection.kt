@@ -6,10 +6,10 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
 import spirite.base.graphics.Composite.*
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.base.graphics.RawImage
-import spirite.base.util.Color
-import spirite.base.util.Colors
+import sgui.generic.color.Color
+import sgui.generic.color.Colors
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.ContentBoundsFinder
@@ -129,7 +129,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
 
 
     // region Lifting
-    fun lift( image: IImage, tBaseToImage: ITransformF? = null) : RawImage {
+    fun lift(image: IImage, tBaseToImage: ITransformF? = null) : RawImage {
         val tSelToImage = (tBaseToImage ?: ImmutableTransformF.Identity) * (transform ?: ImmutableTransformF.Identity)
         val tImageToSel = tSelToImage.invert()
         val lifted = Hybrid.imageCreator.createImage(mask.width, mask.height)

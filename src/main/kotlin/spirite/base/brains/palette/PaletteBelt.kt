@@ -2,8 +2,8 @@ package spirite.base.brains.palette
 
 import rb.owl.bindable.Bindable
 import rb.vectrix.mathUtil.MathUtil
-import spirite.base.util.Color
-import spirite.base.util.Colors
+import sgui.generic.color.Color
+import sgui.generic.color.Colors
 
 class PaletteBelt
 {

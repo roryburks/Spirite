@@ -1,7 +1,7 @@
 package spirite.base.brains.palette
 
-import spirite.base.util.Color
-import spirite.base.util.Colors
+import sgui.generic.color.Color
+import sgui.generic.color.Colors
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
@@ -13,8 +13,8 @@ val default_palette = arrayOf(
 abstract class Palette( name: String, raw: ByteArray? = null) {
     abstract val onChangeTrigger: (Palette) -> Unit
 
-    val colors : Map<Int,Color> get() = _colors
-    private var _colors = mutableMapOf<Int,Color>()
+    val colors : Map<Int, Color> get() = _colors
+    private var _colors = mutableMapOf<Int, Color>()
     var name: String = name
         get
         set(value) {

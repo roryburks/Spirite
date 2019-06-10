@@ -2,9 +2,9 @@ package spirite.gui.components.views
 
 import spirite.base.graphics.gl.GLImageTracker
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.ICrossPanel
-import spirite.gui.components.basic.ITextArea
+import sgui.generic.components.IComponent
+import sgui.generic.components.ICrossPanel
+import sgui.generic.components.ITextArea
 import spirite.gui.resources.IIcon
 import spirite.hybrid.Hybrid
 

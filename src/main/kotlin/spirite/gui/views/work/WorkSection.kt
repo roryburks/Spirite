@@ -12,12 +12,12 @@ import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.pen.Penner
 import spirite.base.util.linear.Rect
-import spirite.gui.Orientation.HORIZONTAL
-import spirite.gui.Orientation.VERTICAL
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.ICrossPanel
+import sgui.generic.Orientation.HORIZONTAL
+import sgui.generic.Orientation.VERTICAL
+import sgui.generic.components.IComponent
+import sgui.generic.components.ICrossPanel
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.basic.SwPanel
+import sgui.swing.components.SwPanel
 import java.awt.Font
 import javax.swing.SwingUtilities
 
@@ -108,7 +108,8 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
     private val zoomPanel = SwPanel { g ->
         val view = currentView
         when {
-            view == null -> {}
+            view == null -> {
+            }
             view.zoomLevel >= 0 -> {
                 g.font = Font("Tahoma", Font.PLAIN, 12)
                 g.drawString(Integer.toString(view.zoomLevel + 1), width - if (view.zoomLevel > 8) 16 else 12, height - 5)

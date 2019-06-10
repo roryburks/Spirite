@@ -1,7 +1,7 @@
 package spirite.hybrid
 
 import com.jogamp.opengl.GL2
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.linear.Rect
 import spirite.pc.graphics.ImageBI

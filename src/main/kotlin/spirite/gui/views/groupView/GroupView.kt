@@ -3,10 +3,10 @@ package spirite.gui.views.groupView
 import rb.jvm.owl.addWeakObserver
 import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
-import spirite.base.util.ColorARGB32Normal
+import sgui.generic.color.ColorARGB32Normal
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.ICrossPanel
+import sgui.generic.components.IComponent
+import sgui.generic.components.ICrossPanel
 import spirite.gui.resources.IIcon
 import spirite.hybrid.Hybrid
 

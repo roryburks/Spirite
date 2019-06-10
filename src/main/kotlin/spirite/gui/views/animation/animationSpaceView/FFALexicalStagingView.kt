@@ -2,8 +2,8 @@ package spirite.gui.views.animation.animationSpaceView
 
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFALexicalPlayback
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.ICrossPanel
+import sgui.generic.components.IComponent
+import sgui.generic.components.ICrossPanel
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.Hybrid
 
@@ -11,7 +11,7 @@ class FFALexicalStagingView(
         val dialog: IDialog,
         val space: FFAAnimationSpace,
         val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-    :IComponent by imp
+    : IComponent by imp
 {
     val tfLexicon = Hybrid.ui.TextArea()
     val btnSetLexicon = Hybrid.ui.Button( "Validate And Set Lexicon")

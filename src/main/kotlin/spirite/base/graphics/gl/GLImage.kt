@@ -6,8 +6,8 @@ import spirite.base.graphics.RawImage
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Rect
-import spirite.base.util.toColor
-import spirite.base.util.toColorPremultiplied
+import sgui.generic.color.toColor
+import sgui.generic.color.toColorPremultiplied
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.INITIALIZATION
 import spirite.pc.JOGL.JOGL

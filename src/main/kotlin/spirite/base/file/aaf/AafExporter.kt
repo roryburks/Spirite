@@ -7,13 +7,12 @@ import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rb.vectrix.rectanglePacking.PackedRectangle
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.mediums.IImageMedium
-import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.util.linear.Rect
 import spirite.hybrid.Hybrid
 import spirite.hybrid.IImageCreator

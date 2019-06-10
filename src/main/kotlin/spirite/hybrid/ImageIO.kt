@@ -1,6 +1,6 @@
 package spirite.hybrid
 
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.gl.GLImage
 import spirite.pc.graphics.ImageBI
@@ -14,7 +14,7 @@ import javax.imageio.ImageIO
  * In the future it might need to be moved to a generic IOutputStream format.  */
 interface IImageIO {
     fun writePNG(image: IImage) : ByteArray
-    fun saveImage( image: IImage, file: File)
+    fun saveImage(image: IImage, file: File)
     fun loadImage( byteArray: ByteArray) : RawImage
 }
 

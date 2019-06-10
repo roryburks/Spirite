@@ -3,7 +3,7 @@ package spirite.base.graphics.rendering
 import rb.owl.observer
 import spirite.base.brains.ICentralObservatory
 import spirite.base.graphics.IFlushable
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.base.graphics.IResourceUseTracker
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.sources.GroupNodeSource
@@ -24,7 +24,7 @@ interface IRenderEngine {
     fun pullImage( target: RenderTarget) : RawImage
 
     fun renderImage( target: RenderTarget) : IImage
-    fun renderWorkspace( workspace: IImageWorkspace) :IImage =
+    fun renderWorkspace( workspace: IImageWorkspace) : IImage =
             renderImage( RenderTarget(GroupNodeSource(workspace.groupTree.root, workspace), RenderSettings(workspace.width, workspace.height)))
 }
 

@@ -22,8 +22,8 @@ import spirite.base.pen.stroke.DrawPointsBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC
-import spirite.base.util.ColorARGB32Normal
-import spirite.base.util.toColor
+import sgui.generic.color.ColorARGB32Normal
+import sgui.generic.color.toColor
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE

@@ -1,7 +1,7 @@
 package spirite.gui.components.dialogs
 
 import spirite.base.brains.IMasterControl
-import spirite.gui.components.basic.ICrossPanel
+import sgui.generic.components.ICrossPanel
 import spirite.hybrid.Hybrid
 
 data class WorkspaceSizeReturn(

@@ -1,13 +1,15 @@
 package spirite.pc.gui
 
-import spirite.base.graphics.IImage
-import spirite.gui.Orientation
+import sgui.generic.components.*
+import sgui.swing.SwGradientSlider
+import sgui.swing.components.*
+import rb.glow.IImage
+import sgui.generic.Orientation
 import spirite.gui.components.advanced.ITreeView
 import spirite.gui.components.advanced.SwTreeView
-import spirite.gui.components.advanced.crossContainer.CrossInitializer
-import spirite.gui.components.basic.*
+import sgui.generic.advancedComponents.crossContainer.CrossInitializer
+import sgui.generic.color.SColor
 import spirite.pc.graphics.ImageBI
-import spirite.pc.gui.basic.*
 import java.awt.image.BufferedImage
 
 object SwingComponentProvider : IComponentProvider {
@@ -42,5 +44,6 @@ object SwingComponentProvider : IComponentProvider {
 
     override fun Slider(min: Int, max: Int, value: Int): ISlider = SwSlider(min, max, value)
 
-    override fun ImageBox(img: IImage?): IImageBox = SwImageBox(img ?: ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR)))
+    override fun ImageBox(img: IImage?): IImageBox = SwImageBox(img
+            ?: ImageBI(BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR)))
 }

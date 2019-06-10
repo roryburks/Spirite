@@ -4,7 +4,7 @@ import rb.vectrix.linear.Vec3f
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
-import spirite.pc.gui.SColor
+import sgui.generic.color.SColor
 
 class MaglevStroke(
         var params: StrokeParams,

@@ -6,7 +6,7 @@ import rb.owl.Observable
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.IAnchorLiftModule
@@ -34,7 +34,7 @@ interface ISelectionEngine {
     fun clearLifted()
     fun attemptLiftData( drawer: IImageDrawer)
     fun setSelectionWithLifted(newSelection: Selection, lifted: ILiftedData)
-    fun imageToSelection( image: IImage, transform: ITransformF?)
+    fun imageToSelection(image: IImage, transform: ITransformF?)
 
     var proposingTransform: ITransformF?
     fun applyProposingTransform()

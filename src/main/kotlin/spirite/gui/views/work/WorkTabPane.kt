@@ -6,9 +6,9 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.ICrossPanel
-import spirite.gui.components.basic.ITabbedPane
+import sgui.generic.components.IComponent
+import sgui.generic.components.ICrossPanel
+import sgui.generic.components.ITabbedPane
 import spirite.gui.resources.IIcon
 import spirite.hybrid.Hybrid
 

@@ -3,8 +3,8 @@ package spirite.base.pen.stroke
 import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.brains.toolset.PenDrawMode.NORMAL
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC
-import spirite.base.util.Color
-import spirite.base.util.Colors
+import sgui.generic.color.Color
+import sgui.generic.color.Colors
 
 data class StrokeParams(
         val color: Color = Colors.BLACK,

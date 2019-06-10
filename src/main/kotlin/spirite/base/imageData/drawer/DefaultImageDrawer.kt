@@ -22,7 +22,7 @@ import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
-import spirite.base.util.Color
+import sgui.generic.color.Color
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.Hybrid

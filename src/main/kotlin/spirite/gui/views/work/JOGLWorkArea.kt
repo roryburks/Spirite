@@ -7,11 +7,11 @@ import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLCanvas
 import spirite.base.graphics.gl.GLGraphicsContext
 import spirite.base.pen.Penner
-import spirite.gui.components.basic.events.MouseEvent
+import sgui.generic.components.events.MouseEvent
 import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
-import spirite.pc.gui.basic.ISwComponent
-import spirite.pc.gui.basic.SwComponent
+import sgui.swing.components.ISwComponent
+import sgui.swing.components.SwComponent
 
 class JOGLWorkArea
 private constructor(

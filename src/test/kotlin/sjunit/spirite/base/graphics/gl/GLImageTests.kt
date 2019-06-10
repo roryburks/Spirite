@@ -3,8 +3,8 @@ package sjunit.spirite.base.graphics.gl
 
 import sjunit.TestConfig
 import spirite.base.graphics.gl.GLImage
-import spirite.base.util.ColorARGB32Normal
-import spirite.base.util.Colors
+import sgui.generic.color.ColorARGB32Normal
+import sgui.generic.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File

@@ -8,7 +8,7 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import spirite.gui.UIPoint
+import sgui.generic.UIPoint
 import spirite.gui.resources.IIcon
 
 abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
@@ -41,7 +41,7 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
            val enabled: Boolean = true)
 
 
-    abstract fun LaunchContextMenu( point: UIPoint, scheme: List<MenuItem>, obj: Any? = null)
+    abstract fun LaunchContextMenu(point: UIPoint, scheme: List<MenuItem>, obj: Any? = null)
 
     fun schemeForNode( workspace: IImageWorkspace, node: Node?) : List<MenuItem>{
 

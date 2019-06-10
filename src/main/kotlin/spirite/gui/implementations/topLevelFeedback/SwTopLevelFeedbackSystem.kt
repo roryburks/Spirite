@@ -4,8 +4,6 @@ import rb.extendo.extensions.removeToList
 import spirite.base.brains.ITopLevelFeedbackSystem
 import spirite.base.brains.SwFrameManager
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.basic.SwLabel
-import javax.swing.JLabel
 
 class SwTopLevelFeedbackSystem(
 ) : ITopLevelFeedbackSystem

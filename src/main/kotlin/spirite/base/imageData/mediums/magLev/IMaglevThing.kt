@@ -2,7 +2,7 @@ package spirite.base.imageData.mediums.magLev
 
 import rb.vectrix.linear.Vec3f
 import spirite.base.imageData.mediums.BuiltMediumData
-import spirite.pc.gui.SColor
+import sgui.generic.color.SColor
 
 
 interface IMaglevThing {

@@ -1,6 +1,5 @@
 package spirite.hybrid.Transferables
 
-import spirite.base.graphics.IImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.Layer
 import java.awt.datatransfer.DataFlavor

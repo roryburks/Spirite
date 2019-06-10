@@ -6,7 +6,7 @@ import rb.vectrix.mathUtil.f
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
-import spirite.base.util.Colors
+import sgui.generic.color.Colors
 import spirite.hybrid.Hybrid
 
 class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(workspace) {

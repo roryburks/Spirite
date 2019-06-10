@@ -4,11 +4,11 @@ import rb.extendo.extensions.append
 import rb.extendo.extensions.deref
 import rb.extendo.extensions.lookup
 import rb.IContract
-import spirite.gui.SUIPoint
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.events.MouseEvent
-import spirite.gui.components.basic.events.MouseEvent.MouseEventType.*
-import spirite.pc.gui.basic.SwComponent
+import sgui.generic.SUIPoint
+import sgui.generic.components.IComponent
+import sgui.generic.components.events.MouseEvent
+import sgui.generic.components.events.MouseEvent.MouseEventType.*
+import sgui.swing.components.SwComponent
 import java.awt.Component
 import java.lang.ref.WeakReference
 import javax.swing.SwingUtilities
@@ -24,7 +24,7 @@ import javax.swing.SwingUtilities
  */
 interface IMouseSystem
 {
-    fun broadcastMouseEvent( mouseEvent: MouseEvent, root: Any)
+    fun broadcastMouseEvent(mouseEvent: MouseEvent, root: Any)
 
     fun attachPriorityHook(hook: IGlobalMouseHook, component: IComponent) : IContract
     fun attachHook(hook: IGlobalMouseHook, component: IComponent) : IContract

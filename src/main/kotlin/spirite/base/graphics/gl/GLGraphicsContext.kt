@@ -1,5 +1,6 @@
 package spirite.base.graphics.gl
 
+import rb.glow.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.mathUtil.f
@@ -8,8 +9,8 @@ import spirite.base.graphics.Composite.SRC_OVER
 import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
-import spirite.base.util.Color
-import spirite.base.util.Colors
+import sgui.generic.color.Color
+import sgui.generic.color.Colors
 import spirite.base.util.glu.GLC
 import spirite.base.util.glu.PolygonTesselater
 import spirite.base.util.linear.Rect

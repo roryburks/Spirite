@@ -1,14 +1,14 @@
 //package demonstration
 //
-//import spirite.gui.Orientation.VERTICAL
+//import sgui.generic.Orientation.VERTICAL
 //import spirite.gui.components.advanced.ITreeView.*
 //import spirite.gui.components.advanced.ITreeViewNonUI.*
 //import spirite.gui.components.advanced.ResizeContainerPanel
 //import spirite.gui.components.advanced.SwTreeView
-//import spirite.gui.components.basic.IComponent
-//import spirite.pc.gui.basic.SwButton
-//import spirite.pc.gui.basic.SwLabel
-//import spirite.pc.gui.basic.jcomponent
+//import sgui.generic.components.IComponent
+//import sgui.basic.basic.SwButton
+//import sgui.basic.basic.SwLabel
+//import sgui.basic.basic.jcomponent
 //import java.awt.GridLayout
 //import java.awt.datatransfer.DataFlavor
 //import java.awt.datatransfer.Transferable

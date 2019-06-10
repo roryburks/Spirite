@@ -4,20 +4,20 @@ import rb.extendo.extensions.then
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
-import spirite.gui.Orientation
-import spirite.gui.Orientation.HORIZONTAL
-import spirite.gui.Orientation.VERTICAL
+import sgui.generic.Orientation
+import sgui.generic.Orientation.HORIZONTAL
+import sgui.generic.Orientation.VERTICAL
 import spirite.gui.components.advanced.IResizeContainerPanel.IResizeBar
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.ICrossPanel
-import spirite.gui.components.basic.events.MouseEvent
-import spirite.gui.components.basic.events.MouseEvent.MouseEventType.DRAGGED
-import spirite.gui.components.basic.events.MouseEvent.MouseEventType.PRESSED
-import spirite.gui.resources.Skin.ResizePanel.BarLineColor
+import sgui.generic.components.IComponent
+import sgui.generic.components.ICrossPanel
+import sgui.generic.components.events.MouseEvent
+import sgui.generic.components.events.MouseEvent.MouseEventType.DRAGGED
+import sgui.generic.components.events.MouseEvent.MouseEventType.PRESSED
+import sgui.skin.Skin.ResizePanel.BarLineColor
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.hybrid.inputSystems.IGlobalMouseHook
-import spirite.pc.gui.basic.SwPanel
+import sgui.swing.components.SwPanel
 import kotlin.reflect.KProperty
 
 interface IResizeContainerPanel : IComponent
@@ -29,7 +29,7 @@ interface IResizeContainerPanel : IComponent
     var stretchComponent : IComponent
 
     fun getPanel(index: Int) : IResizeBar?
-    fun addPanel( component : IComponent, minSize: Int, defaultSize: Int, position: Int = 0, visible: Boolean = true) : Int
+    fun addPanel(component : IComponent, minSize: Int, defaultSize: Int, position: Int = 0, visible: Boolean = true) : Int
     fun removePanel( index: Int)
 
     interface IResizeBar {
@@ -45,7 +45,7 @@ private constructor(
         private val defaultSize: Int,
         private val panel : ICrossPanel
 ) : IComponent by panel, IResizeContainerPanel {
-    constructor(stretchComponent: IComponent,orientation: Orientation, defaultSize: Int = 100) : this(stretchComponent, orientation, defaultSize, Hybrid.ui.CrossPanel())
+    constructor(stretchComponent: IComponent, orientation: Orientation, defaultSize: Int = 100) : this(stretchComponent, orientation, defaultSize, Hybrid.ui.CrossPanel())
 
     override var minStretch: Int by LayoutDelegate(0)
     override var orientation by LayoutDelegate(orientation)
@@ -61,7 +61,7 @@ private constructor(
         else -> null
     }
 
-    override fun addPanel( component: IComponent, minSize: Int, defaultSize: Int, position: Int, visible: Boolean) : Int{
+    override fun addPanel(component: IComponent, minSize: Int, defaultSize: Int, position: Int, visible: Boolean) : Int{
         val p = when(position) {
             0, Int.MAX_VALUE -> leadingBars.size + 1
             Int.MIN_VALUE ->  -trailingBars.size - 1    // -Int.MIN_VALUE = Int.MIN_VALUE.  tricky

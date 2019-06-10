@@ -5,28 +5,30 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
-import spirite.gui.Direction
-import spirite.gui.UIPoint
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
-import spirite.gui.components.basic.ICrossPanel
-import spirite.gui.components.basic.events.MouseEvent
-import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
-import spirite.gui.components.basic.events.MouseEvent.MouseEventType.RELEASED
+import sgui.generic.Direction
+import sgui.generic.UIPoint
+import sgui.generic.components.IComponent
+import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
+import sgui.generic.components.ICrossPanel
+import sgui.generic.components.events.MouseEvent
+import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
+import sgui.generic.components.events.MouseEvent.MouseEventType.RELEASED
 import spirite.gui.components.dialogs.IDialog
 import spirite.gui.menus.ContextMenus
 import spirite.gui.menus.ContextMenus.MenuItem
-import spirite.gui.resources.Skin
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
 import spirite.hybrid.Hybrid
 import spirite.hybrid.customGui.ArrowPanel
 import spirite.hybrid.customGui.DashedOutPanel
 import spirite.pc.graphics.ImageBI
-import spirite.pc.gui.basic.SwComponent
+import sgui.swing.components.SwComponent
+import sgui.skin.Skin.FFAAnimation.Arrow
+import sgui.skin.Skin.Global.Bg
+import sgui.skin.Skin.Global.Fg
 import java.awt.image.BufferedImage
 import java.io.InvalidClassException
 
-fun ContextMenus.launchContextMenuFor( point: UIPoint, layer: IFfaLayer, dialog: IDialog) {
+fun ContextMenus.launchContextMenuFor(point: UIPoint, layer: IFfaLayer, dialog: IDialog) {
     val schema = mutableListOf<MenuItem>()
 
 
@@ -40,7 +42,7 @@ fun ContextMenus.launchContextMenuFor( point: UIPoint, layer: IFfaLayer, dialog:
     this.LaunchContextMenu(point, schema)
 }
 
-fun ContextMenus.launchContextMenuFor( point: UIPoint, frame: IFfaFrame) {
+fun ContextMenus.launchContextMenuFor(point: UIPoint, frame: IFfaFrame) {
     val schema = mutableListOf<MenuItem>()
     val layer = frame.layer
 
@@ -83,7 +85,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
     {
         override val component get() = imp
         override val height: Int get() = 32
-        override val dragBrain = AnimDragBrain {evt: MouseEvent, context : AnimFFAStructPanel ->
+        override val dragBrain = AnimDragBrain { evt: MouseEvent, context : AnimFFAStructPanel ->
             if( evt.type == RELEASED && evt.button == RIGHT)
                 contextMenu.launchContextMenuFor(evt.point, layer, dialog)
             else if( evt.type == RELEASED)
@@ -113,7 +115,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
     {
         override val component: IComponent get() = imp
         override val height: Int get() = 32
-        override val dragBrain: IAnimDragBrain? = AnimDragBrain {evt: MouseEvent, context : AnimFFAStructPanel ->
+        override val dragBrain: IAnimDragBrain? = AnimDragBrain { evt: MouseEvent, context : AnimFFAStructPanel ->
             if( evt.type == RELEASED && evt.button == RIGHT)
                 contextMenu.launchContextMenuFor(evt.point, layer, dialog)
             else if( evt.type == RELEASED)
@@ -149,7 +151,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
         :IFFAStructView
     {
         override val component = Hybrid.ui.CrossPanel {
-            rows.add(SwComponent(DashedOutPanel(Skin.Global.Bg.jcolor, Skin.Global.Fg.jcolor)), width = 32)
+            rows.add(SwComponent(DashedOutPanel(Bg.jcolor, Fg.jcolor)), width = 32)
         }
         override val height: Int get() = 32
         override val dragBrain: IAnimDragBrain? = object : ResizeableBrain(frame) {
@@ -174,7 +176,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
         override val component = Hybrid.ui.CrossPanel {
             cols.add(imgBox, width = tickLen)
             if( frame.length > 1) {
-                cols.add(SwComponent(ArrowPanel(null, Skin.FFAAnimation.Arrow.jcolor, Direction.RIGHT)), width = tickLen * (frame.length - 1))
+                cols.add(SwComponent(ArrowPanel(null, Arrow.jcolor, Direction.RIGHT)), width = tickLen * (frame.length - 1))
             }
         }
         override val height: Int get() = tickLen

@@ -4,7 +4,7 @@ import rb.owl.observer
 import spirite.base.brains.ICentralObservatory
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.settings.ISettingsManager
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.graphics.rendering.ThumbnailStore.ReferenceObject

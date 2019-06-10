@@ -7,13 +7,14 @@ import spirite.base.imageData.undo.UndoIndex
 import spirite.gui.components.advanced.ITreeViewNonUI.SimpleTreeComponent
 import spirite.gui.components.advanced.ITreeViewNonUI.TreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.components.basic.IComponent
+import sgui.generic.components.IComponent
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 
 class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
-    override val component: IComponent get() = Hybrid.ui.CrossPanel {
+    override val component: IComponent
+        get() = Hybrid.ui.CrossPanel {
         rows.addGap(3)
         rows += {
             addGap(3)

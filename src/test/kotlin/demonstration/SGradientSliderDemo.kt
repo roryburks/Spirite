@@ -1,11 +1,11 @@
 package demonstration
 
 import spirite.base.util.InvertibleFunction
-import spirite.gui.Orientation.HORIZONTAL
+import sgui.generic.Orientation.HORIZONTAL
 import spirite.gui.components.advanced.ResizeContainerPanel
-import spirite.gui.components.basic.IButton
+import sgui.generic.components.IButton
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.basic.jcomponent
+import sgui.swing.components.jcomponent
 import java.awt.Color
 import java.awt.GridLayout
 import javax.swing.JFrame

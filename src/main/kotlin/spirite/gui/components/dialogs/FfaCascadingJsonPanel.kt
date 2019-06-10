@@ -2,7 +2,7 @@ package spirite.gui.components.dialogs
 
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.base.imageData.animation.ffa.FfaLayerCascading
-import spirite.gui.components.basic.ICrossPanel
+import sgui.generic.components.ICrossPanel
 import spirite.hybrid.Hybrid
 
 
@@ -15,7 +15,7 @@ data class FfaCascadingJsonContractSub(
         val lexicon: String?)
 
 class FfaCascadingJsonPanel(val layer: FfaLayerCascading)
-    :ICrossPanel by Hybrid.ui.CrossPanel(), IDialogPanel<List<FfaCascadingSublayerContract>>
+    : ICrossPanel by Hybrid.ui.CrossPanel(), IDialogPanel<List<FfaCascadingSublayerContract>>
 {
     private val _textArea = Hybrid.ui.TextArea()
 

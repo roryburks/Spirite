@@ -12,11 +12,11 @@ import jpen.owner.multiAwt.AwtPenToolkit
 import rb.vectrix.mathUtil.round
 import spirite.base.graphics.gl.GLGraphicsContext
 import spirite.base.pen.Penner
-import spirite.gui.components.basic.events.MouseEvent.MouseButton
+import sgui.generic.components.events.MouseEvent.MouseButton
 import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
-import spirite.pc.gui.basic.ISwComponent
-import spirite.pc.gui.basic.SwComponent
+import sgui.swing.components.ISwComponent
+import sgui.swing.components.SwComponent
 import java.awt.event.MouseAdapter
 import javax.swing.SwingUtilities
 

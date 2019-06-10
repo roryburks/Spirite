@@ -12,7 +12,7 @@ import spirite.base.graphics.gl.PolyType.STRIP
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.graphics.gl.SquareGradientCall.GradientType
 import spirite.base.pen.stroke.DrawPoints
-import spirite.base.util.Colors
+import sgui.generic.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File

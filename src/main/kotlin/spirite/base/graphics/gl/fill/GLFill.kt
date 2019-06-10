@@ -8,7 +8,7 @@ import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.GLParameters
 import spirite.base.util.glu.GLC
 import spirite.pc.JOGL.JOGL.JOGLTextureSource
-import spirite.pc.gui.SColor
+import sgui.generic.color.SColor
 import java.nio.IntBuffer
 
 

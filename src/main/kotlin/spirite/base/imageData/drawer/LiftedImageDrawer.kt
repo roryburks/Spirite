@@ -11,7 +11,7 @@ import spirite.base.graphics.RawImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.LiftedImageData
-import spirite.base.util.Color
+import sgui.generic.color.Color
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 

@@ -1,6 +1,6 @@
 package spirite.gui.components.advanced.omniContainer
 
-import spirite.gui.components.basic.IComponent
+import sgui.generic.components.IComponent
 import spirite.gui.resources.IIcon
 
 interface IOmniComponent {

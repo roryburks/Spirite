@@ -8,10 +8,10 @@ import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.*
 import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
-import spirite.gui.resources.Skin.Global
+import sgui.skin.Skin.Global
 import spirite.gui.resources.SwIcons
-import spirite.pc.gui.SColor
-import spirite.pc.gui.basic.jcomponent
+import sgui.generic.color.SColor
+import sgui.swing.components.jcomponent
 import spirite.pc.gui.jcolor
 import spirite.pc.gui.scolor
 import java.io.File

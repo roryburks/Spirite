@@ -3,12 +3,12 @@ package spirite.base.file
 import spirite.base.brains.IMasterControl
 import spirite.base.file.load.BadSifFileException
 import spirite.base.file.load.LoadEngine
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
-import spirite.base.util.Colors
+import sgui.generic.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE

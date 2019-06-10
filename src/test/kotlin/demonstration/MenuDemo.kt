@@ -3,7 +3,7 @@ package demonstration
 import spirite.base.brains.MasterControl
 import spirite.base.brains.commands.GlobalCommands
 import spirite.gui.menus.ContextMenus.MenuItem
-import spirite.pc.gui.basic.SwMenuBar
+import sgui.swing.components.SwMenuBar
 import spirite.pc.gui.menus.SwContextMenus
 import javax.swing.JFrame
 

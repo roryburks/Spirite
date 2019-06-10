@@ -2,7 +2,7 @@ package spirite.pc.gui.dragAndDrop
 
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
-import spirite.pc.gui.basic.SwComponent
+import sgui.swing.components.SwComponent
 import java.awt.Component
 import java.awt.Point
 import java.awt.dnd.*

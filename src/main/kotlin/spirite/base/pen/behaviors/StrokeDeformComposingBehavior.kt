@@ -7,10 +7,10 @@ import spirite.base.imageData.deformation.StrokeDeformationPiece
 import spirite.base.imageData.deformation.StrokeDeformationV2
 import spirite.base.imageData.drawer.IImageDrawer.IDeformDrawer
 import spirite.base.pen.Penner
-import spirite.base.util.ColorARGB32Normal
-import spirite.base.util.Colors
-import spirite.gui.components.basic.events.MouseEvent.MouseButton
-import spirite.gui.components.basic.events.MouseEvent.MouseButton.*
+import sgui.generic.color.ColorARGB32Normal
+import sgui.generic.color.Colors
+import sgui.generic.components.events.MouseEvent.MouseButton
+import sgui.generic.components.events.MouseEvent.MouseButton.*
 import spirite.gui.views.work.WorkSectionView
 
 private val DefaultStrokeColors = listOf(
@@ -110,11 +110,11 @@ class StrokeDeformComposingBehavior(
 
     override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {
         fromStrokes.forEachIndexed { index, (x_, y_) ->
-            gc.color = ColorARGB32Normal( DefaultStrokeColors[index])
+            gc.color = ColorARGB32Normal(DefaultStrokeColors[index])
             gc.drawPolyLine(x_, y_, x_.size)
         }
         toStrokes.forEachIndexed { index, (x_, y_) ->
-            gc.color = ColorARGB32Normal( DefaultStrokeColors[index])
+            gc.color = ColorARGB32Normal(DefaultStrokeColors[index])
             gc.drawPolyLine(x_, y_, x_.size)
         }
         val xCompact = xCompact

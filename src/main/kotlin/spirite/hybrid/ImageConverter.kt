@@ -1,6 +1,6 @@
 package spirite.hybrid
 
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.base.graphics.gl.GLEException
 import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.IGL
@@ -51,7 +51,7 @@ class ImageConverter(
 
     fun convertToInternal( from: IImage) = convert<InternalImage>(from)
 
-    fun loadImageIntoGL( image: IImage, gl: IGL) {
+    fun loadImageIntoGL(image: IImage, gl: IGL) {
         when( image) {
             is ImageBI -> {
 

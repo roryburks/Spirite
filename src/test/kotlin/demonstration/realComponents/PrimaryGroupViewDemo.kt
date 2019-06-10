@@ -4,11 +4,11 @@ import demonstration.DemoLauncher
 import sjunit.TestHelper
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.FLAT
-import spirite.gui.Orientation.HORIZONTAL
+import sgui.generic.Orientation.HORIZONTAL
 import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.gui.views.groupView.GroupView
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.basic.jcomponent
+import sgui.swing.components.jcomponent
 import java.awt.GridLayout
 import javax.swing.JFrame
 import javax.swing.SwingUtilities

@@ -1,11 +1,11 @@
 package spirite.gui.components.advanced.omniContainer
 
-import spirite.gui.Orientation
-import spirite.gui.Orientation.HORIZONTAL
-import spirite.gui.Orientation.VERTICAL
+import sgui.generic.Orientation
+import sgui.generic.Orientation.HORIZONTAL
+import sgui.generic.Orientation.VERTICAL
 import spirite.gui.components.advanced.ResizeContainerPanel
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.ICrossPanel
+import sgui.generic.components.IComponent
+import sgui.generic.components.ICrossPanel
 import spirite.hybrid.Hybrid
 
 class OmniContainer
@@ -77,7 +77,7 @@ data class SubContainer(
 
 
 class OmniInitializer {
-    lateinit var orientation: Orientation ; private set
+    lateinit var orientation: Orientation; private set
     lateinit var center : OmniThing
     var defaultSize : Int? = null
     var minSize : Int? = null

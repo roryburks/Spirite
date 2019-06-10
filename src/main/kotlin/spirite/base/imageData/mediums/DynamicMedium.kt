@@ -11,8 +11,8 @@ import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
-import spirite.base.util.Colors
-import spirite.pc.gui.SColor
+import sgui.generic.color.Colors
+import sgui.generic.color.SColor
 
 
 /***

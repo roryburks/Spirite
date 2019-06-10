@@ -4,11 +4,11 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.MediumType
 import spirite.base.imageData.mediums.MediumType.FLAT
-import spirite.base.util.Color
-import spirite.base.util.Colors
-import spirite.gui.Orientation.HORIZONTAL
-import spirite.gui.Orientation.VERTICAL
-import spirite.gui.components.basic.ICrossPanel
+import sgui.generic.color.Color
+import sgui.generic.color.Colors
+import sgui.generic.Orientation.HORIZONTAL
+import sgui.generic.Orientation.VERTICAL
+import sgui.generic.components.ICrossPanel
 import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
 import spirite.hybrid.Hybrid
 

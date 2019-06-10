@@ -9,7 +9,7 @@ import spirite.base.pen.Penner
 import spirite.base.pen.selectionBuilders.OvalSelectionBuilder
 import spirite.base.pen.selectionBuilders.RectSelectionBuilder
 import spirite.base.pen.selectionBuilders.SelectionBuilder
-import spirite.base.util.Colors
+import sgui.generic.color.Colors
 import spirite.gui.views.work.WorkSectionView
 
 

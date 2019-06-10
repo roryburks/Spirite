@@ -1,10 +1,10 @@
 //package spirite.pc.graphics.awt
 //
 //import spirite.base.graphics.GraphicsContext
-//import spirite.base.graphics.IImage
+//import rb.glow.IImage
 //import spirite.base.graphics.LineAttributes
 //import spirite.base.graphics.RenderRubric
-//import spirite.base.util.Color
+//import sgui.generic.color.Color
 //import rb.vectrix.linear.ITransformF
 //import java.awt.Graphics
 //import java.awt.Graphics2D

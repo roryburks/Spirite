@@ -1,6 +1,7 @@
 package spirite.base.graphics
 
-import spirite.base.util.Colors
+import rb.glow.IImage
+import sgui.generic.color.Colors
 
 
 /**

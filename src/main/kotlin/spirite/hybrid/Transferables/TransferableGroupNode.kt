@@ -1,11 +1,8 @@
 package spirite.hybrid.Transferables
 
-import rb.extendo.dataStructures.Deque
-import spirite.base.graphics.IImage
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.MovableGroupTree
 import spirite.base.imageData.groupTree.duplicateInto
-import spirite.base.util.StringUtil
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException

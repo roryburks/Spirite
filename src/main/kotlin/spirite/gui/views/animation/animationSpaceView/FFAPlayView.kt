@@ -4,13 +4,13 @@ import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
-import spirite.base.util.Colors
-import spirite.gui.Orientation.VERTICAL
+import sgui.generic.color.Colors
+import sgui.generic.Orientation.VERTICAL
 import spirite.gui.components.advanced.ResizeContainerPanel
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_RAISED
-import spirite.gui.components.basic.ICrossPanel
-import spirite.gui.resources.Skin
+import sgui.generic.components.IComponent
+import sgui.generic.components.IComponent.BasicBorder.BEVELED_RAISED
+import sgui.generic.components.ICrossPanel
+import sgui.skin.Skin
 import spirite.gui.resources.SwIcons
 import spirite.gui.views.animation.AnimationPlayView
 import spirite.hybrid.Hybrid
@@ -18,7 +18,7 @@ import spirite.hybrid.Hybrid
 class  FFAPlayView(
         val master: IMasterControl,
         val space: FFAAnimationSpace,
-        private val imp : ICrossPanel= Hybrid.ui.CrossPanel())
+        private val imp : ICrossPanel = Hybrid.ui.CrossPanel())
     : IComponent by imp
 {
     val drawView = AnimationPlayView()

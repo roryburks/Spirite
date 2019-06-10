@@ -10,7 +10,7 @@ import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
-import spirite.base.util.Colors
+import sgui.generic.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
 import spirite.pc.graphics.ImageBI

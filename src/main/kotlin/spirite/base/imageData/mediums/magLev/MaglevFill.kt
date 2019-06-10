@@ -6,7 +6,7 @@ import spirite.base.brains.toolset.MagneticFillMode.NORMAL
 import spirite.base.graphics.Composite.DST_OVER
 import spirite.base.graphics.Composite.SRC_OVER
 import spirite.base.imageData.mediums.BuiltMediumData
-import spirite.pc.gui.SColor
+import sgui.generic.color.SColor
 import kotlin.math.abs
 
 data class MaglevFill(

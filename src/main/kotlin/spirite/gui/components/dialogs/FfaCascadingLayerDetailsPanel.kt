@@ -1,12 +1,12 @@
 package spirite.gui.components.dialogs
 
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
-import spirite.gui.components.basic.ICrossPanel
+import sgui.generic.components.ICrossPanel
 import spirite.hybrid.Hybrid
 
 
 class FfaCascadingLayerDetailsPanel(val defaultInfo: FfaCascadingSublayerContract)
-    :ICrossPanel by Hybrid.ui.CrossPanel(), IDialogPanel<FfaCascadingSublayerContract>
+    : ICrossPanel by Hybrid.ui.CrossPanel(), IDialogPanel<FfaCascadingSublayerContract>
 {
 
     private val _lexicalKeyField = Hybrid.ui.TextField().also { it.text = defaultInfo.lexicalKey.toString() }

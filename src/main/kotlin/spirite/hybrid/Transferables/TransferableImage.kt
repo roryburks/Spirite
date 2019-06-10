@@ -1,6 +1,6 @@
 package spirite.hybrid.Transferables
 
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import java.awt.datatransfer.DataFlavor

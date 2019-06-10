@@ -15,12 +15,12 @@ import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.pen.Penner
 import spirite.base.pen.behaviors.TransformBehavior.TransformStates.*
-import spirite.base.util.Colors
+import sgui.generic.color.Colors
 import spirite.base.util.linear.Rect
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.base.util.shapes.Rectangle
-import spirite.gui.components.basic.events.MouseEvent.MouseButton
+import sgui.generic.components.events.MouseEvent.MouseButton
 import spirite.gui.views.work.WorkSectionView
 import kotlin.math.atan2
 

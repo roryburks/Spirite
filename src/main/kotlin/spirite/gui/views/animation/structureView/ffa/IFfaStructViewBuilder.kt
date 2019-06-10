@@ -3,8 +3,8 @@ package spirite.gui.views.animation.structureView.ffa
 import rb.IContract
 import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.events.MouseEvent
+import sgui.generic.components.IComponent
+import sgui.generic.components.events.MouseEvent
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
 import java.awt.Graphics2D
 
@@ -24,7 +24,7 @@ class AnimDragBrain(val lambda: (evt: MouseEvent, context : AnimFFAStructPanel) 
 }
 
 interface IFFAStructView {
-    val component :IComponent
+    val component : IComponent
     val height: Int
     val dragBrain : IAnimDragBrain?
 }

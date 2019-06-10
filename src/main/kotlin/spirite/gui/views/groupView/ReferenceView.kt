@@ -1,7 +1,7 @@
 package spirite.gui.views.groupView
 
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.components.basic.IComponent
+import sgui.generic.components.IComponent
 import spirite.gui.resources.IIcon
 import spirite.hybrid.Hybrid
 

@@ -9,16 +9,16 @@ import rb.owl.interprettedBindings.bindToX
 import rb.owl.interprettedBindings.bindToY
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
-import spirite.base.util.Colors
+import sgui.generic.color.Colors
 import spirite.base.util.InvertibleFunction
 import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.components.basic.IComboBox
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
-import spirite.gui.components.basic.ICrossPanel
+import sgui.generic.components.IComboBox
+import sgui.generic.components.IComponent
+import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
+import sgui.generic.components.ICrossPanel
 import spirite.gui.resources.IIcon
-import spirite.gui.resources.Skin
+import sgui.skin.Skin
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.jcolor
 
@@ -28,7 +28,7 @@ fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {
     rows.add( DDPAdapter(values, valueBind), height = 24)
 }
 private class DDPAdapter<T>(values: Array<T>, bind: Bindable<T>, imp : IComboBox<T> = Hybrid.ui.ComboBox(values))
-    :IComponent by imp
+    : IComponent by imp
 {
     init {
         imp.selectedItem = bind.field
@@ -42,7 +42,7 @@ private class DDPAdapter<T>(values: Array<T>, bind: Bindable<T>, imp : IComboBox
 
 
 
-fun <T> RadioButtonProperty<T>.getComponent() :IComponent {
+fun <T> RadioButtonProperty<T>.getComponent() : IComponent {
     val cluster = RadioButtonCluster(value, values.asList())
     val valueK = cluster.valueBind.bindWeaklyTo(valueBind)
 

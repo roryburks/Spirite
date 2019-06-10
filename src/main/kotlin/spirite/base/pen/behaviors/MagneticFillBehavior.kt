@@ -4,9 +4,9 @@ import rb.vectrix.mathUtil.f
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.drawer.IImageDrawer.IMagneticFillModule
 import spirite.base.pen.Penner
-import spirite.base.util.ColorARGB32Normal
+import sgui.generic.color.ColorARGB32Normal
 import spirite.gui.views.work.WorkSectionView
-import spirite.pc.gui.SColor
+import sgui.generic.color.SColor
 import kotlin.math.min
 
 class MagneticFillBehavior(penner: Penner, val drawer: IMagneticFillModule, val color: SColor)
@@ -27,7 +27,7 @@ class MagneticFillBehavior(penner: Penner, val drawer: IMagneticFillModule, val 
 
     override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {
         gc.transform = view.tWorkspaceToScreen
-        gc.color = ColorARGB32Normal( 0xFFFFFF xor color.argb32)
+        gc.color = ColorARGB32Normal(0xFFFFFF xor color.argb32)
         val fx = drawer.magFillXs
         val fy = drawer.magFillYs
         gc.drawPolyLine(fx, fy, min(fx.size, fy.size))

@@ -7,17 +7,17 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.palette.Palette
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.components.basic.IColorSquare
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
-import spirite.gui.components.basic.ICrossPanel
-import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
+import sgui.generic.components.IColorSquare
+import sgui.generic.components.IComponent
+import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
+import sgui.generic.components.ICrossPanel
+import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.basic.SJPanel
-import spirite.pc.gui.basic.SwComponent
+import sgui.swing.components.SJPanel
+import sgui.swing.components.SwComponent
 import spirite.pc.gui.jcolor
 import java.awt.BasicStroke
 import java.awt.Color
@@ -180,7 +180,7 @@ private class PaletteChooserView
 constructor(
         val master: IMasterControl,
         val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-    :IComponent by imp
+    : IComponent by imp
 {
     private val currentWorkspace get() = master.workspaceSet.currentWorkspace
     private val paletteManager get() = master.paletteManager
@@ -304,7 +304,7 @@ private class PaletteView
 private constructor(
         val master: IMasterControl,
         val imp: PaletteViewImp )
-    :IComponent by SwComponent(imp)
+    : IComponent by SwComponent(imp)
 {
     constructor(master: IMasterControl) : this(master, PaletteViewImp())
 

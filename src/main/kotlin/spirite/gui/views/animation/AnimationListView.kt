@@ -14,14 +14,15 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.ITreeViewNonUI.ITreeComponent
 import spirite.gui.components.advanced.ITreeViewNonUI.TreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
+import sgui.generic.components.IComponent
+import sgui.generic.components.events.MouseEvent
+import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.SwIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.basic.jcomponent
+import sgui.swing.components.jcomponent
 import java.awt.Point
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DragGestureEvent
@@ -72,7 +73,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
         workspace?.animationManager?.animations
     }
 
-    private val rightclick = { evt : spirite.gui.components.basic.events.MouseEvent->
+    private val rightclick = { evt : MouseEvent ->
         if( evt.button == RIGHT )
             workspace?.apply {
                 val animation = list.getNodeFromY(evt.point.y)?.value

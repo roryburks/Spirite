@@ -3,12 +3,12 @@ package spirite.gui.views.animation
 import rb.extendo.delegates.OnChangeDelegate
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.gui.components.basic.IComponent
-import spirite.gui.resources.Skin.Global.Bg
+import sgui.generic.components.IComponent
+import sgui.skin.Skin.Global.Bg
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
-import spirite.pc.gui.SColor
-import spirite.pc.gui.basic.SwComponent
+import sgui.generic.color.SColor
+import sgui.swing.components.SwComponent
 import spirite.pc.gui.jcolor
 import java.awt.Graphics
 import javax.swing.JPanel

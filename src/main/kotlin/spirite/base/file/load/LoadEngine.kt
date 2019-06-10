@@ -8,14 +8,12 @@ import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readNullTerminatedStringUTF8
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.util.Color
-import spirite.base.util.ColorARGB32Normal
+import sgui.generic.color.Color
+import sgui.generic.color.ColorARGB32Normal
 import java.io.File
-import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.charset.Charset
 
@@ -304,7 +302,7 @@ object LoadEngine {
         val nodeMap = List(numMappedNodes) {
                     val node = context.nodes.getOrNull(ra.readInt())
                     val colorSize = ra.readUnsignedByte()
-                    val colors = List<Color>(colorSize) {ColorARGB32Normal(ra.readInt())}
+                    val colors = List<Color>(colorSize) { ColorARGB32Normal(ra.readInt()) }
 
                     node?.run { Pair(this,colors) }
                 }
@@ -316,7 +314,7 @@ object LoadEngine {
                     val group = context.nodes.getOrNull(ra.readInt()) as? GroupNode
                     val partName = ra.readNullTerminatedStringUTF8()
                     val colorSize = ra.readUnsignedByte()
-                    val colors = List<Color>(colorSize) {ColorARGB32Normal(ra.readInt())}
+                    val colors = List<Color>(colorSize) { ColorARGB32Normal(ra.readInt()) }
 
                     group?.run { Pair(Pair(group, partName), colors) }
                 }

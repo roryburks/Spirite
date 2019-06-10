@@ -3,9 +3,9 @@ package spirite.pc.graphics
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IDrawer
 import spirite.base.graphics.RawImage
-import spirite.base.util.Color
-import spirite.base.util.ColorARGB32Normal
-import spirite.base.util.ColorARGB32Premultiplied
+import sgui.generic.color.Color
+import sgui.generic.color.ColorARGB32Normal
+import sgui.generic.color.ColorARGB32Premultiplied
 import java.awt.image.BufferedImage
 
 class ImageBI(
@@ -15,8 +15,8 @@ class ImageBI(
 
     override fun getColor(x: Int, y: Int): Color {
         return when( bi.isAlphaPremultiplied) {
-            true -> ColorARGB32Premultiplied(bi.getRGB(x,y))
-            false -> ColorARGB32Normal(bi.getRGB(x,y))
+            true -> ColorARGB32Premultiplied(bi.getRGB(x, y))
+            false -> ColorARGB32Normal(bi.getRGB(x, y))
         }
     }
 

@@ -13,19 +13,20 @@ import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.util.linear.Rect
-import spirite.gui.components.advanced.crossContainer.CrossInitializer
-import spirite.gui.components.advanced.crossContainer.CrossRowInitializer
-import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
-import spirite.gui.components.basic.ICrossPanel
-import spirite.gui.components.basic.IScrollContainer
-import spirite.gui.resources.Skin
+import sgui.generic.advancedComponents.crossContainer.CrossInitializer
+import sgui.generic.advancedComponents.crossContainer.CrossRowInitializer
+import sgui.generic.components.IComponent
+import sgui.generic.components.IComponent.BasicCursor.DEFAULT
+import sgui.generic.components.ICrossPanel
+import sgui.generic.components.IScrollContainer
+import sgui.generic.components.events.MouseEvent
+import sgui.skin.Skin
 import spirite.gui.views.animation.structureView.ffa.FfaStructBuilderFactory
 import spirite.gui.views.animation.structureView.ffa.IAnimDragBehavior
 import spirite.gui.views.animation.structureView.ffa.IFFAStructView
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.basic.SJPanel
-import spirite.pc.gui.basic.SwComponent
+import sgui.swing.components.SJPanel
+import sgui.swing.components.SwComponent
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.lang.ref.WeakReference
@@ -183,7 +184,7 @@ private constructor(
     // endregion
 
     private inner class TickPanel( val tick: Int, private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-        :ICrossPanel by imp
+        : ICrossPanel by imp
     {
         init {
             imp.setLayout {
@@ -236,7 +237,7 @@ private constructor(
             override fun void() { dragBehavior = null}
         }
 
-        fun interpretEvt( evt: spirite.gui.components.basic.events.MouseEvent) {
+        fun interpretEvt( evt: MouseEvent) {
             if( dragBehavior == null) {
                 val pt = evt.point.convert(this)
 

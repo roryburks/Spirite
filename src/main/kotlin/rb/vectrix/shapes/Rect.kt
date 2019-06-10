@@ -107,4 +107,7 @@ data class RectI(
             LineSegmentI(x1i, y2i, x2i, y2i),
             LineSegmentI(x1i, y1i, x2i, y2i))
 
+    fun contains(x: Int, y: Int) =
+            if (w <= 0 || h <= 0) false
+            else !(x2 < x || y2 < y || x2 > x + w || y2 > y + h)
 }

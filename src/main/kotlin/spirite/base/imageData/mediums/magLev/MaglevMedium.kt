@@ -1,19 +1,17 @@
 package spirite.base.imageData.mediums.magLev
 
 import rb.extendo.dataStructures.SinglyList
-import rb.extendo.extensions.replace
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
-import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.*
 import spirite.base.imageData.mediums.MediumType.MAGLEV
-import spirite.base.util.Colors
-import spirite.pc.gui.SColor
+import sgui.generic.color.Colors
+import sgui.generic.color.SColor
 
 
 class MaglevMedium

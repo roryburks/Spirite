@@ -4,7 +4,7 @@ import rb.jvm.owl.addWeakObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.components.basic.IComponent
+import sgui.generic.components.IComponent
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid

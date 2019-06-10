@@ -1,6 +1,6 @@
 package spirite.hybrid.Transferables
 
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.layers.Layer
 import spirite.hybrid.Hybrid

@@ -1,10 +1,10 @@
 package spirite.hybrid.customGui
 
 import rb.vectrix.mathUtil.round
-import spirite.gui.Direction
-import spirite.gui.Direction.*
+import sgui.generic.Direction
+import sgui.generic.Direction.*
 import spirite.pc.gui.JColor
-import spirite.pc.gui.basic.SJPanel
+import sgui.swing.components.SJPanel
 import java.awt.Graphics
 
 

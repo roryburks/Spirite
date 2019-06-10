@@ -1,9 +1,9 @@
 package spirite.gui.views.work
 
 import spirite.base.graphics.GraphicsContext
-import spirite.base.util.Colors
-import spirite.gui.resources.Skin
-import spirite.pc.gui.basic.ISwComponent
+import sgui.generic.color.Colors
+import sgui.skin.Skin
+import sgui.swing.components.ISwComponent
 
 abstract class WorkArea(
         val context: WorkSection) {

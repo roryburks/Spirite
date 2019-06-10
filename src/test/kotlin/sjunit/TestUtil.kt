@@ -1,6 +1,6 @@
 package sjunit
 
-import spirite.base.graphics.IImage
+import rb.glow.IImage
 
 fun verifyRawImagesAreEqual(raw1: IImage, raw2: IImage) {
     assert(raw1.width == raw2.width)

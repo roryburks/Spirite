@@ -8,7 +8,6 @@ import spirite.base.brains.commands.FrameCommandExecutor.FrameCommand
 import spirite.base.brains.commands.GlobalCommands
 import spirite.base.brains.commands.SelectCommand
 import spirite.base.brains.commands.WorkspaceCommands
-import spirite.base.util.Colors
 import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
 import spirite.gui.components.advanced.omniContainer.OmniTab
@@ -26,8 +25,8 @@ import spirite.gui.views.tool.ToolSettingsSection
 import spirite.gui.views.work.WorkTabPane
 import spirite.hybrid.Hybrid
 import spirite.hybrid.SwHybrid
-import spirite.pc.gui.basic.SwMenuBar
-import spirite.pc.gui.basic.jcomponent
+import sgui.swing.components.SwMenuBar
+import sgui.swing.components.jcomponent
 import spirite.pc.gui.menus.SwContextMenus
 import java.awt.Dimension
 import java.awt.GridLayout

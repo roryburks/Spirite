@@ -9,7 +9,7 @@
 //import spirite.base.graphics.RenderRubric
 //import spirite.base.graphics.rendering.TransformedHandle
 //import spirite.base.imageData.MediumHandle
-//import spirite.base.util.Colors
+//import sgui.generic.color.Colors
 //import spirite.hybrid.Hybrid
 //import spirite.hybrid.ImageConverter
 //import spirite.pc.graphics.ImageBI

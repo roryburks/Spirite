@@ -4,7 +4,7 @@ import sjunit.TestConfig
 import spirite.base.graphics.fill.V0FillArrayAlgorithm
 import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.fill.GLFill
-import spirite.base.util.Colors
+import sgui.generic.color.Colors
 import spirite.hybrid.EngineLaunchpoint
 import spirite.pc.toBufferedImage
 import java.io.File
