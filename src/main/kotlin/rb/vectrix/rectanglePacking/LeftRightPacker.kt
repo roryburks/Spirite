@@ -1,16 +1,12 @@
-package spirite.base.util.rectanglePacking
+package rb.vectrix.rectanglePacking
 
 import rb.extendo.extensions.removeToList
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.floor
-import spirite.base.util.linear.Rect
+import rb.vectrix.shapes.RectI
 import kotlin.math.max
 import kotlin.math.sqrt
-
-interface IRectanglePackingAlgorithm {
-    fun pack(toPack: List<Vec2i>) : PackedRectangle
-}
 
 object LeftRightPacker  : IRectanglePackingAlgorithm {
     override fun pack(toPack: List<Vec2i>): PackedRectangle {
@@ -21,24 +17,24 @@ object LeftRightPacker  : IRectanglePackingAlgorithm {
         val inc = max(1, (maxWidth-minWidth + 5)/10)
 
         return (minWidth..maxWidth step inc).asSequence()
-                .map { packSub(cropped, it) }
-                .minBy { it.width * it.height } ?: NilPacked
+            .map { packSub(cropped, it) }
+            .minBy { it.width * it.height } ?: NilPacked
     }
 
     private fun packSub(rectsToPack: List<Vec2i>, width: Int) : PackedRectangle {
         val unpacked = rectsToPack.toMutableList()
         val rows = mutableListOf<Row>()
-        val packed = mutableListOf<Rect>()
+        val packed = mutableListOf<RectI>()
 
         // Step 1: Add all pieces > width/2, widest first
         var wy = 0
         unpacked
-                .removeToList { it.xi >= width/2 }
-                .forEach { dim ->
-                    packed.add(Rect(0, wy, dim.xi, dim.yi))
-                    rows.add(Row(dim.yi, width - dim.xi))
-                    wy += dim.yi
-                }
+            .removeToList { it.xi >= width/2 }
+            .forEach { dim ->
+                packed.add(RectI(0, wy, dim.xi, dim.yi))
+                rows.add(Row(dim.yi, width - dim.xi))
+                wy += dim.yi
+            }
 
         unpacked.sortBy { -it.yi }
 
@@ -48,7 +44,7 @@ object LeftRightPacker  : IRectanglePackingAlgorithm {
             val row = rows.firstOrNull()
             if( row == null) {
                 val toPack = unpacked.removeAt(0)
-                packed.add(Rect(0, wy, toPack.xi, toPack.yi))
+                packed.add(RectI(0, wy, toPack.xi, toPack.yi))
                 rows.add(Row(toPack.yi, width - toPack.xi))
             }
             else {
@@ -58,7 +54,7 @@ object LeftRightPacker  : IRectanglePackingAlgorithm {
                     rows.removeAt(0)
                 } else {
                     unpacked.remove(toPack)
-                    packed.add(Rect(width - row.right - toPack.xi, wy, toPack.xi, toPack.yi))
+                    packed.add(RectI(width - row.right - toPack.xi, wy, toPack.xi, toPack.yi))
 
                     when {
                         toPack.yi == row.h -> row.right -= toPack.xi
@@ -102,7 +98,7 @@ object LeftRightPacker  : IRectanglePackingAlgorithm {
     }
 
     private class Row(
-            var h: Int,
-            var free_w: Int,
-            var right: Int = 0)
+        var h: Int,
+        var free_w: Int,
+        var right: Int = 0)
 }

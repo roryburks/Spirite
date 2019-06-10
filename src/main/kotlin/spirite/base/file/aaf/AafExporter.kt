@@ -5,6 +5,8 @@ import rb.extendo.extensions.toLookup
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher
+import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
+import rb.vectrix.rectanglePacking.PackedRectangle
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
@@ -13,10 +15,6 @@ import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.mediums.IImageMedium
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.util.linear.Rect
-import spirite.base.util.rectanglePacking.BottomUpPacker
-import spirite.base.util.rectanglePacking.LeftRightPacker
-import spirite.base.util.rectanglePacking.ModifiedSleatorAlgorithm2
-import spirite.base.util.rectanglePacking.PackedRectangle
 import spirite.hybrid.Hybrid
 import spirite.hybrid.IImageCreator
 import spirite.hybrid.IImageIO
@@ -47,7 +45,7 @@ class AafExporter(
                 .toList()
 
         // Step 3: Use Rectangle Packing Algorithm to pack them.
-        val packed = ModifiedSleatorAlgorithm2(
+        val packed = ModifiedSleatorAlgorithm(
                 uniqueImages.map { Vec2i(it.width, it.height) })
 
         // Step 3: Construct packed Image and map from Image -> Rect
@@ -141,7 +139,7 @@ class AafExporter(
             val chunks: List<Rect>,
             val chunkMap: Map<IImage,Int>)
 
-    private fun drawAndMap(packed: PackedRectangle,uniqueImages: List<IImage>)
+    private fun drawAndMap(packed: PackedRectangle, uniqueImages: List<IImage>)
             : AafInfo
     {
         val img = imageCreator.createImage(packed.width, packed.height)
@@ -150,12 +148,12 @@ class AafExporter(
 
         val chunkMap = packed.packedRects
                 .mapIndexed { index, rect ->
-                    val image= imagesByDimension[Vec2i(rect.width, rect.height)]!!.pop()
-                    img.graphics.renderImage(image, rect.x, rect.y)
+                    val image= imagesByDimension[Vec2i(rect.wi, rect.hi)]!!.pop()
+                    img.graphics.renderImage(image, rect.x1i, rect.y1i)
                     Pair(image, index)
                 }.toMap()
 
-        val chunks = packed.packedRects
+        val chunks = packed.packedRects.map { Rect(it.x1i, it.y1i,it.wi, it.hi) }
 
         return AafInfo(img, chunks, chunkMap)
     }

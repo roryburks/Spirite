@@ -1,12 +1,11 @@
-package spirite.base.util.rectanglePacking
+package rb.vectrix.rectanglePacking
 
-import rb.extendo.extensions.cross
 import rb.extendo.extensions.removeFirst
 import rb.extendo.extensions.removeToList
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.floor
-import spirite.base.util.linear.Rect
+import rb.vectrix.shapes.RectI
 import kotlin.math.max
 import kotlin.math.sqrt
 
@@ -19,24 +18,24 @@ object BottomUpPacker  : IRectanglePackingAlgorithm {
         val inc = max(1, (maxWidth-minWidth + 5)/10)
 
         return (minWidth..maxWidth step inc).asSequence()
-                .map { packSub(cropped, it) }
-                .minBy { it.width * it.height } ?: NilPacked
+            .map { packSub(cropped, it) }
+            .minBy { it.width * it.height } ?: NilPacked
     }
 
     private fun packSub(rectsToPack: List<Vec2i>, spaceWidth: Int) : PackedRectangle {
         val unpacked = rectsToPack.toMutableList()
         val rows = mutableListOf<Row>()
-        val packed = mutableListOf<Rect>()
+        val packed = mutableListOf<RectI>()
 
         // Step 1: Add all pieces > spaceWidth/2, widest first
         var wy = 0
         unpacked
-                .removeToList { it.xi >= spaceWidth/2 }
-                .forEach { dim ->
-                    packed.add(Rect(0, wy, dim.xi, dim.yi))
-                    rows.add(Row.Left(dim.yi, dim.xi, spaceWidth))
-                    wy += dim.yi
-                }
+            .removeToList { it.xi >= spaceWidth/2 }
+            .forEach { dim ->
+                packed.add(RectI(0, wy, dim.xi, dim.yi))
+                rows.add(BottomUpPacker.Row.Left(dim.yi, dim.xi, spaceWidth))
+                wy += dim.yi
+            }
 
         unpacked.sortBy { -it.yi }
 
@@ -46,13 +45,13 @@ object BottomUpPacker  : IRectanglePackingAlgorithm {
             val row = rows.firstOrNull()
             if( row == null) {
                 val toPack = unpacked.removeAt(0)
-                packed.add(Rect(0, wy, toPack.xi, toPack.yi))
-                rows.add(Row.Left(toPack.yi, toPack.xi, spaceWidth))
+                packed.add(RectI(0, wy, toPack.xi, toPack.yi))
+                rows.add(BottomUpPacker.Row.Left(toPack.yi, toPack.xi, spaceWidth))
             }
             else {
                 val set = unpacked.asSequence()
-                        .flatMap { x -> row.freeWidths.asSequence().map { Pair(x, it) } }
-                        .firstOrNull { it.first.xi <= it.second.last - it.second.first }
+                    .flatMap { x -> row.freeWidths.asSequence().map { Pair(x, it) } }
+                    .firstOrNull { it.first.xi <= it.second.last - it.second.first }
                 if (set == null) {
                     wy += row.h
                     rows.removeAt(0)
@@ -60,7 +59,7 @@ object BottomUpPacker  : IRectanglePackingAlgorithm {
                     val (toPack, range) = set
                     unpacked.remove(toPack)
                     val left = range.last - toPack.xi
-                    packed.add(Rect(left, wy, toPack.xi, toPack.yi))
+                    packed.add(RectI(left, wy, toPack.xi, toPack.yi))
 
                     InsertRect(rows, toPack, left, spaceWidth)
                 }
@@ -85,7 +84,7 @@ object BottomUpPacker  : IRectanglePackingAlgorithm {
                 while (height_to_consume > 0) {
                     val rowToModify = rows.getOrNull(row_i)
                     if( rowToModify == null) {
-                        rows.add(Row.Middle(height_to_consume, left, toInsert.xi, spaceWidth))
+                        rows.add(BottomUpPacker.Row.Middle(height_to_consume, left, toInsert.xi, spaceWidth))
                         break
                     }
                     else if( rowToModify.h > height_to_consume)  {
@@ -105,8 +104,8 @@ object BottomUpPacker  : IRectanglePackingAlgorithm {
     }
 
     private class Row(
-            var h: Int,
-            var freeWidths: MutableList<IntRange>)
+        var h: Int,
+        var freeWidths: MutableList<IntRange>)
     {
         fun insert( left: Int, width: Int) {
             val toModify = freeWidths.removeFirst { it.contains(left) } ?: return
