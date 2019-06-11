@@ -1,6 +1,6 @@
 package spirite.base.graphics.gl.shader
 
-import spirite.base.graphics.gl.IGLProgram
+import rb.glow.gl.IGLProgram
 
 interface IGLShaderLoader {
     fun initShaderPrograms() : Array<IGLProgram>

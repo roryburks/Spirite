@@ -1,5 +1,9 @@
 package spirite.base.graphics.gl
 
+import rb.glow.gl.IGL
+import rb.glow.gl.IGLFramebuffer
+import rb.glow.gl.IGLProgram
+import rb.glow.gl.IGLTexture
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Mat4f
@@ -101,7 +105,7 @@ class GLEngine(
                     height = 1
                 }
                 else {
-                    fbo = gl.genFramebuffer()
+                    fbo = gl.genFramebuffer() ?: return
                     gl.bindFrameBuffer(GLC.FRAMEBUFFER, fbo)
 
                     field = value

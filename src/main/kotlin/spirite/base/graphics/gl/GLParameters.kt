@@ -1,5 +1,7 @@
 package spirite.base.graphics.gl
 
+import rb.glow.gl.IGL
+import rb.glow.gl.IGLProgram
 import rb.vectrix.linear.Mat4f
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
@@ -54,8 +56,8 @@ data class GLParameters(
 sealed class GLUniform(
         val name: String
 ) {
-    abstract fun apply( gl : IGL, program: IGLProgram)
-    fun getUniformLocation( gl: IGL, program: IGLProgram) = gl.getUniformLocation(program, name)
+    abstract fun apply(gl : IGL, program: IGLProgram)
+    fun getUniformLocation(gl: IGL, program: IGLProgram) = gl.getUniformLocation(program, name)
 }
 
 class GLUniform1f(name: String, val x: Float) : GLUniform(name) {

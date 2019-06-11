@@ -1,5 +1,6 @@
 package spirite.base.graphics.gl
 
+import rb.glow.gl.IGLTexture
 import spirite.hybrid.Hybrid
 import java.lang.ref.WeakReference
 

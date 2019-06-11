@@ -1,11 +1,14 @@
 package spirite.base.graphics.gl.shader
 
+import rb.glow.gl.IGL
+import rb.glow.gl.IGLProgram
+import rb.glow.gl.IGLShader
 import spirite.base.graphics.gl.*
 import spirite.base.resources.IScriptService
 import spirite.base.util.glu.GLC
 
 
-class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLShaderLoader {
+class GL330ShaderLoader(val gl: IGL, val scriptService: IScriptService) : IGLShaderLoader {
     private val root = "shaders/330"
     private val GLOBAL = "#GLOBAL"
 
@@ -97,7 +100,7 @@ class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLSh
         return Array(ProgramType.values().size, {array.getOrNull(it) ?: default})
     }
 
-    fun loadProgram(vert: String?, geom: String?, frag: String?) : IGLProgram{
+    fun loadProgram(vert: String?, geom: String?, frag: String?) : IGLProgram {
         val shaders = mutableListOf<IGLShader>()
 
         if( vert != null) {
@@ -133,7 +136,7 @@ class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLSh
         return shader
     }
 
-    private fun linkProgram( shaders: List<IGLShader>) : IGLProgram{
+    private fun linkProgram( shaders: List<IGLShader>) : IGLProgram {
         val program = gl.createProgram() ?: throw GLEException("Couldn't allocate OpenGL program resources.")
 
         shaders.forEach { gl.attachShader(program, it) }

@@ -2,7 +2,7 @@ package spirite.pc.JOGL
 
 import com.jogamp.opengl.GL
 import com.jogamp.opengl.GL2
-import spirite.base.graphics.gl.*
+import rb.glow.gl.*
 import spirite.base.util.glu.GLC
 import java.nio.Buffer
 import java.nio.ByteBuffer
@@ -83,7 +83,7 @@ class JOGL(
 
     override fun attachShader(program: IGLProgram, shader: IGLShader) =
             gl.glAttachShader( (program as JOGLProgram).programId, (shader as JOGLShader).shaderId)
-    override fun detatchShader( program: IGLProgram, shader: IGLShader) =
+    override fun detatchShader(program: IGLProgram, shader: IGLShader) =
             gl.glDetachShader( (program as JOGLProgram).programId, (shader as JOGLShader).shaderId)
 
     override fun linkProgram(program: IGLProgram) = gl.glLinkProgram((program as JOGLProgram).programId)
@@ -322,7 +322,7 @@ class JOGL(
     override fun drawArrays(mode: Int, first: Int, count: Int) =
             gl.glDrawArrays( mode, first, count)
 
-    override fun readnPixels( x: Int, y: Int, w: Int, h: Int, format: Int, type: Int, n: Int, buffer: IArraySource ){
+    override fun readnPixels( x: Int, y: Int, w: Int, h: Int, format: Int, type: Int, n: Int, buffer: IArraySource){
         if( buffer is JOGLArraySource)
             gl.glReadnPixels( x, y, w, h, format, type, n, buffer.data)
     }

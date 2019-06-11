@@ -2,8 +2,8 @@ package spirite.base.util.linear
 
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Mat4f
-import spirite.base.graphics.gl.IFloat32Source
-import spirite.base.graphics.gl.IGL
+import rb.glow.gl.IFloat32Source
+import rb.glow.gl.IGL
 
 // TODO: Figure out where this belongs (later).  Possibly in Glow
 object MatrixBuilder {

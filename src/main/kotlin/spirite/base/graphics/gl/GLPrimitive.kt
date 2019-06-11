@@ -1,5 +1,6 @@
 package spirite.base.graphics.gl
 
+import rb.glow.gl.IGL
 import spirite.base.util.glu.GLC
 import kotlin.math.min
 

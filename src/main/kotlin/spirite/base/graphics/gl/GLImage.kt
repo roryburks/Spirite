@@ -8,6 +8,8 @@ import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Rect
 import rb.glow.color.toColor
 import rb.glow.color.toColorPremultiplied
+import rb.glow.gl.GLResourcException
+import rb.glow.gl.IGLTexture
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.INITIALIZATION
 import spirite.pc.JOGL.JOGL
@@ -74,7 +76,7 @@ class GLImage : RawImage {
         GLImageTracker.glImageLoaded(this)
     }
 
-    constructor( tex: IGLTexture, width: Int, height: Int, glEngine: IGLEngine, premultiplied: Boolean = true) {
+    constructor(tex: IGLTexture, width: Int, height: Int, glEngine: IGLEngine, premultiplied: Boolean = true) {
         this._tex = tex
         this.width = width
         this.height = height

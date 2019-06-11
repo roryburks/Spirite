@@ -3,7 +3,7 @@ package spirite.hybrid
 import rb.glow.IImage
 import spirite.base.graphics.gl.GLEException
 import spirite.base.graphics.gl.GLImage
-import spirite.base.graphics.gl.IGL
+import rb.glow.gl.IGL
 import spirite.base.graphics.gl.IGLEngine
 import spirite.base.util.glu.GLC
 import spirite.pc.JOGL.JOGL.JOGLTextureSource

@@ -55,12 +55,12 @@ object ContentBoundsFinder {
 
             engine.setTarget(raw)
 
-            val intBuffer = IntBuffer.allocate(w*h)
+            val intBuffer = IntArray(w*h)
             gl.readnPixels(0, 0, w, h,
                     GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, 4 * w * h,
                     gl.makeInt32Source(intBuffer))
 
-            data = _ImageCropHelperInt(intBuffer.array(), w, h)
+            data = _ImageCropHelperInt(intBuffer, w, h)
         } else
             throw UnsupportedImageTypeException("Unsupported RawImage type")
 

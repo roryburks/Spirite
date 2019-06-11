@@ -1,7 +1,7 @@
 package spirite.pc.JOGL
 
 import com.jogamp.opengl.*
-import spirite.base.graphics.gl.IGL
+import rb.glow.gl.IGL
 
 object JOGLProvider {
     private val drawable: GLOffscreenAutoDrawable
@@ -15,7 +15,8 @@ object JOGLProvider {
     // There is probably a more strategic process for this than wrapping the gl2 in JOGL every time something needs to
     //  make a GL call, but really this wrapping process should be no larger than a normal variable getter as JOGL is
     //  just a single variable and a ton of methods.
-    val gl : IGL get() {
+    val gl : IGL
+        get() {
         val gl2 = gl2 ?: this._gl.gL2
 
         return JOGL(gl2)

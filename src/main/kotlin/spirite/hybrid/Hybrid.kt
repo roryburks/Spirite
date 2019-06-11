@@ -1,6 +1,6 @@
 package spirite.hybrid
 
-import spirite.base.graphics.gl.IGL
+import rb.glow.gl.IGL
 import spirite.base.graphics.gl.IGLEngine
 import sgui.generic.components.IComponentProvider
 import sgui.generic.systems.IMouseSystem
