@@ -1,6 +1,6 @@
 package spirite.base.graphics.isolation
 
-import rb.jvm.owl.addWeakObserver
+import rbJvm.owl.addWeakObserver
 import rb.IContract
 import rb.owl.bindable.addObserver
 import spirite.base.graphics.RenderRubric

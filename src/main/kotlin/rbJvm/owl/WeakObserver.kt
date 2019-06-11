@@ -1,4 +1,4 @@
-package rb.jvm.owl
+package rbJvm.owl
 
 import rb.extendo.extensions.mapRemoveIfNull
 import rb.IContract

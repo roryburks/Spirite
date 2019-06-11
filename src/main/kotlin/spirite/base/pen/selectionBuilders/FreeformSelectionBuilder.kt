@@ -1,6 +1,6 @@
 package spirite.base.pen.selectionBuilders
 
-import rb.jvm.vectrix.compaction.IntCompactor
+import rbJvm.vectrix.compaction.IntCompactor
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.f
 import spirite.base.graphics.GraphicsContext

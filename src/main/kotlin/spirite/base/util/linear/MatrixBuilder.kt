@@ -4,34 +4,10 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Mat4f
 import rb.glow.gl.IFloat32Source
 import rb.glow.gl.IGL
+import rb.vectrix.linear.ITransform
+import rb.vectrix.mathUtil.f
 
 // TODO: Figure out where this belongs (later).  Possibly in Glow
-object MatrixBuilder {
-    /** Creates a transform matrix representing an Orthagonal Projection
-     * (A flat, rectangular projection in XY coordinates). */
-    fun orthagonalProjectionMatrix(
-            left: Float, right: Float,
-            bottom: Float, top: Float,
-            near: Float, far: Float
-    ): FloatArray {
-        return floatArrayOf(
-                2f / (right - left), 0f, 0f, -(right + left) / (right - left),
-                0f, 2f / (top - bottom), 0f, -(bottom + top) / (top - bottom),
-                0f, 0f, -2f / (far - near), -(far + near) / (far - near),
-                0f, 0f, 0f, 1f)
-    }
-
-    /** Converts a 3x3 AffineTransform into a Quaternion Transformation Matrix
-     * which can be fed into OpenGL to behave in the expected way. */
-    fun wrapTransformAs4x4(transform: ITransformF): FloatArray {
-        return floatArrayOf(
-                transform.m00f, transform.m01f, 0f, transform.m02f,
-                transform.m10f, transform.m11f, 0f, transform.m12f,
-                0f, 0f, 1f, 0f,
-                0f, 0f, 0f, 1f)
-    }
-
-}
 
 fun Mat4f.toIFloat32Source(gl: IGL): IFloat32Source {
     val source = gl.makeFloat32Source(16)

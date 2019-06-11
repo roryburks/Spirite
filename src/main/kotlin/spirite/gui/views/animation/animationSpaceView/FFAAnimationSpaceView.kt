@@ -1,7 +1,7 @@
 package spirite.gui.views.animation.animationSpaceView
 
 import sgui.swing.advancedComponents.CrossContainer.CrossLayout
-import rb.jvm.owl.addWeakObserver
+import rbJvm.owl.addWeakObserver
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.MathUtil

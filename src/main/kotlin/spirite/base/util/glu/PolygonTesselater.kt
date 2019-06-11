@@ -2,19 +2,18 @@ package spirite.base.util.glu
 
 import com.jogamp.opengl.glu.GLU
 import com.jogamp.opengl.glu.GLUtessellatorCallback
-import rb.jvm.vectrix.compaction.FloatCompactor
+import rbJvm.vectrix.compaction.FloatCompactor
 import rb.glow.gle.GLPrimitive
+import rb.glow.glu.IPolygonTesselator
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
 
-// TODO: Wrap in shared-interface with Javascript interpolator and then put
-//  interface: rb.glow.glu
-//  this: rb.jvm.glow.glu
-//  js version: rb.js.glow.glu
-object PolygonTesselater {
-    fun tesselatePolygon( x: List<Float>, y: List<Float>, count: Int) : GLPrimitive {
+object PolygonTesselater :IPolygonTesselator {
+    override fun tesselatePolygon( x: Sequence<Double>, y: Sequence<Double>, count: Int) : GLPrimitive {
         val tess = GLU.gluNewTess()
         val callback = GLUTCB()
+        val xi = x.iterator()
+        val yi = y.iterator()
 
         GLU.gluTessCallback(tess, GLU.GLU_TESS_VERTEX, callback)
         GLU.gluTessCallback(tess, GLU.GLU_TESS_BEGIN, callback)
@@ -28,7 +27,7 @@ object PolygonTesselater {
         GLU.gluTessBeginPolygon(tess, null)
         GLU.gluTessBeginContour(tess)
         for (i in 0 until count) {
-            val buffer = doubleArrayOf(x[i].toDouble(), y[i].toDouble(), 0.0)
+            val buffer = doubleArrayOf(xi.next(), yi.next(), 0.0)
             GLU.gluTessVertex(tess, buffer, 0, buffer)
         }
         GLU.gluTessEndContour(tess)

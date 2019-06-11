@@ -1,6 +1,6 @@
 package spirite.base.file.load
 
-import rb.jvm.vectrix.interpolation.CubicSplineInterpolator2D
+import rbJvm.vectrix.interpolation.CubicSplineInterpolator2D
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.round

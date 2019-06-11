@@ -1,4 +1,4 @@
-package rb.jvm.vectrix.compaction
+package rbJvm.vectrix.compaction
 
 import kotlin.math.max
 

@@ -1,6 +1,6 @@
 package spirite.gui.views.tool
 
-import rb.jvm.owl.addWeakObserver
+import rbJvm.owl.addWeakObserver
 import rb.owl.bindable.addObserver
 import rb.owl.observer
 import spirite.base.brains.IMasterControl

@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
 import com.hackoeur.jglm.support.FastMath.max
-import rb.jvm.owl.bindWeaklyTo
+import rbJvm.owl.bindWeaklyTo
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer

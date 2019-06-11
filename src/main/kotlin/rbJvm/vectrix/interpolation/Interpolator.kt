@@ -1,4 +1,4 @@
-package rb.jvm.vectrix.interpolation
+package rbJvm.vectrix.interpolation
 
 interface Interpolator {
     fun eval(t: Float): Float

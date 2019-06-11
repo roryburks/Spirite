@@ -1,7 +1,7 @@
 package spirite.base.pen.stroke
 
-import rb.jvm.vectrix.compaction.FloatCompactor
-import rb.jvm.vectrix.interpolation.Interpolator2D
+import rbJvm.vectrix.compaction.FloatCompactor
+import rbJvm.vectrix.interpolation.Interpolator2D
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.pen.PenState
 

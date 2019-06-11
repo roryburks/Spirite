@@ -3,7 +3,7 @@ package spirite.gui.views.animation.structureView
 import sgui.swing.advancedComponents.CrossContainer.CrossLayout
 import rb.extendo.dataStructures.SinglySequence
 import rb.extendo.extensions.then
-import rb.jvm.owl.addWeakObserver
+import rbJvm.owl.addWeakObserver
 import rb.IContract
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation

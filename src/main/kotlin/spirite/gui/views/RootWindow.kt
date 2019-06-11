@@ -1,6 +1,6 @@
 package spirite.gui.views
 
-import rb.jvm.owl.addWeakObserver
+import rbJvm.owl.addWeakObserver
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand

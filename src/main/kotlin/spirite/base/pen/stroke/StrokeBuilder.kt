@@ -1,7 +1,7 @@
 package spirite.base.pen.stroke
 
-import rb.jvm.vectrix.interpolation.CubicSplineInterpolator2D
-import rb.jvm.vectrix.interpolation.Interpolator2D
+import rbJvm.vectrix.interpolation.CubicSplineInterpolator2D
+import rbJvm.vectrix.interpolation.Interpolator2D
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import spirite.base.imageData.mediums.ArrangedMediumData

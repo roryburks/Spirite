@@ -1,7 +1,7 @@
 package spirite.gui.views.tool
 
-import rb.jvm.owl.addWeakObserver
-import rb.jvm.owl.bindWeaklyTo
+import rbJvm.owl.addWeakObserver
+import rbJvm.owl.bindWeaklyTo
 import rb.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
@@ -20,7 +20,6 @@ import sgui.generic.components.ICrossPanel
 import sgui.swing.SwIcon
 import sgui.swing.skin.Skin
 import spirite.hybrid.Hybrid
-import sgui.swing.jcolor
 
 
 fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {

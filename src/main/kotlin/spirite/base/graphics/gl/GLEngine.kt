@@ -4,10 +4,6 @@ import rb.glow.gl.IGL
 import rb.glow.gl.IGLFramebuffer
 import rb.glow.gl.IGLProgram
 import rb.glow.gl.IGLTexture
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.ImmutableTransformF
-import rb.vectrix.linear.Mat4f
-import rb.vectrix.linear.Vec3f
 import spirite.base.graphics.CapMethod
 import spirite.base.graphics.JoinMethod
 import spirite.base.graphics.gl.ProgramType.STROKE_V2_LINE_PASS
@@ -19,8 +15,10 @@ import rb.glow.gle.GLPrimitive
 import rb.glow.gle.IGLPrimitive
 import rb.glow.gle.IPreparedPrimitive
 import rb.glow.gle.PolyType
-import spirite.base.util.linear.MatrixBuilder.orthagonalProjectionMatrix
-import spirite.base.util.linear.MatrixBuilder.wrapTransformAs4x4
+import rb.glow.glu.IPolygonTesselator
+import rb.glow.glu.MatrixBuilder.F.orthagonalProjectionMatrix
+import rb.glow.glu.MatrixBuilder.F.wrapTransform
+import rb.vectrix.linear.*
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.pc.JOGL.JOGLProvider
@@ -28,6 +26,8 @@ import javax.swing.SwingUtilities
 
 interface IGLEngine
 {
+    val tesselator : IPolygonTesselator
+
     val width : Int
     val height : Int
 
@@ -42,8 +42,9 @@ interface IGLEngine
     fun applyPassProgram(
             programCall: ProgramCall,
             params: GLParameters,
-            trans: ITransformF?,
-            x1: Float, y1: Float, x2: Float, y2: Float)
+            trans: ITransform?,
+            x1: Float, y1: Float, x2: Float, y2: Float,
+            u1: Float = 0f, v1: Float = 0f, u2: Float = 1f, v2: Float = 1f)
 
     fun applyComplexLineProgram(
             xPoints: List<Float>, yPoints: List<Float>, numPoints: Int,
@@ -83,6 +84,8 @@ class GLEngine(
         scriptService: IScriptService
 ) : IGLEngine
 {
+    override val tesselator: IPolygonTesselator get() = TODO("not implemented")
+
 
     private val programs = initShaderPrograms(scriptService)
 
@@ -158,19 +161,20 @@ class GLEngine(
     override fun applyPassProgram(
             programCall: ProgramCall,
             params: GLParameters,
-            trans: ITransformF?,
-            x1: Float, y1: Float, x2: Float, y2: Float)
+            trans: ITransform?,
+            x1: Float, y1: Float, x2: Float, y2: Float,
+            u1: Float, v1: Float, u2: Float, v2: Float)
     {
         val iParams = mutableListOf<GLUniform>()
         loadUniversalUniforms(params, iParams, trans)
 
         val preparedPrimitive = GLPrimitive(
                 floatArrayOf(
-                        // xi  yi   u   v
-                        x1, y1, 0.0f, 0.0f,
-                        x2, y1, 1.0f, 0.0f,
-                        x1, y2, 0.0f, 1.0f,
-                        x2, y2, 1.0f, 1.0f
+                        // x  y   u   v
+                        x1, y1, u1, v1,
+                        x2, y1, u2, v1,
+                        x1, y2, u1, v2,
+                        x2, y2, u2, v2
                 ), intArrayOf(2, 2), GLC.TRIANGLE_STRIP, intArrayOf(4)).prepare(gl)
         applyProgram( programCall, params, iParams, preparedPrimitive)
         preparedPrimitive.flush()
@@ -368,7 +372,7 @@ class GLEngine(
     private fun loadUniversalUniforms(
             params: GLParameters,
             internalParams: MutableList<GLUniform>,
-            trans: ITransformF?,
+            trans: ITransform?,
             separateWorldTransfom: Boolean = false)
     {
         // Construct flags
@@ -396,17 +400,17 @@ class GLEngine(
             y2 = clipRect.y + clipRect.height + 0f
         }
 
-        var perspective = Mat4f(orthagonalProjectionMatrix(
-                x1, x2, if (params.flip) y2 else y1, if (params.flip) y1 else y2, -1f, 1f))
+        var perspective = orthagonalProjectionMatrix(
+                x1, x2, if (params.flip) y2 else y1, if (params.flip) y1 else y2, -1f, 1f)
 
 
         if( separateWorldTransfom) {
             internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", perspective.transpose))
-            internalParams.add(GLUniformMatrix4fv("worldMatrix", Mat4f(wrapTransformAs4x4(trans
-                    ?: ImmutableTransformF.Identity)).transpose))
+            internalParams.add(GLUniformMatrix4fv("worldMatrix", wrapTransform(trans
+                    ?: ImmutableTransformF.Identity).transpose))
         }
         else {
-            trans?.also {x  -> perspective = Mat4f(wrapTransformAs4x4(x)) * perspective }
+            trans?.also {x  -> perspective = wrapTransform(x) * perspective }
             perspective = perspective.transpose
             internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", perspective))
         }

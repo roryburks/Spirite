@@ -1,6 +1,6 @@
 package spirite.base.imageData.animationSpaces.FFASpace
 
-import rb.jvm.owl.addWeakObserver
+import rbJvm.owl.addWeakObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver

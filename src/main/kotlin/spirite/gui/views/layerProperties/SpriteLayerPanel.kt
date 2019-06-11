@@ -1,7 +1,7 @@
 package spirite.gui.views.layerProperties
 
-import rb.jvm.owl.addWeakObserver
-import rb.jvm.owl.bindWeaklyTo
+import rbJvm.owl.addWeakObserver
+import rbJvm.owl.bindWeaklyTo
 import rb.IContract
 import rb.owl.bindable.Bindable
 import spirite.base.brains.IMasterControl
@@ -15,7 +15,6 @@ import sgui.generic.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.generic.components.ICrossPanel
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
-import sgui.swing.jcolor
 
 class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
 {

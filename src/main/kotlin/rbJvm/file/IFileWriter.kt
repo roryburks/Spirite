@@ -1,4 +1,4 @@
-package rb.jvm.file
+package rbJvm.file
 
 interface IFileWriter {
 
