@@ -3,6 +3,7 @@ package spirite.pc.JOGL
 import com.jogamp.opengl.GL
 import com.jogamp.opengl.GL2
 import rb.glow.gl.*
+import rb.glow.gl.GlShaderVersion.GLSL_330
 import spirite.base.util.glu.GLC
 import java.nio.Buffer
 import java.nio.ByteBuffer
@@ -15,6 +16,9 @@ import java.nio.IntBuffer
 class JOGL(
         val gl : GL2
 ) : IGL {
+
+    override val preferredShaderVersion: GlShaderVersion get() = GLSL_330
+    override val supportedShaderVersions: Set<GlShaderVersion> get() = setOf(GLSL_330)
 
     override fun clearColor(red: Float, green: Float, blue: Float, alpha: Float, mask: Int) {
         val color = FloatBuffer.wrap(floatArrayOf(red, green, blue, alpha))
@@ -293,7 +297,7 @@ class JOGL(
         override val length : Int
     }
     override fun makeFloat32Source(size: Int): IFloat32Source = JOGLFloat32Source(size)
-    override fun makeFloat32Source(buffer: FloatBuffer): IFloat32Source = JOGLFloat32Source(buffer)
+    fun makeFloat32Source(buffer: FloatBuffer): IFloat32Source = JOGLFloat32Source(buffer)
     override fun makeFloat32Source(array: FloatArray): IFloat32Source = JOGLFloat32Source(FloatBuffer.wrap(array))
 
 
@@ -315,7 +319,7 @@ class JOGL(
 
     }
     override fun makeInt32Source(size: Int): IInt32Source = JOGLInt32Source(size)
-    override fun makeInt32Source(buffer: IntBuffer): IInt32Source = JOGLInt32Source(buffer)
+    fun makeInt32Source(buffer: IntBuffer): IInt32Source = JOGLInt32Source(buffer)
     override fun makeInt32Source(array: IntArray): IInt32Source = JOGLInt32Source(IntBuffer.wrap(array))
     // endregion
 

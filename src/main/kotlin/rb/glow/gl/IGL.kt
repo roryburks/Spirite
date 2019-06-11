@@ -5,6 +5,9 @@ package rb.glow.gl
  * management inherent in OpenGL, so should itself be wrapped in a Graphics Engine and shielded from the use sources.
  */
 interface IGL {
+    val preferredShaderVersion: GlShaderVersion
+    val supportedShaderVersions: Set<GlShaderVersion>
+
     fun clearColor(red: Float, green: Float, blue: Float, alpha: Float, mask: Int)
 
     fun viewport( x: Int, y: Int, w: Int, h: Int)
