@@ -1,6 +1,7 @@
 package spirite.base.graphics.gl
 
 import rb.glow.IImage
+import rb.glow.using
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.mathUtil.f
@@ -9,8 +10,8 @@ import spirite.base.graphics.Composite.SRC_OVER
 import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
-import sgui.generic.color.Color
-import sgui.generic.color.Colors
+import rb.glow.color.Color
+import rb.glow.color.Colors
 import spirite.base.util.glu.GLC
 import spirite.base.util.glu.PolygonTesselater
 import spirite.base.util.linear.Rect
@@ -65,17 +66,17 @@ class GLGraphicsContext : GraphicsContext {
 
 
     override fun drawBounds(image: IImage, c: Int) {
-        using(GLImage(width, height, gle)) {buffer ->
+        using(GLImage(width, height, gle)) { buffer ->
             val gc = buffer.graphics
             gc.clear()
 
             val texture = ImageConverter(gle).convert<GLImage>(image)
-            val bufferParams = cachedParams.copy( texture1 = texture)
-            gc.applyPassProgram( BasicCall(),
+            val bufferParams = cachedParams.copy(texture1 = texture)
+            gc.applyPassProgram(BasicCall(),
                     bufferParams, transform, 0f, 0f, image.width + 0f, image.height + 0f)
 
             bufferParams.texture1 = buffer
-            applyPassProgram( BorderCall(c), bufferParams, null)
+            applyPassProgram(BorderCall(c), bufferParams, null)
         }
     }
 

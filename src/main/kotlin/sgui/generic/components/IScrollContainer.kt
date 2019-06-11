@@ -1,9 +1,10 @@
 package sgui.generic.components
 
-import spirite.base.util.linear.Rect
+import rb.vectrix.shapes.RectI
+
 
 interface IScrollContainer : IComponent {
-    fun makeAreaVisible( area: Rect)
+    fun makeAreaVisible( area: RectI)
 
     val horizontalBar: IScrollBar
     val verticalBar: IScrollBar

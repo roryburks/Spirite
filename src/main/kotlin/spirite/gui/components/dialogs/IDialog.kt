@@ -8,12 +8,12 @@ import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.*
 import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
-import sgui.skin.Skin.Global
-import spirite.gui.resources.SwIcons
-import sgui.generic.color.SColor
+import sgui.swing.skin.Skin.Global
+import spirite.gui.resources.SpiriteIcons
+import rb.glow.color.SColor
 import sgui.swing.components.jcomponent
-import spirite.pc.gui.jcolor
-import spirite.pc.gui.scolor
+import sgui.swing.jcolor
+import sgui.swing.scolor
 import java.io.File
 import javax.swing.JColorChooser
 import javax.swing.JFileChooser
@@ -74,7 +74,7 @@ class JDialog(private val master: IMasterControl) : IDialog
                 "New Layer",
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE,
-                SwIcons.BigIcons.NewLayer.icon)
+                SpiriteIcons.BigIcons.NewLayer.icon)
 
         return when(result) {
             JOptionPane.OK_OPTION -> panel.result

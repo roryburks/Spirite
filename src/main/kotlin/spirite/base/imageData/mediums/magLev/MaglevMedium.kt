@@ -5,13 +5,13 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.RawImage
+import rb.glow.RawImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.*
 import spirite.base.imageData.mediums.MediumType.MAGLEV
-import sgui.generic.color.Colors
-import sgui.generic.color.SColor
+import rb.glow.color.Colors
+import rb.glow.color.SColor
 
 
 class MaglevMedium

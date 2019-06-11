@@ -1,7 +1,7 @@
 package sgui.generic.components
 
 import rb.owl.bindable.Bindable
-import spirite.gui.resources.IIcon
+import sgui.generic.IIcon
 
 interface IToggleButtonNonUI {
     val checkBind : Bindable<Boolean>

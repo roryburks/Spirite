@@ -7,7 +7,7 @@ import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File

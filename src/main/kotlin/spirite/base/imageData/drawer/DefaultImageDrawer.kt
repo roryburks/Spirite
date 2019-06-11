@@ -8,7 +8,7 @@ import rb.vectrix.mathUtil.floor
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.graphics.Composite.DST_OUT
 import spirite.base.graphics.Composite.SRC
-import spirite.base.graphics.RawImage
+import rb.glow.RawImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -22,7 +22,7 @@ import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
-import sgui.generic.color.Color
+import rb.glow.color.Color
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.Hybrid

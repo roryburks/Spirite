@@ -1,7 +1,6 @@
 package rb.glow
 
-import sgui.generic.color.Color
-import spirite.base.graphics.RawImage
+import rb.glow.color.Color
 
 
 interface IImage {

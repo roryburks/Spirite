@@ -5,7 +5,7 @@ import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.graphics.fill.V0FillArrayAlgorithm
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.fill.GLFill
-import sgui.generic.color.Color
+import rb.glow.color.Color
 import spirite.base.util.glu.GLC
 
 class GLDrawer( val image: GLImage) : IDrawer {

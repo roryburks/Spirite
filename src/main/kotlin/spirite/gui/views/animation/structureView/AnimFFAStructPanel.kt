@@ -1,6 +1,6 @@
 package spirite.gui.views.animation.structureView
 
-import CrossLayout
+import sgui.swing.advancedComponents.CrossContainer.CrossLayout
 import rb.extendo.dataStructures.SinglySequence
 import rb.extendo.extensions.then
 import rb.jvm.owl.addWeakObserver
@@ -13,14 +13,14 @@ import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.util.linear.Rect
-import sgui.generic.advancedComponents.crossContainer.CrossInitializer
-import sgui.generic.advancedComponents.crossContainer.CrossRowInitializer
+import sgui.generic.components.initializers.CrossInitializer
+import sgui.generic.components.initializers.CrossRowInitializer
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicCursor.DEFAULT
 import sgui.generic.components.ICrossPanel
 import sgui.generic.components.IScrollContainer
 import sgui.generic.components.events.MouseEvent
-import sgui.skin.Skin
+import sgui.swing.skin.Skin
 import spirite.gui.views.animation.structureView.ffa.FfaStructBuilderFactory
 import spirite.gui.views.animation.structureView.ffa.IAnimDragBehavior
 import spirite.gui.views.animation.structureView.ffa.IFFAStructView

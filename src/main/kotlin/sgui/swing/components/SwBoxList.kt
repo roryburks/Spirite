@@ -1,11 +1,11 @@
 package sgui.swing.components
 
-import CrossLayout
-import sgui.generic.advancedComponents.crossContainer.CrossInitializer
+import sgui.swing.advancedComponents.CrossContainer.CrossLayout
+import sgui.generic.components.initializers.CrossInitializer
 import sgui.generic.components.BoxList
 import sgui.generic.components.IComponent
-import spirite.pc.gui.SwUtil
-import spirite.pc.gui.SwingComponentProvider
+import sgui.swing.SwUtil
+import sgui.swing.SwingComponentProvider
 import java.awt.GridLayout
 import java.awt.Point
 import java.awt.event.ComponentAdapter

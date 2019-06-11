@@ -1,5 +1,9 @@
 package spirite.base.graphics
 
+import rb.glow.IFlushable
+import rb.glow.RawImage
+import rb.glow.using
+import rb.glow.with
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.Composite.SRC
@@ -22,7 +26,7 @@ class DynamicImage(
         raw: RawImage? = null,
         xOffset: Int = 0,
         yOffset: Int = 0)
-    :IFlushable
+    : IFlushable
 {
     var xOffset = xOffset ; private set
     var yOffset = yOffset ; private set
@@ -70,7 +74,7 @@ class DynamicImage(
         val combiningBounds = RectangleUtil.circumscribeTrans(Rect(0,0, context.compositionWidth, context.compositionHeight), tCompositeToImage)
                 .union( Rect(xOffset, yOffset, base?.width ?: 0, base?.height ?: 0))
 
-        using(Hybrid.imageCreator.createImage( combiningBounds.width, combiningBounds.height)) { combiningImage ->
+        using(Hybrid.imageCreator.createImage(combiningBounds.width, combiningBounds.height)) { combiningImage ->
             val gc = combiningImage.graphics
 
             base?.with {

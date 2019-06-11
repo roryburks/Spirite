@@ -9,18 +9,18 @@ import rb.owl.interprettedBindings.bindToX
 import rb.owl.interprettedBindings.bindToY
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
-import sgui.generic.color.Colors
-import spirite.base.util.InvertibleFunction
+import rb.glow.color.Colors
+import rb.vectrix.functions.InvertibleFunction
 import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComboBox
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.generic.components.ICrossPanel
-import spirite.gui.resources.IIcon
-import sgui.skin.Skin
+import sgui.swing.SwIcon
+import sgui.swing.skin.Skin
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.jcolor
+import sgui.swing.jcolor
 
 
 fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {
@@ -63,7 +63,7 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
     is SizeProperty ->  Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(0f, 1000f, toolProperty.hrName).apply {
             contractList.add(valueBind.bindTo(toolProperty.valueBind))
-            mutatorPositionToValue = object : InvertibleFunction<Float>{
+            mutatorPositionToValue = object : InvertibleFunction<Float> {
                 override fun perform(x: Float): Float = when {
                     x < 0.25f   -> x * 10f * 4f
                     x < 0.5f    -> (x - 0.25f) * 90f * 4f + 10f
@@ -128,12 +128,12 @@ private constructor(val master : IMasterControl, val imp : ICrossPanel)
 {
     init { imp.ref = this}
     override val component: IComponent get() = imp
-    override val icon: IIcon? get() = null
+    override val icon: SwIcon? get() = null
     override val name: String get() = "Tool Settings"
 
     constructor(master: IMasterControl) : this(master, Hybrid.ui.CrossPanel())
 
-    val toolLabel = Hybrid.ui.Label().apply { textColor = Colors.BLACK.jcolor }
+    val toolLabel = Hybrid.ui.Label().apply { textColor = Colors.BLACK }
     val toolPanel = Hybrid.ui.CrossPanel().apply { setBasicBorder(BEVELED_LOWERED) }
 
     private val contractList = mutableListOf<IContract>()

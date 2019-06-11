@@ -11,15 +11,15 @@ import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChan
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_RAISED
-import spirite.gui.resources.IIcon
-import sgui.skin.Skin
-import spirite.gui.resources.SwIcons
+import sgui.swing.SwIcon
+import sgui.swing.skin.Skin
+import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ITimer
 import spirite.pc.graphics.ImageBI
 import sgui.swing.components.SJPanel
 import sgui.swing.components.SwComponent
-import spirite.pc.gui.jcolor
+import sgui.swing.jcolor
 import java.awt.Graphics
 import kotlin.math.floor
 import kotlin.math.max
@@ -27,7 +27,7 @@ import kotlin.math.round
 
 class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
-    override val icon: IIcon? get() = SwIcons.BigIcons.Frame_AnimationScheme
+    override val icon: SwIcon? get() = SpiriteIcons.BigIcons.Frame_AnimationScheme
     override val name: String get() = "Animation Preview"
 
 
@@ -37,9 +37,9 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     var offsetY by offsetYBind
 
     private val viewPanel = AnimationViewPanel()
-    private val btnPrev = Hybrid.ui.Button().also { it.setIcon(SwIcons.BigIcons.Anim_StepB) }
-    private val btnPlay = Hybrid.ui.ToggleButton().also { it.setOffIcon(SwIcons.BigIcons.Anim_Play) }
-    private val btnNext = Hybrid.ui.Button().also { it.setIcon(SwIcons.BigIcons.Anim_StepF) }
+    private val btnPrev = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.BigIcons.Anim_StepB) }
+    private val btnPlay = Hybrid.ui.ToggleButton().also { it.setOffIcon(SpiriteIcons.BigIcons.Anim_Play) }
+    private val btnNext = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.BigIcons.Anim_StepF) }
     private val ffFps = Hybrid.ui.FloatField()
     private val sliderMet = Hybrid.ui.Slider(0,100,0).also { it.snapsToTick = false }
     private val bgColorBox = Hybrid.ui.ColorSquare(Skin.Global.Bg.scolor).also { it.setBasicBorder(BEVELED_RAISED) }

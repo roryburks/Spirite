@@ -1,6 +1,7 @@
 package spirite.gui.views.animation.structureView.ffa
 
 import rb.IContract
+import rb.vectrix.shapes.RectI
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import sgui.generic.components.IComponent.BasicCursor.DEFAULT
 import sgui.generic.components.IComponent.BasicCursor.E_RESIZE
@@ -43,7 +44,7 @@ abstract class ResizeableBrain(
                     toLen =  max(0, (pt.x - viewspace.leftJustification + viewspace.tickWidth/2) / viewspace.tickWidth - start)
                     val endBox = viewspace.rectForRangeInLayer(frame.layer, IntRange(start+toLen-1, start+toLen))
                     context.stretchWidth = endBox.x2
-                    context.scrollContext.makeAreaVisible(endBox)
+                    context.scrollContext.makeAreaVisible(endBox.run { RectI(x, y, width, height) })
                     context.redraw()
                 }
                 RELEASED -> {

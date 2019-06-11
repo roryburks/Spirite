@@ -4,11 +4,11 @@ import spirite.base.brains.IMasterControl
 import spirite.base.file.load.BadSifFileException
 import spirite.base.file.load.LoadEngine
 import rb.glow.IImage
-import spirite.base.graphics.using
+import rb.glow.using
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE
@@ -70,12 +70,12 @@ class FileManager( val master: IMasterControl)  : IFileManager{
             "jpg", "jpeg" -> {
                 // Remove Alpha Layer of JPG so that it works correctly with encoding
                 val wsImage = master.renderEngine.renderWorkspace(workspace)
-                using(Hybrid.imageCreator.createImage(wsImage.width, wsImage.height)) { img->
+                using(Hybrid.imageCreator.createImage(wsImage.width, wsImage.height)) { img ->
                     val gc = img.graphics
-                    gc.clear( Colors.WHITE)
+                    gc.clear(Colors.WHITE)
                     gc.renderImage(wsImage, 0, 0)
 
-                    Hybrid.imageIO.saveImage( img, file)
+                    Hybrid.imageIO.saveImage(img, file)
                 }
             }
             else -> Hybrid.imageIO.saveImage( master.renderEngine.renderWorkspace(workspace), file)

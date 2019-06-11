@@ -6,7 +6,7 @@ import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.Penner
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
-import sgui.generic.color.Color
+import rb.glow.color.Color
 
 
 object EraserBehavior {

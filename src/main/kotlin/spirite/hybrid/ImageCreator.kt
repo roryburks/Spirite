@@ -1,6 +1,6 @@
 package spirite.hybrid
 
-import spirite.base.graphics.RawImage
+import rb.glow.RawImage
 import spirite.base.graphics.gl.GLImage
 
 interface IImageCreator {

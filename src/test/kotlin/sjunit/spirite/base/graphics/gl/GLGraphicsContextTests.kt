@@ -6,7 +6,7 @@ import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.graphics.LineAttributes
 import spirite.base.graphics.gl.GLImage
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File

@@ -4,7 +4,7 @@ import spirite.base.brains.MasterControl
 import spirite.base.brains.commands.GlobalCommands
 import spirite.gui.menus.ContextMenus.MenuItem
 import sgui.swing.components.SwMenuBar
-import spirite.pc.gui.menus.SwContextMenus
+import spirite.pc.menus.SwContextMenus
 import javax.swing.JFrame
 
 fun main( args: Array<String>) {

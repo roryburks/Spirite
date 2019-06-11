@@ -7,13 +7,13 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
-import spirite.gui.resources.IIcon
+import sgui.swing.SwIcon
 import spirite.hybrid.Hybrid
 
 class LayerPropertiesPanel( val master: IMasterControl) : IOmniComponent
 {
     override val component: IComponent get() = imp
-    override val icon: IIcon? get() = null
+    override val icon: SwIcon? get() = null
     override val name: String get() = "Layer Properties"
 
     private val imp = Hybrid.ui.CrossPanel()

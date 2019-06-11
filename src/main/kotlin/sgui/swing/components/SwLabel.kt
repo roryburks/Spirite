@@ -1,9 +1,11 @@
 package sgui.swing.components
 
+import rb.glow.color.SColor
 import sgui.generic.components.ILabel
-import sgui.skin.Skin
-import sgui.swing.adaptMouseSystem
-import java.awt.Color
+import sgui.swing.skin.Skin
+import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.jcolor
+import sgui.swing.scolor
 import java.awt.Font
 import javax.swing.JLabel
 
@@ -18,9 +20,9 @@ private constructor( private val imp : SwLabelImp)
     override var text: String
         get() = imp.text
         set(value) {imp.text = value}
-    override var textColor: Color
-        get() = imp.foreground
-        set(value) {imp.foreground = value}
+    override var textColor: SColor
+        get() = imp.foreground.scolor
+        set(value) {imp.foreground = value.jcolor}
 
     override var bold = true
         set(value) {

@@ -2,15 +2,16 @@ package sgui.swing.components
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
+import rb.glow.color.SColor
 import sgui.generic.components.*
-import sgui.skin.Skin.BevelBorder.Dark
-import sgui.skin.Skin.BevelBorder.Light
-import sgui.skin.Skin.TextField.Background
-import sgui.skin.Skin.TextField.InvalidBg
+import sgui.swing.skin.Skin.BevelBorder.Dark
+import sgui.swing.skin.Skin.BevelBorder.Light
+import sgui.swing.skin.Skin.TextField.Background
+import sgui.swing.skin.Skin.TextField.InvalidBg
 import spirite.hybrid.Hybrid
 import spirite.hybrid.SwHybrid
-import sgui.swing.adaptMouseSystem
-import java.awt.Color
+import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.jcolor
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.BorderFactory
@@ -83,12 +84,12 @@ private constructor(
         val imp : SwNumberFieldImp)
     : ISwComponent by SwComponent(imp), INumberFieldUI
 {
-    override var validBg: Color = Background.jcolor
+    override var validBg: SColor = Background.scolor
         set(value) {
             field = value
             checkIfOob()
         }
-    override var invalidBg: Color = InvalidBg.jcolor
+    override var invalidBg: SColor = InvalidBg.scolor
         set(value) {
             field = value
             checkIfOob()
@@ -102,8 +103,8 @@ private constructor(
     abstract fun isOob(str: String) : Boolean
     private fun checkIfOob() {
         imp.background = when( isOob(text)) {
-            true -> invalidBg
-            false -> validBg
+            true -> invalidBg.jcolor
+            false -> validBg.jcolor
         }
     }
 

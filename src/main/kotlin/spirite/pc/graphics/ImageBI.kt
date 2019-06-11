@@ -2,10 +2,10 @@ package spirite.pc.graphics
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IDrawer
-import spirite.base.graphics.RawImage
-import sgui.generic.color.Color
-import sgui.generic.color.ColorARGB32Normal
-import sgui.generic.color.ColorARGB32Premultiplied
+import rb.glow.RawImage
+import rb.glow.color.Color
+import rb.glow.color.ColorARGB32Normal
+import rb.glow.color.ColorARGB32Premultiplied
 import java.awt.image.BufferedImage
 
 class ImageBI(

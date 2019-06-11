@@ -7,9 +7,9 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
 import spirite.base.graphics.Composite.*
 import rb.glow.IImage
-import spirite.base.graphics.RawImage
-import sgui.generic.color.Color
-import sgui.generic.color.Colors
+import rb.glow.RawImage
+import rb.glow.color.Color
+import rb.glow.color.Colors
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.ContentBoundsFinder

@@ -13,11 +13,11 @@ import spirite.base.exceptions.CommandNotValidException
 import spirite.base.file.workspaceFromImage
 import spirite.base.graphics.Composite.SRC_IN
 import rb.glow.IImage
-import spirite.base.graphics.RawImage
+import rb.glow.RawImage
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
-import spirite.base.graphics.using
+import rb.glow.using
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupTree
@@ -27,7 +27,7 @@ import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.base.imageData.mutations.ImportInto
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import spirite.base.util.linear.Rect
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF

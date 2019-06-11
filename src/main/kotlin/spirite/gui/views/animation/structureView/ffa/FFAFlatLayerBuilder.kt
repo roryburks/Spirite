@@ -22,9 +22,9 @@ import spirite.hybrid.customGui.ArrowPanel
 import spirite.hybrid.customGui.DashedOutPanel
 import spirite.pc.graphics.ImageBI
 import sgui.swing.components.SwComponent
-import sgui.skin.Skin.FFAAnimation.Arrow
-import sgui.skin.Skin.Global.Bg
-import sgui.skin.Skin.Global.Fg
+import sgui.swing.skin.Skin.FFAAnimation.Arrow
+import sgui.swing.skin.Skin.Global.Bg
+import sgui.swing.skin.Skin.Global.Fg
 import java.awt.image.BufferedImage
 import java.io.InvalidClassException
 

@@ -1,11 +1,11 @@
 package sgui.generic.components
 
 import rb.glow.IImage
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import sgui.generic.Orientation
-import spirite.gui.components.advanced.ITreeView
-import sgui.generic.advancedComponents.crossContainer.CrossInitializer
-import sgui.generic.color.SColor
+import sgui.swing.advancedComponents.ITreeView
+import sgui.generic.components.initializers.CrossInitializer
+import rb.glow.color.SColor
 
 interface IComponentProvider {
     fun Button(str: String? = null) : IButton

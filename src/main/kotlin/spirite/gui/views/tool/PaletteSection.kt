@@ -13,12 +13,12 @@ import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.generic.components.ICrossPanel
 import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.menus.ContextMenus.MenuItem
-import spirite.gui.resources.IIcon
-import spirite.gui.resources.SwIcons
+import sgui.swing.SwIcon
+import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 import sgui.swing.components.SJPanel
 import sgui.swing.components.SwComponent
-import spirite.pc.gui.jcolor
+import sgui.swing.jcolor
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics
@@ -32,7 +32,7 @@ class PaletteSection(
     : IOmniComponent
 {
     override val component: IComponent get() = imp
-    override val icon: IIcon? get() = null
+    override val icon: SwIcon? get() = null
     override val name: String get() = "Palette"
 
     private val primaryColorSquare : IColorSquare = Hybrid.ui.ColorSquare()
@@ -185,10 +185,10 @@ constructor(
     private val currentWorkspace get() = master.workspaceSet.currentWorkspace
     private val paletteManager get() = master.paletteManager
 
-    private val btnNewPalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_NewColor) }
-    private val btnRemovePalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Rig_Remove) }
-    private val btnSavePalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_Save) }
-    private val btnLoadPalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_Load) }
+    private val btnNewPalette = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.SmallIcons.Palette_NewColor) }
+    private val btnRemovePalette = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.SmallIcons.Rig_Remove) }
+    private val btnSavePalette = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.SmallIcons.Palette_Save) }
+    private val btnLoadPalette = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.SmallIcons.Palette_Load) }
 
     private val cbPaletteSelector = Hybrid.ui.ComboBox<Palette?>(arrayOf(null))
 

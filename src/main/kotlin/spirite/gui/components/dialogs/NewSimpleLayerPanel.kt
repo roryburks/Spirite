@@ -4,8 +4,8 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.MediumType
 import spirite.base.imageData.mediums.MediumType.FLAT
-import sgui.generic.color.Color
-import sgui.generic.color.Colors
+import rb.glow.color.Color
+import rb.glow.color.Colors
 import sgui.generic.Orientation.HORIZONTAL
 import sgui.generic.Orientation.VERTICAL
 import sgui.generic.components.ICrossPanel

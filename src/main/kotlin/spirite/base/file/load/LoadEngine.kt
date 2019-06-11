@@ -11,8 +11,8 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.mediums.IMedium
-import sgui.generic.color.Color
-import sgui.generic.color.ColorARGB32Normal
+import rb.glow.color.Color
+import rb.glow.color.ColorARGB32Normal
 import java.io.File
 import java.io.RandomAccessFile
 import java.nio.charset.Charset

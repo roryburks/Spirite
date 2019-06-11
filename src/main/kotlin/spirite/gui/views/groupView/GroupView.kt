@@ -3,11 +3,11 @@ package spirite.gui.views.groupView
 import rb.jvm.owl.addWeakObserver
 import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
-import sgui.generic.color.ColorARGB32Normal
+import rb.glow.color.ColorARGB32Normal
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
 import sgui.generic.components.ICrossPanel
-import spirite.gui.resources.IIcon
+import sgui.swing.SwIcon
 import spirite.hybrid.Hybrid
 
 class GroupView
@@ -17,7 +17,7 @@ private constructor(
     : IOmniComponent
 {
     override val component: IComponent get() = panel
-    override val icon: IIcon? get() = null
+    override val icon: SwIcon? get() = null
     override val name: String get() = "Group Tree"
 
     constructor(master: IMasterControl) : this(master, panel = Hybrid.ui.CrossPanel())

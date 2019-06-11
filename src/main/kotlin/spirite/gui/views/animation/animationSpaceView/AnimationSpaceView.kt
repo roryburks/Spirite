@@ -12,11 +12,11 @@ import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSpaceObserver
 import sgui.generic.Orientation.HORIZONTAL
-import spirite.gui.components.advanced.ResizeContainerPanel
+import sgui.swing.components.ResizeContainerPanel
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
-import spirite.gui.resources.IIcon
-import spirite.gui.resources.SwIcons
+import sgui.swing.SwIcon
+import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
@@ -29,7 +29,7 @@ import java.awt.dnd.DropTargetDropEvent
 
 class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
-    override val icon: IIcon? get() = null
+    override val icon: SwIcon? get() = null
     override val name: String get() = "Animation Space View"
 
     private val rightImp = Hybrid.ui.CrossPanel()
@@ -38,8 +38,8 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
     private val imp = Hybrid.ui.CrossPanel()
     private val subRightPanel = Hybrid.ui.CrossPanel()
     private val spaceDropdown = Hybrid.ui.ComboBox<AnimationSpace>(emptyArray())
-    private val removeButton = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Rig_Remove) }
-    private val newButton = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Rig_New) }
+    private val removeButton = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.SmallIcons.Rig_Remove) }
+    private val newButton = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.SmallIcons.Rig_New) }
 
     val currentWorkspace get() = master.workspaceSet.currentWorkspace
 

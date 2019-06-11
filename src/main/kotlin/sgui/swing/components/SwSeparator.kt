@@ -2,7 +2,7 @@ package sgui.swing.components
 
 import sgui.generic.Orientation
 import sgui.generic.components.ISeparator
-import sgui.swing.adaptMouseSystem
+import sgui.swing.mouseSystem.adaptMouseSystem
 import javax.swing.JSeparator
 import javax.swing.SwingConstants
 

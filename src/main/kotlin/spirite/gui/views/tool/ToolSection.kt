@@ -5,16 +5,16 @@ import rb.owl.bindable.addObserver
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.Tool
 import spirite.base.imageData.drawer.NillImageDrawer
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IBoxList
 import sgui.generic.components.IBoxList.IBoxComponent
 import sgui.generic.components.IComponent
-import spirite.gui.resources.IIcon
-import sgui.skin.Skin
+import sgui.swing.SwIcon
+import sgui.swing.skin.Skin
 import spirite.gui.resources.ToolIcons
 import spirite.hybrid.Hybrid
-import sgui.swing.adaptMouseSystem
+import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.components.SwToggleButton
 import java.awt.Color
 import java.awt.GradientPaint
@@ -33,7 +33,7 @@ class ToolSection (
     :IOmniComponent
 {
     override val component: IComponent get() = imp
-    override val icon: IIcon? get() = null
+    override val icon: SwIcon? get() = null
     override val name: String get() = "Tools"
 
     val currentTool get() = master.toolsetManager.selectedTool

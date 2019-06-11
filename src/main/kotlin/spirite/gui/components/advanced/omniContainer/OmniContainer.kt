@@ -3,7 +3,7 @@ package spirite.gui.components.advanced.omniContainer
 import sgui.generic.Orientation
 import sgui.generic.Orientation.HORIZONTAL
 import sgui.generic.Orientation.VERTICAL
-import spirite.gui.components.advanced.ResizeContainerPanel
+import sgui.swing.components.ResizeContainerPanel
 import sgui.generic.components.IComponent
 import sgui.generic.components.ICrossPanel
 import spirite.hybrid.Hybrid

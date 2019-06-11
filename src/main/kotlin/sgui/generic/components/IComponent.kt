@@ -4,7 +4,7 @@ import rb.vectrix.shapes.RectI
 import sgui.generic.UIPoint
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseWheelEvent
-import sgui.generic.color.SColor
+import rb.glow.color.SColor
 
 interface IComponent {
     // Ref is a way for abstract objects to attach themselves to the UI, primarily so that they can stay in memory.

@@ -9,7 +9,7 @@ import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
 import sgui.generic.components.ICrossPanel
 import sgui.generic.components.ITabbedPane
-import spirite.gui.resources.IIcon
+import sgui.swing.SwIcon
 import spirite.hybrid.Hybrid
 
 
@@ -18,7 +18,7 @@ constructor(val master: IMasterControl, private val tabPane: ITabbedPane)
     : IOmniComponent
 {
     override val component: IComponent get() = tabPane
-    override val icon: IIcon? get() = null
+    override val icon: SwIcon? get() = null
     override val name: String get() = "Work Area"
 
     constructor(master: IMasterControl) : this( master, Hybrid.ui.TabbedPane())

@@ -1,7 +1,7 @@
 package sjunit.spirite.gui
 
 import org.junit.Test
-import sgui.generic.advancedComponents.crossContainer.CrossContainer
+import sgui.swing.advancedComponents.CrossContainer.CrossContainer
 import spirite.hybrid.Hybrid
 
 class CrossContainerTests {

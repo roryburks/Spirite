@@ -1,10 +1,10 @@
 //package demonstration
 //
 //import sgui.generic.Orientation.VERTICAL
-//import spirite.gui.components.advanced.ITreeView.*
-//import spirite.gui.components.advanced.ITreeViewNonUI.*
-//import spirite.gui.components.advanced.ResizeContainerPanel
-//import spirite.gui.components.advanced.SwTreeView
+//import sgui.swing.advancedComponents.ITreeView.*
+//import sgui.swing.advancedComponents.ITreeViewNonUI.*
+//import sgui.swing.components.ResizeContainerPanel
+//import sgui.swing.advancedComponents.SwTreeView
 //import sgui.generic.components.IComponent
 //import sgui.basic.basic.SwButton
 //import sgui.basic.basic.SwLabel

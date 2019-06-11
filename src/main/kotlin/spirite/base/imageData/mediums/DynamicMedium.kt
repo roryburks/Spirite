@@ -5,14 +5,14 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.RawImage
+import rb.glow.RawImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
-import sgui.generic.color.Colors
-import sgui.generic.color.SColor
+import rb.glow.color.Colors
+import rb.glow.color.SColor
 
 
 /***

@@ -4,7 +4,7 @@ import spirite.base.brains.toolset.Tool
 import java.awt.Graphics
 
 object ToolIcons {
-    val toolSheet by lazy { SwIcons.loadIconSheet("tool_icons.png") }
+    val toolSheet by lazy { SpiriteIcons.loadIconSheet("tool_icons.png") }
 
     fun drawToolIcon(g: Graphics, x: Int, y: Int, tool: Tool) {
         g.drawImage(toolSheet, x, y, x+24, y+24,

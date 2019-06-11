@@ -8,7 +8,7 @@ import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.generic.components.ICrossPanel
 import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.generic.components.events.MouseEvent.MouseEventType.RELEASED
-import spirite.gui.resources.SwIcons
+import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 import java.io.InvalidClassException
 
@@ -87,7 +87,7 @@ class FfaCascadingLayerBuilder(
         val lexiconButton = Hybrid.ui.Button("Lexicon")
         val jsonButton = Hybrid.ui.Button("JSON")
         val expandButton = Hybrid.ui.Button().also {
-            it.setIcon(if( expanded)SwIcons.SmallIcons.Unexpanded else SwIcons.SmallIcons.Expanded)
+            it.setIcon(if( expanded)SpiriteIcons.SmallIcons.Unexpanded else SpiriteIcons.SmallIcons.Expanded)
         }
 
         init {
@@ -118,7 +118,7 @@ class FfaCascadingLayerBuilder(
             val imp : ICrossPanel = Hybrid.ui.CrossPanel())
         : IComponent by imp
     {
-        val settingsButton = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Unexpanded) }
+        val settingsButton = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.SmallIcons.Unexpanded) }
         val label = Hybrid.ui.Label("SubLayer ${info.lexicalKey}")
 
         init {

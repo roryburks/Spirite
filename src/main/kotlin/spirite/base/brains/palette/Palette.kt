@@ -1,7 +1,7 @@
 package spirite.base.brains.palette
 
-import sgui.generic.color.Color
-import sgui.generic.color.Colors
+import rb.glow.color.Color
+import rb.glow.color.Colors
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 

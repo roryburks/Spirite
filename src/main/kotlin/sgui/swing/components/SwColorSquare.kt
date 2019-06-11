@@ -4,9 +4,9 @@ import rb.owl.bindable.addObserver
 import sgui.generic.components.ColorSquareNonUI
 import sgui.generic.components.IColorSquare
 import sgui.generic.components.IColorSquareNonUI
-import sgui.generic.color.SColor
-import spirite.pc.gui.jcolor
-import spirite.pc.gui.scolor
+import rb.glow.color.SColor
+import sgui.swing.jcolor
+import sgui.swing.scolor
 import java.awt.Graphics
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent

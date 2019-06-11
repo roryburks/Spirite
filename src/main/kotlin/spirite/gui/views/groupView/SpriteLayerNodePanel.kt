@@ -8,16 +8,16 @@ import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BASIC
 import sgui.generic.components.ICrossPanel
 import sgui.generic.components.IToggleButton
 import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
-import sgui.skin.Skin.AnimSchemePanel.ActiveNodeBg
-import spirite.gui.resources.SwIcons.SmallIcons.*
+import sgui.swing.skin.Skin.AnimSchemePanel.ActiveNodeBg
+import spirite.gui.resources.SpiriteIcons.SmallIcons.*
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.jcolor
+import sgui.swing.jcolor
 
 class SpriteLayerNodePanel
 private constructor(
@@ -81,7 +81,7 @@ private constructor(
                     sprite.parts.forEach {part ->
                         val label = Hybrid.ui.Label(part.partName)
                         label.textSize = 10
-                        label.textColor = Colors.BLACK.jcolor
+                        label.textColor = Colors.BLACK
                         add(label,32,8)
                     }
                 }

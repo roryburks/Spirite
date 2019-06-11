@@ -3,7 +3,7 @@ package spirite.hybrid.customGui
 import rb.vectrix.mathUtil.round
 import sgui.generic.Direction
 import sgui.generic.Direction.*
-import spirite.pc.gui.JColor
+import sgui.swing.JColor
 import sgui.swing.components.SJPanel
 import java.awt.Graphics
 

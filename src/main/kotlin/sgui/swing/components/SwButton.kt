@@ -1,10 +1,11 @@
 package sgui.swing.components
 
+import sgui.generic.IIcon
 import sgui.generic.components.IButton
 import sgui.generic.components.IButton.ButtonActionEvent
-import spirite.gui.resources.IIcon
-import sgui.skin.Skin
-import sgui.swing.adaptMouseSystem
+import sgui.swing.SwIcon
+import sgui.swing.skin.Skin
+import sgui.swing.mouseSystem.adaptMouseSystem
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.swing.BorderFactory
@@ -19,7 +20,7 @@ private constructor( private val imp: SwButtonImp)
 
     constructor(str: String? = null) : this(SwButtonImp(str))
 
-    override fun setIcon(icon: IIcon) {imp.icon = icon.icon}
+    override fun setIcon(icon: IIcon) {(icon as? SwIcon)?.run { imp.icon = this.icon}}
 
     override var action: ((ButtonActionEvent) -> Unit)?
         get() = imp.action

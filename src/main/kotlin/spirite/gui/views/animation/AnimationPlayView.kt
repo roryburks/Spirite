@@ -4,12 +4,12 @@ import rb.extendo.delegates.OnChangeDelegate
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import sgui.generic.components.IComponent
-import sgui.skin.Skin.Global.Bg
+import sgui.swing.skin.Skin.Global.Bg
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
-import sgui.generic.color.SColor
+import rb.glow.color.SColor
 import sgui.swing.components.SwComponent
-import spirite.pc.gui.jcolor
+import sgui.swing.jcolor
 import java.awt.Graphics
 import javax.swing.JPanel
 import kotlin.math.floor

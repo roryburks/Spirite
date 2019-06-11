@@ -14,7 +14,7 @@ import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import sgui.generic.components.events.MouseEvent.MouseButton
 import sgui.generic.components.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.views.work.WorkSection

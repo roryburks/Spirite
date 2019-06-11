@@ -2,14 +2,14 @@ package sgui.swing.components
 
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.round
-import spirite.base.util.linear.Rect
+import rb.vectrix.shapes.RectI
 import sgui.generic.components.IComponent
 import sgui.generic.components.IScrollBar
 import sgui.generic.components.IScrollContainer
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseEventType.*
 import spirite.hybrid.Hybrid
-import spirite.hybrid.inputSystems.IGlobalMouseHook
+import sgui.generic.systems.IGlobalMouseHook
 import java.awt.Component
 
 class SwScrollContainer
@@ -64,7 +64,7 @@ private constructor( private val imp: SwScrollContainerImp)
         }
     }, this)
 
-    override fun makeAreaVisible(area: Rect) {
+    override fun makeAreaVisible(area: RectI) {
         val viewWidth = imp.view.width
         val viewHeight = imp.view.height
         val viewportWidth = imp.viewport.width
@@ -83,13 +83,13 @@ private constructor( private val imp: SwScrollContainerImp)
         val view_y2 = view_y1 + viewportHeight
 
         val x = when {
-            area.x < view_x1 -> area.x.d
-            area.x2 > view_x2 -> area.x2.d - viewportWidth
+            area.x1 < view_x1 -> area.x1
+            area.x2 > view_x2 -> area.x2 - viewportWidth
             else -> horizontalBar.scroll.d
         }
         val y = when {
-            area.y < view_y1 -> area.y.d
-            area.y2 > view_y2 -> area.y2.d - viewportHeight
+            area.y1 < view_y1 -> area.y1
+            area.y2 > view_y2 -> area.y2 - viewportHeight
             else -> verticalBar.scroll.d
         }
         horizontalBar.scroll = (x * hBarRatio).round

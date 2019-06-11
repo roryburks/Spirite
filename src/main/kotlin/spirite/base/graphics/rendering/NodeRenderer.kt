@@ -4,7 +4,7 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.ceil
 import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.RawImage
+import rb.glow.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.graphics.isolation.IIsolator

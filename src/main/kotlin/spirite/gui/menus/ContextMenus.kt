@@ -9,7 +9,7 @@ import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import sgui.generic.UIPoint
-import spirite.gui.resources.IIcon
+import sgui.swing.SwIcon
 
 abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
 
@@ -34,11 +34,11 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
      *   array (in fact they don't need to exist).
      */
     data class MenuItem(
-           val lexicon : String,
-           val command: ICommand? = null,
-           val icon: IIcon? = null,
-           val customAction :(()->Unit)? = null,
-           val enabled: Boolean = true)
+            val lexicon : String,
+            val command: ICommand? = null,
+            val icon: SwIcon? = null,
+            val customAction :(()->Unit)? = null,
+            val enabled: Boolean = true)
 
 
     abstract fun LaunchContextMenu(point: UIPoint, scheme: List<MenuItem>, obj: Any? = null)

@@ -1,7 +1,7 @@
 package sgui.swing.components
 
-import sgui.skin.Skin.Global
-import sgui.swing.adaptMouseSystem
+import sgui.swing.skin.Skin.Global
+import sgui.swing.mouseSystem.adaptMouseSystem
 import java.awt.*
 import javax.swing.*
 import javax.swing.plaf.basic.BasicScrollBarUI

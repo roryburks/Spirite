@@ -4,7 +4,7 @@
 //import rb.glow.IImage
 //import spirite.base.graphics.LineAttributes
 //import spirite.base.graphics.RenderRubric
-//import sgui.generic.color.Color
+//import rb.glow.color.Color
 //import rb.vectrix.linear.ITransformF
 //import java.awt.Graphics
 //import java.awt.Graphics2D

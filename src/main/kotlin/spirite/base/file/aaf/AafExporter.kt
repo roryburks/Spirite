@@ -8,7 +8,7 @@ import rb.vectrix.mathUtil.IDataStreamHasher
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rb.vectrix.rectanglePacking.PackedRectangle
 import rb.glow.IImage
-import spirite.base.graphics.RawImage
+import rb.glow.RawImage
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode

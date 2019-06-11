@@ -2,10 +2,10 @@ package spirite.base.graphics.rendering
 
 import rb.owl.observer
 import spirite.base.brains.ICentralObservatory
-import spirite.base.graphics.IFlushable
+import rb.glow.IFlushable
 import rb.glow.IImage
 import spirite.base.graphics.IResourceUseTracker
-import spirite.base.graphics.RawImage
+import rb.glow.RawImage
 import spirite.base.graphics.rendering.sources.GroupNodeSource
 import spirite.base.graphics.rendering.sources.RenderSource
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent

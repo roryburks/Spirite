@@ -7,8 +7,8 @@ import spirite.base.imageData.deformation.StrokeDeformationPiece
 import spirite.base.imageData.deformation.StrokeDeformationV2
 import spirite.base.imageData.drawer.IImageDrawer.IDeformDrawer
 import spirite.base.pen.Penner
-import sgui.generic.color.ColorARGB32Normal
-import sgui.generic.color.Colors
+import rb.glow.color.ColorARGB32Normal
+import rb.glow.color.Colors
 import sgui.generic.components.events.MouseEvent.MouseButton
 import sgui.generic.components.events.MouseEvent.MouseButton.*
 import spirite.gui.views.work.WorkSectionView

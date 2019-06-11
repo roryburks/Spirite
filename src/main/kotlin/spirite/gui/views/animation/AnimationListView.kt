@@ -11,15 +11,15 @@ import spirite.base.brains.commands.RenameAnimationCommand
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.gui.components.advanced.ITreeViewNonUI.ITreeComponent
-import spirite.gui.components.advanced.ITreeViewNonUI.TreeNodeAttributes
+import sgui.swing.advancedComponents.ITreeViewNonUI.ITreeComponent
+import sgui.swing.advancedComponents.ITreeViewNonUI.TreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.menus.ContextMenus.MenuItem
-import spirite.gui.resources.IIcon
-import spirite.gui.resources.SwIcons
+import sgui.swing.SwIcon
+import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
 import spirite.hybrid.Hybrid
 import sgui.swing.components.jcomponent
@@ -31,7 +31,7 @@ import java.awt.dnd.DragSource
 
 class AnimationListView(val master: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
-    override val icon: IIcon? get() = SwIcons.BigIcons.Frame_AnimationScheme
+    override val icon: SwIcon? get() = SpiriteIcons.BigIcons.Frame_AnimationScheme
     override val name: String get() = "Anims"
 
     private val workspace get() = master.workspaceSet.currentWorkspace

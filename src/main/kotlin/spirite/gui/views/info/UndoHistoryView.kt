@@ -4,12 +4,12 @@ import rb.owl.observer
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import spirite.base.imageData.undo.UndoIndex
-import spirite.gui.components.advanced.ITreeViewNonUI.SimpleTreeComponent
-import spirite.gui.components.advanced.ITreeViewNonUI.TreeNodeAttributes
+import sgui.swing.advancedComponents.ITreeViewNonUI.SimpleTreeComponent
+import sgui.swing.advancedComponents.ITreeViewNonUI.TreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
-import spirite.gui.resources.IIcon
-import spirite.gui.resources.SwIcons
+import sgui.swing.SwIcon
+import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 
 class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
@@ -25,7 +25,7 @@ class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
         rows.addGap(3)
     }
 
-    override val icon: IIcon? get() = SwIcons.BigIcons.Frame_UndoHistory
+    override val icon: SwIcon? get() = SpiriteIcons.BigIcons.Frame_UndoHistory
     override val name: String get() = "Undo History"
 
 

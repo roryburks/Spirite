@@ -16,7 +16,7 @@ import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import spirite.hybrid.Hybrid
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

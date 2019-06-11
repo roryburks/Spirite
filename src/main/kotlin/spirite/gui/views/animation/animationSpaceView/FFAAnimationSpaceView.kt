@@ -1,6 +1,6 @@
 package spirite.gui.views.animation.animationSpaceView
 
-import CrossLayout
+import sgui.swing.advancedComponents.CrossContainer.CrossLayout
 import rb.jvm.owl.addWeakObserver
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec2i
@@ -16,7 +16,7 @@ import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimat
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
 import spirite.base.util.linear.Rect
 import sgui.generic.UIPoint
-import sgui.generic.advancedComponents.crossContainer.CrossInitializer
+import sgui.generic.components.initializers.CrossInitializer
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BASIC
 import sgui.generic.components.ICrossPanel

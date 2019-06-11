@@ -2,7 +2,7 @@ package spirite.gui.components.dialogs
 
 import sgui.generic.components.ICrossPanel
 import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
-import spirite.gui.resources.SwIcons
+import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 
 class DisplayOptionsPanel(
@@ -22,8 +22,8 @@ class DisplayOptionsPanel(
     var alpha by sliderAlpha.valueBind
 
     init {
-        btnVisible.setOnIcon( SwIcons.BigIcons.VisibleOn)
-        btnVisible.setOffIcon( SwIcons.BigIcons.VisibleOff)
+        btnVisible.setOnIcon( SpiriteIcons.BigIcons.VisibleOn)
+        btnVisible.setOffIcon( SpiriteIcons.BigIcons.VisibleOff)
 
         sliderAlpha.value = defaultOptions?.alpha ?: 1f
         setLayout {

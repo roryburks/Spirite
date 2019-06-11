@@ -5,7 +5,7 @@ import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
 import sgui.generic.components.ICrossPanel
 import sgui.generic.components.ITextArea
-import spirite.gui.resources.IIcon
+import sgui.swing.SwIcon
 import spirite.hybrid.Hybrid
 
 class DebugView
@@ -13,7 +13,7 @@ private constructor( val imp : ICrossPanel)
     :IOmniComponent
 {
     override val component: IComponent get() = imp
-    override val icon: IIcon? get() = null
+    override val icon: SwIcon? get() = null
     override val name: String get() = "Debug"
 
     constructor() : this( Hybrid.ui.CrossPanel())

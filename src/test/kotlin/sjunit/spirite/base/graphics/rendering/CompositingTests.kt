@@ -12,7 +12,7 @@
 //import spirite.base.imageData.mediums.FlatMedium
 //import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 //import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-//import sgui.generic.color.Colors
+//import rb.glow.color.Colors
 //import spirite.hybrid.Hybrid
 //import spirite.hybrid.ImageConverter
 //import spirite.pc.graphics.ImageBI

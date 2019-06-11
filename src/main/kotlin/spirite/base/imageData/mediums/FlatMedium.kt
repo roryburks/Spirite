@@ -4,14 +4,14 @@ import rb.extendo.dataStructures.SinglyList
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.RawImage
+import rb.glow.RawImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.MediumType.FLAT
-import sgui.generic.color.Colors
-import sgui.generic.color.SColor
+import rb.glow.color.Colors
+import rb.glow.color.SColor
 
 /***
  * A FlatMedium is a thin wrapper for a RawImage, exposing its functionality to the program.

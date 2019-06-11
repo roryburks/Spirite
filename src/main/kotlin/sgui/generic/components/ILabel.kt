@@ -1,6 +1,7 @@
 package sgui.generic.components
 
-import java.awt.Color
+import rb.glow.color.Color
+
 
 interface ILabel : IComponent {
     var text : String

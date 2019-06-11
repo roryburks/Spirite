@@ -2,7 +2,7 @@ package sgui.generic.components
 
 import rb.owl.bindable.Bindable
 import rb.vectrix.mathUtil.MathUtil
-import java.awt.Color
+import rb.glow.color.Color
 
 interface ITextFieldNonUI {
     val textBind : Bindable<String>

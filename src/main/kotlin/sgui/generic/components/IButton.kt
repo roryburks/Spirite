@@ -1,6 +1,6 @@
 package sgui.generic.components
 
-import spirite.gui.resources.IIcon
+import sgui.generic.IIcon
 
 interface IButton : IComponent {
     data class ButtonActionEvent(

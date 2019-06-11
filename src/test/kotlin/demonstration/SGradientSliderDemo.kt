@@ -1,8 +1,8 @@
 package demonstration
 
-import spirite.base.util.InvertibleFunction
+import rb.vectrix.functions.InvertibleFunction
 import sgui.generic.Orientation.HORIZONTAL
-import spirite.gui.components.advanced.ResizeContainerPanel
+import sgui.swing.components.ResizeContainerPanel
 import sgui.generic.components.IButton
 import spirite.hybrid.Hybrid
 import sgui.swing.components.jcomponent

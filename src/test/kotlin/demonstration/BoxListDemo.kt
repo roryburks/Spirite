@@ -2,7 +2,7 @@ package demonstration
 
 import sgui.swing.components.*
 import sgui.generic.Orientation.HORIZONTAL
-import spirite.gui.components.advanced.ResizeContainerPanel
+import sgui.swing.components.ResizeContainerPanel
 import sgui.generic.components.IBoxList.IBoxComponent
 import spirite.hybrid.Hybrid
 import sgui.swing.components.basic.*

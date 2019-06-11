@@ -3,11 +3,13 @@ package spirite.hybrid
 import spirite.base.graphics.gl.IGL
 import spirite.base.graphics.gl.IGLEngine
 import sgui.generic.components.IComponentProvider
+import sgui.generic.systems.IMouseSystem
+import sgui.swing.mouseSystem.SwMouseSystem
 import spirite.hybrid.Transferables.IClipboard
 import spirite.hybrid.Transferables.SwClipboard
 import spirite.hybrid.inputSystems.*
 import spirite.pc.JOGL.JOGLProvider
-import spirite.pc.gui.SwingComponentProvider
+import sgui.swing.SwingComponentProvider
 
 /** Hybrid is a collection of components and interfaces that are platform-specific (things like Timers, GUI libraries,
  * OpenGL implementations, etc).  It wraps them such that they can code can be as portable as possible.
@@ -43,7 +45,7 @@ object SwHybrid : IHybrid {
     override val imageIO: IImageIO get() = JImageIO
     override val clipboard: IClipboard get() = SwClipboard
 
-    override val mouseSystem: IMouseSystem = SwMouseSystem()
+    override val mouseSystem: IMouseSystem get() = SwMouseSystem
     override val keypressSystem: MKeypressSystem = KeypressSystem()
 
     override fun LockFrom(o: Any): ILock = JLock(o)

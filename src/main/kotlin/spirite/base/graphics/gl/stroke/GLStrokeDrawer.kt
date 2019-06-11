@@ -6,7 +6,7 @@ import spirite.base.graphics.Composite.*
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
-import spirite.base.graphics.using
+import rb.glow.using
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawer
 import spirite.base.pen.stroke.StrokeBuilder
@@ -62,7 +62,7 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
     }
 
     override fun batchDraw(gc: GraphicsContext, drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int) {
-        using( GLImage(width, height, gle, false)) {batchImage ->
+        using(GLImage(width, height, gle, false)) { batchImage ->
             val glParams = batchImage.glParams
             doBatch(batchImage, drawPoints, params, glParams)
 

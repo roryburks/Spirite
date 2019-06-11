@@ -7,15 +7,15 @@ import rb.owl.bindable.Bindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import sgui.generic.components.IBoxList.IBoxComponent
 import sgui.generic.components.IBoxList.IMovementContract
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.generic.components.ICrossPanel
-import spirite.gui.resources.SwIcons
+import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.jcolor
+import sgui.swing.jcolor
 
 class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
@@ -96,10 +96,10 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
     private val btnVisibility = Hybrid.ui.ToggleButton()
 
     init {
-        btnVisibility.setOnIcon(SwIcons.SmallIcons.Rig_VisibileOn)
-        btnVisibility.setOffIcon(SwIcons.SmallIcons.Rig_VisibleOff)
-        btnNewPart.setIcon(SwIcons.SmallIcons.Rig_New)
-        btnRemovePart.setIcon(SwIcons.SmallIcons.Rig_Remove)
+        btnVisibility.setOnIcon(SpiriteIcons.SmallIcons.Rig_VisibileOn)
+        btnVisibility.setOffIcon(SpiriteIcons.SmallIcons.Rig_VisibleOff)
+        btnNewPart.setIcon(SpiriteIcons.SmallIcons.Rig_New)
+        btnRemovePart.setIcon(SpiriteIcons.SmallIcons.Rig_Remove)
 
         btnNewPart.action = {evt ->
             linkedSprite?.addPart("new", linked = evt.pressingShift)
@@ -124,7 +124,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                         cols += {
                             width = 32
                             addFlatGroup(22) {
-                                add(Hybrid.ui.Label(part.partName).also {it.textSize = 10;it.textColor= Colors.BLACK.jcolor}, height = 8)
+                                add(Hybrid.ui.Label(part.partName).also {it.textSize = 10;it.textColor= Colors.BLACK}, height = 8)
                             }
                             this += {
                                 val thumbnail = Hybrid.ui.ImageBox()

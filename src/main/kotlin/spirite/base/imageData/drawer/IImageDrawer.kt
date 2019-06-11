@@ -13,9 +13,9 @@ import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.ImageAction
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
-import sgui.generic.color.Color
+import rb.glow.color.Color
 import spirite.base.util.linear.Rect
-import sgui.generic.color.SColor
+import rb.glow.color.SColor
 
 
 fun IUndoEngine.performMaskedImageAction(description: String, arranged: ArrangedMediumData, mask: Selection?, action: (BuiltMediumData, Selection?)->Any? )

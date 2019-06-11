@@ -6,7 +6,7 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import sgui.generic.color.Color
+import rb.glow.color.Color
 import kotlin.math.min
 
 interface IPaletteMediumMap

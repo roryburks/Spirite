@@ -27,7 +27,7 @@ import spirite.hybrid.Hybrid
 import spirite.hybrid.SwHybrid
 import sgui.swing.components.SwMenuBar
 import sgui.swing.components.jcomponent
-import spirite.pc.gui.menus.SwContextMenus
+import spirite.pc.menus.SwContextMenus
 import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.KeyboardFocusManager

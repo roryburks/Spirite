@@ -9,11 +9,11 @@ import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import sgui.generic.color.Colors
-import spirite.gui.components.advanced.ITreeElementConstructor
-import spirite.gui.components.advanced.ITreeView
-import spirite.gui.components.advanced.ITreeViewNonUI.*
-import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
+import rb.glow.color.Colors
+import sgui.swing.advancedComponents.ITreeElementConstructor
+import sgui.swing.advancedComponents.ITreeView
+import sgui.swing.advancedComponents.ITreeViewNonUI.*
+import sgui.swing.advancedComponents.ITreeViewNonUI.DropDirection.*
 import sgui.generic.components.IComponent
 import sgui.generic.components.ICrossPanel
 import sgui.generic.components.IToggleButton
@@ -21,10 +21,10 @@ import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseButton.LEFT
 import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.generic.components.events.MouseEvent.MouseEventType.RELEASED
-import spirite.gui.resources.SwIcons
+import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
-import spirite.hybrid.inputSystems.IGlobalMouseHook
+import sgui.generic.systems.IGlobalMouseHook
 import java.awt.datatransfer.Transferable
 
 class PrimaryGroupView
@@ -87,12 +87,12 @@ private constructor(
             visibilityButton.checkBind.addObserver {new, _ ->
                 t.visible = new
             }
-            visibilityButton.setOnIcon( SwIcons.BigIcons.VisibleOn)
+            visibilityButton.setOnIcon( SpiriteIcons.BigIcons.VisibleOn)
             _nodeMap[t] = visibilityButton
 
             // This hook prevents the main hook of the Group Tree from being executed
             //  (in particular, it prevents automatic selection of nodes you're toggling the visibility of)
-            visibilityButton.setOffIcon( SwIcons.BigIcons.VisibleOff)
+            visibilityButton.setOffIcon( SpiriteIcons.BigIcons.VisibleOff)
             val k = Hybrid.mouseSystem.attachHook( object : IGlobalMouseHook {
                 override fun processMouseEvent(evt: MouseEvent) {evt.consume()}
             }, visibilityButton)

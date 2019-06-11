@@ -5,13 +5,13 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
-import spirite.gui.resources.IIcon
-import spirite.gui.resources.SwIcons
+import sgui.swing.SwIcon
+import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 
 class AnimationStructureView(val master: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
-    override val icon: IIcon? get() = SwIcons.BigIcons.Frame_AnimationScheme
+    override val icon: SwIcon? get() = SpiriteIcons.BigIcons.Frame_AnimationScheme
     override val name: String get() = "Animation Details"
 
     private val label = Hybrid.ui.Label(" ")

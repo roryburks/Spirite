@@ -4,14 +4,14 @@ import rb.jvm.owl.addWeakObserver
 import rb.jvm.owl.bindWeaklyTo
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
-import sgui.generic.color.Colors
+import rb.glow.color.Colors
 import sgui.generic.Orientation.VERTICAL
-import spirite.gui.components.advanced.ResizeContainerPanel
+import sgui.swing.components.ResizeContainerPanel
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.generic.components.ICrossPanel
-import sgui.skin.Skin
-import spirite.gui.resources.SwIcons
+import sgui.swing.skin.Skin
+import spirite.gui.resources.SpiriteIcons
 import spirite.gui.views.animation.AnimationPlayView
 import spirite.hybrid.Hybrid
 
@@ -28,7 +28,7 @@ class  FFAPlayView(
 
     val innerImpTop = Hybrid.ui.CrossPanel()
     val innerImpBottom = Hybrid.ui.CrossPanel()
-    val resize = ResizeContainerPanel(innerImpTop,VERTICAL, 300)
+    val resize = ResizeContainerPanel(innerImpTop, VERTICAL, 300)
 
     init {
         imp.setLayout {
@@ -36,8 +36,8 @@ class  FFAPlayView(
             rows.flex = 100f
         }
 
-        btnPlayPause.setOnIcon(SwIcons.BigIcons.Anim_Play)
-        btnPlayPause.setOffIcon(SwIcons.BigIcons.Anim_Play)
+        btnPlayPause.setOnIcon(SpiriteIcons.BigIcons.Anim_Play)
+        btnPlayPause.setOffIcon(SpiriteIcons.BigIcons.Anim_Play)
 
         resize.addPanel(innerImpBottom, 20,50,-1,false)
 

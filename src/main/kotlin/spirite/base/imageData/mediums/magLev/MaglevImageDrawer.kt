@@ -24,10 +24,10 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
-import sgui.generic.color.Color
+import rb.glow.color.Color
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import sgui.generic.color.SColor
+import rb.glow.color.SColor
 import kotlin.math.abs
 
 class MaglevImageDrawer(
