@@ -1,12 +1,6 @@
-package spirite.base.util.glu
+package rb.glow.gl
 
-// TODO: Move to rb.glow.glu
-/**
- * GLC is a namespace which includes all needed GL Constants whether the
- * local OpenGL version supports them or not.
- *
- * @author Guy Rory Burks
- */
+
 object GLC {
 
     val OES_VERSION_1_0  = 1

@@ -2,8 +2,8 @@ package spirite.base.util.shapes
 
 import rb.jvm.vectrix.compaction.FloatCompactor
 import rb.vectrix.mathUtil.d
-import spirite.base.graphics.gl.GLPrimitive
-import spirite.base.util.glu.GLC
+import rb.glow.gle.GLPrimitive
+import rb.glow.gl.GLC
 
 // TODO: Merge with Vectrix Shapes
 class Rectangle(

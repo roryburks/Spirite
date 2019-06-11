@@ -1,5 +1,6 @@
 package spirite.base.graphics.gl
 
+import rb.glow.gle.GLPrimitive
 import rb.jvm.vectrix.compaction.FloatCompactor
 import rb.jvm.vectrix.compaction.ReverseFloatCompactor
 
@@ -24,7 +25,7 @@ class PrimitiveBuilder(
         plen = 0
     }
 
-    fun build() = GLPrimitive( output.toArray(), attrLengths, primitiveType, primitiveLengths.toIntArray())
+    fun build() = GLPrimitive(output.toArray(), attrLengths, primitiveType, primitiveLengths.toIntArray())
 }
 class DoubleEndedSinglePrimitiveBuilder(
         val attrLengths: IntArray,

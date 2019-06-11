@@ -3,7 +3,7 @@ package spirite.base.util.glu
 import com.jogamp.opengl.glu.GLU
 import com.jogamp.opengl.glu.GLUtessellatorCallback
 import rb.jvm.vectrix.compaction.FloatCompactor
-import spirite.base.graphics.gl.GLPrimitive
+import rb.glow.gle.GLPrimitive
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
 

@@ -14,7 +14,11 @@ import spirite.base.graphics.gl.ProgramType.STROKE_V2_LINE_PASS
 import spirite.base.graphics.gl.ProgramType.STROKE_V3_LINE_PASS
 import spirite.base.graphics.gl.shader.GL330ShaderLoader
 import spirite.base.resources.IScriptService
-import spirite.base.util.glu.GLC
+import rb.glow.gl.GLC
+import rb.glow.gle.GLPrimitive
+import rb.glow.gle.IGLPrimitive
+import rb.glow.gle.IPreparedPrimitive
+import rb.glow.gle.PolyType
 import spirite.base.util.linear.MatrixBuilder.orthagonalProjectionMatrix
 import spirite.base.util.linear.MatrixBuilder.wrapTransformAs4x4
 import spirite.hybrid.MDebug
@@ -256,7 +260,7 @@ class GLEngine(
         val data = FloatArray(2*numPoints)
         xPoints.forEachIndexed { i, x -> data[i*2] = x }
         yPoints.forEachIndexed { i, y -> data[i*2+1] = y }
-        val prim = GLPrimitive( data, intArrayOf(2), polyType.glConst, intArrayOf(numPoints)).prepare(gl)
+        val prim = GLPrimitive(data, intArrayOf(2), polyType.glConst, intArrayOf(numPoints)).prepare(gl)
 
         applyProgram( programCall, params, iParams, prim)
         prim.flush()
@@ -416,4 +420,3 @@ class GLEngine(
 }
 
 
-class GLEException(message: String) : Exception(message)

@@ -8,7 +8,7 @@ import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.graphics.gl.*
-import spirite.base.graphics.gl.PolyType.STRIP
+import rb.glow.gle.PolyType.STRIP
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.graphics.gl.SquareGradientCall.GradientType
 import spirite.base.pen.stroke.DrawPoints

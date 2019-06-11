@@ -1,7 +1,8 @@
-package spirite.base.graphics.gl
+package rb.glow.gle
 
+import rb.glow.exceptions.GLEException
 import rb.glow.gl.IGL
-import spirite.base.util.glu.GLC
+import rb.glow.gl.GLC
 import kotlin.math.min
 
 enum class PolyType( val glConst: Int) {
@@ -27,7 +28,7 @@ data class GLPrimitive(
         val attrLengths: IntArray,
         val primitiveTypes: IntArray,
         val primitiveLengths: IntArray)
-    :IGLPrimitive
+    : IGLPrimitive
 {
     constructor( raw: FloatArray, attrLengths: IntArray, primitiveType: Int, primitiveLengths: IntArray) :
             this(raw, attrLengths, IntArray(primitiveLengths.size) {primitiveType}, primitiveLengths)
@@ -38,7 +39,7 @@ data class GLPrimitive(
 class PreparedPrimitive(
         val primative: GLPrimitive,
         val gl: IGL)
-    :IPreparedPrimitive
+    : IPreparedPrimitive
 {
     val buffer = gl.createBuffer() ?: throw GLEException("Failed to create Buffer")
 

@@ -6,7 +6,7 @@ import spirite.base.graphics.fill.V0FillArrayAlgorithm
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.fill.GLFill
 import rb.glow.color.Color
-import spirite.base.util.glu.GLC
+import rb.glow.gl.GLC
 
 class GLDrawer( val image: GLImage) : IDrawer {
     val params by lazy {

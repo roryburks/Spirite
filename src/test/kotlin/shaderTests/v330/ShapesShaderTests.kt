@@ -7,10 +7,10 @@
 //import rb.vectrix.mathUtil.i
 //import sjunit.TestConfig
 //import spirite.base.graphics.gl.GLImage
-//import spirite.base.graphics.gl.GLPrimitive
+//import rb.glow.gle.GLPrimitive
 //import spirite.base.graphics.gl.IGLEngine
-//import spirite.base.graphics.gl.PreparedPrimitive
-//import spirite.base.util.glu.GLC
+//import rb.glow.gle.PreparedPrimitive
+//import rb.glow.gl.GLC
 //import spirite.base.util.linear.MatrixBuilder
 //import spirite.pc.toBufferedImage
 //import java.io.File

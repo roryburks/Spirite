@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL
 import com.jogamp.opengl.GL2
 import rb.glow.gl.*
 import rb.glow.gl.GlShaderVersion.GLSL_330
-import spirite.base.util.glu.GLC
+import rb.glow.gl.GLC
 import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer

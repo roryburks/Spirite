@@ -9,7 +9,8 @@ import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
-import spirite.base.util.glu.GLC
+import rb.glow.gl.GLC
+import rb.glow.gle.GLPrimitive
 
 class GLStrokeDrawerV2(
         gle: IGLEngine) : GLStrokeDrawer(gle)
@@ -88,7 +89,7 @@ class GLStrokeDrawerV2(
 
 
     private val SV2_STRIDE = 3
-    fun strokeV2LinePassGeom( raw: FloatArray) : Pair<GLPrimitive,GLPrimitive> {
+    fun strokeV2LinePassGeom( raw: FloatArray) : Pair<GLPrimitive, GLPrimitive> {
         val lineBuilder = DoubleEndedSinglePrimitiveBuilder(intArrayOf(2), GLC.LINE_STRIP)
         val polyBuilder = PrimitiveBuilder(intArrayOf(2), GLC.TRIANGLE_STRIP)
 

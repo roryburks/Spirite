@@ -12,7 +12,8 @@ import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import rb.glow.color.Color
 import rb.glow.color.Colors
-import spirite.base.util.glu.GLC
+import rb.glow.gl.GLC
+import rb.glow.gle.PolyType
 import spirite.base.util.glu.PolygonTesselater
 import spirite.base.util.linear.Rect
 import spirite.base.util.shapes.IShape

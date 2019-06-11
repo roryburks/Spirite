@@ -6,7 +6,7 @@ import spirite.base.graphics.fill.IFillArrayAlgorithm
 import spirite.base.graphics.gl.FillAfterpassCall
 import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.GLParameters
-import spirite.base.util.glu.GLC
+import rb.glow.gl.GLC
 import spirite.pc.JOGL.JOGL.JOGLTextureSource
 import rb.glow.color.SColor
 import java.nio.IntBuffer

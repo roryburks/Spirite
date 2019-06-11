@@ -9,7 +9,8 @@ import rb.vectrix.mathUtil.f
 import spirite.base.graphics.gl.*
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
-import spirite.base.util.glu.GLC
+import rb.glow.gl.GLC
+import rb.glow.gle.GLPrimitive
 import kotlin.math.PI
 
 // Dot

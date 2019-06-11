@@ -4,7 +4,7 @@
 //import rb.vectrix.mathUtil.f
 //import spirite.base.graphics.gl.*
 //import spirite.base.graphics.gl.shader.GL330ShaderLoader
-//import spirite.base.util.glu.GLC
+//import rb.glow.gl.GLC
 //import spirite.base.util.linear.MatrixBuilder
 //import spirite.hybrid.Hybrid
 //import spirite.pc.JOGL.JOGL.JOGLUniformLocation

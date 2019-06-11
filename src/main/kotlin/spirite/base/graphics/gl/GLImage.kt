@@ -4,7 +4,7 @@ import spirite.base.graphics.GLDrawer
 import spirite.base.graphics.IDrawer
 import rb.glow.RawImage
 import rb.glow.RawImage.InvalidImageDimensionsExeption
-import spirite.base.util.glu.GLC
+import rb.glow.gl.GLC
 import spirite.base.util.linear.Rect
 import rb.glow.color.toColor
 import rb.glow.color.toColorPremultiplied
