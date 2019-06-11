@@ -1,9 +1,9 @@
 package rb.owl.bindableMList
 
+import rb.IContract
 import rb.extendo.dataStructures.SinglyCollection
 import rb.extendo.dataStructures.SinglySet
 import rb.extendo.extensions.asHashSet
-import rb.IContract
 import rb.owl.IObserver
 
 
@@ -11,7 +11,7 @@ class ObservableMList<T>
     (list: Collection<T> = emptyList())
     : IMutableListObservable<T>, MutableList<T>
 {
-    private inner class ObserverContract(private val observer: IMutableListObserver<T>) : IContract {
+    private inner class ObserverContract(private val observer: IMutableListObserver<T>) : IContract{
         override fun void() { observers.remove(observer)}
     }
 

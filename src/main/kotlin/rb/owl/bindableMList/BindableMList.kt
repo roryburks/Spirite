@@ -1,7 +1,7 @@
 package rb.owl.bindableMList
 
-import rb.extendo.extensions.mapRemoveIfNull
 import rb.IContract
+import rb.extendo.extensions.mapRemoveIfNull
 
 
 interface IBindableMList<T> {

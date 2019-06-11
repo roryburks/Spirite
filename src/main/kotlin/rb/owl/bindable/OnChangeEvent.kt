@@ -7,5 +7,5 @@ fun <T> onChangeObserver(trigger: (new:T, old:T)->Unit ) = object : IBindObserve
     override val trigger: OnChangeEvent<T> = trigger
 }
 
-fun <T> IBindable<T>.addObserver(trigger: Boolean = true, event: (new: T, old: T) -> Unit)
+fun <T> IBindable<T>.addObserver(trigger: Boolean = false, event: (new: T, old: T) -> Unit)
         = addObserver(onChangeObserver<T>(event), trigger)

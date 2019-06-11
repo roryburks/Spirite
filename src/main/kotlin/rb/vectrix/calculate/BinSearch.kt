@@ -1,4 +1,4 @@
-package spirite.base.util
+package rb.vectrix.calculate
 
 // TODO: Figure out where this belongs.
 

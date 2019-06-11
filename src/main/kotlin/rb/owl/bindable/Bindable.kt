@@ -43,16 +43,13 @@ class Bindable<T>(default: T) : IBindable<T>
     private val bindList = mutableListOf<Bindable<T>>()
 
     private class Underlying<T>( default: T, root: Bindable<T>) {
-        private var recursiveLock = false
         var value: T = default
             set(value) {
                 val prev = field
-                if( value != field && !recursiveLock) {
-                    recursiveLock = true
+                if( value != field) {
                     field = value
                     val t = triggers.toList()
                     t.forEach { it.invoke(value,prev)}
-                    recursiveLock = false
                 }
             }
 

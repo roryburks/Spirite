@@ -5,6 +5,7 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.linear.Vec2f
 
+
 fun Bindable<Float>.bindToX( root: Bindable<Vec2f> ) : IContract
 {
     if( this.field != root.field.xf)

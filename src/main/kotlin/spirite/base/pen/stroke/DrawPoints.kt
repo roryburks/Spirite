@@ -1,6 +1,6 @@
 package spirite.base.pen.stroke
 
-import spirite.base.util.nearestBinarySearch
+import rb.vectrix.calculate.nearestBinarySearch
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 
