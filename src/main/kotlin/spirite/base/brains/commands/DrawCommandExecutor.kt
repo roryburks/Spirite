@@ -7,6 +7,7 @@ import rb.vectrix.mathUtil.f
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand.*
+import spirite.base.brains.commands.specific.LayerFixes
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
@@ -66,7 +67,7 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
             SHIFT_RIGHT.string -> if( !shift(1,0, workspace)) return false
             SCALE3x.string -> {
                 val transform = MutableTransformF.Scale(1.1f,1.1f)
-                (workspace.activeDrawer as? ITransformModule)?.transform(transform) ?: print("dont")
+                LayerFixes.ApplyTransformAccrossNode(workspace, workspace.groupTree.selectedNode ?: return false, transform)
             }
 
             else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: draw.$string")

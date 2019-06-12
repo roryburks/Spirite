@@ -14,6 +14,7 @@ interface Layer {
     val height: Int
     val activeData: ArrangedMediumData
     fun getDrawer( arranged: ArrangedMediumData): IImageDrawer
+
     val imageDependencies: List<MediumHandle>
     fun getDrawList(isolator: IIsolator? = null) : List<TransformedHandle>
     fun dupe( workspace: MImageWorkspace) : Layer
