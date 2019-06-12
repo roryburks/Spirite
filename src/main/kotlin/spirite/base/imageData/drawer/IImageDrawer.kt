@@ -55,7 +55,7 @@ interface IImageDrawer {
         fun flip(horizontal: Boolean)
     }
     interface ITransformModule : IFlipModule {
-        fun transform(trans: ITransformF)
+        fun transform(trans: ITransformF, centered: Boolean = true)
 
         fun startManipulatingTransform() : Rect?
         fun stepManipulatingTransform()

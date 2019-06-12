@@ -194,7 +194,7 @@ class DefaultImageDrawer(
     }
     // endregion
 
-    override fun transform(trans: ITransformF) {
+    override fun transform(trans: ITransformF, centered : Boolean) {
         val mask = mask
 
         val rect = when {
@@ -206,7 +206,9 @@ class DefaultImageDrawer(
         val cx = rect.x + rect.width /2f
         val cy = rect.y + rect.height /2f
 
-        val effectiveTrans = ImmutableTransformF.Translation(cx,cy) * trans * ImmutableTransformF.Translation(-cx,-cy)
+        val effectiveTrans =
+                if( centered) ImmutableTransformF.Translation(cx,cy) * trans * ImmutableTransformF.Translation(-cx,-cy)
+                else trans
 
         doTransformStraight(effectiveTrans)
     }

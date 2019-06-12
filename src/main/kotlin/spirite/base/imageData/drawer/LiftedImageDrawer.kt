@@ -42,7 +42,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         return true
     }
 
-    override fun transform(trans: ITransformF) {
+    override fun transform(trans: ITransformF, centered : Boolean) {
         val mask = workspace.selectionEngine.selection ?: return
         val rect = when {
             mask.transform == null -> Rect(mask.width, mask.height)
@@ -52,7 +52,9 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         val cx = rect.x + rect.width /2f
         val cy = rect.y + rect.height /2f
 
-        val effectiveTrans = ImmutableTransformF.Translation(cx,cy) * trans * ImmutableTransformF.Translation(-cx,-cy)
+        val effectiveTrans =
+                if( centered) ImmutableTransformF.Translation(cx,cy) * trans * ImmutableTransformF.Translation(-cx,-cy)
+                else trans
 
         workspace.undoEngine.doAsAggregateAction("Lift and ITransformF") {
             workspace.selectionEngine.transformSelection(effectiveTrans, true)
