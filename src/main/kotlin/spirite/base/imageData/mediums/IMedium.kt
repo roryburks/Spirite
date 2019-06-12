@@ -91,4 +91,5 @@ object NilMMediumRepo : MMediumRepository {
     override fun clearUnusedCache(externalDataUsed: Set<MediumHandle>) = throw NotImplementedError()
     override fun changeMedium(i: Int, runner: (IMedium) -> Unit) {}
     override fun importMap(map: Map<Int, IMedium>): Map<Int, Int> = throw NotImplementedError()
+    override fun getUnused(externalDataUsed: Set<MediumHandle>) = throw NotImplementedError()
 }

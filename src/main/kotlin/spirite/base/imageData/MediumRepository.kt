@@ -38,6 +38,7 @@ interface MMediumRepository : IMediumRepository {
 
     fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium)
     fun clearUnusedCache(externalDataUsed : Set<MediumHandle>)
+    fun getUnused(externalDataUsed : Set<MediumHandle>) : List<MediumHandle>
     fun changeMedium( i: Int, runner: (IMedium)->Unit)
 }
 
@@ -108,6 +109,18 @@ class MediumRepository(private val imageWorkspace: IImageWorkspace)
                 mediumData.remove(unusedIndex)
             }
         }
+    }
+
+    override fun getUnused(externalDataUsed: Set<MediumHandle>): List<MediumHandle> {
+        val externalImageIds = externalDataUsed.map { it.id }
+
+        val layerImages =  imageWorkspace.groupTree.root.getLayerNodes()
+                .flatMap { it.layer.imageDependencies }
+        val layerImageIds = layerImages.map { it.id }.distinct()
+
+        val unused = mediumData.keys
+                .filter {!externalImageIds.contains( it) && !layerImageIds.contains(it)}
+        return  unused.map { MediumHandle(imageWorkspace, it) }
     }
 
     override fun addMedium(medium: IMedium) : MediumHandle{

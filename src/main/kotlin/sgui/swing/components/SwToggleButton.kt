@@ -1,5 +1,6 @@
 package sgui.swing.components
 
+import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import sgui.generic.IIcon
 import sgui.generic.components.IComponent
@@ -18,9 +19,11 @@ import javax.swing.JToggleButton
 open class SwToggleButton
 protected constructor(startChecked: Boolean, private val imp: JToggleButton )
     : IToggleButton,
-        IToggleButtonNonUI by ToggleButtonNonUI(startChecked), IComponent,
+        IComponent,
         ISwComponent by SwComponent(imp)
 {
+    override val checkBind = Bindable(startChecked)
+    override var checked by checkBind
 
     override fun setOnIcon(icon: IIcon) {imp.selectedIcon = (icon as? SwIcon)?.icon ?: return}
     override fun setOffIcon(icon: IIcon) {imp.icon = (icon as? SwIcon)?.icon ?: return}
@@ -44,6 +47,7 @@ protected constructor(startChecked: Boolean, private val imp: JToggleButton )
 
 
     init {
+
         checkBind.addObserver { new, _ -> imp.isSelected = new }
         setBasicBorder(BEVELED_RAISED)
         background = Skin.Global.BgDark.scolor

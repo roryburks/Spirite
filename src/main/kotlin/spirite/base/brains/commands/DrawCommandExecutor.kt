@@ -65,8 +65,7 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
             SHIFT_LEFT.string -> if( !shift(-1,0, workspace)) return false
             SHIFT_RIGHT.string -> if( !shift(1,0, workspace)) return false
             SCALE3x.string -> {
-                val transform = MutableTransformF.Scale(3f,3f)
-                transform.preTranslate(0f, -200f)
+                val transform = MutableTransformF.Scale(1.1f,1.1f)
                 (workspace.activeDrawer as? ITransformModule)?.transform(transform) ?: print("dont")
             }
 

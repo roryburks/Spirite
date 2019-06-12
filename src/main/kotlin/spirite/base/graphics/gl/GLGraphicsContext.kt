@@ -14,6 +14,7 @@ import rb.glow.color.Color
 import rb.glow.color.Colors
 import rb.glow.gl.GLC
 import rb.glow.gle.PolyType
+import rb.vectrix.mathUtil.d
 import spirite.base.util.glu.PolygonTesselater
 import spirite.base.util.linear.Rect
 import spirite.base.util.shapes.IShape
@@ -208,7 +209,7 @@ class GLGraphicsContext : GraphicsContext {
 
     override fun fillPolygon(x: List<Float>, y: List<Float>, length: Int) {
         reset()
-        val poly = PolygonTesselater.tesselatePolygon(x, y, x.size)
+        val poly = PolygonTesselater.tesselatePolygon(x.asSequence().map { it.d }, y.asSequence().map { it.d }, x.size)
         gle.applyPrimitiveProgram( PolyRenderCall(color.rgbComponent, alpha), poly, cachedParams, _trans)
     }
     // endregion

@@ -13,6 +13,10 @@ import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.mediums.IMedium
 import rb.glow.color.Color
 import rb.glow.color.ColorARGB32Normal
+import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.layers.SimpleLayer
+import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.layers.sprite.SpritePartStructure
 import java.io.File
 import java.io.RandomAccessFile
 import java.nio.charset.Charset
@@ -144,6 +148,8 @@ object LoadEngine {
             print(context.telemetry)
 
             workspace.finishBuilding()
+
+            //adHocSave(workspace)
             workspace.mediumRepository.clearUnusedCache(emptySet())
 
             workspace.paletteManager.drivePalette = paletteDriving
@@ -154,6 +160,30 @@ object LoadEngine {
             throw BadSifFileException("Error Reading File: " + e.stackTrace)
         }
     }
+
+    val adHocRecover = listOf(13,27,41,59,74,89,104,119,134,150,166,182,198,214,229,244,259,276,291,306,322,337,352)
+    fun adHocSave(workspace: MImageWorkspace) {
+
+        val unused = workspace.mediumRepository.getUnused(emptySet())
+        val group = workspace.groupTree.addGroupNode(null, "SAVED")
+        var m = 0
+
+        val groupedMedHandles = mutableListOf<List<MediumHandle>>()
+        var workingGroup = mutableListOf<MediumHandle>()
+        unused.mapIndexed{ i, mh ->
+            workingGroup.add(mh)
+            if( adHocRecover.contains(i)) {
+                groupedMedHandles.add(workingGroup)
+                workingGroup = mutableListOf()
+            }
+        }
+
+        groupedMedHandles
+                .map { SpriteLayer(workspace, it.mapIndexed {  i, h -> Pair(h, SpritePartStructure(i, "$i")) }) }
+                .forEachIndexed { index, spriteLayer -> workspace.groupTree.importLayer(group, "$index", spriteLayer) }
+    }
+
+
 
     private fun parseChunks( context: LoadContext) {
         val buffer = ByteArray(4)

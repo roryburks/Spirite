@@ -102,7 +102,8 @@ private val defaultHotkeys = mapOf(
         DrawCommand.SHIFT_RIGHT.keyCommand to (Hotkey( KeyEvent.VK_RIGHT, SHIFT or CTRL)),
         DrawCommand.SHIFT_DOWN.keyCommand to (Hotkey( KeyEvent.VK_DOWN, SHIFT or CTRL)),
         DrawCommand.SHIFT_UP.keyCommand to (Hotkey( KeyEvent.VK_UP, SHIFT or CTRL)),
-        DrawCommand.SCALE3x.keyCommand to (Hotkey( KeyEvent.VK_3, 0)),
+        DrawCommand.SCALE3x.keyCommand to (Hotkey( KeyEvent.VK_F3, SHIFT)),
+
 
         SelectCommand.All.keyCommand to (Hotkey( KeyEvent.VK_A, CTRL)),
         SelectCommand.None.keyCommand to (Hotkey( KeyEvent.VK_D, CTRL or SHIFT)),
