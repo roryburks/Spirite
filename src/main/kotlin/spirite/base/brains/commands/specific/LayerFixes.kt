@@ -16,7 +16,7 @@ object LayerFixes {
                 val drawers = layer.imageDependencies.map { it.medium.getImageDrawer(ArrangedMediumData(it)) }
                 drawers
                         .filterIsInstance<IImageDrawer.ITransformModule>()
-                        .forEach { it.transform(transform) }
+                        .forEach { it.transform(transform, false) }
             }
             if (node is GroupTree.GroupNode) {
                 node.children.forEach { rec(it) }
