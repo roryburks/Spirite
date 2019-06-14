@@ -12,7 +12,7 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import sgui.swing.advancedComponents.ITreeViewNonUI.ITreeComponent
-import sgui.swing.advancedComponents.ITreeViewNonUI.TreeNodeAttributes
+import sgui.swing.advancedComponents.ITreeViewNonUI.ITreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
 import sgui.generic.components.events.MouseEvent
@@ -43,7 +43,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
         rows.flex = 1f
     }
 
-    private val attributes = object : TreeNodeAttributes<Animation> {
+    private val attributes = object : ITreeNodeAttributes<Animation> {
         override fun makeComponent(t: Animation): ITreeComponent {
             return object : ITreeComponent {
                 override val component = Hybrid.ui.Label(t.name).also {
@@ -54,7 +54,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
             }
         }
     }
-    private val detailAttributes = object : TreeNodeAttributes<Animation> {
+    private val detailAttributes = object : ITreeNodeAttributes<Animation> {
         override fun makeComponent(t: Animation): ITreeComponent {
             return object : ITreeComponent {
                 override val component: IComponent = Hybrid.ui.Button(t.name).also{dnd.addListener(it, t)}

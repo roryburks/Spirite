@@ -66,7 +66,7 @@
 //        this.add(resizeContainer.jcomponent)
 //    }
 //
-//    class STNAtt() : TreeNodeAttributes<String> {
+//    class STNAtt() : ITreeNodeAttributes<String> {
 //        override fun makeLeftComponent(t: String): IComponent? = SwButton("${i}")
 //        override fun makeComponent(t: String): IComponent = SwLabel(t)
 //

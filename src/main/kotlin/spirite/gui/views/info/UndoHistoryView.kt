@@ -5,7 +5,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import spirite.base.imageData.undo.UndoIndex
 import sgui.swing.advancedComponents.ITreeViewNonUI.SimpleTreeComponent
-import sgui.swing.advancedComponents.ITreeViewNonUI.TreeNodeAttributes
+import sgui.swing.advancedComponents.ITreeViewNonUI.ITreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
 import sgui.swing.SwIcon
@@ -60,7 +60,7 @@ class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
     }
 
     private val attributes = NodeAttributes()
-    private inner class NodeAttributes : TreeNodeAttributes<UndoIndex> {
+    private inner class NodeAttributes : ITreeNodeAttributes<UndoIndex> {
         override fun makeComponent(t: UndoIndex) = SimpleTreeComponent(Hybrid.ui.Label(t.action.description))
     }
 }

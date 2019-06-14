@@ -119,7 +119,7 @@ private constructor(
         override fun onRename() {component.triggerRename()}
     }
 
-    private open inner class BaseNodeAttributes : TreeNodeAttributes<Node> {
+    private open inner class BaseNodeAttributes : ITreeNodeAttributes<Node> {
         override fun makeComponent(t: Node) : ITreeComponent = NormalNodeComponent(t)
 
         override fun makeTransferable(t: Node): Transferable {return NodeTransferable(t)}
