@@ -1,9 +1,12 @@
 package spirite.base.pen
 
+import rb.glow.color.Colors
 import rb.owl.bindable.addObserver
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
+import sgui.generic.components.events.MouseEvent.MouseButton
+import sgui.generic.components.events.MouseEvent.MouseButton.LEFT
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
@@ -14,9 +17,6 @@ import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
-import rb.glow.color.Colors
-import sgui.generic.components.events.MouseEvent.MouseButton
-import sgui.generic.components.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.views.work.WorkSection
 import spirite.gui.views.work.WorkSectionView
 import spirite.hybrid.Hybrid

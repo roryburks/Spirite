@@ -1,12 +1,12 @@
 package spirite.base.graphics.gl.shader
 
 import rb.glow.exceptions.GLEException
+import rb.glow.gl.GLC
 import rb.glow.gl.IGL
 import rb.glow.gl.IGLProgram
 import rb.glow.gl.IGLShader
 import spirite.base.graphics.gl.*
 import spirite.base.resources.IScriptService
-import rb.glow.gl.GLC
 
 
 class GL330ShaderLoader(val gl: IGL, val scriptService: IScriptService) : IGLShaderLoader {

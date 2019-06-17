@@ -1,5 +1,7 @@
 package spirite.gui.menus
 
+import sgui.generic.UIPoint
+import sgui.swing.SwIcon
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.base.brains.commands.ICommand
 import spirite.base.brains.commands.NodeCommands
@@ -8,8 +10,6 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import sgui.generic.UIPoint
-import sgui.swing.SwIcon
 
 abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
 

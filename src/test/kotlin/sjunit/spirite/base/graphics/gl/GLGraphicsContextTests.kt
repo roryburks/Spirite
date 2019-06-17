@@ -1,12 +1,12 @@
 package sjunit.spirite.base.graphics.gl
 
+import rb.glow.color.Colors
 import rb.vectrix.linear.Vec2i
 import sjunit.TestConfig
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.graphics.LineAttributes
 import spirite.base.graphics.gl.GLImage
-import rb.glow.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File

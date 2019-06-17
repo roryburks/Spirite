@@ -1,11 +1,11 @@
 package spirite.base.graphics.rendering
 
+import rb.glow.IImage
+import rb.glow.RawImage
 import rb.owl.observer
 import spirite.base.brains.ICentralObservatory
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.settings.ISettingsManager
-import rb.glow.IImage
-import rb.glow.RawImage
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.graphics.rendering.ThumbnailStore.ReferenceObject
 import spirite.base.graphics.rendering.ThumbnailStore.ReferenceObject.*

@@ -1,9 +1,9 @@
 package demonstration
 
+import sgui.swing.components.SwMenuBar
 import spirite.base.brains.MasterControl
 import spirite.base.brains.commands.GlobalCommands
 import spirite.gui.menus.ContextMenus.MenuItem
-import sgui.swing.components.SwMenuBar
 import spirite.pc.menus.SwContextMenus
 import javax.swing.JFrame
 

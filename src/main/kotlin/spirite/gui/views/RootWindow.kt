@@ -1,6 +1,8 @@
 package spirite.gui.views
 
 import rbJvm.owl.addWeakObserver
+import sgui.swing.components.SwMenuBar
+import sgui.swing.components.jcomponent
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
@@ -25,8 +27,6 @@ import spirite.gui.views.tool.ToolSettingsSection
 import spirite.gui.views.work.WorkTabPane
 import spirite.hybrid.Hybrid
 import spirite.hybrid.SwHybrid
-import sgui.swing.components.SwMenuBar
-import sgui.swing.components.jcomponent
 import spirite.pc.menus.SwContextMenus
 import java.awt.Dimension
 import java.awt.GridLayout

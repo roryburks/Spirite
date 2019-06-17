@@ -8,7 +8,6 @@ import spirite.pc.graphics.ImageBI
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.awt.image.DataBufferInt
-import java.nio.IntBuffer
 import java.util.concurrent.atomic.AtomicReference
 
 object ContentBoundsFinder {

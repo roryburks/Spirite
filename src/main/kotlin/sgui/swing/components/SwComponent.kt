@@ -1,6 +1,6 @@
 package sgui.swing.components
 
-import sgui.swing.SUIPoint
+import rb.glow.color.SColor
 import sgui.generic.UIPoint
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.*
@@ -9,12 +9,12 @@ import sgui.generic.components.Invokable
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseEventType.*
 import sgui.generic.components.events.MouseWheelEvent
-import sgui.swing.skin.Skin
-import spirite.hybrid.Hybrid
 import sgui.generic.systems.IGlobalMouseHook
-import rb.glow.color.SColor
+import sgui.swing.SUIPoint
 import sgui.swing.jcolor
 import sgui.swing.scolor
+import sgui.swing.skin.Skin
+import spirite.hybrid.Hybrid
 import java.awt.Component
 import java.awt.Cursor
 import java.awt.event.*

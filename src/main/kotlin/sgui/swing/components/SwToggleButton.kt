@@ -6,11 +6,9 @@ import sgui.generic.IIcon
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.generic.components.IToggleButton
-import sgui.generic.components.IToggleButtonNonUI
-import sgui.generic.components.ToggleButtonNonUI
 import sgui.swing.SwIcon
-import sgui.swing.skin.Skin
 import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.skin.Skin
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.swing.JToggleButton

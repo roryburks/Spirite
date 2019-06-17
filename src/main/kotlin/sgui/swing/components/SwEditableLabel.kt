@@ -1,13 +1,13 @@
 package sgui.swing.components
 
+import rb.glow.color.SColor
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import rb.glow.color.SColor
 import sgui.generic.components.IComponent
 import sgui.generic.components.IEditableLabel
+import sgui.swing.jcolor
 import sgui.swing.skin.Skin.Global.Bg
 import sgui.swing.skin.Skin.Global.Text
-import sgui.swing.jcolor
 import spirite.hybrid.SwHybrid
 import java.awt.KeyboardFocusManager
 import java.awt.event.*

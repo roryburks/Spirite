@@ -1,17 +1,17 @@
 package sgui.swing.components
 
 import rb.extendo.delegates.OnChangeDelegate
+import rb.glow.color.SColor
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
-import rb.glow.color.SColor
 import sgui.generic.components.GradientSliderNonUI
 import sgui.generic.components.IGradientSlider
 import sgui.generic.components.IGradientSliderNonUIImpl
 import sgui.generic.components.events.MouseEvent
 import sgui.swing.SwUtil
-import sgui.swing.skin.Skin
-import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.jcolor
+import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.skin.Skin
 import java.awt.Color
 import java.awt.GradientPaint
 import java.awt.Graphics

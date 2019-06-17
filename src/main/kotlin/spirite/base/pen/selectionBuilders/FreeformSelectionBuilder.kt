@@ -1,12 +1,12 @@
 package spirite.base.pen.selectionBuilders
 
-import rbJvm.vectrix.compaction.IntCompactor
+import rb.glow.color.Colors
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.f
+import rbJvm.vectrix.compaction.IntCompactor
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
-import rb.glow.color.Colors
 import spirite.hybrid.Hybrid
 
 class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(workspace) {

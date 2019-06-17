@@ -1,16 +1,16 @@
 package spirite.base.pen.behaviors
 
+import rb.glow.color.ColorARGB32Normal
+import rb.glow.color.Colors
 import rbJvm.vectrix.compaction.FloatCompactor
 import rbJvm.vectrix.interpolation.CubicSplineInterpolator2D
+import sgui.generic.components.events.MouseEvent.MouseButton
+import sgui.generic.components.events.MouseEvent.MouseButton.*
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.deformation.StrokeDeformationPiece
 import spirite.base.imageData.deformation.StrokeDeformationV2
 import spirite.base.imageData.drawer.IImageDrawer.IDeformDrawer
 import spirite.base.pen.Penner
-import rb.glow.color.ColorARGB32Normal
-import rb.glow.color.Colors
-import sgui.generic.components.events.MouseEvent.MouseButton
-import sgui.generic.components.events.MouseEvent.MouseButton.*
 import spirite.gui.views.work.WorkSectionView
 
 private val DefaultStrokeColors = listOf(

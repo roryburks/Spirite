@@ -1,11 +1,9 @@
 package demonstration
 
-import sgui.swing.components.*
 import sgui.generic.Orientation.HORIZONTAL
-import sgui.swing.components.ResizeContainerPanel
 import sgui.generic.components.IBoxList.IBoxComponent
+import sgui.swing.components.*
 import spirite.hybrid.Hybrid
-import sgui.swing.components.basic.*
 import java.awt.Color
 import java.awt.GridLayout
 import javax.swing.BorderFactory

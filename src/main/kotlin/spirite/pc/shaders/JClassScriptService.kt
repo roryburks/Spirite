@@ -1,4 +1,4 @@
-package spirite.pc.resources
+package spirite.pc.shaders
 
 import spirite.base.resources.IScriptService
 import spirite.hybrid.MDebug

@@ -1,10 +1,10 @@
 package sjunit.spirite.base.graphics.gl
 
 
-import sjunit.TestConfig
-import spirite.base.graphics.gl.GLImage
 import rb.glow.color.ColorARGB32Normal
 import rb.glow.color.Colors
+import sjunit.TestConfig
+import spirite.base.graphics.gl.GLImage
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File

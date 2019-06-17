@@ -1,13 +1,13 @@
 package spirite.base.pen.behaviors
 
+import rb.glow.color.Colors
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
+import sgui.generic.components.events.MouseEvent.MouseButton
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.pen.Penner
 import spirite.base.pen.selectionBuilders.FreeformSelectionBuilder
-import rb.glow.color.Colors
-import sgui.generic.components.events.MouseEvent.MouseButton
 import spirite.gui.views.work.WorkSectionView
 
 class FreeformSelectionBehavior(

@@ -3,11 +3,11 @@ package sgui.swing.advancedComponents.CrossContainer
 import rb.vectrix.mathUtil.floor
 import sgui.generic.Orientation.HORIZONTAL
 import sgui.generic.Orientation.VERTICAL
+import sgui.generic.components.IComponent
 import sgui.generic.components.crossContainer.CSE_Component
 import sgui.generic.components.crossContainer.CSE_Gap
 import sgui.generic.components.crossContainer.CSE_Group
 import sgui.generic.components.crossContainer.CrossInitializer
-import sgui.generic.components.IComponent
 import java.awt.Component
 import java.awt.Container
 import javax.swing.GroupLayout

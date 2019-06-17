@@ -1,12 +1,13 @@
 package spirite.base.graphics
 
+import rb.glow.color.Color
+import rb.glow.gl.GLC
+import rb.glow.gle.GLParameters
 import rb.vectrix.mathUtil.f
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.graphics.fill.V0FillArrayAlgorithm
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.fill.GLFill
-import rb.glow.color.Color
-import rb.glow.gl.GLC
 
 class GLDrawer( val image: GLImage) : IDrawer {
     val params by lazy {

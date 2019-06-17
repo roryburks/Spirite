@@ -1,15 +1,15 @@
 package spirite.base.imageData.selection
 
+import rb.glow.IImage
+import rb.glow.RawImage
+import rb.glow.color.Color
+import rb.glow.color.Colors
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
 import spirite.base.graphics.Composite.*
-import rb.glow.IImage
-import rb.glow.RawImage
-import rb.glow.color.Color
-import rb.glow.color.Colors
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.ContentBoundsFinder

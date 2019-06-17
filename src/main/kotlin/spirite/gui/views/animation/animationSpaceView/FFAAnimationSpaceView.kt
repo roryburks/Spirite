@@ -1,13 +1,19 @@
 package spirite.gui.views.animation.animationSpaceView
 
-import sgui.swing.advancedComponents.CrossContainer.CrossLayout
-import rbJvm.owl.addWeakObserver
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
+import rbJvm.owl.addWeakObserver
+import sgui.generic.UIPoint
+import sgui.generic.components.IComponent
+import sgui.generic.components.IComponent.BasicBorder.BASIC
+import sgui.generic.components.crossContainer.CrossInitializer
+import sgui.generic.components.crossContainer.ICrossPanel
+import sgui.swing.advancedComponents.CrossContainer.CrossLayout
+import sgui.swing.components.SwComponent
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
@@ -15,13 +21,7 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.Spacial
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationPlayObserver
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
 import spirite.base.util.linear.Rect
-import sgui.generic.UIPoint
-import sgui.generic.components.crossContainer.CrossInitializer
-import sgui.generic.components.IComponent
-import sgui.generic.components.IComponent.BasicBorder.BASIC
-import sgui.generic.components.crossContainer.ICrossPanel
 import spirite.hybrid.Hybrid
-import sgui.swing.components.SwComponent
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics

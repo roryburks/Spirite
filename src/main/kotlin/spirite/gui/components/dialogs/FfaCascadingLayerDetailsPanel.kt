@@ -1,7 +1,7 @@
 package spirite.gui.components.dialogs
 
-import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import sgui.generic.components.crossContainer.ICrossPanel
+import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.hybrid.Hybrid
 
 

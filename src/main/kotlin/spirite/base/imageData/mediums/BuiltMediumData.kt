@@ -1,9 +1,9 @@
 package spirite.base.imageData.mediums
 
+import rb.glow.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.GraphicsContext
-import rb.glow.RawImage
 import spirite.base.imageData.MMediumRepository
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL

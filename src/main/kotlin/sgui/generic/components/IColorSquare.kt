@@ -1,7 +1,7 @@
 package sgui.generic.components
 
-import rb.owl.bindable.Bindable
 import rb.glow.color.SColor
+import rb.owl.bindable.Bindable
 
 interface IColorSquareNonUI {
     val colorBind : Bindable<SColor>

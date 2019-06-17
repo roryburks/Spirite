@@ -1,9 +1,9 @@
 package spirite.gui.views.work
 
-import spirite.base.graphics.GraphicsContext
 import rb.glow.color.Colors
-import sgui.swing.skin.Skin
 import sgui.swing.components.ISwComponent
+import sgui.swing.skin.Skin
+import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.drawer.SpiriteDrawer
 
 abstract class WorkArea(

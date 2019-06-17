@@ -1,7 +1,7 @@
 package rb.vectrix.intersect
 
-import rb.vectrix.shapes.*
 import rb.vectrix.mathUtil.MathUtil
+import rb.vectrix.shapes.*
 import kotlin.math.abs
 import kotlin.math.sqrt
 

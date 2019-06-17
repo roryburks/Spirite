@@ -1,9 +1,9 @@
 package spirite.base.graphics.filter
 
+import rb.glow.IImage
 import spirite.base.graphics.Composite.CLEAR
 import spirite.base.graphics.Composite.DST_IN
 import spirite.base.graphics.GraphicsContext
-import rb.glow.IImage
 import kotlin.math.min
 
 interface IFilter {

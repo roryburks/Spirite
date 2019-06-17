@@ -1,12 +1,12 @@
 package spirite.base.pen.behaviors
 
+import rb.glow.color.Color
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.Penner
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.InterpolationMethod.NONE
 import spirite.base.pen.stroke.StrokeParams.Method.PIXEL
-import rb.glow.color.Color
 
 
 object PixelBehavior {

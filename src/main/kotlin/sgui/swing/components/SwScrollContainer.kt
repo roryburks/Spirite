@@ -8,8 +8,8 @@ import sgui.generic.components.IScrollBar
 import sgui.generic.components.IScrollContainer
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseEventType.*
-import spirite.hybrid.Hybrid
 import sgui.generic.systems.IGlobalMouseHook
+import spirite.hybrid.Hybrid
 import java.awt.Component
 
 class SwScrollContainer

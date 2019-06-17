@@ -1,8 +1,8 @@
 package spirite.pc.menus
 
-import spirite.base.brains.commands.ICentralCommandExecutor
-import sgui.swing.SUIPoint
 import sgui.generic.UIPoint
+import sgui.swing.SUIPoint
+import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.gui.menus.ContextMenus
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug

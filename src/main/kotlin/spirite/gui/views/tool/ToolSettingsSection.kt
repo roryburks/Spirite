@@ -1,24 +1,24 @@
 package spirite.gui.views.tool
 
-import rbJvm.owl.addWeakObserver
-import rbJvm.owl.bindWeaklyTo
 import rb.IContract
+import rb.glow.color.Colors
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.interprettedBindings.bindToX
 import rb.owl.interprettedBindings.bindToY
-import spirite.base.brains.IMasterControl
-import spirite.base.brains.toolset.*
-import rb.glow.color.Colors
 import rb.vectrix.functions.InvertibleFunction
-import spirite.gui.components.advanced.RadioButtonCluster
-import spirite.gui.components.advanced.omniContainer.IOmniComponent
+import rbJvm.owl.addWeakObserver
+import rbJvm.owl.bindWeaklyTo
 import sgui.generic.components.IComboBox
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.swing.SwIcon
 import sgui.swing.skin.Skin
+import spirite.base.brains.IMasterControl
+import spirite.base.brains.toolset.*
+import spirite.gui.components.advanced.RadioButtonCluster
+import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.hybrid.Hybrid
 
 

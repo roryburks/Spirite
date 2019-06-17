@@ -2,10 +2,10 @@ package demonstration
 
 import rb.vectrix.functions.InvertibleFunction
 import sgui.generic.Orientation.HORIZONTAL
-import sgui.swing.components.ResizeContainerPanel
 import sgui.generic.components.IButton
-import spirite.hybrid.Hybrid
+import sgui.swing.components.ResizeContainerPanel
 import sgui.swing.components.jcomponent
+import spirite.hybrid.Hybrid
 import java.awt.Color
 import java.awt.GridLayout
 import javax.swing.JFrame

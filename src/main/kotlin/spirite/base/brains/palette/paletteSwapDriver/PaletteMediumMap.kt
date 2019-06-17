@@ -1,12 +1,12 @@
 package spirite.base.brains.palette.paletteSwapDriver
 
+import rb.glow.color.Color
 import rb.owl.bindable.addObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import rb.glow.color.Color
 import kotlin.math.min
 
 interface IPaletteMediumMap

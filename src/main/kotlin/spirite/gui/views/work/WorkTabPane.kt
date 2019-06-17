@@ -1,15 +1,15 @@
 package spirite.gui.views.work
 
-import rbJvm.owl.addWeakObserver
 import rb.owl.bindable.addObserver
+import rbJvm.owl.addWeakObserver
+import sgui.generic.components.IComponent
+import sgui.generic.components.ITabbedPane
+import sgui.generic.components.crossContainer.ICrossPanel
+import sgui.swing.SwIcon
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import sgui.generic.components.IComponent
-import sgui.generic.components.crossContainer.ICrossPanel
-import sgui.generic.components.ITabbedPane
-import sgui.swing.SwIcon
 import spirite.hybrid.Hybrid
 
 

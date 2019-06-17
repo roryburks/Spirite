@@ -1,12 +1,12 @@
 package spirite.base.pen.behaviors
 
+import rb.glow.color.Color
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.brains.toolset.PenDrawMode.NORMAL
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.Penner
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
-import rb.glow.color.Color
 
 
 object EraserBehavior {

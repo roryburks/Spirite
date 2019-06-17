@@ -7,10 +7,10 @@ import rb.extendo.extensions.lookup
 import sgui.generic.components.IComponent
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseEventType.*
-import sgui.swing.SUIPoint
-import sgui.swing.components.SwComponent
 import sgui.generic.systems.IGlobalMouseHook
 import sgui.generic.systems.IMouseSystem
+import sgui.swing.SUIPoint
+import sgui.swing.components.SwComponent
 import java.awt.Component
 import java.lang.ref.WeakReference
 import javax.swing.SwingUtilities

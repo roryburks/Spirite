@@ -1,10 +1,9 @@
-package spirite.pc.JOGL
+package rbJvm.glow.jogl
 
 import com.jogamp.opengl.GL
 import com.jogamp.opengl.GL2
 import rb.glow.gl.*
 import rb.glow.gl.GlShaderVersion.GLSL_330
-import rb.glow.gl.GLC
 import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
@@ -301,7 +300,7 @@ class JOGL(
     override fun makeFloat32Source(array: FloatArray): IFloat32Source = JOGLFloat32Source(FloatBuffer.wrap(array))
 
 
-    class JOGLInt32Source: IInt32Source,JOGLArraySource {
+    class JOGLInt32Source: IInt32Source, JOGLArraySource {
         constructor( size: Int) {
             data = IntBuffer.allocate(size)
             length = size

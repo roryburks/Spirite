@@ -2,10 +2,10 @@ package spirite.hybrid
 
 import rb.glow.IImage
 import rb.glow.exceptions.GLEException
-import spirite.base.graphics.gl.GLImage
-import rb.glow.gl.IGL
-import spirite.base.graphics.gl.IGLEngine
 import rb.glow.gl.GLC
+import rb.glow.gl.IGL
+import spirite.base.graphics.gl.GLImage
+import spirite.base.graphics.gl.IGLEngine
 import spirite.pc.JOGL.JOGL.JOGLTextureSource
 import spirite.pc.graphics.ImageBI
 import spirite.pc.toBufferedImage

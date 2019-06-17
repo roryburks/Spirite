@@ -1,6 +1,10 @@
 package spirite.base.brains.commands
 
 import rb.extendo.dataStructures.SinglySet
+import rb.glow.IImage
+import rb.glow.RawImage
+import rb.glow.color.Colors
+import rb.glow.using
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil
@@ -12,12 +16,9 @@ import spirite.base.brains.MWorkspaceSet
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.file.workspaceFromImage
 import spirite.base.graphics.Composite.SRC_IN
-import rb.glow.IImage
-import rb.glow.RawImage
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
-import rb.glow.using
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupTree
@@ -27,7 +28,6 @@ import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.base.imageData.mutations.ImportInto
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
-import rb.glow.color.Colors
 import spirite.base.util.linear.Rect
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF

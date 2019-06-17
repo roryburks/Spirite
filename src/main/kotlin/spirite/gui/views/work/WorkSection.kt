@@ -1,23 +1,23 @@
 package spirite.gui.views.work
 
-import rbJvm.owl.addWeakObserver
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.owl.bindable.addObserver
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
+import rbJvm.owl.addWeakObserver
+import sgui.generic.Orientation.HORIZONTAL
+import sgui.generic.Orientation.VERTICAL
+import sgui.generic.components.IComponent
+import sgui.generic.components.crossContainer.ICrossPanel
+import sgui.swing.components.SwPanel
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.pen.Penner
 import spirite.base.util.linear.Rect
-import sgui.generic.Orientation.HORIZONTAL
-import sgui.generic.Orientation.VERTICAL
-import sgui.generic.components.IComponent
-import sgui.generic.components.crossContainer.ICrossPanel
 import spirite.hybrid.Hybrid
-import sgui.swing.components.SwPanel
 import java.awt.Font
 import javax.swing.SwingUtilities
 

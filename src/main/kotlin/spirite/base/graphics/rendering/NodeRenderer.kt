@@ -1,13 +1,13 @@
 package spirite.base.graphics.rendering
 
+import rb.glow.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.ceil
 import spirite.base.graphics.GraphicsContext
-import rb.glow.RawImage
 import spirite.base.graphics.RenderRubric
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.graphics.isolation.IIsolator
+import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.mediums.IComplexMedium

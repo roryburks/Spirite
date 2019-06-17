@@ -1,11 +1,11 @@
 package spirite.gui.components.views
 
+import sgui.generic.components.IComponent
+import sgui.generic.components.ITextArea
+import sgui.generic.components.crossContainer.ICrossPanel
+import sgui.swing.SwIcon
 import spirite.base.graphics.gl.GLImageTracker
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import sgui.generic.components.IComponent
-import sgui.generic.components.crossContainer.ICrossPanel
-import sgui.generic.components.ITextArea
-import sgui.swing.SwIcon
 import spirite.hybrid.Hybrid
 
 class DebugView

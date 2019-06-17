@@ -1,13 +1,13 @@
 package spirite.gui.views.groupView
 
-import rbJvm.owl.addWeakObserver
-import rb.owl.bindable.addObserver
-import spirite.base.brains.IMasterControl
 import rb.glow.color.ColorARGB32Normal
-import spirite.gui.components.advanced.omniContainer.IOmniComponent
+import rb.owl.bindable.addObserver
+import rbJvm.owl.addWeakObserver
 import sgui.generic.components.IComponent
 import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.swing.SwIcon
+import spirite.base.brains.IMasterControl
+import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.hybrid.Hybrid
 
 class GroupView

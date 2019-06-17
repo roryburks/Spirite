@@ -1,7 +1,7 @@
 package rbJvm.owl
 
-import rb.extendo.extensions.mapRemoveIfNull
 import rb.IContract
+import rb.extendo.extensions.mapRemoveIfNull
 import rb.owl.IObservable
 import rb.owl.IObserver
 import rb.owl.bindable.Bindable

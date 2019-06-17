@@ -2,8 +2,8 @@ package demonstration
 
 import sgui.generic.Orientation.HORIZONTAL
 import sgui.swing.components.ResizeContainerPanel
-import spirite.hybrid.Hybrid
 import sgui.swing.components.jcomponent
+import spirite.hybrid.Hybrid
 import java.awt.GridLayout
 import javax.swing.JFrame
 

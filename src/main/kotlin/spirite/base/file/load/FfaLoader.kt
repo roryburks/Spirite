@@ -3,9 +3,12 @@ package spirite.base.file.load
 import rb.vectrix.mathUtil.i
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readNullTerminatedStringUTF8
-import spirite.base.imageData.animation.ffa.*
+import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
+import spirite.base.imageData.animation.ffa.FfaFrameStructure
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked.UnlinkedFrameCluster
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL

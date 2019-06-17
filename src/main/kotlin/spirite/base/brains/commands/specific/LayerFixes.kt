@@ -1,6 +1,5 @@
 package spirite.base.brains.commands.specific
 
-import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.ITransformF
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer

@@ -3,6 +3,7 @@ package sjunit.spirite.base.imageData.mediums
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Test
+import rb.glow.color.Colors
 import sjunit.TestConfig
 import sjunit.TestHelper
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
@@ -16,7 +17,6 @@ import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams
-import rb.glow.color.Colors
 import spirite.hybrid.Hybrid
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

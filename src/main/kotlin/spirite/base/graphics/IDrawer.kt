@@ -1,8 +1,7 @@
 package spirite.base.graphics
 
-import rb.glow.IImage
-import spirite.base.brains.toolset.ColorChangeMode
 import rb.glow.color.Color
+import spirite.base.brains.toolset.ColorChangeMode
 
 /***
  * You can think of IDrawer as somewhat of an extension to GraphicsContent as it takes a base surface/image and applies

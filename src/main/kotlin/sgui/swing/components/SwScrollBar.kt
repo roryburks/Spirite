@@ -8,8 +8,8 @@ import sgui.generic.components.IComponent
 import sgui.generic.components.IScrollBar
 import sgui.generic.components.IScrollBarNonUIImp
 import sgui.generic.components.ScrollBarNonUI
-import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.components.SScrollPane.ModernScrollBarUI
+import sgui.swing.mouseSystem.adaptMouseSystem
 import javax.swing.JComponent
 import javax.swing.JScrollBar
 

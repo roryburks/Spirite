@@ -1,14 +1,14 @@
 package demonstration.realComponents
 
 import demonstration.DemoLauncher
+import sgui.generic.Orientation.HORIZONTAL
+import sgui.swing.components.ResizeContainerPanel
+import sgui.swing.components.jcomponent
 import sjunit.TestHelper
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.FLAT
-import sgui.generic.Orientation.HORIZONTAL
-import sgui.swing.components.ResizeContainerPanel
 import spirite.gui.views.groupView.GroupView
 import spirite.hybrid.Hybrid
-import sgui.swing.components.jcomponent
 import java.awt.GridLayout
 import javax.swing.JFrame
 import javax.swing.SwingUtilities

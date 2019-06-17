@@ -1,15 +1,15 @@
 package spirite.gui.views.animation
 
 import rb.extendo.delegates.OnChangeDelegate
-import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import sgui.generic.components.IComponent
-import sgui.swing.skin.Skin.Global.Bg
-import spirite.hybrid.Hybrid
-import spirite.pc.graphics.ImageBI
 import rb.glow.color.SColor
+import sgui.generic.components.IComponent
 import sgui.swing.components.SwComponent
 import sgui.swing.jcolor
+import sgui.swing.skin.Skin.Global.Bg
+import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.hybrid.Hybrid
+import spirite.pc.graphics.ImageBI
 import java.awt.Graphics
 import javax.swing.JPanel
 import kotlin.math.floor

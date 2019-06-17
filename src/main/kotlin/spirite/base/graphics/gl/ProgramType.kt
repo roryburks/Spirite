@@ -1,5 +1,6 @@
 package spirite.base.graphics.gl
 
+import rb.glow.gl.*
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
 import rb.vectrix.mathUtil.f
@@ -9,15 +10,9 @@ import spirite.base.graphics.JoinMethod
 import spirite.base.graphics.JoinMethod.*
 import spirite.base.graphics.gl.IGLEngine.BlendMethod
 import spirite.base.graphics.gl.IGLEngine.BlendMethod.*
-import spirite.base.graphics.gl.ProgramType.*
-import spirite.base.graphics.gl.SquareGradientCall.Companion
 
 //STROKE_SPORE(MAX),
 //STROKE_BASIC(SRC_OVER),
-internal enum class ProgramType(
-        internal val method: BlendMethod
-) {
-}
 
 interface IGlProgramCall {
     val uniforms: List<GLUniform>?
@@ -51,7 +46,7 @@ class ChangeColorCall(
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform4f("u_fromColor", fromColor),
             GLUniform4f("u_toColor", toColor),
-            GLUniform1i("u_optionMask", when( changeMethod) {
+            GLUniform1i("u_optionMask", when (changeMethod) {
                 CHECK_ALL -> 0
                 IGNORE_ALPHA -> 1
                 AUTO -> 2
@@ -69,9 +64,9 @@ class GridCall(
     : IGlProgramCall
 {
     override val uniforms: List<GLUniform>? = listOf(
-            GLUniform3f( "u_Color1", color1),
-            GLUniform3f( "u_Color2", color2),
-            GLUniform1i( "u_Size", size)
+            GLUniform3f("u_Color1", color1),
+            GLUniform3f("u_Color2", color2),
+            GLUniform1i("u_Size", size)
     )
 
     override val programKey: String get() = SquareGradientCall.Key
@@ -119,8 +114,8 @@ class RenderCall(
 
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform1f("u_alpha", alpha),
-            GLUniform1iv("u_values", IntArray(MAX_CALLS, {calls.getOrNull(it)?.second ?: 0})),
-            GLUniform1iv( "u_composites", IntArray(MAX_CALLS, {calls.getOrNull(it)?.first?.progId ?: 0}))
+            GLUniform1iv("u_values", IntArray(MAX_CALLS, { calls.getOrNull(it)?.second ?: 0 })),
+            GLUniform1iv("u_composites", IntArray(MAX_CALLS, { calls.getOrNull(it)?.first?.progId ?: 0 }))
     )
 
     override val programKey: String get() = SquareGradientCall.Key
@@ -159,7 +154,7 @@ class StrokeV2ApplyCall(
         HARD_EDGED(1),
     }
     override val uniforms: List<GLUniform>? = listOf(
-            GLUniform3f( "u_color", color),
+            GLUniform3f("u_color", color),
             GLUniform1f("u_alpha", alpha),
             GLUniform1i("u_intensifyMode", intensifyMethod.code))
 
@@ -173,7 +168,7 @@ class StrokeApplyCall(
     :IGlProgramCall
 {
     override val uniforms: List<GLUniform>? = listOf(
-            GLUniform3f( "u_color", color),
+            GLUniform3f("u_color", color),
             GLUniform1f("u_alpha", alpha))
 
     override val programKey: String get() = SquareGradientCall.Key
@@ -187,7 +182,7 @@ class PolyRenderCall(
     :IGlProgramCall
 {
     override val uniforms: List<GLUniform>? = listOf(
-            GLUniform3f( "u_color", color),
+            GLUniform3f("u_color", color),
             GLUniform1f("u_alpha", alpha))
 
     override val programKey: String get() = SquareGradientCall.Key
@@ -202,13 +197,13 @@ class LineRenderCall(
     : IGlProgramCall
 {
     override val uniforms: List<GLUniform>? = listOf(
-            GLUniform1i("u_join", when( joinMethod) {
+            GLUniform1i("u_join", when (joinMethod) {
                 BEVEL -> 1 // 2
                 MITER -> 1
                 ROUNDED -> 1 // 0
             }),
-            GLUniform1f("u_width", lineWidth/2f),
-            GLUniform3f( "u_color", color),
+            GLUniform1f("u_width", lineWidth / 2f),
+            GLUniform3f("u_color", color),
             GLUniform1f("u_alpha", alpha))
 
     override val programKey: String get() = SquareGradientCall.Key
@@ -220,7 +215,7 @@ class StrokePixelCall( color: Vec3f)
     :IGlProgramCall
 {
     override val uniforms: List<GLUniform>? = listOf(
-            GLUniform3f( "u_color", color))
+            GLUniform3f("u_color", color))
 
     override val programKey: String get() = SquareGradientCall.Key
     companion object { const val Key = "STROKE_PIXEL"}
@@ -230,11 +225,11 @@ class FillAfterpassCall(color: Vec4f, width: Int, height: Int)
     :IGlProgramCall
 {
     override val uniforms: List<GLUniform>? = listOf(
-            GLUniform4f( "u_color", color),
+            GLUniform4f("u_color", color),
             GLUniform1i("u_width", width),
             GLUniform1i("u_height", height),
-            GLUniform1f("u_wratio", width / (((width-1)/8+1)*8).f),
-            GLUniform1f("u_hratio", height / (((height-1)/4+1)*4).f))
+            GLUniform1f("u_wratio", width / (((width - 1) / 8 + 1) * 8).f),
+            GLUniform1f("u_hratio", height / (((height - 1) / 4 + 1) * 4).f))
 
     override val programKey: String get() = SquareGradientCall.Key
     companion object { const val Key = "FILL_AFTERPASS"}

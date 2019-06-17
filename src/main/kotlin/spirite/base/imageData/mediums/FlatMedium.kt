@@ -1,17 +1,17 @@
 package spirite.base.imageData.mediums
 
 import rb.extendo.dataStructures.SinglyList
+import rb.glow.RawImage
+import rb.glow.color.Colors
+import rb.glow.color.SColor
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.graphics.GraphicsContext
-import rb.glow.RawImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.MediumType.FLAT
-import rb.glow.color.Colors
-import rb.glow.color.SColor
 
 /***
  * A FlatMedium is a thin wrapper for a RawImage, exposing its functionality to the program.

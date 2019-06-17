@@ -1,18 +1,18 @@
 package spirite.gui.views.layerProperties
 
+import rb.IContract
+import rb.glow.color.Colors
+import rb.owl.bindable.Bindable
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
-import rb.IContract
-import rb.owl.bindable.Bindable
-import spirite.base.brains.IMasterControl
-import spirite.base.imageData.layers.sprite.SpriteLayer
-import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import rb.glow.color.Colors
 import sgui.generic.components.IBoxList.IBoxComponent
 import sgui.generic.components.IBoxList.IMovementContract
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.generic.components.crossContainer.ICrossPanel
+import spirite.base.brains.IMasterControl
+import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 

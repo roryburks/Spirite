@@ -1,10 +1,10 @@
 package sgui.swing.components
 
+import rb.glow.color.SColor
 import rb.owl.bindable.addObserver
 import sgui.generic.components.ColorSquareNonUI
 import sgui.generic.components.IColorSquare
 import sgui.generic.components.IColorSquareNonUI
-import rb.glow.color.SColor
 import sgui.swing.jcolor
 import sgui.swing.scolor
 import java.awt.Graphics

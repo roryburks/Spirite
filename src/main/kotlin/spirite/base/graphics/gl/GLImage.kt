@@ -1,15 +1,16 @@
 package spirite.base.graphics.gl
 
-import spirite.base.graphics.GLDrawer
-import spirite.base.graphics.IDrawer
 import rb.glow.RawImage
 import rb.glow.RawImage.InvalidImageDimensionsExeption
-import rb.glow.gl.GLC
-import spirite.base.util.linear.Rect
 import rb.glow.color.toColor
 import rb.glow.color.toColorPremultiplied
+import rb.glow.gl.GLC
 import rb.glow.gl.GLResourcException
 import rb.glow.gl.IGLTexture
+import rb.glow.gle.GLParameters
+import spirite.base.graphics.GLDrawer
+import spirite.base.graphics.IDrawer
+import spirite.base.util.linear.Rect
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.INITIALIZATION
 import spirite.pc.JOGL.JOGL

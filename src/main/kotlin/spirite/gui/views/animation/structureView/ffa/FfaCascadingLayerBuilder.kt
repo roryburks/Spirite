@@ -1,13 +1,16 @@
 package spirite.gui.views.animation.structureView.ffa
 
-import spirite.base.brains.IMasterControl
-import spirite.base.imageData.animation.ffa.*
-import spirite.base.imageData.animation.ffa.FfaLayerCascading.CascadingFrame
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.generic.components.events.MouseEvent.MouseEventType.RELEASED
+import spirite.base.brains.IMasterControl
+import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
+import spirite.base.imageData.animation.ffa.FfaLayerCascading
+import spirite.base.imageData.animation.ffa.FfaLayerCascading.CascadingFrame
+import spirite.base.imageData.animation.ffa.IFfaFrame
+import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 import java.io.InvalidClassException

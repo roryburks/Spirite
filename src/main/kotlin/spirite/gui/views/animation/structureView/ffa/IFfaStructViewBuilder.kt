@@ -1,10 +1,10 @@
 package spirite.gui.views.animation.structureView.ffa
 
 import rb.IContract
-import spirite.base.imageData.animation.ffa.IFfaFrame
-import spirite.base.imageData.animation.ffa.IFfaLayer
 import sgui.generic.components.IComponent
 import sgui.generic.components.events.MouseEvent
+import spirite.base.imageData.animation.ffa.IFfaFrame
+import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
 import java.awt.Graphics2D
 

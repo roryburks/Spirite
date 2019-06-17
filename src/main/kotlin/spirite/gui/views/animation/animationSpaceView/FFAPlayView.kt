@@ -1,16 +1,16 @@
 package spirite.gui.views.animation.animationSpaceView
 
+import rb.glow.color.Colors
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
-import spirite.base.brains.IMasterControl
-import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
-import rb.glow.color.Colors
 import sgui.generic.Orientation.VERTICAL
-import sgui.swing.components.ResizeContainerPanel
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.generic.components.crossContainer.ICrossPanel
+import sgui.swing.components.ResizeContainerPanel
 import sgui.swing.skin.Skin
+import spirite.base.brains.IMasterControl
+import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.views.animation.AnimationPlayView
 import spirite.hybrid.Hybrid

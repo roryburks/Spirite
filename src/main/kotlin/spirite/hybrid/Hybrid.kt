@@ -1,15 +1,17 @@
 package spirite.hybrid
 
 import rb.glow.gl.IGL
-import spirite.base.graphics.gl.IGLEngine
 import sgui.generic.components.IComponentProvider
 import sgui.generic.systems.IMouseSystem
+import sgui.swing.SwingComponentProvider
 import sgui.swing.mouseSystem.SwMouseSystem
+import spirite.base.graphics.gl.IGLEngine
 import spirite.hybrid.Transferables.IClipboard
 import spirite.hybrid.Transferables.SwClipboard
-import spirite.hybrid.inputSystems.*
-import spirite.pc.JOGL.JOGLProvider
-import sgui.swing.SwingComponentProvider
+import spirite.hybrid.inputSystems.IKeypressSystem
+import spirite.hybrid.inputSystems.KeypressSystem
+import spirite.hybrid.inputSystems.MKeypressSystem
+import rbJvm.glow.jogl.JOGLProvider
 
 /** Hybrid is a collection of components and interfaces that are platform-specific (things like Timers, GUI libraries,
  * OpenGL implementations, etc).  It wraps them such that they can code can be as portable as possible.

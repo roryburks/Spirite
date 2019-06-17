@@ -2,9 +2,9 @@ package sgui.generic.components
 
 import rb.glow.IImage
 import rb.glow.color.Colors
+import rb.glow.color.SColor
 import sgui.generic.Orientation
 import sgui.generic.components.crossContainer.CrossInitializer
-import rb.glow.color.SColor
 import sgui.generic.components.crossContainer.ICrossPanel
 
 interface IComponentProvider {

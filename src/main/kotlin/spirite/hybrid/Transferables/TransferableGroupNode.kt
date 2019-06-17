@@ -1,6 +1,6 @@
 package spirite.hybrid.Transferables
 
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.MovableGroupTree
 import spirite.base.imageData.groupTree.duplicateInto
 import java.awt.datatransfer.DataFlavor

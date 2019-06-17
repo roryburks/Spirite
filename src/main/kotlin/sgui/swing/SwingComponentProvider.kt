@@ -1,15 +1,13 @@
 package sgui.swing
 
-import sgui.generic.components.*
-import sgui.swing.components.SwGradientSlider
-import sgui.swing.components.*
 import rb.glow.IImage
-import sgui.generic.Orientation
-import sgui.generic.components.ITreeView
-import sgui.swing.advancedComponents.SwTreeView
-import sgui.generic.components.crossContainer.CrossInitializer
 import rb.glow.color.SColor
+import sgui.generic.Orientation
+import sgui.generic.components.*
+import sgui.generic.components.crossContainer.CrossInitializer
 import sgui.generic.components.crossContainer.ICrossPanel
+import sgui.swing.advancedComponents.SwTreeView
+import sgui.swing.components.*
 
 object SwingComponentProvider : IComponentProvider {
 

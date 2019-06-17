@@ -1,5 +1,8 @@
 package spirite.base.graphics.gl.stroke
 
+import rb.glow.gl.GLC
+import rb.glow.gle.GLParameters
+import rb.glow.gle.GLPrimitive
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.floor
@@ -8,8 +11,6 @@ import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
-import rb.glow.gl.GLC
-import rb.glow.gle.GLPrimitive
 
 class GLStrikeDrawerPixel(gle: IGLEngine)
     : GLStrokeDrawer(gle)

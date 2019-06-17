@@ -1,28 +1,20 @@
 package spirite.base.graphics.gl
 
-import rb.glow.gl.IGL
-import rb.glow.gl.IGLFramebuffer
-import rb.glow.gl.IGLProgram
-import rb.glow.gl.IGLTexture
-import spirite.base.graphics.CapMethod
-import spirite.base.graphics.JoinMethod
-import spirite.base.graphics.gl.ProgramType.STROKE_V2_LINE_PASS
-import spirite.base.graphics.gl.ProgramType.STROKE_V3_LINE_PASS
-import spirite.base.graphics.gl.shader.GL330ShaderLoader
-import spirite.base.resources.IScriptService
-import rb.glow.gl.GLC
-import rb.glow.gle.GLPrimitive
-import rb.glow.gle.IGLPrimitive
-import rb.glow.gle.IPreparedPrimitive
-import rb.glow.gle.PolyType
+import rb.glow.gl.*
+import rb.glow.gle.*
 import rb.glow.glu.IPolygonTesselator
 import rb.glow.glu.MatrixBuilder.F.orthagonalProjectionMatrix
 import rb.glow.glu.MatrixBuilder.F.wrapTransform
-import rb.vectrix.linear.*
+import rb.vectrix.linear.ITransform
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Vec3f
+import spirite.base.graphics.CapMethod
+import spirite.base.graphics.JoinMethod
 import spirite.base.graphics.gl.shader.IGLShaderLoader
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
-import spirite.pc.JOGL.JOGLProvider
+import rbJvm.glow.jogl.JOGLProvider
 import javax.swing.SwingUtilities
 
 interface IGLEngine
@@ -82,7 +74,6 @@ interface IGLEngine
 
 class GLEngine(
         private val glGetter: () -> IGL,
-        scriptService: IScriptService,
         shaderLoader: IGLShaderLoader
 ) : IGLEngine
 {

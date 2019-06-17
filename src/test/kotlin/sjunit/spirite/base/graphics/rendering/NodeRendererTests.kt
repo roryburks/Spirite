@@ -1,8 +1,9 @@
 package sjunit.spirite.base.graphics.rendering
 
+import rb.glow.RawImage
+import rb.glow.color.Colors
 import sjunit.TestConfig
 import sjunit.TestHelper
-import rb.glow.RawImage
 import spirite.base.graphics.RenderMethod
 import spirite.base.graphics.RenderMethodType.MULTIPLY
 import spirite.base.graphics.rendering.NodeRenderer
@@ -10,7 +11,6 @@ import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
-import rb.glow.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
 import spirite.pc.graphics.ImageBI

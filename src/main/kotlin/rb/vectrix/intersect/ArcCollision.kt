@@ -1,8 +1,8 @@
 package rb.vectrix.intersect
 
-import rb.vectrix.shapes.*
 import rb.vectrix.linear.Vec2
 import rb.vectrix.mathUtil.MathUtil
+import rb.vectrix.shapes.*
 import kotlin.math.PI
 import kotlin.math.atan2
 

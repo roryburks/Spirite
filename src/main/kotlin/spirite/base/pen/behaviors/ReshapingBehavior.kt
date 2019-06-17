@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
 import com.hackoeur.jglm.support.FastMath.max
-import rbJvm.owl.bindWeaklyTo
+import rb.glow.color.Colors
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer
@@ -10,17 +10,17 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
+import rbJvm.owl.bindWeaklyTo
+import sgui.generic.components.events.MouseEvent.MouseButton
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.pen.Penner
 import spirite.base.pen.behaviors.TransformBehavior.TransformStates.*
-import rb.glow.color.Colors
 import spirite.base.util.linear.Rect
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.base.util.shapes.Rectangle
-import sgui.generic.components.events.MouseEvent.MouseButton
 import spirite.gui.views.work.WorkSectionView
 import kotlin.math.atan2
 

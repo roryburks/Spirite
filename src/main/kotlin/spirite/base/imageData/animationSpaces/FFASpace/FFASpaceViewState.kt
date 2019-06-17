@@ -1,10 +1,10 @@
 package spirite.base.imageData.animationSpaces.FFASpace
 
-import rbJvm.owl.addWeakObserver
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.vectrix.linear.Vec2i
+import rbJvm.owl.addWeakObserver
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation

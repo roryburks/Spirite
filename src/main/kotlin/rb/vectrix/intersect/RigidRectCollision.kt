@@ -1,7 +1,8 @@
 package rb.vectrix.intersect
 
 
-import rb.vectrix.shapes.*
+import rb.vectrix.shapes.Rect
+
 infix fun Rect.intersectsPrecise(obj: CollisionObject) : Boolean = when(obj) {
     is CollisionPoint -> contains(obj.x, obj.y)
     is CollisionLineSegment -> lineSegments.any { it intersection obj.lineSegment != null }

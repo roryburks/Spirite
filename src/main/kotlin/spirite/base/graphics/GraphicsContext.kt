@@ -1,10 +1,10 @@
 package spirite.base.graphics
 
 import rb.glow.IImage
+import rb.glow.color.Color
 import rb.vectrix.linear.ITransformF
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
-import rb.glow.color.Color
 import spirite.base.util.shapes.IShape
 import java.util.*
 

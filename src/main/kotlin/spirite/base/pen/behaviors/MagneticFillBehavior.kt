@@ -1,12 +1,12 @@
 package spirite.base.pen.behaviors
 
+import rb.glow.color.ColorARGB32Normal
+import rb.glow.color.SColor
 import rb.vectrix.mathUtil.f
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.drawer.IImageDrawer.IMagneticFillModule
 import spirite.base.pen.Penner
-import rb.glow.color.ColorARGB32Normal
 import spirite.gui.views.work.WorkSectionView
-import rb.glow.color.SColor
 import kotlin.math.min
 
 class MagneticFillBehavior(penner: Penner, val drawer: IMagneticFillModule, val color: SColor)

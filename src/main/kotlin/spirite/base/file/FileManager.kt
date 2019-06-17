@@ -1,14 +1,14 @@
 package spirite.base.file
 
+import rb.glow.IImage
+import rb.glow.color.Colors
+import rb.glow.using
 import spirite.base.brains.IMasterControl
 import spirite.base.file.load.BadSifFileException
 import spirite.base.file.load.LoadEngine
-import rb.glow.IImage
-import rb.glow.using
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
-import rb.glow.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE

@@ -8,10 +8,10 @@ import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
 import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
-import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked
+import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FfaLayerCascading
+import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked
 import spirite.base.imageData.animation.ffa.FfaLayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace

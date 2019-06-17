@@ -1,5 +1,6 @@
 package spirite.base.brains
 
+import rb.glow.IImage
 import spirite.base.brains.commands.CentralCommandExecutor
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.base.brains.palette.IPaletteManager
@@ -13,7 +14,6 @@ import spirite.base.file.FileManager
 import spirite.base.file.IFileManager
 import spirite.base.graphics.DetailedResourceUseTracker
 import spirite.base.graphics.IDetailedResourceUseTracker
-import rb.glow.IImage
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
 import spirite.base.graphics.rendering.*
 import spirite.base.imageData.ImageWorkspace

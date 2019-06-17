@@ -7,18 +7,18 @@ import rb.vectrix.mathUtil.MathUtil
 import sgui.generic.Orientation
 import sgui.generic.Orientation.HORIZONTAL
 import sgui.generic.Orientation.VERTICAL
-import sgui.generic.components.IResizeContainerPanel.IResizeBar
 import sgui.generic.components.IComponent
-import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.generic.components.IResizeContainerPanel
+import sgui.generic.components.IResizeContainerPanel.IResizeBar
+import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseEventType.DRAGGED
 import sgui.generic.components.events.MouseEvent.MouseEventType.PRESSED
+import sgui.generic.systems.IGlobalMouseHook
 import sgui.swing.SwingComponentProvider
 import sgui.swing.mouseSystem.SwMouseSystem
 import sgui.swing.skin.Skin.ResizePanel.BarLineColor
 import spirite.gui.resources.SpiriteIcons
-import sgui.generic.systems.IGlobalMouseHook
 import kotlin.reflect.KProperty
 
 open class ResizeContainerPanel

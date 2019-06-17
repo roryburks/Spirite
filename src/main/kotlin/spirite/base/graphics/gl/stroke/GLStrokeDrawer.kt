@@ -1,12 +1,13 @@
 package spirite.base.graphics.gl.stroke
 
+import rb.glow.gle.GLParameters
+import rb.glow.using
 import spirite.base.brains.toolset.PenDrawMode.BEHIND
 import spirite.base.brains.toolset.PenDrawMode.KEEP_ALPHA
 import spirite.base.graphics.Composite.*
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
-import rb.glow.using
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawer
 import spirite.base.pen.stroke.StrokeBuilder

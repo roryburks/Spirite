@@ -1,5 +1,6 @@
 package spirite.base.pen.behaviors
 
+import rb.glow.color.Colors
 import spirite.base.brains.toolset.BoxSelectionShape
 import spirite.base.brains.toolset.BoxSelectionShape.OVAL
 import spirite.base.brains.toolset.BoxSelectionShape.RECTANGLE
@@ -9,7 +10,6 @@ import spirite.base.pen.Penner
 import spirite.base.pen.selectionBuilders.OvalSelectionBuilder
 import spirite.base.pen.selectionBuilders.RectSelectionBuilder
 import spirite.base.pen.selectionBuilders.SelectionBuilder
-import rb.glow.color.Colors
 import spirite.gui.views.work.WorkSectionView
 
 

@@ -1,17 +1,17 @@
 package sgui.swing.components
 
+import rb.glow.color.SColor
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import rb.glow.color.SColor
 import sgui.generic.components.*
+import sgui.swing.jcolor
+import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin.BevelBorder.Dark
 import sgui.swing.skin.Skin.BevelBorder.Light
 import sgui.swing.skin.Skin.TextField.Background
 import sgui.swing.skin.Skin.TextField.InvalidBg
 import spirite.hybrid.Hybrid
 import spirite.hybrid.SwHybrid
-import sgui.swing.mouseSystem.adaptMouseSystem
-import sgui.swing.jcolor
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.BorderFactory

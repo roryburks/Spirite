@@ -1,8 +1,15 @@
 package spirite.gui.views.animation
 
-import rbJvm.owl.addWeakObserver
 import rb.owl.bindable.addObserver
 import rb.owl.observer
+import rbJvm.owl.addWeakObserver
+import sgui.generic.components.IComponent
+import sgui.generic.components.ITreeViewNonUI.ITreeComponent
+import sgui.generic.components.ITreeViewNonUI.ITreeNodeAttributes
+import sgui.generic.components.events.MouseEvent
+import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
+import sgui.swing.SwIcon
+import sgui.swing.components.jcomponent
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DeleteAnimationCommand
 import spirite.base.brains.commands.DuplicateAnimationCommand
@@ -11,18 +18,11 @@ import spirite.base.brains.commands.RenameAnimationCommand
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import sgui.generic.components.ITreeViewNonUI.ITreeComponent
-import sgui.generic.components.ITreeViewNonUI.ITreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import sgui.generic.components.IComponent
-import sgui.generic.components.events.MouseEvent
-import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.menus.ContextMenus.MenuItem
-import sgui.swing.SwIcon
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
 import spirite.hybrid.Hybrid
-import sgui.swing.components.jcomponent
 import java.awt.Point
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DragGestureEvent

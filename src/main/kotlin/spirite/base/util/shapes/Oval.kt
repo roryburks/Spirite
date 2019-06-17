@@ -1,11 +1,11 @@
 package spirite.base.util.shapes
 
 import com.hackoeur.jglm.support.FastMath
-import rbJvm.vectrix.compaction.FloatCompactor
+import rb.glow.gl.GLC
+import rb.glow.gle.GLPrimitive
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
-import rb.glow.gle.GLPrimitive
-import rb.glow.gl.GLC
+import rbJvm.vectrix.compaction.FloatCompactor
 import kotlin.math.PI
 
 

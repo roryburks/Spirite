@@ -1,22 +1,21 @@
 package spirite.base.file.load
 
 import rb.clicker.telemetry.TelemetryEvent
+import rb.glow.color.Color
+import rb.glow.color.ColorARGB32Normal
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.i
 import spirite.base.brains.IMasterControl
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readNullTerminatedStringUTF8
 import spirite.base.imageData.MImageWorkspace
+import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
-import spirite.base.imageData.mediums.IMedium
-import rb.glow.color.Color
-import rb.glow.color.ColorARGB32Normal
-import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
+import spirite.base.imageData.mediums.IMedium
 import java.io.File
 import java.io.RandomAccessFile
 import java.nio.charset.Charset

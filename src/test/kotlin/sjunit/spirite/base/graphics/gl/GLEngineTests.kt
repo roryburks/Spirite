@@ -1,6 +1,9 @@
 package sjunit.spirite.base.graphics.gl
 
 
+import rb.glow.color.Colors
+import rb.glow.gle.GLParameters
+import rb.glow.gle.PolyType.STRIP
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
 import sjunit.TestConfig
@@ -8,11 +11,9 @@ import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.graphics.gl.*
-import rb.glow.gle.PolyType.STRIP
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.graphics.gl.SquareGradientCall.GradientType
 import spirite.base.pen.stroke.DrawPoints
-import rb.glow.color.Colors
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File
@@ -102,7 +103,7 @@ class GLEngineTests {
         image.graphics.clear()
         gle.setTarget(image)
 
-        val params = GLParameters(500,500, texture1 = star)
+        val params = GLParameters(500, 500, texture1 = star)
 
         // Call this one first to make sure the entire Uniform Arrays associated are properly reset
         gle.applyPassProgram( RenderCall(0.5f,

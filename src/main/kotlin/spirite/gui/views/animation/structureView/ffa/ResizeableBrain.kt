@@ -2,12 +2,12 @@ package spirite.gui.views.animation.structureView.ffa
 
 import rb.IContract
 import rb.vectrix.shapes.RectI
-import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import sgui.generic.components.IComponent.BasicCursor.DEFAULT
 import sgui.generic.components.IComponent.BasicCursor.E_RESIZE
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseButton.LEFT
 import sgui.generic.components.events.MouseEvent.MouseEventType.*
+import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
 import java.awt.BasicStroke
 import java.awt.Color

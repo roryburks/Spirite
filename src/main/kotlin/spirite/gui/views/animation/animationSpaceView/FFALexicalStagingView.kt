@@ -1,9 +1,9 @@
 package spirite.gui.views.animation.animationSpaceView
 
-import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
-import spirite.base.imageData.animationSpaces.FFASpace.FFALexicalPlayback
 import sgui.generic.components.IComponent
 import sgui.generic.components.crossContainer.ICrossPanel
+import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
+import spirite.base.imageData.animationSpaces.FFASpace.FFALexicalPlayback
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.Hybrid
 

@@ -1,23 +1,21 @@
 package spirite.base.graphics.gl
 
 import rb.glow.IImage
+import rb.glow.color.Color
+import rb.glow.color.Colors
+import rb.glow.gl.GLC
+import rb.glow.gle.GLParameters
+import rb.glow.gle.PolyType
 import rb.glow.using
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.MutableTransformF
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import spirite.base.graphics.*
 import spirite.base.graphics.Composite.SRC_OVER
 import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
-import rb.glow.color.Color
-import rb.glow.color.Colors
-import rb.glow.gl.GLC
-import rb.glow.gle.GLPrimitive
-import rb.glow.gle.PolyType
-import rb.vectrix.linear.Vec3f
-import rb.vectrix.mathUtil.d
-import spirite.base.util.glu.PolygonTesselater
 import spirite.base.util.linear.Rect
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
@@ -115,7 +113,7 @@ class GLGraphicsContext : GraphicsContext {
             setCompositeBlend(cachedParams, value)
             field = value
         }
-    private fun setCompositeBlend( params: GLParameters, composite: Composite) {
+    private fun setCompositeBlend(params: GLParameters, composite: Composite) {
         when (composite) {
             Composite.SRC -> params.setBlendMode(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD)
             Composite.SRC_OVER -> params.setBlendMode(GLC.ONE, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
@@ -211,7 +209,7 @@ class GLGraphicsContext : GraphicsContext {
 
     override fun fillPolygon(x: List<Float>, y: List<Float>, length: Int) {
         reset()
-        val poly = PolygonTesselater.tesselatePolygon(x.asSequence().map { it.d }, y.asSequence().map { it.d }, x.size)
+        val poly = gle.tesselator.tesselatePolygon(x.asSequence().map { it.d }, y.asSequence().map { it.d }, x.size)
         gle.applyPrimitiveProgram( PolyRenderCall(color.rgbComponent, alpha), poly, cachedParams, _trans)
     }
     // endregion
@@ -289,7 +287,7 @@ class GLGraphicsContext : GraphicsContext {
     }
 
     fun applyPassProgram(programCall: IGlProgramCall, params: GLParameters, trans: ITransformF?,
-                                 x1: Float = 0f, y1: Float = 0f, x2: Float = width.f, y2: Float = height.f)
+                         x1: Float = 0f, y1: Float = 0f, x2: Float = width.f, y2: Float = height.f)
     {
         reset()
         gle.applyPassProgram( programCall, params, trans,  x1, y1, x2, y2)

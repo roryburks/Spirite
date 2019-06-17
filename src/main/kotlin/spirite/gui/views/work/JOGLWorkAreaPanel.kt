@@ -10,13 +10,13 @@ import jpen.PButton.Type.*
 import jpen.event.PenListener
 import jpen.owner.multiAwt.AwtPenToolkit
 import rb.vectrix.mathUtil.round
-import spirite.base.graphics.gl.GLGraphicsContext
-import spirite.base.pen.Penner
 import sgui.generic.components.events.MouseEvent.MouseButton
-import spirite.hybrid.Hybrid
-import spirite.pc.JOGL.JOGLProvider
 import sgui.swing.components.ISwComponent
 import sgui.swing.components.SwComponent
+import spirite.base.graphics.gl.GLGraphicsContext
+import spirite.base.pen.Penner
+import spirite.hybrid.Hybrid
+import rbJvm.glow.jogl.JOGLProvider
 import java.awt.event.MouseAdapter
 import javax.swing.SwingUtilities
 

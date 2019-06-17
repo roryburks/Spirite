@@ -1,8 +1,8 @@
 package rb.glow.gle
 
 import rb.glow.exceptions.GLEException
-import rb.glow.gl.IGL
 import rb.glow.gl.GLC
+import rb.glow.gl.IGL
 import kotlin.math.min
 
 enum class PolyType( val glConst: Int) {

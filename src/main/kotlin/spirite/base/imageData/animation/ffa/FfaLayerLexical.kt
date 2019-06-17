@@ -1,7 +1,6 @@
 package spirite.base.imageData.animation.ffa
 
 import rb.extendo.delegates.OnChangeDelegate
-import spirite.base.file.load.FfaLexicalLayerLoader
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.FRAME
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.GAP
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract

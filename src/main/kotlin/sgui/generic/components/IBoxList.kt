@@ -4,8 +4,9 @@ import rb.extendo.delegates.OnChangeDelegate
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
+import sgui.generic.components.IBoxList.IBoxComponent
+import sgui.generic.components.IBoxList.IMovementContract
 import sgui.generic.components.crossContainer.CrossInitializer
-import sgui.generic.components.IBoxList.*
 import kotlin.math.max
 
 interface IBoxList<T> : IComponent

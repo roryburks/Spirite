@@ -1,7 +1,7 @@
 package spirite.base.imageData.groupTree
 
-import spirite.base.graphics.DynamicImage
 import rb.glow.IImage
+import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.SimpleLayer

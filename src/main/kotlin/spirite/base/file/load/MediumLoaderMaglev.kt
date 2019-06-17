@@ -1,9 +1,11 @@
 package spirite.base.file.load
 
-import rbJvm.vectrix.interpolation.CubicSplineInterpolator2D
+import rb.glow.color.ColorARGB32Normal
+import rb.glow.color.toColor
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.round
+import rbJvm.vectrix.interpolation.CubicSplineInterpolator2D
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.file.SaveLoadUtil
@@ -22,8 +24,6 @@ import spirite.base.pen.stroke.DrawPointsBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC
-import rb.glow.color.ColorARGB32Normal
-import rb.glow.color.toColor
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FILE

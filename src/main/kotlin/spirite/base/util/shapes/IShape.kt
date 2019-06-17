@@ -1,8 +1,8 @@
 package spirite.base.util.shapes
 
-import rbJvm.vectrix.compaction.FloatCompactor
-import rb.vectrix.mathUtil.f
 import rb.glow.gle.GLPrimitive
+import rb.vectrix.mathUtil.f
+import rbJvm.vectrix.compaction.FloatCompactor
 
 // TODO: Merge with Vectrix Shapes
 interface IShape {

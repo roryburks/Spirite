@@ -1,4 +1,4 @@
-package spirite.pc.JOGL
+package rbJvm.glow.jogl
 
 import com.jogamp.opengl.*
 import rb.glow.gl.IGL
@@ -17,7 +17,7 @@ object JOGLProvider {
     //  just a single variable and a ton of methods.
     val gl : IGL
         get() {
-        val gl2 = gl2 ?: this._gl.gL2
+        val gl2 = gl2 ?: _gl.gL2
 
         return JOGL(gl2)
     }
@@ -66,8 +66,8 @@ object JOGLProvider {
         if( exception!= null)
             throw Exception(exception)
 
-        this._gl = gl ?: throw NullPointerException("No GL Loaded")
+        _gl = gl ?: throw NullPointerException("No GL Loaded")
 
-        this._gl.gl.context.makeCurrent()
+        _gl.gl.context.makeCurrent()
     }
 }

@@ -1,6 +1,9 @@
 package rb.vectrix.intersect
 
-import rb.vectrix.shapes.*
+import rb.vectrix.shapes.LineSegment
+import rb.vectrix.shapes.Parabola
+import rb.vectrix.shapes.RayRect
+import rb.vectrix.shapes.Rect
 import kotlin.math.sqrt
 
 

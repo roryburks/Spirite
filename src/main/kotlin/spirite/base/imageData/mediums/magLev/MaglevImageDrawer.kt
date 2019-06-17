@@ -1,5 +1,7 @@
 package spirite.base.imageData.mediums.magLev
 
+import rb.glow.color.Color
+import rb.glow.color.SColor
 import rb.hydra.anyTiamatGrindSync
 import rb.hydra.miniTiamatGrindSync
 import rb.vectrix.linear.ITransformF
@@ -24,10 +26,8 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
-import rb.glow.color.Color
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import rb.glow.color.SColor
 import kotlin.math.abs
 
 class MaglevImageDrawer(

@@ -1,12 +1,12 @@
 package spirite.base.imageData.selection
 
 import rb.extendo.delegates.DerivedLazy
+import rb.glow.IImage
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f
-import rb.glow.IImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.IAnchorLiftModule

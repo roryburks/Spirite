@@ -1,12 +1,12 @@
 package spirite.base.imageData.mediums.magLev
 
+import rb.glow.color.SColor
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.MagneticFillMode.BEHIND
 import spirite.base.brains.toolset.MagneticFillMode.NORMAL
 import spirite.base.graphics.Composite.DST_OVER
 import spirite.base.graphics.Composite.SRC_OVER
 import spirite.base.imageData.mediums.BuiltMediumData
-import rb.glow.color.SColor
 import kotlin.math.abs
 
 data class MaglevFill(

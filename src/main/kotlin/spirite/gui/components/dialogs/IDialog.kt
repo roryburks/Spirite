@@ -1,5 +1,10 @@
 package spirite.gui.components.dialogs
 
+import rb.glow.color.SColor
+import sgui.swing.components.jcomponent
+import sgui.swing.jcolor
+import sgui.swing.scolor
+import sgui.swing.skin.Skin.Global
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
@@ -8,12 +13,7 @@ import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.*
 import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
-import sgui.swing.skin.Skin.Global
 import spirite.gui.resources.SpiriteIcons
-import rb.glow.color.SColor
-import sgui.swing.components.jcomponent
-import sgui.swing.jcolor
-import sgui.swing.scolor
 import java.io.File
 import javax.swing.JColorChooser
 import javax.swing.JFileChooser

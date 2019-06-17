@@ -1,11 +1,11 @@
 package spirite.base.brains.palette
 
-import rbJvm.owl.addWeakObserver
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
+import rbJvm.owl.addWeakObserver
 import spirite.base.brains.ICentralObservatory
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.palette.IPaletteManager.*

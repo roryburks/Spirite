@@ -1,11 +1,12 @@
 package sgui.generic.components
 
-import rb.owl.bindable.Bindable
-import rb.owl.bindable.IBindable
 import rb.glow.IImage
 import rb.glow.NillImage
 import rb.glow.color.SColor
-import sgui.generic.components.ITreeViewNonUI.*
+import rb.owl.bindable.Bindable
+import rb.owl.bindable.IBindable
+import sgui.generic.components.ITreeViewNonUI.ITreeNode
+import sgui.generic.components.ITreeViewNonUI.ITreeNodeAttributes
 import sgui.generic.transfer.ITransferObject
 import sgui.generic.transfer.StringTransferObject
 

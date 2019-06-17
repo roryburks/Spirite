@@ -1,11 +1,11 @@
 package spirite.gui.views.animation.structureView
 
 import rbJvm.owl.addWeakObserver
+import sgui.generic.components.IComponent
+import sgui.swing.SwIcon
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import sgui.generic.components.IComponent
-import sgui.swing.SwIcon
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 

@@ -1,10 +1,10 @@
 package spirite.base.imageData.mediums.magLev
 
+import rb.glow.color.SColor
 import rb.vectrix.linear.Vec3f
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
-import rb.glow.color.SColor
 
 class MaglevStroke(
         var params: StrokeParams,

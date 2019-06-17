@@ -5,13 +5,13 @@ import com.jogamp.opengl.GLCapabilities
 import com.jogamp.opengl.GLEventListener
 import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLCanvas
-import spirite.base.graphics.gl.GLGraphicsContext
-import spirite.base.pen.Penner
 import sgui.generic.components.events.MouseEvent
-import spirite.hybrid.Hybrid
-import spirite.pc.JOGL.JOGLProvider
 import sgui.swing.components.ISwComponent
 import sgui.swing.components.SwComponent
+import spirite.base.graphics.gl.GLGraphicsContext
+import spirite.base.pen.Penner
+import spirite.hybrid.Hybrid
+import rbJvm.glow.jogl.JOGLProvider
 
 class JOGLWorkArea
 private constructor(
