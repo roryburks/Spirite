@@ -1,6 +1,6 @@
 package spirite.base.graphics.gl.stroke
 
-import spirite.base.graphics.gl.IGLEngine
+import rb.glow.gle.IGLEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.PIXEL

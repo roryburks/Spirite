@@ -1,7 +1,7 @@
 package spirite.base.graphics.rendering.sources
 
 import rb.vectrix.mathUtil.f
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle

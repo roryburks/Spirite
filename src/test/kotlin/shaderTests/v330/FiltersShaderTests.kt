@@ -4,9 +4,9 @@
 //import io.mockk.mockk
 //import rb.vectrix.mathUtil.f
 //import sjunit.TestConfig
-//import spirite.base.graphics.gl.GLImage
+//import rb.glow.gl.GLImage
 //import rb.glow.gle.GLPrimitive
-//import spirite.base.graphics.gl.IGLEngine
+//import rb.glow.gle.IGLEngine
 //import rb.glow.gle.PreparedPrimitive
 //import rb.glow.gl.GLC
 //import spirite.pc.toBufferedImage

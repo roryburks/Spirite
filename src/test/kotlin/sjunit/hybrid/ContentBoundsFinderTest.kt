@@ -1,7 +1,7 @@
 package sjunit.hybrid
 
 
-import spirite.base.graphics.gl.GLImage
+import rb.glow.gl.GLImage
 import spirite.base.util.linear.Rect
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid

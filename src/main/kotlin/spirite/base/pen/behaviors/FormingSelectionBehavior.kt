@@ -4,7 +4,7 @@ import rb.glow.color.Colors
 import spirite.base.brains.toolset.BoxSelectionShape
 import spirite.base.brains.toolset.BoxSelectionShape.OVAL
 import spirite.base.brains.toolset.BoxSelectionShape.RECTANGLE
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.pen.Penner
 import spirite.base.pen.selectionBuilders.OvalSelectionBuilder

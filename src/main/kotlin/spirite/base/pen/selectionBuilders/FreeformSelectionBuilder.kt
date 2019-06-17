@@ -4,7 +4,7 @@ import rb.glow.color.Colors
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.f
 import rbJvm.vectrix.compaction.IntCompactor
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
 import spirite.hybrid.Hybrid

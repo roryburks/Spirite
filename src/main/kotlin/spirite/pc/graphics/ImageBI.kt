@@ -4,7 +4,7 @@ import rb.glow.RawImage
 import rb.glow.color.Color
 import rb.glow.color.ColorARGB32Normal
 import rb.glow.color.ColorARGB32Premultiplied
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.graphics.IDrawer
 import java.awt.image.BufferedImage
 

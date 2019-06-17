@@ -4,9 +4,9 @@ import rb.glow.IImage
 import rb.glow.exceptions.GLEException
 import rb.glow.gl.GLC
 import rb.glow.gl.IGL
-import spirite.base.graphics.gl.GLImage
-import spirite.base.graphics.gl.IGLEngine
-import spirite.pc.JOGL.JOGL.JOGLTextureSource
+import rb.glow.gl.GLImage
+import rb.glow.gle.IGLEngine
+import rbJvm.glow.jogl.JOGL.JOGLTextureSource
 import spirite.pc.graphics.ImageBI
 import spirite.pc.toBufferedImage
 import spirite.pc.util.RasterHelper

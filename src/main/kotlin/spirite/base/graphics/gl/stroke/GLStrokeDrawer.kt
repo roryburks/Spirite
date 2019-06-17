@@ -1,11 +1,14 @@
 package spirite.base.graphics.gl.stroke
 
+import rb.glow.gl.GLImage
+import rb.glow.gle.GLGraphicsContext
 import rb.glow.gle.GLParameters
+import rb.glow.gle.IGLEngine
 import rb.glow.using
 import spirite.base.brains.toolset.PenDrawMode.BEHIND
 import spirite.base.brains.toolset.PenDrawMode.KEEP_ALPHA
-import spirite.base.graphics.Composite.*
-import spirite.base.graphics.GraphicsContext
+import rb.glow.Composite.*
+import rb.glow.GraphicsContext
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
 import spirite.base.pen.stroke.DrawPoints
@@ -33,7 +36,7 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
     protected abstract fun getIntensifyMethod(params: StrokeParams) : IntensifyMethod
 
     override fun start(builder: StrokeBuilder, width: Int, height: Int): Boolean {
-        val image = GLImage( width, height, gle, false)
+        val image = GLImage(width, height, gle, false)
         val glParams = GLParameters(width, height, premultiplied = false)
 
         gle.setTarget(image)

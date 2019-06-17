@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL
 import com.jogamp.opengl.GL2
 import rb.glow.gl.*
 import rb.glow.gl.GlShaderVersion.GLSL_330
+import rbJvm.glow.JvmImageTracker
 import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
@@ -15,6 +16,7 @@ import java.nio.IntBuffer
 class JOGL(
         val gl : GL2
 ) : IGL {
+    override val tracker: IGLImageTracker get() = JvmImageTracker
 
     override val preferredShaderVersion: GlShaderVersion get() = GLSL_330
     override val supportedShaderVersions: Set<GlShaderVersion> get() = setOf(GLSL_330)

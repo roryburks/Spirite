@@ -12,7 +12,7 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rbJvm.owl.bindWeaklyTo
 import sgui.generic.components.events.MouseEvent.MouseButton
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.pen.Penner

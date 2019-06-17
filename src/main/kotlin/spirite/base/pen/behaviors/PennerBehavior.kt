@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
 import sgui.generic.components.events.MouseEvent.MouseButton
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.pen.Penner
 import spirite.gui.views.work.WorkSectionView
 

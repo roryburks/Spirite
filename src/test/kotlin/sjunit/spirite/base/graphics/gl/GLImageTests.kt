@@ -4,7 +4,7 @@ package sjunit.spirite.base.graphics.gl
 import rb.glow.color.ColorARGB32Normal
 import rb.glow.color.Colors
 import sjunit.TestConfig
-import spirite.base.graphics.gl.GLImage
+import rb.glow.gl.GLImage
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File
@@ -18,7 +18,7 @@ class GLImageTests {
     val gle = Hybrid.gle
 
     @test fun BasicGLFunctionality() {
-        val glimage = GLImage(10,10,gle)
+        val glimage = GLImage(10, 10, gle)
 
         val gc = glimage.graphics
         //gc.clear()
@@ -30,14 +30,14 @@ class GLImageTests {
         assertEquals(Colors.RED.argb, color)
     }
     @test fun SuperBasicFunctionality() {
-        val glimage = GLImage(10,12,gle)
+        val glimage = GLImage(10, 12, gle)
 
         assertEquals( 10, glimage.width)
         assertEquals( 12, glimage.height)
     }
 
     @test fun DeepCopy() {
-        val glimage = GLImage(10,10,gle)
+        val glimage = GLImage(10, 10, gle)
 
         val gc = glimage.graphics
         gc.clear()
@@ -50,7 +50,7 @@ class GLImageTests {
         assertEquals(Colors.RED.argb, color)
     }
     @test fun TestConvertToBi() {
-        val glimage = GLImage(10,12,gle)
+        val glimage = GLImage(10, 12, gle)
         glimage.graphics.clear()
 
         assertEquals( 10, glimage.width)
@@ -63,8 +63,8 @@ class GLImageTests {
     }
 
     @test fun SwitchesTargets() {
-        val img1 = GLImage( 25,25,gle, false)
-        val img2 = GLImage( 25, 25, gle, false)
+        val img1 = GLImage(25, 25, gle, false)
+        val img2 = GLImage(25, 25, gle, false)
 
         val gc1 = img1.graphics
         gc1.color = Colors.RED
@@ -86,9 +86,9 @@ class GLImageTests {
     }
 
     @test fun DrawsNotPremultiplied() {
-        val img1 = GLImage( 25,25,gle, true)
-        val img2 = GLImage( 25, 25, gle, false)
-        val img3 = GLImage( 25, 25, gle, true)
+        val img1 = GLImage(25, 25, gle, true)
+        val img2 = GLImage(25, 25, gle, false)
+        val img3 = GLImage(25, 25, gle, true)
 
         img1.graphics.also {
             it.color = ColorARGB32Normal(0x88ff0000.toInt())

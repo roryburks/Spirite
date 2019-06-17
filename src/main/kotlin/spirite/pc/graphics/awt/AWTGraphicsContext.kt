@@ -1,8 +1,8 @@
 //package spirite.pc.graphics.awt
 //
-//import spirite.base.graphics.GraphicsContext
+//import rb.glow.GraphicsContext
 //import rb.glow.IImage
-//import spirite.base.graphics.LineAttributes
+//import rb.glow.LineAttributes
 //import spirite.base.graphics.RenderRubric
 //import rb.glow.color.Color
 //import rb.vectrix.linear.ITransformF

@@ -2,7 +2,7 @@ package spirite.hybrid
 
 import com.jogamp.opengl.GL2
 import rb.glow.IImage
-import spirite.base.graphics.gl.GLImage
+import rb.glow.gl.GLImage
 import spirite.base.util.linear.Rect
 import spirite.pc.graphics.ImageBI
 import java.awt.image.BufferedImage

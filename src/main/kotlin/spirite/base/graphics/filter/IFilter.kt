@@ -1,13 +1,13 @@
 package spirite.base.graphics.filter
 
 import rb.glow.IImage
-import spirite.base.graphics.Composite.CLEAR
-import spirite.base.graphics.Composite.DST_IN
-import spirite.base.graphics.GraphicsContext
+import rb.glow.Composite.CLEAR
+import rb.glow.Composite.DST_IN
+import rb.glow.GraphicsContext
 import kotlin.math.min
 
 interface IFilter {
-    fun apply( gc: GraphicsContext, w: Int, h: Int)
+    fun apply(gc: GraphicsContext, w: Int, h: Int)
 }
 
 class StencilFilter(

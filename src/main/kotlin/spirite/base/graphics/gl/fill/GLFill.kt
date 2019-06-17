@@ -7,7 +7,7 @@ import rb.vectrix.mathUtil.f
 import rbJvm.glow.jogl.JOGL.JOGLTextureSource
 import spirite.base.graphics.fill.IFillArrayAlgorithm
 import spirite.base.graphics.gl.FillAfterpassCall
-import spirite.base.graphics.gl.GLImage
+import rb.glow.gl.GLImage
 import rb.glow.gle.GLParameters
 import java.nio.IntBuffer
 
@@ -38,7 +38,7 @@ class GLFill(val filler: IFillArrayAlgorithm)  {
                 GLC.UNSIGNED_INT,
                 JOGLTextureSource( faW, faH, IntBuffer.wrap(data)))
 
-        val img2 = GLImage(_tex,  faW, faH, gle)
+        val img2 = GLImage(_tex, faW, faH, gle)
 
         glImage.engine.setTarget(glImage)
 

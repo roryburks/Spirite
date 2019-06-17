@@ -6,7 +6,7 @@ import rb.glow.using
 import rb.glow.with
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import spirite.base.graphics.Composite.SRC
+import rb.glow.Composite.SRC
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.ContentBoundsFinder

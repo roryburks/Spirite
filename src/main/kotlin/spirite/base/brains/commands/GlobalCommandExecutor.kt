@@ -15,7 +15,7 @@ import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.file.workspaceFromImage
-import spirite.base.graphics.Composite.SRC_IN
+import rb.glow.Composite.SRC_IN
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode

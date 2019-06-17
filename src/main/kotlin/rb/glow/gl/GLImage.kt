@@ -1,20 +1,15 @@
-package spirite.base.graphics.gl
+package rb.glow.gl
 
 import rb.glow.RawImage
 import rb.glow.RawImage.InvalidImageDimensionsExeption
 import rb.glow.color.toColor
 import rb.glow.color.toColorPremultiplied
-import rb.glow.gl.GLC
-import rb.glow.gl.GLResourcException
-import rb.glow.gl.IGLTexture
 import rb.glow.gle.GLParameters
+import rb.glow.gle.IGLEngine
+import rb.vectrix.shapes.RectI
 import spirite.base.graphics.GLDrawer
 import spirite.base.graphics.IDrawer
-import spirite.base.util.linear.Rect
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.INITIALIZATION
-import spirite.pc.JOGL.JOGL
-import spirite.pc.JOGL.JOGL.JOGLTexture
+import rb.glow.gle.GLGraphicsContext
 
 class GLImage : RawImage {
     override val width : Int
@@ -31,7 +26,7 @@ class GLImage : RawImage {
     var flushed : Boolean = false
 
     // region Constructors
-    constructor( width: Int, height: Int, glEngine: IGLEngine, premultiplied: Boolean = true) {
+    constructor(width: Int, height: Int, glEngine: IGLEngine, premultiplied: Boolean = true) {
         if( width <= 0 || height <= 0)
             throw InvalidImageDimensionsExeption("Invalid Image Dimensions")
         this.width = width
@@ -50,11 +45,12 @@ class GLImage : RawImage {
         gl.texImage2D( GLC.TEXTURE_2D, 0, GLC.RGBA8, GLC.RGBA, GLC.UNSIGNED_BYTE,
                 gl.createBlankTextureSource(width, height))
 
-        if( ! (gl as JOGL).gl.glIsTexture((_tex as JOGLTexture).texId))
-        {
-            MDebug.handleWarning(INITIALIZATION, "Failed to initialize GL Image")
-        }
-        GLImageTracker.glImageLoaded(this)
+        // TODO: Add back
+//        if( ! (gl as JOGL).gl.glIsTexture((_tex as JOGLTexture).texId))
+//        {
+//            MDebug.handleWarning(INITIALIZATION, "Failed to initialize GL Image")
+//        }
+        gl.tracker.markGlImageLoaded(this)
     }
 
     constructor( toCopy: GLImage) {
@@ -74,7 +70,7 @@ class GLImage : RawImage {
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_S, GLC.CLAMP_TO_EDGE)
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_T, GLC.CLAMP_TO_EDGE)
         gl.copyTexImage2D(GLC.TEXTURE_2D, 0, GLC.RGBA8, 0, 0, width, height, 0)
-        GLImageTracker.glImageLoaded(this)
+        gl.tracker.markGlImageLoaded(this)
     }
 
     constructor(tex: IGLTexture, width: Int, height: Int, glEngine: IGLEngine, premultiplied: Boolean = true) {
@@ -83,7 +79,7 @@ class GLImage : RawImage {
         this.height = height
         this.engine = glEngine
         this.premultiplied = premultiplied
-        GLImageTracker.glImageLoaded(this)
+        glEngine.gl.tracker.markGlImageLoaded(this)
     }
 
     // endregion
@@ -101,7 +97,7 @@ class GLImage : RawImage {
             flushed = true
             // Must be run on the AWT Thread to prevent JOGL-internal deadlocks
             engine.runOnGLThread {
-                GLImageTracker.glImageUnloaded(this)
+                gl.tracker.markGLImageUnloaded(this)
 
                 //engine.glImageUnloaded(this)  // TODO
                 if( engine.target == _tex)
@@ -127,17 +123,17 @@ class GLImage : RawImage {
         return  read[0]
     }
 
-    fun toIntArray( rect: Rect? = null) : IntArray{
-        val rect = rect ?: Rect(width, height)
+    fun toIntArray( rect: RectI? = null) : IntArray{
+        val rect2 = rect ?: RectI(0,0,width, height)
         engine.setTarget(this)
 
-        if( rect.isEmpty)
+        if( rect2.wi <= 0 || rect2.hi <= 0)
             return IntArray(0)
 
         val gl = engine.gl
-        val data = IntArray(rect.width * rect.height)
+        val data = IntArray(rect2.wi * rect2.hi)
         val read = gl.makeInt32Source(data)
-        gl.readnPixels(rect.x, rect.y, rect.width, rect.height, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4*data.size, read )
+        gl.readnPixels(rect2.x1i, rect2.y1i, rect2.wi, rect2.hi, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4*data.size, read )
 
         return data
     }

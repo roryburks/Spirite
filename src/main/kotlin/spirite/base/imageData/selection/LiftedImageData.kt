@@ -3,7 +3,7 @@ package spirite.base.imageData.selection
 import rb.glow.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.mathUtil.f
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.LiftedImageDrawer

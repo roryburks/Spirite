@@ -1,6 +1,6 @@
 package rb.glow.gle
 
-import spirite.base.graphics.gl.GLImage
+import rb.glow.gl.GLImage
 import spirite.base.util.linear.Rect
 
 data class GLParameters(

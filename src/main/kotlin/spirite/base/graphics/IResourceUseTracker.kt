@@ -1,7 +1,7 @@
 package spirite.base.graphics
 
-import spirite.base.graphics.gl.GLImage
-import spirite.base.graphics.gl.GLImageTracker
+import rb.glow.gl.GLImage
+import spirite.hybrid.Hybrid
 
 interface IResourceUseTracker {
     val bytesUsed: Long
@@ -18,7 +18,7 @@ interface IDetailedResourceUseTracker : IResourceUseTracker{
 
 }
 class DetailedResourceUseTracker : IDetailedResourceUseTracker {
-    override val bytesUsed: Long get() = GLImageTracker.bytesUsed
+    override val bytesUsed: Long get() = Hybrid.gl.tracker.bytesUsed
 
-    override val glImages: Collection<GLImage> get() = GLImageTracker.images
+    override val glImages: Collection<GLImage> get() = Hybrid.gl.tracker.images
 }

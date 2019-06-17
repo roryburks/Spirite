@@ -3,9 +3,9 @@ package spirite.pc
 import rb.glow.gl.GLC
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.MutableTransformF
-import spirite.base.graphics.gl.GLImage
-import spirite.base.graphics.gl.IGLEngine
-import spirite.pc.JOGL.JOGL.JOGLInt32Source
+import rb.glow.gl.GLImage
+import rb.glow.gle.IGLEngine
+import rbJvm.glow.jogl.JOGL.JOGLInt32Source
 import spirite.pc.util.RasterHelper
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
@@ -28,7 +28,7 @@ fun GLImage.toBufferedImage() : BufferedImage {
     return bi
 }
 
-fun IGLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int) : BufferedImage{
+fun IGLEngine.surfaceToBufferedImage(type: Int, width: Int, height: Int) : BufferedImage{
     val bi = when( type) {
         BufferedImage.TYPE_INT_ARGB,
         BufferedImage.TYPE_INT_ARGB_PRE -> {

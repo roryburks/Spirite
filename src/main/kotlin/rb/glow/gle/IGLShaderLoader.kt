@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl.shader
+package rb.glow.gle
 
 import rb.glow.gl.IGLProgram
 

@@ -1,6 +1,6 @@
 package spirite.base.imageData.mediums
 
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 
 
 data class CompositeSource(

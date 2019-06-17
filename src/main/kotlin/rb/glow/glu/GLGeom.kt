@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl
+package rb.glow.glu
 
 import rb.glow.gle.GLPrimitive
 import rbJvm.vectrix.compaction.FloatCompactor

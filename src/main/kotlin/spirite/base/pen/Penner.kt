@@ -10,7 +10,7 @@ import sgui.generic.components.events.MouseEvent.MouseButton.LEFT
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree

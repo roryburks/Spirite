@@ -2,8 +2,12 @@ package spirite.base.graphics.gl.stroke
 
 import com.hackoeur.jglm.support.FastMath
 import rb.glow.gl.GLC
+import rb.glow.gl.GLImage
 import rb.glow.gle.GLParameters
 import rb.glow.gle.GLPrimitive
+import rb.glow.gle.IGLEngine
+import rb.glow.gle.PolyRenderCall
+import rb.glow.glu.PrimitiveBuilder
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.d
@@ -83,7 +87,7 @@ class GLStrokeDrawerV3(
 
 
         fun linePassGeom( states: DrawPoints, width: Float) : DotPrimitive {
-            val smallLineBuilder = PrimitiveBuilder(intArrayOf(2,1), GLC.LINE_STRIP)
+            val smallLineBuilder = PrimitiveBuilder(intArrayOf(2, 1), GLC.LINE_STRIP)
             val circleBuilder = PrimitiveBuilder(intArrayOf(2), GLC.TRIANGLE_FAN)
             val lineBuilder = PrimitiveBuilder(intArrayOf(2), GLC.LINE_STRIP)
             val polyBuilder = PrimitiveBuilder(intArrayOf(2), GLC.TRIANGLE_STRIP)

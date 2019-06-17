@@ -1,7 +1,6 @@
 package rb.glow
 
 import rb.glow.color.Colors
-import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IDrawer
 
 

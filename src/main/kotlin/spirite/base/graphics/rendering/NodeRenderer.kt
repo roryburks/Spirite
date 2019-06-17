@@ -4,7 +4,7 @@ import rb.glow.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.ceil
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.graphics.RenderRubric
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.imageData.IImageWorkspace
@@ -183,7 +183,7 @@ class NodeRenderer(
     private abstract inner class DrawThing {
         val subDepth: Int = tick++
         abstract val depth: Int
-        abstract fun draw( gc:GraphicsContext)
+        abstract fun draw( gc: GraphicsContext)
     }
 
     private inner class GroupDrawThing(

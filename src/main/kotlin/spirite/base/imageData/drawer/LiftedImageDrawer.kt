@@ -8,7 +8,7 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import spirite.base.brains.toolset.ColorChangeMode
-import spirite.base.graphics.Composite.DST_IN
+import rb.glow.Composite.DST_IN
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.LiftedImageData

@@ -2,6 +2,8 @@ package spirite.base.graphics
 
 import rb.glow.color.Color
 import rb.glow.gl.GLC
+import rb.glow.gl.GLImage
+import rb.glow.gle.BasicCall
 import rb.glow.gle.GLParameters
 import rb.vectrix.mathUtil.f
 import spirite.base.brains.toolset.ColorChangeMode
@@ -18,7 +20,7 @@ class GLDrawer( val image: GLImage) : IDrawer {
 
     override fun invert() {
         val gle = image.engine
-        val buffer= GLImage(image.width, image.height,gle, image.premultiplied)
+        val buffer= GLImage(image.width, image.height, gle, image.premultiplied)
 
         params.texture1 = image
         gle.setTarget(buffer)
@@ -36,7 +38,7 @@ class GLDrawer( val image: GLImage) : IDrawer {
 
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
         val gle = image.engine
-        val buffer= GLImage(image.width, image.height,gle, image.premultiplied)
+        val buffer= GLImage(image.width, image.height, gle, image.premultiplied)
 
         params.texture1 = image
         gle.setTarget(buffer)

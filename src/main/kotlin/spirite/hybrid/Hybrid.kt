@@ -5,7 +5,7 @@ import sgui.generic.components.IComponentProvider
 import sgui.generic.systems.IMouseSystem
 import sgui.swing.SwingComponentProvider
 import sgui.swing.mouseSystem.SwMouseSystem
-import spirite.base.graphics.gl.IGLEngine
+import rb.glow.gle.IGLEngine
 import spirite.hybrid.Transferables.IClipboard
 import spirite.hybrid.Transferables.SwClipboard
 import spirite.hybrid.inputSystems.IKeypressSystem

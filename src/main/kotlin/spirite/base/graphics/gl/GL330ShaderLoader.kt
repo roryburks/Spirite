@@ -1,11 +1,11 @@
-package spirite.base.graphics.gl.shader
+package spirite.base.graphics.gl
 
 import rb.glow.exceptions.GLEException
 import rb.glow.gl.GLC
 import rb.glow.gl.IGL
 import rb.glow.gl.IGLProgram
 import rb.glow.gl.IGLShader
-import spirite.base.graphics.gl.*
+import rb.glow.gle.*
 import spirite.base.resources.IScriptService
 
 

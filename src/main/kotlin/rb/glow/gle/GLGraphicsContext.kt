@@ -1,21 +1,23 @@
-package spirite.base.graphics.gl
+package rb.glow.gle
 
-import rb.glow.IImage
+import rb.glow.*
+import rb.glow.CapMethod.NONE
 import rb.glow.color.Color
 import rb.glow.color.Colors
 import rb.glow.gl.GLC
-import rb.glow.gle.GLParameters
-import rb.glow.gle.PolyType
-import rb.glow.using
+import rb.glow.gl.GLImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import spirite.base.graphics.*
-import spirite.base.graphics.Composite.SRC_OVER
+import rb.glow.Composite.SRC_OVER
+import rb.glow.JoinMethod.ROUNDED
 import spirite.base.graphics.RenderMethodType.*
-import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
-import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
+import rb.glow.gle.RenderCall.RenderAlgorithm
+import rb.glow.gle.RenderCall.RenderAlgorithm.*
+import spirite.base.graphics.gl.BorderCall
+import spirite.base.graphics.gl.GridCall
 import spirite.base.util.linear.Rect
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
@@ -41,7 +43,7 @@ class GLGraphicsContext : GraphicsContext {
 
     val gle: IGLEngine
 
-    constructor( width: Int, height: Int, flip: Boolean, gle:IGLEngine, premultiplied: Boolean = false)  {
+    constructor(width: Int, height: Int, flip: Boolean, gle: IGLEngine, premultiplied: Boolean = false)  {
         this.width = width
         this.height = height
         this.image = null
@@ -132,7 +134,7 @@ class GLGraphicsContext : GraphicsContext {
         }
     }
 
-    private val defaultLA = LineAttributes(1f, CapMethod.NONE, JoinMethod.ROUNDED, null)
+    private val defaultLA = LineAttributes(1f, NONE, ROUNDED, null)
     override var lineAttributes: LineAttributes = defaultLA
 
     override fun setClip(i: Int, j: Int, width: Int, height: Int) {
@@ -192,7 +194,7 @@ class GLGraphicsContext : GraphicsContext {
         val x_ = floatArrayOf(x + 0f, x + w + 0f, x + 0f, x+ w + 0f).toList()
         val y_ = floatArrayOf(y + 0f, y + 0f, y + h + 0f, y + h + 0f).toList()
 
-        gle.applyPolyProgram( PolyRenderCall(color.rgbComponent, alpha), x_, y_, 4,
+        gle.applyPolyProgram(PolyRenderCall(color.rgbComponent, alpha), x_, y_, 4,
                 PolyType.STRIP, cachedParams, _trans)
     }
 
@@ -203,14 +205,14 @@ class GLGraphicsContext : GraphicsContext {
     override fun fill(shape: IShape) {
         reset()
         val x_y = shape.buildPath(0.5f)
-        gle.applyPolyProgram( PolyRenderCall(color.rgbComponent, alpha), x_y.first.asList(), x_y.second.asList(), x_y.first.size,
+        gle.applyPolyProgram(PolyRenderCall(color.rgbComponent, alpha), x_y.first.asList(), x_y.second.asList(), x_y.first.size,
                 PolyType.FAN, cachedParams, _trans)
     }
 
     override fun fillPolygon(x: List<Float>, y: List<Float>, length: Int) {
         reset()
         val poly = gle.tesselator.tesselatePolygon(x.asSequence().map { it.d }, y.asSequence().map { it.d }, x.size)
-        gle.applyPrimitiveProgram( PolyRenderCall(color.rgbComponent, alpha), poly, cachedParams, _trans)
+        gle.applyPrimitiveProgram(PolyRenderCall(color.rgbComponent, alpha), poly, cachedParams, _trans)
     }
     // endregion
 
@@ -266,20 +268,20 @@ class GLGraphicsContext : GraphicsContext {
             else -> transform * render.transform
         }
 
-        applyPassProgram( RenderCall( alpha * (render?.alpha ?: 1f), calls),
+        applyPassProgram(RenderCall(alpha * (render?.alpha ?: 1f), calls),
                 params, tDraw, x + 0f, y + 0f, x + rawImage.width + 0f, y +  rawImage.height + 0f)
     }
 
     // endregion
 
     fun drawTransparencyBG(x: Int, y: Int, w: Int, h: Int, squareSize: Int) {
-        applyPassProgram( GridCall( Colors.GRAY.rgbComponent, Colors.LIGHT_GRAY.rgbComponent, squareSize),
+        applyPassProgram(GridCall(Colors.GRAY.rgbComponent, Colors.LIGHT_GRAY.rgbComponent, squareSize),
                 cachedParams, transform, x.f, y.f, w.f, h.f)
     }
 
     // region Direct
     // Note: These exist mostly to make sure Reset is called
-    fun applyPassProgram( programCall: IGlProgramCall, image: GLImage, x1 :Float= 0f, y1 :Float= 0f, x2 : Float = image.width.f, y2 : Float = image.height.f)
+    fun applyPassProgram(programCall: IGlProgramCall, image: GLImage, x1 :Float= 0f, y1 :Float= 0f, x2 : Float = image.width.f, y2 : Float = image.height.f)
     {
         reset()
         gle.applyPassProgram( programCall, cachedParams.copy(texture1 = image), transform, x1, y1, x2, y2)

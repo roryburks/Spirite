@@ -1,8 +1,11 @@
 package spirite.base.graphics.gl.stroke
 
 import rb.glow.gl.GLC
+import rb.glow.gl.GLImage
 import rb.glow.gle.GLParameters
 import rb.glow.gle.GLPrimitive
+import rb.glow.gle.IGLEngine
+import rb.glow.gle.PolyRenderCall
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.floor
@@ -37,7 +40,7 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
     override fun getIntensifyMethod(params: StrokeParams): IntensifyMethod  = DEFAULT
 
     companion object {
-        fun drawPoint( gle: IGLEngine, image: GLImage, x:Int, y:Int, params: GLParameters) {
+        fun drawPoint(gle: IGLEngine, image: GLImage, x:Int, y:Int, params: GLParameters) {
             gle.setTarget(image)
             val data = floatArrayOf(
                     x+0f, y+0f,
@@ -49,7 +52,7 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
                     prim, params, null)
         }
 
-        fun drawStroke( gle: IGLEngine, image: GLImage, points: DrawPoints, params: GLParameters) {
+        fun drawStroke(gle: IGLEngine, image: GLImage, points: DrawPoints, params: GLParameters) {
             val vb = composeVBuffer(points)
 
             image.graphics.clear()

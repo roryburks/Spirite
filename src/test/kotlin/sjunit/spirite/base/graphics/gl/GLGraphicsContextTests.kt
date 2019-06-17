@@ -3,10 +3,10 @@ package sjunit.spirite.base.graphics.gl
 import rb.glow.color.Colors
 import rb.vectrix.linear.Vec2i
 import sjunit.TestConfig
-import spirite.base.graphics.CapMethod.NONE
-import spirite.base.graphics.JoinMethod.MITER
-import spirite.base.graphics.LineAttributes
-import spirite.base.graphics.gl.GLImage
+import rb.glow.CapMethod.NONE
+import rb.glow.JoinMethod.MITER
+import rb.glow.LineAttributes
+import rb.glow.gl.GLImage
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
 import java.io.File
@@ -24,7 +24,7 @@ class GLGraphicsContextTests {
         gc.color = Colors.RED
         gc.fillRect( 5, 5, 10, 10)
 
-        val toImage = GLImage(30,30, gle)
+        val toImage = GLImage(30, 30, gle)
         toImage.graphics.drawBounds( img, 101101)
 
         if( TestConfig.save)
@@ -37,7 +37,7 @@ class GLGraphicsContextTests {
         gc.color = Colors.RED
         gc.fillRect( 5, 5, 10, 10)
 
-        val toImage = GLImage(30,30, gle)
+        val toImage = GLImage(30, 30, gle)
         val togc = toImage.graphics
         togc.alpha = 0.5f
         togc.renderImage( subImg, 5, 5)
@@ -50,7 +50,7 @@ class GLGraphicsContextTests {
     }
 
     @test fun drawRect(){
-        val img = GLImage( 30, 30, gle)
+        val img = GLImage(30, 30, gle)
         val gc = img.graphics
 
         //gc.setComposite(gc.composite, 0.5f)
@@ -83,7 +83,7 @@ class GLGraphicsContextTests {
     }
 
     @test fun fillRect(){
-        val img = GLImage( 30, 30, gle)
+        val img = GLImage(30, 30, gle)
         val gc = img.graphics
 
         gc.color = Colors.RED
@@ -104,7 +104,7 @@ class GLGraphicsContextTests {
     }
 
     @test fun fillPoly() {
-        val img = GLImage( 50, 50, gle)
+        val img = GLImage(50, 50, gle)
         val gc = img.graphics
 
         val xs = listOf(0f, 50f, 0f, 50f, 25f)

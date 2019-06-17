@@ -3,7 +3,7 @@ package sjunit.spirite.base.graphics.fill
 import rb.glow.color.Colors
 import sjunit.TestConfig
 import spirite.base.graphics.fill.V0FillArrayAlgorithm
-import spirite.base.graphics.gl.GLImage
+import rb.glow.gl.GLImage
 import spirite.base.graphics.gl.fill.GLFill
 import spirite.hybrid.EngineLaunchpoint
 import spirite.pc.toBufferedImage
@@ -22,7 +22,7 @@ class GLFillTests {
 
     fun TestFill( r: Int) {
 
-        val image = GLImage(r,r, EngineLaunchpoint.gle, true)
+        val image = GLImage(r, r, EngineLaunchpoint.gle, true)
         val w = image.width
         val h = image.height
 

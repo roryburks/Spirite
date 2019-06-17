@@ -6,7 +6,7 @@ import rb.glow.color.Colors
 import rb.glow.color.SColor
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IFloatingMedium
 import spirite.base.imageData.MImageWorkspace
@@ -40,7 +40,7 @@ interface IMedium : IFlushable {
     fun build(arranged: ArrangedMediumData): BuiltMediumData
     fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer
 
-    fun render( gc: GraphicsContext, render: RenderRubric? = null)
+    fun render(gc: GraphicsContext, render: RenderRubric? = null)
 
     fun dupe(workspace: MImageWorkspace): IMedium
     override fun flush()
@@ -48,7 +48,7 @@ interface IMedium : IFlushable {
 }
 
 abstract class IComplexMedium : IMedium {
-    override fun render( gc: GraphicsContext, render: RenderRubric?) {
+    override fun render(gc: GraphicsContext, render: RenderRubric?) {
         drawBehindComposite(gc,render)
         drawOverComposite(gc, render)
     }
@@ -70,7 +70,7 @@ object NilMedium : IMedium {
     override fun dupe(workspace: MImageWorkspace) = this
     override fun flush() {}
     override fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer  = throw Exception("Tried to Get Drawer for NilMedium")
-    override fun render( gc: GraphicsContext, render: RenderRubric?) {}
+    override fun render(gc: GraphicsContext, render: RenderRubric?) {}
 
     class NilBuiltMedium(arranged: ArrangedMediumData) : BuiltMediumData(arranged, NilMMediumRepo) {
         override val tWorkspaceToComposite: ITransformF get() = ImmutableTransformF.Identity

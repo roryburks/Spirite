@@ -2,7 +2,7 @@ package spirite.base.graphics.rendering
 
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 import spirite.base.graphics.RenderMethod
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.MediumHandle

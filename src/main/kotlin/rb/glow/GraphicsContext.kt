@@ -1,10 +1,10 @@
-package spirite.base.graphics
+package rb.glow
 
-import rb.glow.IImage
 import rb.glow.color.Color
 import rb.vectrix.linear.ITransformF
-import spirite.base.graphics.CapMethod.NONE
-import spirite.base.graphics.JoinMethod.MITER
+import rb.glow.CapMethod.NONE
+import rb.glow.JoinMethod.MITER
+import spirite.base.graphics.RenderRubric
 import spirite.base.util.shapes.IShape
 import java.util.*
 
@@ -77,7 +77,7 @@ abstract class GraphicsContext {
     fun popTransform() {transform = transformStack.pop()}
 
     private val stateStack = Stack<GraphicalState>()
-    fun pushState() { stateStack.push( GraphicalState(transform.toMutable(), composite, alpha, color))}
+    fun pushState() { stateStack.push(GraphicalState(transform.toMutable(), composite, alpha, color))}
     fun popState() {
         val state = stateStack.pop()
         transform = state.trans

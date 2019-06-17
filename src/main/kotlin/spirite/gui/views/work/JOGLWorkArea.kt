@@ -8,7 +8,7 @@ import com.jogamp.opengl.awt.GLCanvas
 import sgui.generic.components.events.MouseEvent
 import sgui.swing.components.ISwComponent
 import sgui.swing.components.SwComponent
-import spirite.base.graphics.gl.GLGraphicsContext
+import rb.glow.gle.GLGraphicsContext
 import spirite.base.pen.Penner
 import spirite.hybrid.Hybrid
 import rbJvm.glow.jogl.JOGLProvider

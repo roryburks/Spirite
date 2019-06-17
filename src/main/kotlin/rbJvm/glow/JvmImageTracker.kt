@@ -1,27 +1,29 @@
-package spirite.base.graphics.gl
+package rbJvm.glow
 
+import rb.glow.gl.GLImage
+import rb.glow.gl.IGLImageTracker
 import rb.glow.gl.IGLTexture
 import spirite.hybrid.Hybrid
 import java.lang.ref.WeakReference
 
-object GLImageTracker {
+object JvmImageTracker : IGLImageTracker{
     private data class ImageData(
             val w: Int, val h: Int, val tex: IGLTexture)
 
-    val images get() = _images.mapNotNull { it.first.get() }
-    private val _images = mutableListOf<Pair<WeakReference<GLImage>,ImageData>>()
+    override val images get() = _images.mapNotNull { it.first.get() }
+    private val _images = mutableListOf<Pair<WeakReference<GLImage>, ImageData>>()
 
 
 
 
-    val bytesUsed get() = images.fold(0L) { acc, it -> acc + it.width*it.height*4L}
+    override val bytesUsed get() = images.fold(0L) { acc, it -> acc + it.width*it.height*4L}
 
-    internal fun glImageLoaded(image: GLImage) {
-        _images.add(Pair(WeakReference(image),ImageData(image.width, image.height,image._tex)))
+    override fun markGlImageLoaded(image: GLImage) {
+        _images.add(Pair(WeakReference(image), ImageData(image.width, image.height, image._tex)))
         _checkStatus()
     }
 
-    internal fun glImageUnloaded( image: GLImage) {
+    override fun markGLImageUnloaded(image: GLImage) {
         _images.removeIf { it.first.get() == image }
         _checkStatus()
     }

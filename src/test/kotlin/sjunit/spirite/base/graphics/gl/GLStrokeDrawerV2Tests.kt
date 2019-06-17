@@ -3,7 +3,7 @@ package sjunit.spirite.base.graphics.gl
 import org.junit.Test
 import rb.glow.color.Colors
 import sjunit.TestConfig
-import spirite.base.graphics.gl.GLImage
+import rb.glow.gl.GLImage
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
@@ -25,7 +25,7 @@ class GLStrokeDrawerV2Tests {
                 FloatArray(100, { it.toFloat() }),
                 FloatArray(100, { 1f - abs(50 - it) / 50f })
         )
-        val image = GLImage(100,100, gle)
+        val image = GLImage(100, 100, gle)
         drawer.batchDraw(image.graphics, drawPoints, StrokeParams(Colors.GREEN, width = 5f, alpha = 0.5f), 100, 100)
 
         //val image = drawer.batchDraw(drawPoints, StrokeParams(width = 5f), 100, 100)
@@ -41,7 +41,7 @@ class GLStrokeDrawerV2Tests {
                 FloatArray(100, { it.toFloat() }),
                 FloatArray(100, { 1f - abs(50 - it) / 50f })
         )
-        val image = GLImage(100,100, gle)
+        val image = GLImage(100, 100, gle)
         val gc = image.graphics
         gc.color = Colors.GRAY
         gc.fillRect(0,0,100,100)

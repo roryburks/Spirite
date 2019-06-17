@@ -1,6 +1,6 @@
 package spirite.base.pen.stroke
 
-import spirite.base.graphics.GraphicsContext
+import rb.glow.GraphicsContext
 
 interface IStrokeDrawer {
     fun start( builder: StrokeBuilder, width: Int, height:Int) : Boolean

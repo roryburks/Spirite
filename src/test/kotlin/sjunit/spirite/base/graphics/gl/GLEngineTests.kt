@@ -2,16 +2,20 @@ package sjunit.spirite.base.graphics.gl
 
 
 import rb.glow.color.Colors
+import rb.glow.gl.GLImage
+import rb.glow.gle.BasicCall
 import rb.glow.gle.GLParameters
+import rb.glow.gle.PolyRenderCall
 import rb.glow.gle.PolyType.STRIP
+import rb.glow.gle.RenderCall
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
 import sjunit.TestConfig
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
-import spirite.base.graphics.CapMethod.NONE
-import spirite.base.graphics.JoinMethod.MITER
+import rb.glow.CapMethod.NONE
+import rb.glow.JoinMethod.MITER
 import spirite.base.graphics.gl.*
-import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
+import rb.glow.gle.RenderCall.RenderAlgorithm.*
 import spirite.base.graphics.gl.SquareGradientCall.GradientType
 import spirite.base.pen.stroke.DrawPoints
 import spirite.hybrid.Hybrid
@@ -91,7 +95,7 @@ class GLEngineTests {
     // Draws using all the shaders and outputs it to an image
     @test fun writeOutPassShaders() {
         // Draw the base star
-        val star = GLImage( 50, 50, gle)
+        val star = GLImage(50, 50, gle)
         val gc = star.graphics
 
         val xs = listOf(0f, 50f, 0f, 50f, 25f)
@@ -99,14 +103,14 @@ class GLEngineTests {
         gc.color = Colors.RED
         gc.fillPolygon(xs, ys, 5)
 
-        val image = GLImage( 500, 500, gle)
+        val image = GLImage(500, 500, gle)
         image.graphics.clear()
         gle.setTarget(image)
 
         val params = GLParameters(500, 500, texture1 = star)
 
         // Call this one first to make sure the entire Uniform Arrays associated are properly reset
-        gle.applyPassProgram( RenderCall(0.5f,
+        gle.applyPassProgram(RenderCall(0.5f,
                 listOf(
                         Pair(DISSOLVE, 4),
                         Pair(AS_COLOR, 0xff0000ff.toInt()))),
@@ -117,19 +121,19 @@ class GLEngineTests {
                 params, null, 50f, 0f, 100f, 50f)
         gle.applyPassProgram( GridCall(Vec3f(0.25f, 0.25f, 0.25f), Vec3f(0.5f, 0.5f, 0.5f), 4),
                 params, null, 100f, 0f, 150f, 50f)
-        gle.applyPassProgram( BasicCall(),
+        gle.applyPassProgram(BasicCall(),
                 params, null, 150f, 0f, 200f, 50f)
         gle.applyPassProgram( BorderCall(3),
                 params, null, 200f, 0f, 250f, 50f)
         gle.applyPassProgram( InvertCall(),
                 params, null, 250f, 0f, 300f, 50f)
-        gle.applyPassProgram( RenderCall(0.5f, emptyList()),
+        gle.applyPassProgram(RenderCall(0.5f, emptyList()),
                 params, null, 0f, 50f, 50f, 100f)
-        gle.applyPassProgram( RenderCall(0.5f, listOf(Pair(AS_COLOR, 0xff0000ff.toInt()))),
+        gle.applyPassProgram(RenderCall(0.5f, listOf(Pair(AS_COLOR, 0xff0000ff.toInt()))),
                 params, null, 50f, 50f, 100f, 100f)
-        gle.applyPassProgram( RenderCall(0.5f, listOf(Pair(AS_COLOR_ALL,0xff00ffff.toInt()))),
+        gle.applyPassProgram(RenderCall(0.5f, listOf(Pair(AS_COLOR_ALL, 0xff00ffff.toInt()))),
                 params, null, 100f, 50f, 150f, 100f)
-        gle.applyPassProgram( RenderCall(0.5f, listOf(Pair(DISSOLVE, 4))),
+        gle.applyPassProgram(RenderCall(0.5f, listOf(Pair(DISSOLVE, 4))),
                 params, null, 150f, 50f, 200f, 100f)
 
 
@@ -138,7 +142,7 @@ class GLEngineTests {
     }
 
     @test fun doStroke() {
-        val image = GLImage( 100, 100, gle)
+        val image = GLImage(100, 100, gle)
 
         gle.setTarget(image)
         val drawPoints = DrawPoints(

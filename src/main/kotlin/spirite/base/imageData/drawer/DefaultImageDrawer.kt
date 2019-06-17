@@ -8,8 +8,8 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import spirite.base.brains.toolset.ColorChangeMode
-import spirite.base.graphics.Composite.DST_OUT
-import spirite.base.graphics.Composite.SRC
+import rb.glow.Composite.DST_OUT
+import rb.glow.Composite.SRC
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.mediums.ArrangedMediumData

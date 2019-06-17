@@ -4,8 +4,8 @@ import rb.glow.color.SColor
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.MagneticFillMode.BEHIND
 import spirite.base.brains.toolset.MagneticFillMode.NORMAL
-import spirite.base.graphics.Composite.DST_OVER
-import spirite.base.graphics.Composite.SRC_OVER
+import rb.glow.Composite.DST_OVER
+import rb.glow.Composite.SRC_OVER
 import spirite.base.imageData.mediums.BuiltMediumData
 import kotlin.math.abs
 

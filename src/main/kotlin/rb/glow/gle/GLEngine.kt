@@ -1,7 +1,7 @@
-package spirite.base.graphics.gl
+package rb.glow.gle
 
+import rb.glow.exceptions.GLEException
 import rb.glow.gl.*
-import rb.glow.gle.*
 import rb.glow.glu.IPolygonTesselator
 import rb.glow.glu.MatrixBuilder.F.orthagonalProjectionMatrix
 import rb.glow.glu.MatrixBuilder.F.wrapTransform
@@ -9,12 +9,10 @@ import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec3f
-import spirite.base.graphics.CapMethod
-import spirite.base.graphics.JoinMethod
-import spirite.base.graphics.gl.shader.IGLShaderLoader
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType
+import rb.glow.CapMethod
+import rb.glow.JoinMethod
 import rbJvm.glow.jogl.JOGLProvider
+import rb.glow.gl.GLImage
 import javax.swing.SwingUtilities
 
 interface IGLEngine
@@ -73,19 +71,17 @@ interface IGLEngine
 }
 
 class GLEngine(
-        private val glGetter: () -> IGL,
-        shaderLoader: IGLShaderLoader
-) : IGLEngine
+        private val _glGetter: () -> IGL,
+        override val tesselator: IPolygonTesselator,
+        shaderLoader: IGLShaderLoader)
+    : IGLEngine
 {
-    override val tesselator: IPolygonTesselator get() = TODO("not implemented")
-
-
     private val programs = shaderLoader.initShaderPrograms()
 
     //private val dbo : IGLRenderbuffer by lazy { gl.genRenderbuffer() }
     private lateinit var fbo : IGLFramebuffer
 
-    override val gl get() = glGetter.invoke()
+    override val gl get() = _glGetter.invoke()
 
     override var width : Int = 1 ; private set
     override var height : Int = 1 ; private set
@@ -120,7 +116,8 @@ class GLEngine(
                     val status = gl.checkFramebufferStatus(GLC.FRAMEBUFFER)
                     when(status) {
                         GLC.FRAMEBUFFER_COMPLETE -> {}
-                        else -> MDebug.handleError(ErrorType.GL, "Failed to bind Framebuffer: $status") }
+                        else -> throw GLEException("Failed to bind Framebuffer: $status")
+                    }
                 }
             }
         }
@@ -233,7 +230,7 @@ class GLEngine(
                     intArrayOf(size)).prepare(gl)
 
             gl.enable(GLC.MULTISAMPLE)
-            applyProgram(LineRenderCall( join, lineWidth, color, alpha), params, iParams, prim)
+            applyProgram(LineRenderCall(join, lineWidth, color, alpha), params, iParams, prim)
             gl.disable(GLC.MULTISAMPLE)
 
             prim.flush()

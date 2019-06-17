@@ -4,7 +4,6 @@ import sgui.generic.components.IComponent
 import sgui.generic.components.ITextArea
 import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.swing.SwIcon
-import spirite.base.graphics.gl.GLImageTracker
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.hybrid.Hybrid
 
@@ -35,8 +34,8 @@ private constructor( val imp : ICrossPanel)
         Hybrid.timing.createTimer(100, true){
             val sb = StringBuilder()
 
-            sb.appendln("${GLImageTracker.images.size} : ${GLImageTracker.bytesUsed}")
-            GLImageTracker.images.forEach {
+            sb.appendln("${Hybrid.gl.tracker.images.size} : ${Hybrid.gl.tracker.bytesUsed}")
+            Hybrid.gl.tracker.images.forEach {
                 sb.appendln("  [${it.width} xi ${it.height}]")
             }
 
