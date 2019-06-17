@@ -272,7 +272,7 @@ class GLGraphicsContext : GraphicsContext {
 
     // endregion
 
-    override fun drawTransparencyBG(x: Int, y: Int, w: Int, h: Int, squareSize: Int) {
+    fun drawTransparencyBG(x: Int, y: Int, w: Int, h: Int, squareSize: Int) {
         applyPassProgram( GridCall( Colors.GRAY.rgbComponent, Colors.LIGHT_GRAY.rgbComponent, squareSize),
                 cachedParams, transform, x.f, y.f, w.f, h.f)
     }
@@ -286,7 +286,7 @@ class GLGraphicsContext : GraphicsContext {
 
     }
 
-    private fun applyPassProgram(programCall: ProgramCall, params: GLParameters, trans: ITransformF?,
+    fun applyPassProgram(programCall: ProgramCall, params: GLParameters, trans: ITransformF?,
                                  x1: Float = 0f, y1: Float = 0f, x2: Float = width.f, y2: Float = height.f)
     {
         reset()

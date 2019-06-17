@@ -37,6 +37,11 @@ internal enum class ProgramType(
     FILL_AFTERPASS(SRC_OVER),
 }
 
+interface IGlProgramCall {
+    val uniforms: List<GLUniform>?
+    val programKey: String
+}
+
 sealed abstract class ProgramCall {
     abstract val uniforms: List<GLUniform>?
 

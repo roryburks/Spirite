@@ -77,7 +77,7 @@ abstract class GraphicsContext {
     fun popTransform() {transform = transformStack.pop()}
 
     private val stateStack = Stack<GraphicalState>()
-    fun pushState() { stateStack.push( GraphicalState(transform, composite, alpha, color))}
+    fun pushState() { stateStack.push( GraphicalState(transform.toMutable(), composite, alpha, color))}
     fun popState() {
         val state = stateStack.pop()
         transform = state.trans
@@ -85,9 +85,6 @@ abstract class GraphicsContext {
         alpha = state.alpha
         color = state.color
     }
-
-    open fun drawTransparencyBG( x: Int, y: Int, w: Int, h: Int, squareSize: Int) {}
-
 }
 
 

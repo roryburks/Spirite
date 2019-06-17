@@ -16,5 +16,10 @@ interface IGraphicsContext {
     var color: Color
     var lineAttributes: LineAttributes
 
+    fun pushTransform()
+    fun popTransform()
+    fun pushState()
+    fun popState()
+
     fun clear(color: Color = Colors.TRANSPARENT)
 }

@@ -4,6 +4,7 @@ import spirite.base.graphics.GraphicsContext
 import rb.glow.color.Colors
 import sgui.swing.skin.Skin
 import sgui.swing.components.ISwComponent
+import spirite.base.graphics.drawer.SpiriteDrawer
 
 abstract class WorkArea(
         val context: WorkSection) {
@@ -21,7 +22,7 @@ abstract class WorkArea(
         if( view != null && workspace != null) {
             gc.transform = view.tWorkspaceToScreen
 
-            gc.drawTransparencyBG(0, 0, workspace.width, workspace.height, 8)
+            SpiriteDrawer(gc).drawTransparencyBg(0, 0, workspace.width, workspace.height, 8)
 
             // TODO: Draw Reference Behind
 
