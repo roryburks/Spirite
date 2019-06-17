@@ -13,7 +13,9 @@ import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import rb.glow.color.Color
 import rb.glow.color.Colors
 import rb.glow.gl.GLC
+import rb.glow.gle.GLPrimitive
 import rb.glow.gle.PolyType
+import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.d
 import spirite.base.util.glu.PolygonTesselater
 import spirite.base.util.linear.Rect
@@ -279,14 +281,14 @@ class GLGraphicsContext : GraphicsContext {
 
     // region Direct
     // Note: These exist mostly to make sure Reset is called
-    fun applyPassProgram( programCall: ProgramCall, image: GLImage, x1 :Float= 0f, y1 :Float= 0f, x2 : Float = image.width.f, y2 : Float = image.height.f)
+    fun applyPassProgram( programCall: IGlProgramCall, image: GLImage, x1 :Float= 0f, y1 :Float= 0f, x2 : Float = image.width.f, y2 : Float = image.height.f)
     {
         reset()
         gle.applyPassProgram( programCall, cachedParams.copy(texture1 = image), transform, x1, y1, x2, y2)
 
     }
 
-    fun applyPassProgram(programCall: ProgramCall, params: GLParameters, trans: ITransformF?,
+    fun applyPassProgram(programCall: IGlProgramCall, params: GLParameters, trans: ITransformF?,
                                  x1: Float = 0f, y1: Float = 0f, x2: Float = width.f, y2: Float = height.f)
     {
         reset()

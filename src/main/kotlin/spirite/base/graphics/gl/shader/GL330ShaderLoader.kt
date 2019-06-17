@@ -15,90 +15,90 @@ class GL330ShaderLoader(val gl: IGL, val scriptService: IScriptService) : IGLSha
 
     val globalFrag : String by lazy { scriptService.loadScript("${root}/global.frag") }
 
-    override fun initShaderPrograms(): Array<IGLProgram> {
+    override fun initShaderPrograms(): Map<String,IGLProgram> {
 
-        val array = Array<IGLProgram?>(ProgramType.values().size,{null})
+        val array = mutableMapOf<String,IGLProgram>()
 
         // Brushes
         val default = loadProgram(
                 "${root}/brushes/stroke_basic.vert",
                 "${root}/brushes/stroke_basic.geom",
                 "${root}/brushes/stroke_basic.frag")
-        array[ProgramType.STROKE_BASIC.ordinal] = default
-        array[ProgramType.STROKE_SPORE.ordinal] = loadProgram(
-                "${root}/brushes/brush_spore.vert",
-                "${root}/brushes/brush_spore.geom",
-                "${root}/brushes/brush_spore.frag")
-        array[ProgramType.STROKE_V2_LINE_PASS.ordinal] = loadProgram(
+        array[BasicCall.Key] = default
+//        array[ProgramType.STROKE_SPORE.ordinal] = loadProgram(
+//                "${root}/brushes/brush_spore.vert",
+//                "${root}/brushes/brush_spore.geom",
+//                "${root}/brushes/brush_spore.frag")
+        array[StrokeV2LinePass.Key] = loadProgram(
                 "${root}/brushes/stroke_pixel.vert",
                 null,
                 "${root}/brushes/stroke_pixel.frag")
-        array[ProgramType.STROKE_PIXEL.ordinal] = array[ProgramType.STROKE_V2_LINE_PASS.ordinal]
-        array[ProgramType.STROKE_INTENSIFY.ordinal] = loadProgram(
+        array[StrokePixelCall.Key] = array[StrokeV2LinePass.Key]!!
+        array[StrokeV2ApplyCall.Key] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/brushes/stroke_intensify.frag")
-        array[ProgramType.STROKE_APPLY.ordinal] = loadProgram(
+        array[StrokeApplyCall.Key] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/brushes/stroke_apply.frag")
-        array[ProgramType.STROKE_V3_LINE_PASS.ordinal] = loadProgram(
+        array[StrokeV3LinePass.Key] = loadProgram(
                 "${root}/brushes/stroke_v3_line.vert",
                 null,
                 "${root}/brushes/stroke_v3_line.frag")
 
         // Constructions
-        array[ProgramType.SQARE_GRADIENT.ordinal] = loadProgram(
+        array[SquareGradientCall.Key] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/constructions/square_grad.frag")
-        array[ProgramType.GRID.ordinal] = loadProgram(
+        array[GridCall.Key] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/constructions/pass_grid.frag")
 
         // Shapes
-        array[ProgramType.POLY_RENDER.ordinal] = loadProgram(
+        array[PolyRenderCall.Key] = loadProgram(
                 "${root}/shapes/poly_render.vert",
                 null,
                 "${root}/shapes/shape_render.frag")
-        array[ProgramType.LINE_RENDER.ordinal] = loadProgram(
+        array[LineRenderCall.Key] = loadProgram(
                 "${root}/shapes/line_render.vert",
                 "${root}/shapes/line_render.geom",
                 "${root}/shapes/shape_render.frag")
 
         // Filters
-        array[ProgramType.CHANGE_COLOR.ordinal] = loadProgram(
+        array[ChangeColorCall.Key] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/filters/pass_change_color.frag")
-        array[ProgramType.PASS_INVERT.ordinal] = loadProgram(
+        array[InvertCall.Key] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/filters/pass_invert.frag")
 
         // Special
-        array[ProgramType.FILL_AFTERPASS.ordinal] = loadProgram(
+        array[FillAfterpassCall.Key] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/special/pass_fill.frag")
-        array[ProgramType.PASS_BORDER.ordinal] = loadProgram(
+        array[BorderCall.Key] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/special/pass_border.frag")
 
         // Render
-        array[ProgramType.PASS_RENDER.ordinal] = loadProgram(
+        array[RenderCall.Key] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/render/pass_render.frag")
-        array[ProgramType.PASS_BASIC.ordinal] = loadProgram(
+        array[BasicCall.Key] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/render/pass_basic.frag")
 
 
-        return Array(ProgramType.values().size, {array.getOrNull(it) ?: default})
+        return array
     }
 
     fun loadProgram(vert: String?, geom: String?, frag: String?) : IGLProgram {

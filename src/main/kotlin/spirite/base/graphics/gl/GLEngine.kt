@@ -19,6 +19,7 @@ import rb.glow.glu.IPolygonTesselator
 import rb.glow.glu.MatrixBuilder.F.orthagonalProjectionMatrix
 import rb.glow.glu.MatrixBuilder.F.wrapTransform
 import rb.vectrix.linear.*
+import spirite.base.graphics.gl.shader.IGLShaderLoader
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.pc.JOGL.JOGLProvider
@@ -40,7 +41,7 @@ interface IGLEngine
 
 
     fun applyPassProgram(
-            programCall: ProgramCall,
+            programCall: IGlProgramCall,
             params: GLParameters,
             trans: ITransform?,
             x1: Float, y1: Float, x2: Float, y2: Float,
@@ -53,7 +54,7 @@ interface IGLEngine
             params: GLParameters, trans: ITransformF?)
 
     fun applyPolyProgram(
-            programCall: ProgramCall,
+            programCall: IGlProgramCall,
             xPoints: List<Float>,
             yPoints: List<Float>,
             numPoints: Int,
@@ -61,7 +62,7 @@ interface IGLEngine
             params: GLParameters,
             trans : ITransformF?)
     fun applyPrimitiveProgram(
-            programCall: ProgramCall,
+            programCall: IGlProgramCall,
             primitive: IGLPrimitive,
             params: GLParameters,
             trans: ITransformF?)
@@ -81,13 +82,14 @@ interface IGLEngine
 
 class GLEngine(
         private val glGetter: () -> IGL,
-        scriptService: IScriptService
+        scriptService: IScriptService,
+        shaderLoader: IGLShaderLoader
 ) : IGLEngine
 {
     override val tesselator: IPolygonTesselator get() = TODO("not implemented")
 
 
-    private val programs = initShaderPrograms(scriptService)
+    private val programs = shaderLoader.initShaderPrograms()
 
     //private val dbo : IGLRenderbuffer by lazy { gl.genRenderbuffer() }
     private lateinit var fbo : IGLFramebuffer
@@ -159,7 +161,7 @@ class GLEngine(
     // region Exposed Rendering Methods
 
     override fun applyPassProgram(
-            programCall: ProgramCall,
+            programCall: IGlProgramCall,
             params: GLParameters,
             trans: ITransform?,
             x1: Float, y1: Float, x2: Float, y2: Float,
@@ -250,7 +252,7 @@ class GLEngine(
     }
 
     override fun applyPolyProgram(
-            programCall: ProgramCall,
+            programCall: IGlProgramCall,
             xPoints: List<Float>,
             yPoints: List<Float>,
             numPoints: Int,
@@ -271,7 +273,7 @@ class GLEngine(
     }
 
     override fun applyPrimitiveProgram(
-            programCall: ProgramCall,
+            programCall: IGlProgramCall,
             primitive: IGLPrimitive,
             params: GLParameters,
             trans: ITransformF?
@@ -288,7 +290,7 @@ class GLEngine(
     // region Base Rendering
 
     private fun applyProgram(
-            programCall: ProgramCall,
+            programCall: IGlProgramCall,
             params: GLParameters,
             internalParams: List<GLUniform>,
             preparedPrimitive: IPreparedPrimitive)
@@ -303,7 +305,7 @@ class GLEngine(
             else -> gl.viewport(clipRect.x, clipRect.y, clipRect.width, clipRect.height)
         }
 
-        val program = programs[programCall.programType.ordinal]
+        val program = programs[programCall.programKey] !!
         gl.useProgram(program)
 
         // Bind Attribute Streams
@@ -336,7 +338,7 @@ class GLEngine(
             gl.enable( GLC.BLEND)
             when( params.useDefaultBlendMode) {
                 true -> {
-                    val blendMethod = programCall.programType.method
+                    val blendMethod = programCall.method
                     gl.blendFunc(blendMethod.sourceFactor,blendMethod.destFactor)
                     gl.blendEquation(blendMethod.formula)
                 }
@@ -347,14 +349,11 @@ class GLEngine(
             }
         }
 
-        when( programCall.programType) {
-            STROKE_V2_LINE_PASS,
-            STROKE_V3_LINE_PASS -> {
-                gl.enable(GLC.LINE_SMOOTH)
-                gl.enable(GLC.BLEND)
-                gl.depthMask(false)
-                gl.lineWidth(1f)
-            }
+        if( programCall.lineSmoothing) {
+            gl.enable(GLC.LINE_SMOOTH)
+            gl.enable(GLC.BLEND)
+            gl.depthMask(false)
+            gl.lineWidth(1f)
         }
 
         // Draw
@@ -417,10 +416,6 @@ class GLEngine(
     }
 
     // endregion
-
-    private fun initShaderPrograms(scriptService: IScriptService) : Array<IGLProgram> {
-        return GL330ShaderLoader(gl, scriptService).initShaderPrograms()
-    }
 }
 
 
