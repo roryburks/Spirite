@@ -13,11 +13,11 @@ import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.util.linear.Rect
-import sgui.generic.components.initializers.CrossInitializer
-import sgui.generic.components.initializers.CrossRowInitializer
+import sgui.generic.components.crossContainer.CrossInitializer
+import sgui.generic.components.crossContainer.CrossRowInitializer
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicCursor.DEFAULT
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.generic.components.IScrollContainer
 import sgui.generic.components.events.MouseEvent
 import sgui.swing.skin.Skin

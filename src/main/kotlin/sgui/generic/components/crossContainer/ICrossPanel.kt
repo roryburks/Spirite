@@ -1,6 +1,6 @@
-package sgui.generic.components
+package sgui.generic.components.crossContainer
 
-import sgui.generic.components.initializers.CrossInitializer
+import sgui.generic.components.IComponent
 
 interface ICrossPanel : IComponent {
     fun setLayout(constructor: CrossInitializer.()->Unit)

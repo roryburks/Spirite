@@ -19,17 +19,13 @@ abstract class GraphicsContext {
     abstract val width: Int
     abstract val height: Int
 
-    /** Setting to null produces undefined behavior.  */
     abstract var transform: ITransformF
     abstract var alpha: Float
     abstract var composite: Composite
     abstract var color: Color
-
-    /** May return null if the underlying engine's Line Attributes aren't
-     * representable by the generic LineAttributes class.  */
     abstract var lineAttributes: LineAttributes
 
-    abstract fun drawBounds(image: IImage, c: Int)
+    abstract fun drawBounds(image: IImage, c: Int)  // TODO: Remove
 
     abstract fun clear( color: Color? = null)
     abstract fun preTranslate(offsetX: Float, offsetY: Float)

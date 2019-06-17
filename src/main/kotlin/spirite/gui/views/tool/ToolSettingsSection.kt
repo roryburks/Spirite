@@ -16,7 +16,7 @@ import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComboBox
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.swing.SwIcon
 import sgui.swing.skin.Skin
 import spirite.hybrid.Hybrid

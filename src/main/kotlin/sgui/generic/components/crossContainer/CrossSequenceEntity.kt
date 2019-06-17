@@ -1,4 +1,4 @@
-package sgui.generic.components.initializers
+package sgui.generic.components.crossContainer
 
 import sgui.generic.components.IComponent
 

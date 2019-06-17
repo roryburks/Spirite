@@ -10,12 +10,12 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import rb.glow.color.Colors
-import sgui.swing.advancedComponents.ITreeElementConstructor
-import sgui.swing.advancedComponents.ITreeView
-import sgui.swing.advancedComponents.ITreeViewNonUI.*
-import sgui.swing.advancedComponents.ITreeViewNonUI.DropDirection.*
+import sgui.generic.components.ITreeElementConstructor
+import sgui.generic.components.ITreeView
+import sgui.generic.components.ITreeViewNonUI.*
+import sgui.generic.components.ITreeViewNonUI.DropDirection.*
 import sgui.generic.components.IComponent
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.generic.components.IToggleButton
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseButton.LEFT
@@ -25,6 +25,8 @@ import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
 import sgui.generic.systems.IGlobalMouseHook
+import sgui.generic.transfer.ITransferObject
+import spirite.gui.resources.Transferables
 import java.awt.datatransfer.Transferable
 
 class PrimaryGroupView
@@ -122,13 +124,13 @@ private constructor(
     private open inner class BaseNodeAttributes : ITreeNodeAttributes<Node> {
         override fun makeComponent(t: Node) : ITreeComponent = NormalNodeComponent(t)
 
-        override fun makeTransferable(t: Node): Transferable {return NodeTransferable(t)}
+        override fun makeTransferable(t: Node): ITransferObject {return Transferables.NodeTransferObject(t)}
 
         override fun canDrag(): Boolean = true
         override fun dragOut( t: Node, up: Boolean, inArea: Boolean) {}
-        override fun canImport(trans: Transferable) = trans.isDataFlavorSupported(NodeTransferable.FLAVOR)
-        override fun interpretDrop(trans: Transferable, dropInto: ITreeNode<Node>, dropDirection: DropDirection) {
-            val node = trans.getTransferData(NodeTransferable.FLAVOR) as? Node ?: return
+        override fun canImport(trans: ITransferObject) = trans.dataTypes.contains(Transferables.NodeTransferObject.Key)
+        override fun interpretDrop(trans: ITransferObject, dropInto: ITreeNode<Node>, dropDirection: DropDirection) {
+            val node = trans.getData(Transferables.NodeTransferObject.Key) as? Node ?: return
             val relativeTo = dropInto.value
             val groupTree = workspace?.groupTree ?: return
 

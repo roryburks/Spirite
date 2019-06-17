@@ -1,5 +1,6 @@
 package spirite.gui.resources
 
+import sgui.generic.transfer.ITransferObject
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.groupTree.GroupTree.Node
 import java.awt.datatransfer.DataFlavor
@@ -19,6 +20,19 @@ object Transferables {
         companion object {
             val FLAVOR = DataFlavor(NodeTransferable::class.java, "Group Tree GroupNode")
             val flavors = arrayOf(FLAVOR)
+        }
+    }
+
+    class NodeTransferObject(val node: Node) : ITransferObject {
+        override val dataTypes: Set<String> get() = setOf(Key)
+
+        override fun getData(type: String) = when(type) {
+            Key -> node
+            else -> null
+        }
+
+        companion object {
+            const val Key = "SpiriteNode"
         }
     }
 

@@ -1,9 +1,9 @@
 package sgui.swing.components
 
 import sgui.swing.advancedComponents.CrossContainer.CrossLayout
-import sgui.generic.components.initializers.CrossInitializer
+import sgui.generic.components.crossContainer.CrossInitializer
 import sgui.generic.components.IComponent
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.swing.skin.Skin.Global.Bg
 import sgui.swing.mouseSystem.adaptMouseSystem
 import java.awt.Graphics

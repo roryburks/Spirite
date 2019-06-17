@@ -1,10 +1,9 @@
-package sgui.generic.components.initializers
+package sgui.generic.components.crossContainer
 
 import sgui.generic.Orientation
 import sgui.generic.Orientation.HORIZONTAL
 import sgui.generic.Orientation.VERTICAL
 import sgui.generic.components.IComponent
-import sgui.swing.advancedComponents.CrossContainer.CrossScheme
 
 class CrossInitializer {
     val rows

@@ -206,6 +206,15 @@ data class MutableTransformD(
         m12 = n12
     }
 
+    fun set(other: ITransform) {
+        m00 = other.m00
+        m01 = other.m01
+        m02 = other.m02
+        m10 = other.m10
+        m11 = other.m11
+        m12 = other.m12
+    }
+
     fun reset() {
         m00 = 1.0
         m01 = 0.0

@@ -26,7 +26,7 @@ class MagneticFillBehavior(penner: Penner, val drawer: IMagneticFillModule, val 
     }
 
     override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {
-        gc.transform = view.tWorkspaceToScreen
+        gc.transform  = view.tWorkspaceToScreen
         gc.color = ColorARGB32Normal(0xFFFFFF xor color.argb32)
         val fx = drawer.magFillXs
         val fy = drawer.magFillYs

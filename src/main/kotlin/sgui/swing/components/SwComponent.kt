@@ -227,7 +227,7 @@ private object SwCompMap {
 
     fun ageOutMappings() {
         mapFromJCompHashCode.entries
-                .removeIf { entry ->
+                .removeAll { entry ->
                     entry.value.removeIf { it.first.get() == null || it.second.get() == null}
                     entry.value.isEmpty()
                 }

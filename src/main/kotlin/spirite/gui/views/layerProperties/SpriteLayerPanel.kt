@@ -12,7 +12,7 @@ import sgui.generic.components.IBoxList.IBoxComponent
 import sgui.generic.components.IBoxList.IMovementContract
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_RAISED
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 

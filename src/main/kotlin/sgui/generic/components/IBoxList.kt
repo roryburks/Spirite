@@ -4,7 +4,7 @@ import rb.extendo.delegates.OnChangeDelegate
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
-import sgui.generic.components.initializers.CrossInitializer
+import sgui.generic.components.crossContainer.CrossInitializer
 import sgui.generic.components.IBoxList.*
 import kotlin.math.max
 
@@ -134,7 +134,7 @@ abstract class BoxList<T> constructor(
     }
 
     override fun remove( t: T) {
-        _entries.removeIf { it.value == t }
+        _entries.removeAll { it.value == t }
         rebuild()
     }
     override fun clear() {

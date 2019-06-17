@@ -9,7 +9,7 @@ import sgui.generic.Direction
 import sgui.generic.UIPoint
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.generic.components.events.MouseEvent.MouseEventType.RELEASED

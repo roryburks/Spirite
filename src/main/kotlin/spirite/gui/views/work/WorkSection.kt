@@ -15,7 +15,7 @@ import spirite.base.util.linear.Rect
 import sgui.generic.Orientation.HORIZONTAL
 import sgui.generic.Orientation.VERTICAL
 import sgui.generic.components.IComponent
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import spirite.hybrid.Hybrid
 import sgui.swing.components.SwPanel
 import java.awt.Font

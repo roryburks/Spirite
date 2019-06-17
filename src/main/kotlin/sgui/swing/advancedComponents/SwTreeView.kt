@@ -8,13 +8,15 @@ import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
 import sgui.generic.components.IComponent
 import sgui.generic.components.IToggleButton
-import sgui.generic.components.initializers.CrossColInitializer
+import sgui.generic.components.ITreeElementConstructor
+import sgui.generic.components.crossContainer.CrossColInitializer
 import sgui.swing.JColor
 import sgui.swing.SwingComponentProvider
 import sgui.swing.advancedComponents.CrossContainer.CrossLayout
-import sgui.swing.advancedComponents.ITreeElementConstructor.ITNode
-import sgui.swing.advancedComponents.ITreeViewNonUI.*
-import sgui.swing.advancedComponents.ITreeViewNonUI.DropDirection.*
+import sgui.generic.components.ITreeElementConstructor.ITNode
+import sgui.generic.components.ITreeView
+import sgui.generic.components.ITreeViewNonUI.*
+import sgui.generic.components.ITreeViewNonUI.DropDirection.*
 import sgui.swing.components.SJPanel
 import sgui.swing.components.SwComponent
 import sgui.swing.dragAndDrop.addDragSource
@@ -23,6 +25,7 @@ import sgui.swing.jcolor
 import sgui.swing.mouseSystem.SimpleMouseListener
 import sgui.swing.skin.Skin.ContentTree.Background
 import sgui.swing.skin.Skin.ContentTree.SelectedBackground
+import sgui.swing.transfer.SwTransferObjectConverter
 import spirite.gui.resources.SpiriteIcons.SmallIcons.*
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
@@ -291,8 +294,8 @@ private constructor(private val imp : SwTreeViewImp<T>,
 
                 val interpreter = (draggingRelativeTo?.attributes ?: treeRootInterpreter)
                         ?: return
-                if (interpreter.canImport(evt.transferable) && draggingRelativeTo != null)
-                    interpreter.interpretDrop(evt.transferable, draggingRelativeTo, draggingDirection)
+                if (interpreter.canImport(SwTransferObjectConverter.convert(evt.transferable)) && draggingRelativeTo != null)
+                    interpreter.interpretDrop(SwTransferObjectConverter.convert(evt.transferable), draggingRelativeTo, draggingDirection)
             }finally {
                 dragging = null
             }
@@ -322,7 +325,7 @@ private constructor(private val imp : SwTreeViewImp<T>,
             }
 
             val binding = node?.attributes ?: treeRootInterpreter
-            if( binding?.canImport(evt.transferable) == true)
+            if( binding?.canImport(SwTransferObjectConverter.convert(evt.transferable)) == true)
                 evt.acceptDrag(DnDConstants.ACTION_COPY)
             else
                 evt.rejectDrag()
@@ -372,7 +375,7 @@ private constructor(private val imp : SwTreeViewImp<T>,
                     cursor,
                     cursorImage,
                     Point(10, 10),
-                    node.attributes.makeTransferable(node.value),
+                    SwTransferObjectConverter.convert(node.attributes.makeTransferable(node.value)),
                     dragSourceListener)
         }
     }
@@ -422,11 +425,11 @@ private constructor(private val imp : SwTreeViewImp<T>,
         compToNodeMap.forEach {
             val isSelected = selected == it.value.value
             val color = it.value.attributes.getBackgroundColor(it.value.value, isSelected) ?: when {
-                isSelected -> selectedColor.jcolor
+                isSelected -> selectedColor
                 else -> null
             }
             if( color != null) {
-                g2.color = color
+                g2.color = color.jcolor
                 val h = max(it.key.height, it.value.component?.leftComponent?.height ?: 0)
                 g2.fillRect(0, it.key.y, width, h)
             }

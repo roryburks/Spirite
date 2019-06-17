@@ -1,7 +1,7 @@
 package sgui.swing.components
 
 import sgui.swing.advancedComponents.CrossContainer.CrossLayout
-import sgui.generic.components.initializers.CrossInitializer
+import sgui.generic.components.crossContainer.CrossInitializer
 import sgui.generic.components.BoxList
 import sgui.generic.components.IComponent
 import sgui.swing.SwUtil

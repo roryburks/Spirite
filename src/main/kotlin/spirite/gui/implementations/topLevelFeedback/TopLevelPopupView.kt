@@ -3,7 +3,7 @@ package spirite.gui.implementations.topLevelFeedback
 import rb.extendo.extensions.removeFirst
 import rb.vectrix.mathUtil.i
 import sgui.generic.components.IComponent
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import spirite.hybrid.Hybrid
 
 class TopLevelPopupView(private  val imp: ICrossPanel = Hybrid.ui.CrossPanel())

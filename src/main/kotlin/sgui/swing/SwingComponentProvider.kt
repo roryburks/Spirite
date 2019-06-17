@@ -5,10 +5,11 @@ import sgui.swing.components.SwGradientSlider
 import sgui.swing.components.*
 import rb.glow.IImage
 import sgui.generic.Orientation
-import sgui.swing.advancedComponents.ITreeView
+import sgui.generic.components.ITreeView
 import sgui.swing.advancedComponents.SwTreeView
-import sgui.generic.components.initializers.CrossInitializer
+import sgui.generic.components.crossContainer.CrossInitializer
 import rb.glow.color.SColor
+import sgui.generic.components.crossContainer.ICrossPanel
 
 object SwingComponentProvider : IComponentProvider {
 

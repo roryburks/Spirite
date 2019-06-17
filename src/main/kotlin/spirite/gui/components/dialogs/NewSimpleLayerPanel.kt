@@ -8,7 +8,7 @@ import rb.glow.color.Color
 import rb.glow.color.Colors
 import sgui.generic.Orientation.HORIZONTAL
 import sgui.generic.Orientation.VERTICAL
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
 import spirite.hybrid.Hybrid
 

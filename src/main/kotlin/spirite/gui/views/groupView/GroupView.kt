@@ -6,7 +6,7 @@ import spirite.base.brains.IMasterControl
 import rb.glow.color.ColorARGB32Normal
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.swing.SwIcon
 import spirite.hybrid.Hybrid
 

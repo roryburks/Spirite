@@ -3,9 +3,9 @@ package sgui.generic.components
 import rb.glow.IImage
 import rb.glow.color.Colors
 import sgui.generic.Orientation
-import sgui.swing.advancedComponents.ITreeView
-import sgui.generic.components.initializers.CrossInitializer
+import sgui.generic.components.crossContainer.CrossInitializer
 import rb.glow.color.SColor
+import sgui.generic.components.crossContainer.ICrossPanel
 
 interface IComponentProvider {
     fun Button(str: String? = null) : IButton

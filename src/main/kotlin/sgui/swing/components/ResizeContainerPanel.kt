@@ -9,7 +9,7 @@ import sgui.generic.Orientation.HORIZONTAL
 import sgui.generic.Orientation.VERTICAL
 import sgui.generic.components.IResizeContainerPanel.IResizeBar
 import sgui.generic.components.IComponent
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import sgui.generic.components.IResizeContainerPanel
 import sgui.generic.components.events.MouseEvent
 import sgui.generic.components.events.MouseEvent.MouseEventType.DRAGGED

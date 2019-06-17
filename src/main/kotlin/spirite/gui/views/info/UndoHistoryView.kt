@@ -4,8 +4,8 @@ import rb.owl.observer
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import spirite.base.imageData.undo.UndoIndex
-import sgui.swing.advancedComponents.ITreeViewNonUI.SimpleTreeComponent
-import sgui.swing.advancedComponents.ITreeViewNonUI.ITreeNodeAttributes
+import sgui.generic.components.ITreeViewNonUI.SimpleTreeComponent
+import sgui.generic.components.ITreeViewNonUI.ITreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
 import sgui.swing.SwIcon

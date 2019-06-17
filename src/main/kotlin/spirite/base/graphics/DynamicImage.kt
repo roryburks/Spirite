@@ -82,7 +82,7 @@ class DynamicImage(
             }
 
             using(context.buffer) { buffer ->
-                gc.transform = tCompositeToImage
+                gc.transform =tCompositeToImage
                 gc.preTranslate(-combiningBounds.x + 0f, -combiningBounds.y + 0f)
                 gc.composite = SRC
                 gc.renderImage(buffer, 0, 0)

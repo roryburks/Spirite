@@ -16,10 +16,10 @@ import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimat
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
 import spirite.base.util.linear.Rect
 import sgui.generic.UIPoint
-import sgui.generic.components.initializers.CrossInitializer
+import sgui.generic.components.crossContainer.CrossInitializer
 import sgui.generic.components.IComponent
 import sgui.generic.components.IComponent.BasicBorder.BASIC
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import spirite.hybrid.Hybrid
 import sgui.swing.components.SwComponent
 import java.awt.BasicStroke

@@ -5,7 +5,7 @@ import sgui.generic.Orientation.HORIZONTAL
 import sgui.generic.Orientation.VERTICAL
 import sgui.swing.components.ResizeContainerPanel
 import sgui.generic.components.IComponent
-import sgui.generic.components.ICrossPanel
+import sgui.generic.components.crossContainer.ICrossPanel
 import spirite.hybrid.Hybrid
 
 class OmniContainer

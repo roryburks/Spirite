@@ -1,5 +1,6 @@
 package spirite.base.graphics
 
+import rb.glow.IImage
 import spirite.base.brains.toolset.ColorChangeMode
 import rb.glow.color.Color
 

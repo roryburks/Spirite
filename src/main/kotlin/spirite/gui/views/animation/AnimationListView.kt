@@ -11,8 +11,8 @@ import spirite.base.brains.commands.RenameAnimationCommand
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import sgui.swing.advancedComponents.ITreeViewNonUI.ITreeComponent
-import sgui.swing.advancedComponents.ITreeViewNonUI.ITreeNodeAttributes
+import sgui.generic.components.ITreeViewNonUI.ITreeComponent
+import sgui.generic.components.ITreeViewNonUI.ITreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sgui.generic.components.IComponent
 import sgui.generic.components.events.MouseEvent
