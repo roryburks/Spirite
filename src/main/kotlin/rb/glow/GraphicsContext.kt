@@ -5,7 +5,7 @@ import rb.vectrix.linear.ITransformF
 import rb.glow.CapMethod.NONE
 import rb.glow.JoinMethod.MITER
 import spirite.base.graphics.RenderRubric
-import spirite.base.util.shapes.IShape
+import rb.vectrix.shapes.IShape
 import java.util.*
 
 /**

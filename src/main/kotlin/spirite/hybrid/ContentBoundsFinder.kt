@@ -27,7 +27,7 @@ object ContentBoundsFinder {
      * If true, it only crops if the background is transparent, if
      * false it will crop any background jcolor.
      * @return
-     * The Rectangle of the image as it should be cropped.
+     * The RectShape of the image as it should be cropped.
      * @throws
      * UnsupportedDataTypeException if the ColorModel does not conform
      * to the a supported format

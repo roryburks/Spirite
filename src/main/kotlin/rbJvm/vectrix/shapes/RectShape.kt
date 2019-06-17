@@ -1,24 +1,36 @@
-package spirite.base.util.shapes
+package rbJvm.vectrix.shapes
 
 import rb.glow.gl.GLC
 import rb.glow.gle.GLPrimitive
 import rb.vectrix.mathUtil.d
+import rb.vectrix.mathUtil.f
+import rb.vectrix.shapes.IShape
 import rbJvm.vectrix.compaction.FloatCompactor
 
-// TODO: Merge with Vectrix Shapes
-class Rectangle(
+// TODO: Make not-dependent on JVM
+class RectShape(
         val x : Float,
         val y: Float,
         val w: Float,
         val h: Float) : IShape
 {
-    override fun buildPrimitive(maxError: Float, attrLengths: IntArray, packer: (x: Float, y: Float, writer: FloatCompactor) -> Unit): GLPrimitive {
+    fun buildPrimitive(maxError: Float, attrLengths: IntArray, packer: (x: Float, y: Float, writer: FloatCompactor) -> Unit): GLPrimitive {
         val compactor = FloatCompactor()
         packer(x, y,compactor)
         packer(x+w, y,compactor)
         packer(x, y+h,compactor)
         packer(x+w, y+h,compactor)
         return GLPrimitive(compactor.toArray(), attrLengths, GLC.TRIANGLE_STRIP, intArrayOf(4))
+    }
+
+    override fun buildPath(maxError: Float): Pair<FloatArray, FloatArray> {
+        val xComp = FloatCompactor()
+        val yComp = FloatCompactor()
+        doAlongPath(maxError) { x, y ->
+            xComp.add(x.f)
+            yComp.add(y.f)
+        }
+        return Pair(xComp.toArray(), yComp.toArray())
     }
 
     override fun doAlongPath(maxError: Float, lambda: (x: Double, y: Double) -> Unit) {

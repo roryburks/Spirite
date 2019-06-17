@@ -13,11 +13,13 @@ import rb.glow.CapMethod
 import rb.glow.JoinMethod
 import rbJvm.glow.jogl.JOGLProvider
 import rb.glow.gl.GLImage
+import rb.vectrix.mathUtil.f
 import javax.swing.SwingUtilities
 
 interface IGLEngine
 {
     val tesselator : IPolygonTesselator
+    val converter: IImageConverter
 
     val width : Int
     val height : Int
@@ -73,7 +75,8 @@ interface IGLEngine
 class GLEngine(
         private val _glGetter: () -> IGL,
         override val tesselator: IPolygonTesselator,
-        shaderLoader: IGLShaderLoader)
+        shaderLoader: IGLShaderLoader,
+        override val converter: IImageConverter)
     : IGLEngine
 {
     private val programs = shaderLoader.initShaderPrograms()
@@ -290,7 +293,7 @@ class GLEngine(
         val clipRect = params.clipRect
         when( clipRect) {
             null -> gl.viewport( 0, 0, w, h)
-            else -> gl.viewport(clipRect.x, clipRect.y, clipRect.width, clipRect.height)
+            else -> gl.viewport(clipRect.x1i, clipRect.y1i, clipRect.wi, clipRect.hi)
         }
 
         val program = programs[programCall.programKey] !!
@@ -381,10 +384,10 @@ class GLEngine(
             x1 = 0f; x2 = params.width + 0f
             y1 = 0f; y2 = params.heigth + 0f
         } else {
-            x1 = clipRect.x + 0f
-            x2 = clipRect.x + clipRect.width + 0f
-            y1 = clipRect.y + 0f
-            y2 = clipRect.y + clipRect.height + 0f
+            x1 = clipRect.x1i.f
+            x2 = clipRect.x2i.f
+            y1 = clipRect.y1i.f
+            y2 = clipRect.y2i.f
         }
 
         var perspective = orthagonalProjectionMatrix(

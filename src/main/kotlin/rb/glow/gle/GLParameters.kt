@@ -1,13 +1,14 @@
 package rb.glow.gle
 
 import rb.glow.gl.GLImage
+import rb.vectrix.shapes.RectI
 import spirite.base.util.linear.Rect
 
 data class GLParameters(
         var width : Int,
         var heigth: Int,
         var flip: Boolean = false,
-        var clipRect : Rect? = null,
+        var clipRect : RectI? = null,
         var premultiplied: Boolean = true,
 
         var texture1 : GLImage? = null,

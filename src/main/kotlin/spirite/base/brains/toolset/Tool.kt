@@ -102,8 +102,8 @@ class Fill( toolset: Toolset) : Tool(toolset){
 }
 
 enum class BoxSelectionShape( val hrName : String) {
-    RECTANGLE("Rectangle"),
-    OVAL("Oval"),
+    RECTANGLE("RectShape"),
+    OVAL("OvalShape"),
     ;
     override fun toString() = hrName
 }

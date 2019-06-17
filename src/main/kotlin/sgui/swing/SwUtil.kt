@@ -24,7 +24,7 @@ object SwUtil {
     }
 
     /***
-     * Draws the string centered in the given Rectangle (using the font already
+     * Draws the string centered in the given RectShape (using the font already
      * set up in the Graphics)
      */
     fun drawStringCenter(g: Graphics, text: String, rect: Rectangle) {

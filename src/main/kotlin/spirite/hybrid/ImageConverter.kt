@@ -6,15 +6,28 @@ import rb.glow.gl.GLC
 import rb.glow.gl.IGL
 import rb.glow.gl.GLImage
 import rb.glow.gle.IGLEngine
+import rb.glow.gle.IImageConverter
 import rbJvm.glow.jogl.JOGL.JOGLTextureSource
 import spirite.pc.graphics.ImageBI
 import spirite.pc.toBufferedImage
 import spirite.pc.util.RasterHelper
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
+import kotlin.UnsupportedOperationException
+import kotlin.reflect.KClass
 
 typealias NativeImage = ImageBI
 typealias InternalImage = GLImage
+
+class AwtImageConverter() : IImageConverter
+{
+    override fun convert(image: IImage, toType: KClass<*>) = when( toType) {
+        GLImage::class -> ImageConverter(Hybrid.gle).convert<GLImage>(image)
+        ImageBI::class -> ImageConverter(Hybrid.gle).convert<ImageBI>(image)
+        else -> throw UnsupportedOperationException("Unrecognized")
+    }
+
+}
 
 class ImageConverter(
         val gle: IGLEngine? = null

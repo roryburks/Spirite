@@ -43,7 +43,7 @@ class AafExporter(
         val uniqueImages = getAllImages(animation)
                 .toList()
 
-        // Step 3: Use Rectangle Packing Algorithm to pack them.
+        // Step 3: Use RectShape Packing Algorithm to pack them.
         val packed = ModifiedSleatorAlgorithm(
                 uniqueImages.map { Vec2i(it.width, it.height) })
 

@@ -18,9 +18,9 @@ import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.pen.Penner
 import spirite.base.pen.behaviors.TransformBehavior.TransformStates.*
 import spirite.base.util.linear.Rect
-import spirite.base.util.shapes.IShape
-import spirite.base.util.shapes.Oval
-import spirite.base.util.shapes.Rectangle
+import rb.vectrix.shapes.IShape
+import rbJvm.vectrix.shapes.OvalShape
+import rbJvm.vectrix.shapes.RectShape
 import spirite.gui.views.work.WorkSectionView
 import kotlin.math.atan2
 
@@ -143,22 +143,22 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         val b = 1/zoom
 
         val shapes = mutableListOf<IShape>()
-        shapes.add(Rectangle(sw+b, b, x2-sw-b*2, sh-b*2))	// N
-        shapes.add(Rectangle(x2+b, sh+b, sw-b*2, y2-sh-b*2))// E
-        shapes.add(Rectangle(sw+b, y2+b, x2-sw-b*2, sh-b*2))// S
-        shapes.add(Rectangle(0+b, sh+b, sw-b*2, y2-sh-b*2))	// W
+        shapes.add(RectShape(sw + b, b, x2 - sw - b * 2, sh - b * 2))	// N
+        shapes.add(RectShape(x2 + b, sh + b, sw - b * 2, y2 - sh - b * 2))// E
+        shapes.add(RectShape(sw + b, y2 + b, x2 - sw - b * 2, sh - b * 2))// S
+        shapes.add(RectShape(0 + b, sh + b, sw - b * 2, y2 - sh - b * 2))	// W
 
-        shapes.add(Rectangle(b, b, sw-b*2, sh-b*2))			// NW
-        shapes.add(Rectangle(x2+b, b, sw-b*2, sh-b*2))		// NE
-        shapes.add(Rectangle(x2+b, y2+b, sw-b*2, sh-b*2))	// SE
-        shapes.add(Rectangle(b, y2+b, sw-b*2, sh-b*2))		// SW
+        shapes.add(RectShape(b, b, sw - b * 2, sh - b * 2))			// NW
+        shapes.add(RectShape(x2 + b, b, sw - b * 2, sh - b * 2))		// NE
+        shapes.add(RectShape(x2 + b, y2 + b, sw - b * 2, sh - b * 2))	// SE
+        shapes.add(RectShape(b, y2 + b, sw - b * 2, sh - b * 2))		// SW
 
-        shapes.add(Oval( -of, -of, di, di))	// NW
-        shapes.add(Oval( w+of, -of, di, di))	// NE
-        shapes.add(Oval( w+of, h+of, di, di))	// SE
-        shapes.add(Oval( -of, h+of, di, di))	// SW
+        shapes.add(OvalShape(-of, -of, di, di))	// NW
+        shapes.add(OvalShape(w + of, -of, di, di))	// NE
+        shapes.add(OvalShape(w + of, h + of, di, di))	// SE
+        shapes.add(OvalShape(-of, h + of, di, di))	// SW
 
-        shapes.add(Rectangle(sw+b, sh+b, x2-sw-b*2, y2-sh-b*2))	// Center
+        shapes.add(RectShape(sw + b, sh + b, x2 - sw - b * 2, y2 - sh - b * 2))	// Center
 
         gc.alpha = 0.5f
 

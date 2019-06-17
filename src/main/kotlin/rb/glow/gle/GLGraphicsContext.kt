@@ -10,18 +10,24 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
-import spirite.base.graphics.*
 import rb.glow.Composite.SRC_OVER
 import rb.glow.JoinMethod.ROUNDED
 import spirite.base.graphics.RenderMethodType.*
 import rb.glow.gle.RenderCall.RenderAlgorithm
 import rb.glow.gle.RenderCall.RenderAlgorithm.*
+import rb.vectrix.shapes.IShape
+import rb.vectrix.shapes.RectI
+
+
+// Need to move FloatCompactors to non-JVM
+import rbJvm.vectrix.shapes.OvalShape
+
+// Figure out dependencies
+import spirite.base.graphics.RenderRubric
+
+// These need to be separated out of GraphicsContext and into a separate IDrawer only Spirite has
 import spirite.base.graphics.gl.BorderCall
 import spirite.base.graphics.gl.GridCall
-import spirite.base.util.linear.Rect
-import spirite.base.util.shapes.IShape
-import spirite.base.util.shapes.Oval
-import spirite.hybrid.ImageConverter
 
 
 class GLGraphicsContext : GraphicsContext {
@@ -74,7 +80,7 @@ class GLGraphicsContext : GraphicsContext {
             val gc = buffer.graphics
             gc.clear()
 
-            val texture = ImageConverter(gle).convert<GLImage>(image)
+            val texture = gle.converter.convert(image, GLImage::class) as GLImage // ImageConverter(gle).convert<GLImage>(image)
             val bufferParams = cachedParams.copy(texture1 = texture)
             gc.applyPassProgram(BasicCall(),
                     bufferParams, transform, 0f, 0f, image.width + 0f, image.height + 0f)
@@ -138,7 +144,7 @@ class GLGraphicsContext : GraphicsContext {
     override var lineAttributes: LineAttributes = defaultLA
 
     override fun setClip(i: Int, j: Int, width: Int, height: Int) {
-        cachedParams.clipRect = Rect( i, j, width, height)
+        cachedParams.clipRect = RectI( i, j, width, height)
     }
 
     // endregion
@@ -159,7 +165,7 @@ class GLGraphicsContext : GraphicsContext {
     }
 
     override fun drawOval(x: Int, y: Int, w: Int, h: Int) {
-        draw(Oval(x + w / 2.0f, y + h / 2.0f, w / 2.0f, h / 2.0f))
+        draw(OvalShape(x + w / 2.0f, y + h / 2.0f, w / 2.0f, h / 2.0f))
     }
 
     override fun drawPolyLine(x: IntArray, y: IntArray, count: Int) {
@@ -199,7 +205,7 @@ class GLGraphicsContext : GraphicsContext {
     }
 
     override fun fillOval(x: Int, y: Int, w: Int, h: Int) {
-        fill(Oval(x + w / 2.0f, y + h / 2.0f, w / 2.0f, h / 2.0f))
+        fill(OvalShape(x + w / 2.0f, y + h / 2.0f, w / 2.0f, h / 2.0f))
     }
 
     override fun fill(shape: IShape) {
@@ -261,7 +267,7 @@ class GLGraphicsContext : GraphicsContext {
             }
         }
 
-        params.texture1 = ImageConverter(gle).convert<GLImage>(rawImage)
+        params.texture1 = gle.converter.convert(rawImage, GLImage::class) as GLImage // ImageConverter(gle).convert<GLImage>(rawImage)
 
         val tDraw = when( render) {
             null -> transform

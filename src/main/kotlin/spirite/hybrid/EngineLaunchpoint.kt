@@ -13,6 +13,7 @@ object EngineLaunchpoint {
         GLEngine(
                 { JOGLProvider.gl },
                 GluPolygonTesselater,
-                GL330ShaderLoader(JOGLProvider.gl, JClassScriptService()))
+                GL330ShaderLoader(JOGLProvider.gl, JClassScriptService()),
+                AwtImageConverter())
     }
 }

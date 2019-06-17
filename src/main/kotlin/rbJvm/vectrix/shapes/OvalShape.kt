@@ -1,22 +1,23 @@
-package spirite.base.util.shapes
+package rbJvm.vectrix.shapes
 
 import com.hackoeur.jglm.support.FastMath
 import rb.glow.gl.GLC
 import rb.glow.gle.GLPrimitive
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
+import rb.vectrix.shapes.IShape
 import rbJvm.vectrix.compaction.FloatCompactor
 import kotlin.math.PI
 
 
-// TODO: Merge with Vectrix Shapes
-data class Oval(
+// TODO: Make not-dependent on JVM
+data class OvalShape(
         val x : Float,
         val y: Float,
         val r_h: Float,
         val r_v: Float
 ) : IShape {
-    override fun buildPrimitive(maxError: Float, attrLengths: IntArray, packer: (x: Float, y: Float, writer: FloatCompactor) -> Unit): GLPrimitive {
+    fun buildPrimitive(maxError: Float, attrLengths: IntArray, packer: (x: Float, y: Float, writer: FloatCompactor) -> Unit): GLPrimitive {
         val compactor = FloatCompactor()
 
         packer(x,y,compactor)
@@ -25,6 +26,15 @@ data class Oval(
         }
 
         return GLPrimitive(compactor.toArray(), attrLengths, GLC.TRIANGLE_FAN, intArrayOf(compactor.size))
+    }
+    override fun buildPath(maxError: Float): Pair<FloatArray, FloatArray> {
+        val xComp = FloatCompactor()
+        val yComp = FloatCompactor()
+        doAlongPath(maxError) { x, y ->
+            xComp.add(x.f)
+            yComp.add(y.f)
+        }
+        return Pair(xComp.toArray(), yComp.toArray())
     }
 
     override fun doAlongPath(maxError: Float, lambda: (x: Double, y: Double) -> Unit) {

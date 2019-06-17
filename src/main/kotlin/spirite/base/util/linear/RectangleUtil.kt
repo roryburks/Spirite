@@ -6,7 +6,7 @@ import rb.vectrix.linear.Vec2f
 // TODO: Merge into Vectrix once spirite.Rect is replaced with Vectrix.RectI
 object RectangleUtil {
     /**
-     * Constructs a non-negative dimension Rectangle from two coordinates
+     * Constructs a non-negative dimension RectShape from two coordinates
      */
     fun rectFromEndpoints(x1: Int, y1: Int, x2: Int, y2: Int): Rect {
         return Rect(Math.min(x1, x2), Math.min(y1, y2),
@@ -56,7 +56,7 @@ object RectangleUtil {
         return Rect(x1, y1, x2 - x1, y2 - y1)
     }
 
-    /** Stretches the Rectangle from the center by a given scaler  */
+    /** Stretches the RectShape from the center by a given scaler  */
     fun scaleRect(cropSection: Rect, scalar: Float): Rect {
         return Rect(
                 cropSection.x - Math.round(cropSection.width * (scalar - 1) / 2.0f),
