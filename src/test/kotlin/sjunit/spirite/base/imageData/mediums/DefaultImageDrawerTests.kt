@@ -6,7 +6,7 @@ import org.junit.Test
 import rb.glow.color.Colors
 import sjunit.TestConfig
 import sjunit.TestHelper
-import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
+import spirite.specialRendering.stroke.GLStrokeDrawerV2
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.imageData.layers.SimpleLayer

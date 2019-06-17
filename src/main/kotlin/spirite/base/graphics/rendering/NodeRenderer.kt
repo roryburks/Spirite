@@ -5,7 +5,7 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.ceil
 import rb.glow.GraphicsContext
-import spirite.base.graphics.RenderRubric
+import rb.glow.gle.RenderRubric
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -198,7 +198,7 @@ class NodeRenderer(
 
             _renderRec(node, n+1, isolator)
 
-            val rubric = RenderRubric( node.tNodeToContext, node.alpha, node.method)
+            val rubric = RenderRubric(node.tNodeToContext, node.alpha, node.method)
             gc.renderImage( buffer[n+1], 0, 0, rubric)
         }
     }

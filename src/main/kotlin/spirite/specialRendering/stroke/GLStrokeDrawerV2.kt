@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl.stroke
+package spirite.specialRendering.stroke
 
 import rb.glow.gl.GLC
 import rb.glow.gl.GLImage
@@ -11,12 +11,12 @@ import rb.glow.glu.PrimitiveBuilder
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
-import spirite.base.graphics.gl.*
-import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
-import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
-import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
+import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod
+import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
+import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
+import spirite.specialRendering.StrokeV2LinePass
 
 class GLStrokeDrawerV2(
         gle: IGLEngine) : GLStrokeDrawer(gle)

@@ -14,12 +14,12 @@ import sjunit.TestConfig
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import rb.glow.CapMethod.NONE
 import rb.glow.JoinMethod.MITER
-import spirite.base.graphics.gl.*
 import rb.glow.gle.RenderCall.RenderAlgorithm.*
-import spirite.base.graphics.gl.SquareGradientCall.GradientType
 import spirite.base.pen.stroke.DrawPoints
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
+import spirite.specialRendering.*
+import spirite.specialRendering.SquareGradientCall.GradientType.V
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
@@ -115,17 +115,17 @@ class GLEngineTests {
                         Pair(DISSOLVE, 4),
                         Pair(AS_COLOR, 0xff0000ff.toInt()))),
                 params, null, 200f, 50f, 250f, 100f)
-        gle.applyPassProgram( SquareGradientCall(0.5f, GradientType.V),
+        gle.applyPassProgram(SquareGradientCall(0.5f, V),
                 params, null, 0f, 0f, 50f, 50f)
-        gle.applyPassProgram( ChangeColorCall(Vec4f(1f, 0f, 0f, 1f), Vec4f(0f, 1f, 0f, 1f), IGNORE_ALPHA),
+        gle.applyPassProgram(ChangeColorCall(Vec4f(1f, 0f, 0f, 1f), Vec4f(0f, 1f, 0f, 1f), IGNORE_ALPHA),
                 params, null, 50f, 0f, 100f, 50f)
-        gle.applyPassProgram( GridCall(Vec3f(0.25f, 0.25f, 0.25f), Vec3f(0.5f, 0.5f, 0.5f), 4),
+        gle.applyPassProgram(GridCall(Vec3f(0.25f, 0.25f, 0.25f), Vec3f(0.5f, 0.5f, 0.5f), 4),
                 params, null, 100f, 0f, 150f, 50f)
         gle.applyPassProgram(BasicCall(),
                 params, null, 150f, 0f, 200f, 50f)
-        gle.applyPassProgram( BorderCall(3),
+        gle.applyPassProgram(BorderCall(3),
                 params, null, 200f, 0f, 250f, 50f)
-        gle.applyPassProgram( InvertCall(),
+        gle.applyPassProgram(InvertCall(),
                 params, null, 250f, 0f, 300f, 50f)
         gle.applyPassProgram(RenderCall(0.5f, emptyList()),
                 params, null, 0f, 50f, 50f, 100f)

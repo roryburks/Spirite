@@ -3,7 +3,7 @@ package spirite.base.graphics.isolation
 import rb.IContract
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
-import spirite.base.graphics.RenderRubric
+import rb.glow.gle.RenderRubric
 import spirite.base.graphics.isolation.IIsolationManager.IsolationState
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageWorkspace

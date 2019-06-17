@@ -1,6 +1,7 @@
 package spirite.gui.views.groupView
 
 import rb.glow.color.ColorARGB32Normal
+import rb.glow.gle.RenderMethodType
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import sgui.generic.components.IComponent
@@ -54,7 +55,7 @@ private constructor(
     constructor(master: IMasterControl) : this(master,  panel = Hybrid.ui.CrossPanel())
 
     val slider = Hybrid.ui.GradientSlider()
-    val comboBox = Hybrid.ui.ComboBox(spirite.base.graphics.RenderMethodType.values())
+    val comboBox = Hybrid.ui.ComboBox(RenderMethodType.values())
     val colorBox = Hybrid.ui.ColorSquare()
 
     init {

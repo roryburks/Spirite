@@ -4,7 +4,7 @@ import rb.glow.color.Color
 import rb.vectrix.linear.ITransformF
 import rb.glow.CapMethod.NONE
 import rb.glow.JoinMethod.MITER
-import spirite.base.graphics.RenderRubric
+import rb.glow.gle.RenderRubric
 import rb.vectrix.shapes.IShape
 import java.util.*
 
@@ -24,8 +24,6 @@ abstract class GraphicsContext {
     abstract var composite: Composite
     abstract var color: Color
     abstract var lineAttributes: LineAttributes
-
-    abstract fun drawBounds(image: IImage, c: Int)  // TODO: Remove
 
     abstract fun clear( color: Color? = null)
     abstract fun preTranslate(offsetX: Float, offsetY: Float)

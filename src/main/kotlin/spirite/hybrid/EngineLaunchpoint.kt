@@ -4,7 +4,7 @@ import rbJvm.glow.jogl.GluPolygonTesselater
 import rb.glow.gle.GLEngine
 import rb.glow.gle.IGLEngine
 import rbJvm.glow.jogl.JOGLProvider
-import spirite.base.graphics.gl.GL330ShaderLoader
+import spirite.specialRendering.GL330ShaderLoader
 import spirite.pc.shaders.JClassScriptService
 
 /** This serves little purpose other than being the single place that everything else gets its GLEngine singleton */

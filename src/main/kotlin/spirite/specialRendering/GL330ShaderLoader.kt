@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl
+package spirite.specialRendering
 
 import rb.glow.exceptions.GLEException
 import rb.glow.gl.GLC

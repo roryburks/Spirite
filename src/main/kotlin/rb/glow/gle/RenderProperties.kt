@@ -1,6 +1,7 @@
-package spirite.base.graphics
+package rb.glow.gle
 
 import rb.extendo.dataStructures.SinglyList
+import rb.glow.gle.RenderMethodType.DEFAULT
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 
@@ -17,19 +18,19 @@ data class RenderRubric constructor(
             : this(transform, alpha, if( method == null) emptyList() else SinglyList(method))
 
     fun stack(top: RenderRubric) = RenderRubric(
-                top.transform * transform,
-                top.alpha * alpha,
-                methods + top.methods)
+            top.transform * transform,
+            top.alpha * alpha,
+            methods + top.methods)
 
     fun stack( transform: ITransformF) = RenderRubric(
-                transform * this.transform,
-                alpha,
-                methods)
+            transform * this.transform,
+            alpha,
+            methods)
 }
 
 /** RenderMethods is a MethodType along with a scroll (if applicable) */
 data class RenderMethod(
-        val methodType: RenderMethodType = RenderMethodType.DEFAULT,
+        val methodType: RenderMethodType = DEFAULT,
         val renderValue: Int = methodType.defaultValue)
 
 

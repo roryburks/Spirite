@@ -8,8 +8,9 @@ import rb.glow.gle.GLParameters
 import rb.vectrix.mathUtil.f
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.graphics.fill.V0FillArrayAlgorithm
-import spirite.base.graphics.gl.*
-import spirite.base.graphics.gl.fill.GLFill
+import spirite.specialRendering.ChangeColorCall
+import spirite.specialRendering.InvertCall
+import spirite.specialRendering.fill.GLFill
 
 class GLDrawer( val image: GLImage) : IDrawer {
     val params by lazy {

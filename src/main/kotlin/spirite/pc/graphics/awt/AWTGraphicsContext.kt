@@ -3,7 +3,7 @@
 //import rb.glow.GraphicsContext
 //import rb.glow.IImage
 //import rb.glow.LineAttributes
-//import spirite.base.graphics.RenderRubric
+//import rb.glow.gle.RenderRubric
 //import rb.glow.color.Color
 //import rb.vectrix.linear.ITransformF
 //import java.awt.Graphics

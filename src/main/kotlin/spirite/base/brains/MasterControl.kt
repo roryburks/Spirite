@@ -14,7 +14,7 @@ import spirite.base.file.FileManager
 import spirite.base.file.IFileManager
 import spirite.base.graphics.DetailedResourceUseTracker
 import spirite.base.graphics.IDetailedResourceUseTracker
-import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
+import spirite.specialRendering.stroke.GLStrokeDrawerProvider
 import spirite.base.graphics.rendering.*
 import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.MImageWorkspace

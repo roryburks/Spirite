@@ -1,7 +1,7 @@
 package spirite.base.graphics.isolation
 
 import rb.extendo.extensions.then
-import spirite.base.graphics.RenderRubric
+import rb.glow.gle.RenderRubric
 import spirite.base.graphics.isolation.IsolationManager.SpriteIsolationStruct
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node

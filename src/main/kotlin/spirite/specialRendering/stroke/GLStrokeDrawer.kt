@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl.stroke
+package spirite.specialRendering.stroke
 
 import rb.glow.gl.GLImage
 import rb.glow.gle.GLGraphicsContext
@@ -9,8 +9,7 @@ import spirite.base.brains.toolset.PenDrawMode.BEHIND
 import spirite.base.brains.toolset.PenDrawMode.KEEP_ALPHA
 import rb.glow.Composite.*
 import rb.glow.GraphicsContext
-import spirite.base.graphics.gl.*
-import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
+import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawer
 import spirite.base.pen.stroke.StrokeBuilder
@@ -18,6 +17,7 @@ import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
+import spirite.specialRendering.StrokeApplyCall
 
 
 abstract class GLStrokeDrawer(val gle: IGLEngine)

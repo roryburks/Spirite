@@ -2,7 +2,7 @@ package spirite.base.imageData.mediums
 
 import rb.glow.IImage
 import rb.glow.GraphicsContext
-import spirite.base.graphics.RenderRubric
+import rb.glow.gle.RenderRubric
 
 interface IImageMedium : IMedium{
     override fun render(gc: GraphicsContext, render: RenderRubric?) {

@@ -1,6 +1,6 @@
 package spirite.base.graphics.isolation
 
-import spirite.base.graphics.RenderRubric
+import rb.glow.gle.RenderRubric
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer

@@ -4,7 +4,7 @@ import rb.glow.color.Colors
 import sjunit.TestConfig
 import spirite.base.graphics.fill.V0FillArrayAlgorithm
 import rb.glow.gl.GLImage
-import spirite.base.graphics.gl.fill.GLFill
+import spirite.specialRendering.fill.GLFill
 import spirite.hybrid.EngineLaunchpoint
 import spirite.pc.toBufferedImage
 import java.io.File

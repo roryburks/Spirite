@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl.stroke
+package spirite.specialRendering.stroke
 
 import rb.glow.gle.IGLEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider

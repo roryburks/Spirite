@@ -4,7 +4,7 @@ import org.junit.Test
 import rb.glow.color.Colors
 import sjunit.TestConfig
 import rb.glow.gl.GLImage
-import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
+import spirite.specialRendering.stroke.GLStrokeDrawerV2
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE

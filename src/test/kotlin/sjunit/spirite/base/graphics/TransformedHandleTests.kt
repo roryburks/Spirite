@@ -4,9 +4,9 @@
 //import rb.vectrix.linear.MutableTransformF
 //import sjunit.TestConfig
 //import sjunit.TestHelper
-//import spirite.base.graphics.RenderMethod
-//import spirite.base.graphics.RenderMethodType.*
-//import spirite.base.graphics.RenderRubric
+//import rb.glow.gle.RenderMethod
+//import rb.glow.gle.RenderMethodType.*
+//import rb.glow.gle.RenderRubric
 //import spirite.base.graphics.rendering.TransformedHandle
 //import spirite.base.imageData.MediumHandle
 //import rb.glow.color.Colors

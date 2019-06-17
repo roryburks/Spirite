@@ -4,8 +4,8 @@ import rb.glow.RawImage
 import rb.glow.color.Colors
 import sjunit.TestConfig
 import sjunit.TestHelper
-import spirite.base.graphics.RenderMethod
-import spirite.base.graphics.RenderMethodType.MULTIPLY
+import rb.glow.gle.RenderMethod
+import rb.glow.gle.RenderMethodType.MULTIPLY
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer

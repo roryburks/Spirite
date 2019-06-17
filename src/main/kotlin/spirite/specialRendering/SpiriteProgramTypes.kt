@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl
+package spirite.specialRendering
 
 import rb.glow.gl.*
 import rb.vectrix.linear.Vec3f

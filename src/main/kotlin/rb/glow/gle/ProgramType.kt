@@ -6,7 +6,6 @@ import rb.glow.gle.IGLEngine.BlendMethod.SRC_OVER
 import rb.vectrix.linear.Vec3f
 import rb.glow.JoinMethod
 import rb.glow.JoinMethod.*
-import spirite.base.graphics.gl.SquareGradientCall
 
 interface IGlProgramCall {
     val uniforms: List<GLUniform>?

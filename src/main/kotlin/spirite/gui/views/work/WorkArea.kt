@@ -4,7 +4,7 @@ import rb.glow.color.Colors
 import sgui.swing.components.ISwComponent
 import sgui.swing.skin.Skin
 import rb.glow.GraphicsContext
-import spirite.base.graphics.drawer.SpiriteDrawer
+import spirite.specialRendering.SpecialDrawerFactory
 
 abstract class WorkArea(
         val context: WorkSection) {
@@ -22,7 +22,8 @@ abstract class WorkArea(
         if( view != null && workspace != null) {
             gc.transform = view.tWorkspaceToScreen
 
-            SpiriteDrawer(gc).drawTransparencyBg(0, 0, workspace.width, workspace.height, 8)
+            val drawer = SpecialDrawerFactory.makeSpecialDrawer(gc)
+            drawer.drawTransparencyBg(0, 0, workspace.width, workspace.height, 8)
 
             // TODO: Draw Reference Behind
 
@@ -49,7 +50,8 @@ abstract class WorkArea(
                 gc.pushTransform()
                 // Why is this transform instead of preTransform?  Doesn't quite seem right.
                 selection.transform?.let { gc.transform(it) }
-                gc.drawBounds(selection.mask, ++i)
+
+                drawer.drawBounds(selection.mask, ++i)
 
                 gc.popTransform()
             }

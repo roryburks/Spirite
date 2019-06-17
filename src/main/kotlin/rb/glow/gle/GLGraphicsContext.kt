@@ -12,22 +12,18 @@ import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.glow.Composite.SRC_OVER
 import rb.glow.JoinMethod.ROUNDED
-import spirite.base.graphics.RenderMethodType.*
 import rb.glow.gle.RenderCall.RenderAlgorithm
 import rb.glow.gle.RenderCall.RenderAlgorithm.*
 import rb.vectrix.shapes.IShape
 import rb.vectrix.shapes.RectI
-
+import rb.glow.gle.RenderMethodType.*
 
 // Need to move FloatCompactors to non-JVM
 import rbJvm.vectrix.shapes.OvalShape
 
-// Figure out dependencies
-import spirite.base.graphics.RenderRubric
-
 // These need to be separated out of GraphicsContext and into a separate IDrawer only Spirite has
-import spirite.base.graphics.gl.BorderCall
-import spirite.base.graphics.gl.GridCall
+//import spirite.specialRendering.BorderCall
+//import spirite.specialRendering.GridCall
 
 
 class GLGraphicsContext : GraphicsContext {
@@ -71,23 +67,6 @@ class GLGraphicsContext : GraphicsContext {
 
     private fun reset() {
         gle.setTarget(image)
-    }
-
-
-
-    override fun drawBounds(image: IImage, c: Int) {
-        using(GLImage(width, height, gle)) { buffer ->
-            val gc = buffer.graphics
-            gc.clear()
-
-            val texture = gle.converter.convert(image, GLImage::class) as GLImage // ImageConverter(gle).convert<GLImage>(image)
-            val bufferParams = cachedParams.copy(texture1 = texture)
-            gc.applyPassProgram(BasicCall(),
-                    bufferParams, transform, 0f, 0f, image.width + 0f, image.height + 0f)
-
-            bufferParams.texture1 = buffer
-            applyPassProgram(BorderCall(c), bufferParams, null)
-        }
     }
 
     override fun clear( color: Color?) {
@@ -279,11 +258,6 @@ class GLGraphicsContext : GraphicsContext {
     }
 
     // endregion
-
-    fun drawTransparencyBG(x: Int, y: Int, w: Int, h: Int, squareSize: Int) {
-        applyPassProgram(GridCall(Colors.GRAY.rgbComponent, Colors.LIGHT_GRAY.rgbComponent, squareSize),
-                cachedParams, transform, x.f, y.f, w.f, h.f)
-    }
 
     // region Direct
     // Note: These exist mostly to make sure Reset is called

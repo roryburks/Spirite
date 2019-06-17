@@ -9,6 +9,7 @@ import rb.glow.LineAttributes
 import rb.glow.gl.GLImage
 import spirite.hybrid.Hybrid
 import spirite.pc.toBufferedImage
+import spirite.specialRendering.SpecialDrawerFactory
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.test.assertEquals
@@ -25,7 +26,7 @@ class GLGraphicsContextTests {
         gc.fillRect( 5, 5, 10, 10)
 
         val toImage = GLImage(30, 30, gle)
-        toImage.graphics.drawBounds( img, 101101)
+        SpecialDrawerFactory.makeSpecialDrawer(toImage.graphics).drawBounds( img, 101101)
 
         if( TestConfig.save)
             ImageIO.write(toImage.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_drawBounds.png"))
