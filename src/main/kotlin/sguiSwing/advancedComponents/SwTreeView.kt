@@ -14,21 +14,18 @@ import sgui.components.ITreeView
 import sgui.components.ITreeViewNonUI.*
 import sgui.components.ITreeViewNonUI.DropDirection.*
 import sgui.components.crossContainer.CrossColInitializer
-import sguiSwing.JColor
-import sguiSwing.SwingComponentProvider
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SJPanel
 import sguiSwing.components.SwComponent
 import sguiSwing.dragAndDrop.addDragSource
 import sguiSwing.dragAndDrop.setDragTarget
-import sguiSwing.jcolor
 import sguiSwing.mouseSystem.SimpleMouseListener
 import sguiSwing.skin.Skin.ContentTree.Background
 import sguiSwing.skin.Skin.ContentTree.SelectedBackground
 import sguiSwing.transfer.SwTransferObjectConverter
-import spirite.gui.resources.SpiriteIcons.SmallIcons.*
 import rbJvm.glow.awt.ImageBI
-import sguiSwing.SwProvider
+import sguiSwing.*
+import sguiSwing.PrimaryIcon.*
 import java.awt.*
 import java.awt.dnd.*
 import java.awt.event.ActionEvent
@@ -88,10 +85,10 @@ private constructor(private val imp : SwTreeViewImp<T>,
     private fun makeToggleButton( checked: Boolean) : IToggleButton {
         val btn = SwingComponentProvider.ToggleButton(checked)
         btn.plainStyle = true
-        btn.setOnIcon(Expanded)
-        btn.setOnIconOver(ExpandedHighlighted)
-        btn.setOffIcon(Unexpanded)
-        btn.setOffIconOver(UnexpandedHighlighted)
+        btn.setOnIcon(SwPrimaryIconSet.getIcon(SmallExpanded))
+        btn.setOnIconOver(SwPrimaryIconSet.getIcon(SmallExpandedHighlighted))
+        btn.setOffIcon(SwPrimaryIconSet.getIcon(SmallUnexpanded))
+        btn.setOffIconOver(SwPrimaryIconSet.getIcon(SmallUnexpandedHighlighted))
         return btn
     }
 

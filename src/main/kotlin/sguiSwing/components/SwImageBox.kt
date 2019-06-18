@@ -6,8 +6,8 @@ import rb.glow.color.Colors
 import sgui.components.IComponent
 import sgui.components.IImageBox
 import sguiSwing.jcolor
-import spirite.hybrid.Hybrid
 import rbJvm.glow.awt.ImageBI
+import sguiSwing.SwProvider
 import java.awt.Graphics
 import java.awt.Image
 
@@ -19,14 +19,14 @@ private constructor(
 {
     init { imp.context = this }
 
-    private var _img: Image? = img?.run { Hybrid.imageConverter.convert<ImageBI>(img).bi}
+    private var _img: Image? = img?.run { SwProvider.convertOrNull<ImageBI>(img)?.bi}
     override var stretch by OnChangeDelegate(true) { redraw() }
     override var checkeredBackground by OnChangeDelegate(false) { redraw() }
 
     constructor(img: IImage?) : this(img, SwImageBoxImp())
 
     override fun setImage(img: IImage?) {
-        this._img = img?.run { Hybrid.imageConverter.convert<ImageBI>(img).bi}
+        this._img = img?.run { SwProvider.convertOrNull<ImageBI>(img)?.bi}
         imp.repaint()
     }
 

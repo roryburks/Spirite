@@ -69,7 +69,7 @@ open class GroupTree(
         var x get() = view.ox ; set(value) {view = view.copy(ox = value)}
         var y get() = view.oy ; set(value) {view = view.copy(oy = value)}
 
-        var expanded : Boolean by NodePropertyDelegate( true, undoEngine,"Expanded/Contracted $treeDescription GroupNode", false)
+        var expanded : Boolean by NodePropertyDelegate( true, undoEngine,"SmallExpanded/Contracted $treeDescription GroupNode", false)
         var name : String by NodePropertyDelegate( name, undoEngine,"Changed $treeDescription GroupNode's Name", false)
         val isVisible : Boolean get() = visible && alpha > 0f
 

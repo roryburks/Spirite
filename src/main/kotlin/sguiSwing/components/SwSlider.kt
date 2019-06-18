@@ -4,9 +4,9 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import sgui.components.IComponent
 import sgui.components.ISlider
+import sguiSwing.SwingComponentProvider
 import sguiSwing.skin.Skin.BevelBorder.*
 import sguiSwing.skin.Skin.Global.*
-import spirite.hybrid.Hybrid
 import java.awt.*
 import java.util.*
 import javax.swing.JSlider
@@ -41,7 +41,7 @@ private constructor(private val imp : SwSliderImp)
 
     override fun setLabels(labels: Map<Int, String>) {
         val dictionary = Hashtable<Int, Component>(labels.count())
-        labels.forEach { key, value -> dictionary[key] = Hybrid.ui.Label(value).jcomponent }
+        labels.forEach { key, value -> dictionary[key] = SwingComponentProvider.Label(value).jcomponent }
         imp.labelTable = dictionary
     }
 

@@ -3,11 +3,11 @@ package sguiSwing.components
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import sgui.components.ITextArea
+import sgui.systems.KeypressSystem
 import sguiSwing.mouseSystem.adaptMouseSystem
 import sguiSwing.skin.Skin.BevelBorder.Dark
 import sguiSwing.skin.Skin.BevelBorder.Light
 import sguiSwing.skin.Skin.TextField.Background
-import spirite.hybrid.SwHybrid
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.BorderFactory
@@ -45,10 +45,10 @@ private constructor(private val imp : SwTextAreaImp) : ITextArea, ISwComponent b
 
         imp.textArea.addFocusListener(object : FocusListener {
             override fun focusLost(e: FocusEvent) {
-                SwHybrid.keypressSystem.hotkeysEnabled = true
+                KeypressSystem.hotkeysEnabled = true
             }
             override fun focusGained(e: FocusEvent?) {
-                SwHybrid.keypressSystem.hotkeysEnabled = false
+                KeypressSystem.hotkeysEnabled = false
             }
         })
     }

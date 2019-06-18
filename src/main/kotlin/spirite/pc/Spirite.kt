@@ -16,6 +16,7 @@ private lateinit var master: MasterControl
 fun main( args: Array<String>) {
     try {
         SetupVectrixForJvm()
+        setupSwGuiStuff()
 
         UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName())
         SwingUtilities.invokeAndWait {

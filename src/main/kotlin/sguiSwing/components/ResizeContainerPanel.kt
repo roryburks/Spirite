@@ -15,10 +15,12 @@ import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseEventType.DRAGGED
 import sgui.components.events.MouseEvent.MouseEventType.PRESSED
 import sgui.systems.IGlobalMouseHook
+import sguiSwing.PrimaryIcon.*
+import sguiSwing.SwIcon
+import sguiSwing.SwPrimaryIconSet
 import sguiSwing.SwingComponentProvider
 import sguiSwing.mouseSystem.SwMouseSystem
 import sguiSwing.skin.Skin.ResizePanel.BarLineColor
-import spirite.gui.resources.SpiriteIcons
 import kotlin.reflect.KProperty
 
 open class ResizeContainerPanel
@@ -131,12 +133,12 @@ private constructor(
 
             when( orientation) {
                 VERTICAL -> {
-                    btnExpand.setOnIcon(SpiriteIcons.SmallIcons.ArrowE)
-                    btnExpand.setOffIcon( if( trailing) SpiriteIcons.SmallIcons.ArrowS else SpiriteIcons.SmallIcons.ArrowN)
+                    btnExpand.setOnIcon(SwPrimaryIconSet.getIcon(SmallArrowE))
+                    btnExpand.setOffIcon( SwPrimaryIconSet.getIcon(if( trailing) SmallArrowS else SmallArrowN))
                 }
                 HORIZONTAL -> {
-                    btnExpand.setOnIcon(SpiriteIcons.SmallIcons.ArrowS)
-                    btnExpand.setOffIcon( if( trailing) SpiriteIcons.SmallIcons.ArrowE else SpiriteIcons.SmallIcons.ArrowW)
+                    btnExpand.setOnIcon(SwPrimaryIconSet.getIcon(SmallArrowS))
+                    btnExpand.setOffIcon( SwPrimaryIconSet.getIcon(if( trailing) SmallArrowE else SmallArrowW))
                 }
             }
 

@@ -8,7 +8,6 @@ import rb.glow.gl.GLImage
 import rb.glow.gle.IGLEngine
 import rb.glow.gle.IImageConverter
 import rbJvm.glow.jogl.JOGL.JOGLTextureSource
-import spirite.hybrid.Hybrid
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
 import kotlin.UnsupportedOperationException
@@ -17,19 +16,24 @@ import kotlin.reflect.KClass
 typealias NativeImage = ImageBI
 typealias InternalImage = GLImage
 
-object AwtIImageConverter : IImageConverter
+
+class AwtImageConverter(
+        val gleGetter : () -> IGLEngine?)
+    : IImageConverter
+
 {
     override fun convert(image: IImage, toType: KClass<*>) = when( toType) {
-        GLImage::class -> AwtImageConverter(Hybrid.gle).convert<GLImage>(image)
-        ImageBI::class -> AwtImageConverter(Hybrid.gle).convert<ImageBI>(image)
+        GLImage::class -> convert<GLImage>(image)
+        ImageBI::class -> convert<ImageBI>(image)
         else -> throw UnsupportedOperationException("Unrecognized")
     }
 
-}
+    override fun convertOrNull(image: IImage, toType: KClass<*>)= when( toType) {
+        GLImage::class -> convertOrNull<GLImage>(image)
+        ImageBI::class -> convertOrNull<ImageBI>(image)
+        else -> null
+    }
 
-class AwtImageConverter(
-        val gle: IGLEngine? = null
-) {
     val c = GLImage::class.java
 
     inline fun <reified T> convertOrNull(from: IImage) : T? {
@@ -39,6 +43,7 @@ class AwtImageConverter(
 
         when(T::class.java) {
             GLImage::class.java -> {
+                val gle = gleGetter()
                 val gl = gle!!.gl
 
                 val tex = gl.createTexture() ?: throw GLEException("Failed to create texture.")

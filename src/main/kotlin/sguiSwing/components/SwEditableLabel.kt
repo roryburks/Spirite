@@ -5,10 +5,10 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import sgui.components.IComponent
 import sgui.components.IEditableLabel
+import sgui.systems.KeypressSystem
 import sguiSwing.jcolor
 import sguiSwing.skin.Skin.Global.Bg
 import sguiSwing.skin.Skin.Global.Text
-import spirite.hybrid.SwHybrid
 import java.awt.KeyboardFocusManager
 import java.awt.event.*
 import javax.swing.*
@@ -144,10 +144,10 @@ private constructor(
 
             addFocusListener(object : FocusListener {
                 override fun focusLost(e: FocusEvent) {
-                    SwHybrid.keypressSystem.hotkeysEnabled = true
+                    KeypressSystem.hotkeysEnabled = true
                 }
                 override fun focusGained(e: FocusEvent?) {
-                    SwHybrid.keypressSystem.hotkeysEnabled = false
+                    KeypressSystem.hotkeysEnabled = false
                 }
             })
         }

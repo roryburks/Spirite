@@ -3,7 +3,7 @@ package spirite.hybrid
 import rbJvm.glow.jogl.GluPolygonTesselater
 import rb.glow.gle.GLEngine
 import rb.glow.gle.IGLEngine
-import rbJvm.glow.awt.AwtIImageConverter
+import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.jogl.JOGLContext
 import rbJvm.glow.jogl.JOGLProvider
 import spirite.specialRendering.GL330ShaderLoader
@@ -15,7 +15,9 @@ object EngineLaunchpoint {
         GLEngine(
                 GluPolygonTesselater,
                 GL330ShaderLoader(JOGLProvider.gl, JClassScriptService()),
-                AwtIImageConverter,
+                converter,
                 JOGLContext())
     }
+
+    val converter = AwtImageConverter {gle}
 }

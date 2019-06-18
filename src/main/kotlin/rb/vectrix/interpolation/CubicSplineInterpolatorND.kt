@@ -1,5 +1,6 @@
 package rb.vectrix.interpolation
 
+import rb.vectrix.VectrixMathLayer
 import kotlin.math.max
 
 private const val SIZE_PER = 10
@@ -92,14 +93,14 @@ class CubicSplineInterpolatorND(
         var buff: FloatArray
         for (i in 0 until N) {
             buff = FloatArray(l)
-            System.arraycopy(x_[i], 0, buff, 0, length)
+            VectrixMathLayer.arraycopy(x_[i], 0, buff, 0, length)
             x_[i] = buff
             buff = FloatArray(l)
-            System.arraycopy(dx[i], 0, buff, 0, length)
+            VectrixMathLayer.arraycopy(dx[i], 0, buff, 0, length)
             dx[i] = buff
         }
         buff = FloatArray(l)
-        System.arraycopy(t_, 0, buff, 0, length)
+        VectrixMathLayer.arraycopy(t_, 0, buff, 0, length)
         t_ = buff
     }
 

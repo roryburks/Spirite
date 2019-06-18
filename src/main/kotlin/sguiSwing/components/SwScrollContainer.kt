@@ -9,7 +9,8 @@ import sgui.components.IScrollContainer
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseEventType.*
 import sgui.systems.IGlobalMouseHook
-import spirite.hybrid.Hybrid
+import sgui.systems.KeypressSystem
+import sguiSwing.mouseSystem.SwMouseSystem
 import java.awt.Component
 
 class SwScrollContainer
@@ -37,7 +38,7 @@ private constructor( private val imp: SwScrollContainerImp)
 
     }
 
-    val mouseHookK = Hybrid.mouseSystem.attachPriorityHook(object : IGlobalMouseHook {
+    val mouseHookK = SwMouseSystem.attachPriorityHook(object : IGlobalMouseHook {
         var currentX : Int? = null    // Note: if null, not scroll-dragging
         var currentY = 0
 
@@ -46,12 +47,12 @@ private constructor( private val imp: SwScrollContainerImp)
         override fun processMouseEvent(evt: MouseEvent) {
             val nowX = currentX
             when {
-                evt.type == PRESSED && Hybrid.keypressSystem.holdingSpace -> {
+                evt.type == PRESSED && KeypressSystem.holdingSpace -> {
                     currentX = evt.point.x
                     currentY = evt.point.y
                     evt.consume()
                 }
-                evt.type == DRAGGED && nowX != null && !Hybrid.keypressSystem.holdingSpace -> currentX = null
+                evt.type == DRAGGED && nowX != null && !KeypressSystem.holdingSpace -> currentX = null
                 evt.type == DRAGGED && nowX != null -> {
                     horizontalBar.scroll -= ((evt.point.x - nowX )* scrollFactor).round
                     verticalBar.scroll -= ((evt.point.y - currentY ) * scrollFactor).round

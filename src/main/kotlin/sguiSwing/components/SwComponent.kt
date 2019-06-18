@@ -10,11 +10,10 @@ import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseEventType.*
 import sgui.components.events.MouseWheelEvent
 import sgui.systems.IGlobalMouseHook
-import sguiSwing.SUIPoint
 import sguiSwing.jcolor
+import sguiSwing.mouseSystem.SwMouseSystem
 import sguiSwing.scolor
 import sguiSwing.skin.Skin
-import spirite.hybrid.Hybrid
 import java.awt.Component
 import java.awt.Cursor
 import java.awt.event.*
@@ -118,7 +117,7 @@ abstract class ASwComponent : ISwComponent {
     private inner class MouseMultiStack : IGlobalMouseHook
     {
         init {
-            Hybrid.mouseSystem.attachHook(this, this@ASwComponent)
+            SwMouseSystem.attachHook(this, this@ASwComponent)
         }
 
         override fun processMouseEvent(evt: MouseEvent) {

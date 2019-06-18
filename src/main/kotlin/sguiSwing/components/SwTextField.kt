@@ -4,14 +4,13 @@ import rb.glow.color.SColor
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import sgui.components.*
+import sgui.systems.KeypressSystem
 import sguiSwing.jcolor
 import sguiSwing.mouseSystem.adaptMouseSystem
 import sguiSwing.skin.Skin.BevelBorder.Dark
 import sguiSwing.skin.Skin.BevelBorder.Light
 import sguiSwing.skin.Skin.TextField.Background
 import sguiSwing.skin.Skin.TextField.InvalidBg
-import spirite.hybrid.Hybrid
-import spirite.hybrid.SwHybrid
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.BorderFactory
@@ -59,10 +58,10 @@ private constructor(private val imp : SwTextFieldImp) : ITextField, ISwComponent
 
         imp.addFocusListener(object : FocusListener {
             override fun focusLost(e: FocusEvent) {
-                SwHybrid.keypressSystem.hotkeysEnabled = true
+                KeypressSystem.hotkeysEnabled = true
             }
             override fun focusGained(e: FocusEvent?) {
-                SwHybrid.keypressSystem.hotkeysEnabled = false
+                KeypressSystem.hotkeysEnabled = false
             }
         })
     }
@@ -154,7 +153,9 @@ private constructor(
             if( !str.matches("""^-?[0-9]*\.?[0-9]*$""".toRegex())
                     || (str.startsWith('-') && (offs != 0 || !allowsNegatives))
                     || (str.contains('.') && (getText(0, length).contains('.') || !allowsFloats)))
-                Hybrid.beep()
+            {
+                java.awt.Toolkit.getDefaultToolkit().beep()
+            }
             else
                 super.insertString(offs, str, a)
         }

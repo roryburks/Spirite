@@ -1,4 +1,4 @@
-package spirite.hybrid.inputSystems
+package sgui.systems
 
 interface IKeypressSystem
 {
@@ -12,7 +12,7 @@ interface MKeypressSystem : IKeypressSystem
     override var hotkeysEnabled: Boolean
 }
 
-class KeypressSystem : MKeypressSystem {
+object KeypressSystem : MKeypressSystem {
     override var holdingSpace: Boolean = false
     override var hotkeysEnabled: Boolean = true
 }

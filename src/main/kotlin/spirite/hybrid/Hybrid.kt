@@ -9,9 +9,9 @@ import rb.glow.gle.IGLEngine
 import rbJvm.glow.awt.AwtImageConverter
 import spirite.hybrid.Transferables.IClipboard
 import spirite.hybrid.Transferables.SwClipboard
-import spirite.hybrid.inputSystems.IKeypressSystem
-import spirite.hybrid.inputSystems.KeypressSystem
-import spirite.hybrid.inputSystems.MKeypressSystem
+import sgui.systems.IKeypressSystem
+import sgui.systems.KeypressSystem
+import sgui.systems.MKeypressSystem
 import rbJvm.glow.jogl.JOGLProvider
 
 /** Hybrid is a collection of components and interfaces that are platform-specific (things like Timers, GUI libraries,
@@ -49,7 +49,7 @@ object SwHybrid : IHybrid {
     override val clipboard: IClipboard get() = SwClipboard
 
     override val mouseSystem: IMouseSystem get() = SwMouseSystem
-    override val keypressSystem: MKeypressSystem = KeypressSystem()
+    override val keypressSystem: MKeypressSystem = KeypressSystem
 
     override fun LockFrom(o: Any): ILock = JLock(o)
     override fun beep() {
