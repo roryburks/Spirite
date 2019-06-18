@@ -17,9 +17,7 @@ import rb.glow.gle.RenderCall.RenderAlgorithm.*
 import rb.vectrix.shapes.IShape
 import rb.vectrix.shapes.RectI
 import rb.glow.gle.RenderMethodType.*
-
-// Need to move FloatCompactors to non-JVM
-import rbJvm.vectrix.shapes.OvalShape
+import rb.vectrix.shapes.OvalShape
 
 // These need to be separated out of GraphicsContext and into a separate IDrawer only Spirite has
 //import spirite.specialRendering.BorderCall

@@ -1,7 +1,7 @@
 package sjunit.spirite.base.util;
 
 import org.junit.Test;
-import rbJvm.vectrix.interpolation.CubicSplineInterpolatorND;
+import rb.vectrix.interpolation.CubicSplineInterpolatorND;
 
 public class InterpolationTests {
 

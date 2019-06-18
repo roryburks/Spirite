@@ -1,5 +1,6 @@
 package spirite.pc
 
+import rbJvm.vectrix.SetupVectrixForJvm
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.hybrid.EngineLaunchpoint
@@ -14,6 +15,8 @@ private lateinit var master: MasterControl
 
 fun main( args: Array<String>) {
     try {
+        SetupVectrixForJvm()
+
         UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName())
         SwingUtilities.invokeAndWait {
             val bi = BufferedImage(10,10,BufferedImage.TYPE_4BYTE_ABGR)

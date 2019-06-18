@@ -1,11 +1,10 @@
-package rbJvm.vectrix.shapes
+package rb.vectrix.shapes
 
 import rb.glow.gl.GLC
 import rb.glow.gle.GLPrimitive
+import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
-import rb.vectrix.shapes.IShape
-import rbJvm.vectrix.compaction.FloatCompactor
 
 // TODO: Make not-dependent on JVM
 class RectShape(

@@ -1,5 +1,6 @@
-package rbJvm.vectrix.compaction
+package rb.vectrix.compaction
 
+import rb.vectrix.VectrixMathLayer
 import kotlin.math.max
 
 class DoubleEndedFloatCompactor( chunkSize : Int = 1024) {
@@ -35,22 +36,22 @@ class DoubleEndedFloatCompactor( chunkSize : Int = 1024) {
 
     fun insertIntoArray( array: FloatArray, start:Int) {
         if( data.size == 1)
-            System.arraycopy(data.first(), tail+1, array, start, head-tail-1)
+            VectrixMathLayer.arraycopy(data.first(), tail+1, array, start, head-tail-1)
         else {
             val it = data.iterator()
             var caret = start
             // First
-            System.arraycopy(it.next(), tail+1, array, caret, chunkSize-tail-1)
+            VectrixMathLayer.arraycopy(it.next(), tail+1, array, caret, chunkSize-tail-1)
             caret += chunkSize - tail - 1
             while( it.hasNext()) {
                 val chunk = it.next()
                 when( it.hasNext()) {
                     true -> {
                         // Middle
-                        System.arraycopy(chunk, 0, array, caret, chunkSize)
+                        VectrixMathLayer.arraycopy(chunk, 0, array, caret, chunkSize)
                         caret += chunkSize
                     }
-                    false -> System.arraycopy(chunk, 0, array, caret, head)
+                    false -> VectrixMathLayer.arraycopy(chunk, 0, array, caret, head)
                 }
             }
         }

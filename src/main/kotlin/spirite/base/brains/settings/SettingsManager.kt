@@ -3,7 +3,7 @@ package spirite.base.brains.settings
 import rb.extendo.delegates.MutableLazy
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.i
-import rbJvm.vectrix.interpolation.CubicSplineInterpolator
+import rb.vectrix.interpolation.CubicSplineInterpolator
 import java.io.File
 import java.nio.ByteBuffer
 import kotlin.reflect.KProperty

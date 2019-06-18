@@ -3,7 +3,7 @@ package spirite.base.pen.selectionBuilders
 import rb.glow.color.Colors
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.f
-import rbJvm.vectrix.compaction.IntCompactor
+import rb.vectrix.compaction.IntCompactor
 import rb.glow.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection

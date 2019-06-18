@@ -5,7 +5,7 @@ import rb.glow.color.toColor
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.round
-import rbJvm.vectrix.interpolation.CubicSplineInterpolator2D
+import rb.vectrix.interpolation.CubicSplineInterpolator2D
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.file.SaveLoadUtil

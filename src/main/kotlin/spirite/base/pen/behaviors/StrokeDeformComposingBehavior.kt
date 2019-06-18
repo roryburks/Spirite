@@ -2,8 +2,8 @@ package spirite.base.pen.behaviors
 
 import rb.glow.color.ColorARGB32Normal
 import rb.glow.color.Colors
-import rbJvm.vectrix.compaction.FloatCompactor
-import rbJvm.vectrix.interpolation.CubicSplineInterpolator2D
+import rb.vectrix.compaction.FloatCompactor
+import rb.vectrix.interpolation.CubicSplineInterpolator2D
 import sgui.generic.components.events.MouseEvent.MouseButton
 import sgui.generic.components.events.MouseEvent.MouseButton.*
 import rb.glow.GraphicsContext

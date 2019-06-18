@@ -1,12 +1,12 @@
 package rb.glow
 
+import rb.extendo.dataStructures.Deque
 import rb.glow.color.Color
 import rb.vectrix.linear.ITransformF
 import rb.glow.CapMethod.NONE
 import rb.glow.JoinMethod.MITER
 import rb.glow.gle.RenderRubric
 import rb.vectrix.shapes.IShape
-import java.util.*
 
 /**
  * GraphicsContext is an abstract class which wraps all graphical functionality
@@ -69,15 +69,15 @@ abstract class GraphicsContext {
     abstract fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRubric? = null)
 
 
-    private val transformStack = Stack<ITransformF>()
+    private val transformStack = Deque<ITransformF>()
 
-    fun pushTransform() {transformStack.push(transform.toMutable())}
-    fun popTransform() {transform = transformStack.pop()}
+    fun pushTransform() {transformStack.addBack(transform.toMutable())}
+    fun popTransform() {transform = transformStack.popBack() ?: transform}
 
-    private val stateStack = Stack<GraphicalState>()
-    fun pushState() { stateStack.push(GraphicalState(transform.toMutable(), composite, alpha, color))}
+    private val stateStack = Deque<GraphicalState>()
+    fun pushState() { stateStack.addBack(GraphicalState(transform.toMutable(), composite, alpha, color))}
     fun popState() {
-        val state = stateStack.pop()
+        val state = stateStack.popBack() ?: return
         transform = state.trans
         composite = state.composite
         alpha = state.alpha

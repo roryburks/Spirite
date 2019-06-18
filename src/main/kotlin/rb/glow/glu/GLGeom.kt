@@ -1,8 +1,8 @@
 package rb.glow.glu
 
 import rb.glow.gle.GLPrimitive
-import rbJvm.vectrix.compaction.FloatCompactor
-import rbJvm.vectrix.compaction.ReverseFloatCompactor
+import rb.vectrix.compaction.FloatCompactor
+import rb.vectrix.compaction.ReverseFloatCompactor
 
 class PrimitiveBuilder(
         val attrLengths: IntArray,

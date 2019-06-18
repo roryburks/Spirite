@@ -2,7 +2,6 @@ package rb.glow.gle
 
 import rb.glow.gl.GLImage
 import rb.vectrix.shapes.RectI
-import spirite.base.util.linear.Rect
 
 data class GLParameters(
         var width : Int,

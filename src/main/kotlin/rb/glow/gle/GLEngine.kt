@@ -11,10 +11,8 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec3f
 import rb.glow.CapMethod
 import rb.glow.JoinMethod
-import rbJvm.glow.jogl.JOGLProvider
 import rb.glow.gl.GLImage
 import rb.vectrix.mathUtil.f
-import javax.swing.SwingUtilities
 
 interface IGLEngine
 {
@@ -73,10 +71,10 @@ interface IGLEngine
 }
 
 class GLEngine(
-        private val _glGetter: () -> IGL,
         override val tesselator: IPolygonTesselator,
         shaderLoader: IGLShaderLoader,
-        override val converter: IImageConverter)
+        override val converter: IImageConverter,
+        private val _context: IGLContext)
     : IGLEngine
 {
     private val programs = shaderLoader.initShaderPrograms()
@@ -84,7 +82,7 @@ class GLEngine(
     //private val dbo : IGLRenderbuffer by lazy { gl.genRenderbuffer() }
     private lateinit var fbo : IGLFramebuffer
 
-    override val gl get() = _glGetter.invoke()
+    override val gl get() = _context.glGetter.invoke()
 
     override var width : Int = 1 ; private set
     override var height : Int = 1 ; private set
@@ -135,19 +133,9 @@ class GLEngine(
         }
     }
 
-    override fun runOnGLThread( run: () -> Unit) {
-        SwingUtilities.invokeLater{
-            JOGLProvider.context.makeCurrent()
-            run()
-            JOGLProvider.context.release()
-        }
-    }
+    override fun runOnGLThread( run: () -> Unit) = _context.runOnGLThread(run)
 
-    override fun runInGLContext(run: () -> Unit) {
-        JOGLProvider.context.makeCurrent()
-        run()
-        JOGLProvider.context.release()
-    }
+    override fun runInGLContext(run: () -> Unit) = _context.runInGLContext(run)
 
     // region Exposed Rendering Methods
 

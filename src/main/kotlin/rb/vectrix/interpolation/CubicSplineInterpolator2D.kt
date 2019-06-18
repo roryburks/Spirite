@@ -1,7 +1,10 @@
-package rbJvm.vectrix.interpolation
+package rb.vectrix.interpolation
 
+import rb.vectrix.VectrixMathLayer
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * CubicSplineInterpolator2D is a two-dimensional curve interpolator which
@@ -40,7 +43,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
     constructor(points: List<Vec2f>? = null, fast: Boolean = false) {
         numPoints = points?.size ?: 0
 
-        val l = Math.max(numPoints, 10)
+        val l = max(numPoints, 10)
         kx = FloatArray(l)
         ky = FloatArray(l)
         x_ = FloatArray(l)
@@ -71,9 +74,9 @@ class CubicSplineInterpolator2D : Interpolator2D {
     }
 
     constructor(xs: FloatArray?, ys: FloatArray?, fast: Boolean) {
-        numPoints = Math.min(xs?.size ?: 0, ys?.size ?: 0)
+        numPoints = min(xs?.size ?: 0, ys?.size ?: 0)
 
-        val l = Math.max(numPoints, 10)
+        val l = max(numPoints, 10)
         kx = FloatArray(l)
         ky = FloatArray(l)
         x_ = FloatArray(l)
@@ -163,19 +166,19 @@ class CubicSplineInterpolator2D : Interpolator2D {
             l = (l * 3 + 1) / 2
 
         var buff = FloatArray(l)
-        System.arraycopy(kx, 0, buff, 0, numPoints)
+        VectrixMathLayer.arraycopy(kx, 0, buff, 0, numPoints)
         kx = buff
         buff = FloatArray(l)
-        System.arraycopy(ky, 0, buff, 0, numPoints)
+        VectrixMathLayer.arraycopy(ky, 0, buff, 0, numPoints)
         ky = buff
         buff = FloatArray(l)
-        System.arraycopy(x_, 0, buff, 0, numPoints)
+        VectrixMathLayer.arraycopy(x_, 0, buff, 0, numPoints)
         x_ = buff
         buff = FloatArray(l)
-        System.arraycopy(y_, 0, buff, 0, numPoints)
+        VectrixMathLayer.arraycopy(y_, 0, buff, 0, numPoints)
         y_ = buff
         buff = FloatArray(l)
-        System.arraycopy(t_, 0, buff, 0, numPoints)
+        VectrixMathLayer.arraycopy(t_, 0, buff, 0, numPoints)
         t_ = buff
     }
 

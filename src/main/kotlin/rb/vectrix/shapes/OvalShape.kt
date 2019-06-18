@@ -1,13 +1,15 @@
-package rbJvm.vectrix.shapes
+package rb.vectrix.shapes
 
-import com.hackoeur.jglm.support.FastMath
 import rb.glow.gl.GLC
 import rb.glow.gle.GLPrimitive
+import rb.vectrix.VectrixMathLayer
+import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
-import rb.vectrix.shapes.IShape
-import rbJvm.vectrix.compaction.FloatCompactor
 import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.acos
+import kotlin.math.max
 
 
 // TODO: Make not-dependent on JVM
@@ -38,16 +40,16 @@ data class OvalShape(
     }
 
     override fun doAlongPath(maxError: Float, lambda: (x: Double, y: Double) -> Unit) {
-        val c = 1 - Math.abs(maxError) / Math.max(r_h, r_v)
+        val c = 1 - abs(maxError) / max(r_h, r_v)
         val theta_d = when {
             c < 0 -> PI/2.0
-            else -> Math.acos(c.toDouble())
+            else -> acos(c.toDouble())
         }
 
         var theta = 0.0
         while( theta < 2*PI) {
-            val x = (x + r_h * FastMath.cos(theta))
-            val y = (y + r_v * FastMath.sin(theta))
+            val x = (x + r_h * VectrixMathLayer.fastCos(theta))
+            val y = (y + r_v * VectrixMathLayer.fastSin(theta))
 
             lambda(x,y)
             theta += theta_d

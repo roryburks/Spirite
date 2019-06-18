@@ -1,8 +1,6 @@
 package rb.vectrix.shapes
 
-import rb.glow.gle.GLPrimitive
 import rb.vectrix.mathUtil.MathUtil
-import rbJvm.vectrix.compaction.FloatCompactor
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin

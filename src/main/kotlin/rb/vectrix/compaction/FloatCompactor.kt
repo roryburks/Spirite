@@ -1,5 +1,6 @@
-package rbJvm.vectrix.compaction
+package rb.vectrix.compaction
 
+import rb.vectrix.VectrixMathLayer
 import kotlin.math.max
 
 class FloatCompactor( chunkSize: Int = 1024) {
@@ -25,7 +26,7 @@ class FloatCompactor( chunkSize: Int = 1024) {
 
     fun insertIntoArray( array: FloatArray, start: Int) {
         data.forEachIndexed { i, datum ->
-            System.arraycopy(datum, 0, array, start + chunkSize*i, getChunkSize(i))
+            VectrixMathLayer.arraycopy(datum, 0, array, start + chunkSize*i, getChunkSize(i))
         }
     }
 

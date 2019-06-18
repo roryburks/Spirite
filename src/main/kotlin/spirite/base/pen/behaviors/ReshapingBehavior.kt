@@ -19,8 +19,8 @@ import spirite.base.pen.Penner
 import spirite.base.pen.behaviors.TransformBehavior.TransformStates.*
 import spirite.base.util.linear.Rect
 import rb.vectrix.shapes.IShape
-import rbJvm.vectrix.shapes.OvalShape
-import rbJvm.vectrix.shapes.RectShape
+import rb.vectrix.shapes.OvalShape
+import rb.vectrix.shapes.RectShape
 import spirite.gui.views.work.WorkSectionView
 import kotlin.math.atan2
 

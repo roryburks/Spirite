@@ -1,5 +1,6 @@
-package rbJvm.vectrix.compaction
+package rb.vectrix.compaction
 
+import rb.vectrix.VectrixMathLayer
 import kotlin.math.max
 
 class ReverseFloatCompactor( chunkSize: Int = 1024) {
@@ -29,11 +30,11 @@ class ReverseFloatCompactor( chunkSize: Int = 1024) {
         if( size == 0) return
 
         val leadingOffset = getChunkSize(data.size-1)
-        System.arraycopy(data[data.size-1], chunkSize - leadingOffset, array, start, leadingOffset)
+        VectrixMathLayer.arraycopy(data[data.size-1], chunkSize - leadingOffset, array, start, leadingOffset)
 
         ( 1 until data.size).forEach {i ->
             val index = data.size - i - 1
-            System.arraycopy(data[index], 0, array, start + chunkSize*(i-1)+leadingOffset, chunkSize)
+            VectrixMathLayer.arraycopy(data[index], 0, array, start + chunkSize*(i-1)+leadingOffset, chunkSize)
         }
     }
 }
