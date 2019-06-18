@@ -5,7 +5,6 @@ import rb.glow.color.Color
 import rb.glow.color.ColorARGB32Normal
 import rb.glow.color.ColorARGB32Premultiplied
 import rb.glow.GraphicsContext
-import spirite.base.graphics.IDrawer
 import java.awt.image.BufferedImage
 
 class ImageBI(
@@ -21,8 +20,6 @@ class ImageBI(
     }
 
     override val graphics: GraphicsContext
-        get() = TODO("not implemented")
-    override val drawer: IDrawer
         get() = TODO("not implemented")
 
     override val width: Int get() = bi.width

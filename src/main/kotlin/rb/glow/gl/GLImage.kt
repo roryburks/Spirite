@@ -7,8 +7,6 @@ import rb.glow.color.toColorPremultiplied
 import rb.glow.gle.GLParameters
 import rb.glow.gle.IGLEngine
 import rb.vectrix.shapes.RectI
-import spirite.base.graphics.GLDrawer
-import spirite.base.graphics.IDrawer
 import rb.glow.gle.GLGraphicsContext
 
 class GLImage : RawImage {
@@ -85,7 +83,6 @@ class GLImage : RawImage {
     // endregion
 
     override val graphics: GLGraphicsContext get() = GLGraphicsContext(this)
-    override val drawer: IDrawer get() = GLDrawer(this)
     override val byteSize: Int get() = width*height*4
 
     val glParams : GLParameters get() = GLParameters(width, height, premultiplied = premultiplied)
@@ -121,20 +118,5 @@ class GLImage : RawImage {
         val read = gl.makeInt32Source(1)
         gl.readnPixels(x, y, 1, 1, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4, read )
         return  read[0]
-    }
-
-    fun toIntArray( rect: RectI? = null) : IntArray{
-        val rect2 = rect ?: RectI(0,0,width, height)
-        engine.setTarget(this)
-
-        if( rect2.wi <= 0 || rect2.hi <= 0)
-            return IntArray(0)
-
-        val gl = engine.gl
-        val data = IntArray(rect2.wi * rect2.hi)
-        val read = gl.makeInt32Source(data)
-        gl.readnPixels(rect2.x1i, rect2.y1i, rect2.wi, rect2.hi, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4*data.size, read )
-
-        return data
     }
 }

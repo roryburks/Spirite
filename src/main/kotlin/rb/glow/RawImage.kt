@@ -1,7 +1,6 @@
 package rb.glow
 
 import rb.glow.color.Colors
-import spirite.base.graphics.IDrawer
 
 
 /**
@@ -21,13 +20,10 @@ interface RawImage : IImage, IFlushable {
      */
     override fun flush()
 
-    val drawer: IDrawer
-
     class InvalidImageDimensionsExeption(message: String) : Exception(message)
 }
 
 object NillImage: RawImage {
-    override val drawer: IDrawer get() = throw Exception("Can't draw to Nill Image")
     override val graphics: GraphicsContext get() = throw Exception("Can't draw to Nill Image")
     override val width: Int get() = 1
     override val height: Int get() = 1

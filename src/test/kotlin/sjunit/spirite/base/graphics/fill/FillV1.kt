@@ -1,9 +1,10 @@
 package sjunit.spirite.base.graphics.fill
 
 import rb.glow.color.Colors
-import spirite.base.graphics.fill.V0FillArrayAlgorithm
+import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import rb.glow.gl.GLImage
 import spirite.hybrid.EngineLaunchpoint
+import spirite.specialRendering.fill.toIntArray
 import kotlin.system.measureTimeMillis
 import org.junit.Test as test
 
@@ -40,7 +41,7 @@ class FillV1Tests {
         println(measureTimeMillis {
             iii = //GLFillV1.fill(image, 3, 2, Colors.BLACK) ?: throw Exception("bad")
                     V0FillArrayAlgorithm.fill(
-                            image.toIntArray() ?: throw Exception(),
+                            image.graphics.toIntArray() ?: throw Exception(),
                             image.width, image.height, 3, 2, Colors.BLACK.argb32) ?: throw Exception("bad")
         })
 

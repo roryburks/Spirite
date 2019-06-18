@@ -5,21 +5,22 @@ import rb.glow.gl.GLC
 import rb.vectrix.linear.Vec4f
 import rb.vectrix.mathUtil.f
 import rbJvm.glow.jogl.JOGL.JOGLTextureSource
-import spirite.base.graphics.fill.IFillArrayAlgorithm
 import spirite.specialRendering.FillAfterpassCall
 import rb.glow.gl.GLImage
+import rb.glow.gle.GLGraphicsContext
 import rb.glow.gle.GLParameters
+import rb.vectrix.shapes.RectI
 import java.nio.IntBuffer
 
 
 class GLFill(val filler: IFillArrayAlgorithm)  {
-    fun fill(glImage: GLImage, x: Int, y: Int, color: SColor) {
-        val gle = glImage.engine
+    fun fill(gc: GLGraphicsContext, x: Int, y: Int, color: SColor) {
+        val gle = gc.gle
         val gl = gle.gl
-        val w = glImage.width
-        val h = glImage.height
+        val w = gc.width
+        val h = gc.height
 
-        val data = filler.fill(glImage.toIntArray(), w, h, x, y, color.argb32) ?: return
+        val data = filler.fill(gc.toIntArray(), w, h, x, y, color.argb32) ?: return
 
 
         val _tex = gl.createTexture() ?: return
@@ -40,7 +41,7 @@ class GLFill(val filler: IFillArrayAlgorithm)  {
 
         val img2 = GLImage(_tex, faW, faH, gle)
 
-        glImage.engine.setTarget(glImage)
+        gle.setTarget(gc.image)
 
         // Pass 1: clear the filled pixels
         if( color.alpha != 1.0f) {
@@ -57,4 +58,20 @@ class GLFill(val filler: IFillArrayAlgorithm)  {
 
         img2.flush()
     }
+}
+
+
+fun GLGraphicsContext.toIntArray( rect: RectI? = null) : IntArray{
+    val rect2 = rect ?: RectI(0,0,width, height)
+    gle.setTarget(image)
+
+    if( rect2.wi <= 0 || rect2.hi <= 0)
+        return IntArray(0)
+
+    val gl = gle.gl
+    val data = IntArray(rect2.wi * rect2.hi)
+    val read = gl.makeInt32Source(data)
+    gl.readnPixels(rect2.x1i, rect2.y1i, rect2.wi, rect2.hi, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4*data.size, read )
+
+    return data
 }

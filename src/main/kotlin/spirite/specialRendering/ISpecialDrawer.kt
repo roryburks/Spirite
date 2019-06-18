@@ -9,10 +9,16 @@ import rb.glow.gle.BasicCall
 import rb.glow.gle.GLGraphicsContext
 import rb.glow.using
 import rb.vectrix.mathUtil.f
+import spirite.base.brains.toolset.ColorChangeMode
+import spirite.specialRendering.fill.GLFill
+import spirite.specialRendering.fill.V0FillArrayAlgorithm
 
 interface ISpecialDrawer {
     fun drawTransparencyBg(x: Int, y: Int, w: Int, h: Int, squareSize: Int, color1: Color = Colors.GRAY, color2: Color = Colors.LIGHT_GRAY)
     fun drawBounds(image: IImage, c: Int)
+    fun invert()
+    fun changeColor(from: Color, to: Color, mode: ColorChangeMode)
+    fun fill(x: Int, y: Int, color: Color)
 }
 
 object SpecialDrawerFactory {
@@ -23,6 +29,49 @@ object SpecialDrawerFactory {
 }
 
 class GLSpecialDrawer(private val _gc: GLGraphicsContext) : ISpecialDrawer{
+    override fun fill(x: Int, y: Int, color: Color) {
+        GLFill(V0FillArrayAlgorithm).fill(_gc, x, y, color)
+    }
+
+    override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
+        _gc.run {
+            val buffer= GLImage(width, height, gle, premultiplied)
+
+            cachedParams.texture1 = image
+            gle.setTarget(buffer)
+            gle.applyPassProgram(ChangeColorCall(from.rgbaComponent, to.rgbaComponent, mode),
+                    cachedParams, null, 0f, 0f, width.f, height.f)
+
+            cachedParams.texture1 = buffer
+            gle.setTarget(image)
+            gle.applyPassProgram(BasicCall(),
+                    cachedParams, null, 0f, 0f, width.f, height.f)
+
+            cachedParams.texture1 = null
+
+            buffer.flush()
+        }
+    }
+
+    override fun invert() {
+        _gc.run {
+            val buffer= GLImage(width, height, gle, premultiplied)
+
+            cachedParams.texture1 = image
+            gle.setTarget(buffer)
+            gle.applyPassProgram(InvertCall(),
+                    cachedParams, null, 0f, 0f, width.f, height.f)
+
+            cachedParams.texture1 = buffer
+            gle.setTarget(image)
+            gle.applyPassProgram(BasicCall(),
+                    cachedParams, null, 0f, 0f, width.f, height.f)
+
+            buffer.flush()
+            cachedParams.texture1 = null
+        }
+    }
+
     override fun drawTransparencyBg(x: Int, y: Int, w: Int, h: Int, squareSize: Int, color1: Color, color2: Color) {
         _gc.run {
             applyPassProgram(

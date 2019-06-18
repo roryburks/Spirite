@@ -2,7 +2,7 @@ package sjunit.spirite.base.graphics.fill
 
 import rb.glow.color.Colors
 import sjunit.TestConfig
-import spirite.base.graphics.fill.V0FillArrayAlgorithm
+import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import rb.glow.gl.GLImage
 import spirite.specialRendering.fill.GLFill
 import spirite.hybrid.EngineLaunchpoint

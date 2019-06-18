@@ -1,9 +1,9 @@
-package spirite.base.graphics.fill
+package spirite.specialRendering.fill
 
 import rb.vectrix.mathUtil.MathUtil
 import java.util.*
 
-object V0FillArrayAlgorithm : IFillArrayAlgorithm{
+object V0FillArrayAlgorithm : IFillArrayAlgorithm {
     override fun fill(data: IntArray, w: Int, h: Int, x: Int, y: Int, color: Int): IntArray? {
         if( x < 0 || x >= w || y < 0 || y >= h) return null
 
