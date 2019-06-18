@@ -1,10 +1,10 @@
 package spirite.gui.views.animation.structureView.ffa
 
-import sgui.generic.components.IComponent
-import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
-import sgui.generic.components.crossContainer.ICrossPanel
-import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
-import sgui.generic.components.events.MouseEvent.MouseEventType.RELEASED
+import sgui.components.IComponent
+import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
+import sgui.components.crossContainer.ICrossPanel
+import sgui.components.events.MouseEvent.MouseButton.RIGHT
+import sgui.components.events.MouseEvent.MouseEventType.RELEASED
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.base.imageData.animation.ffa.FfaLayerCascading

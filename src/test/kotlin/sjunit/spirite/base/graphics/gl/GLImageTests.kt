@@ -6,7 +6,7 @@ import rb.glow.color.Colors
 import sjunit.TestConfig
 import rb.glow.gl.GLImage
 import spirite.hybrid.Hybrid
-import spirite.pc.toBufferedImage
+import rbJvm.glow.awt.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs

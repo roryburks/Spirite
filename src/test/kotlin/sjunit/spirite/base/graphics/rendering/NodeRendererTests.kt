@@ -12,15 +12,15 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.hybrid.Hybrid
-import spirite.hybrid.ImageConverter
-import spirite.pc.graphics.ImageBI
+import rbJvm.glow.awt.AwtImageConverter
+import rbJvm.glow.awt.ImageBI
 import java.io.File
 import javax.imageio.ImageIO
 import org.junit.Test as test
 
 class NodeRendererTests {
     val gle = Hybrid.gle
-    val imageConverter = ImageConverter(gle)
+    val imageConverter = AwtImageConverter(gle)
     val workspace = TestHelper.makeShellWorkspace(100,100)
 
     @test fun RendersGroup() {

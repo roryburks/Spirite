@@ -1,6 +1,6 @@
 package spirite.hybrid.customGui
 
-import sgui.swing.JColor
+import sguiSwing.JColor
 import java.awt.Graphics
 import javax.swing.JPanel
 

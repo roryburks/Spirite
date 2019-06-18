@@ -2,9 +2,9 @@ package spirite.gui.components.dialogs
 
 import rb.glow.color.Color
 import rb.glow.color.Colors
-import sgui.generic.Orientation.HORIZONTAL
-import sgui.generic.Orientation.VERTICAL
-import sgui.generic.components.crossContainer.ICrossPanel
+import sgui.Orientation.HORIZONTAL
+import sgui.Orientation.VERTICAL
+import sgui.components.crossContainer.ICrossPanel
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.MediumType

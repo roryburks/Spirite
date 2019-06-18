@@ -1,7 +1,7 @@
 package spirite.pc.menus
 
-import sgui.generic.UIPoint
-import sgui.swing.SUIPoint
+import sgui.UIPoint
+import sguiSwing.SUIPoint
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.gui.menus.ContextMenus
 import spirite.hybrid.Hybrid
@@ -16,7 +16,7 @@ class SwContextMenus(commandExecuter: ICentralCommandExecutor) : ContextMenus(co
         cmenu.removeAll()
 
         constructMenu(cmenu, scheme.toList(), extra)
-        cmenu.show( (point as? SUIPoint)?.component, point.x, point.y)
+        cmenu.show( (point as? sguiSwing.SUIPoint)?.component, point.x, point.y)
 
         SwingUtilities.invokeLater { cmenu.requestFocus() } // Meh
     }

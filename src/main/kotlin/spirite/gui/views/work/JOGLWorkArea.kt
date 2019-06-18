@@ -5,9 +5,9 @@ import com.jogamp.opengl.GLCapabilities
 import com.jogamp.opengl.GLEventListener
 import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLCanvas
-import sgui.generic.components.events.MouseEvent
-import sgui.swing.components.ISwComponent
-import sgui.swing.components.SwComponent
+import sgui.components.events.MouseEvent
+import sguiSwing.components.ISwComponent
+import sguiSwing.components.SwComponent
 import rb.glow.gle.GLGraphicsContext
 import spirite.base.pen.Penner
 import spirite.hybrid.Hybrid

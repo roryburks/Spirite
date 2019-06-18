@@ -1,18 +1,17 @@
 package spirite.gui.views.animation.structureView.ffa
 
 import rb.owl.bindable.addObserver
-import sgui.generic.Direction
-import sgui.generic.UIPoint
-import sgui.generic.components.IComponent
-import sgui.generic.components.IComponent.BasicBorder.BEVELED_LOWERED
-import sgui.generic.components.crossContainer.ICrossPanel
-import sgui.generic.components.events.MouseEvent
-import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
-import sgui.generic.components.events.MouseEvent.MouseEventType.RELEASED
-import sgui.swing.components.SwComponent
-import sgui.swing.skin.Skin.FFAAnimation.Arrow
-import sgui.swing.skin.Skin.Global.Bg
-import sgui.swing.skin.Skin.Global.Fg
+import sgui.UIPoint
+import sgui.components.IComponent
+import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
+import sgui.components.crossContainer.ICrossPanel
+import sgui.components.events.MouseEvent
+import sgui.components.events.MouseEvent.MouseButton.RIGHT
+import sgui.components.events.MouseEvent.MouseEventType.RELEASED
+import sguiSwing.components.SwComponent
+import sguiSwing.skin.Skin.FFAAnimation.Arrow
+import sguiSwing.skin.Skin.Global.Bg
+import sguiSwing.skin.Skin.Global.Fg
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
@@ -24,7 +23,7 @@ import spirite.gui.views.animation.structureView.AnimFFAStructPanel
 import spirite.hybrid.Hybrid
 import spirite.hybrid.customGui.ArrowPanel
 import spirite.hybrid.customGui.DashedOutPanel
-import spirite.pc.graphics.ImageBI
+import rbJvm.glow.awt.ImageBI
 import java.awt.image.BufferedImage
 import java.io.InvalidClassException
 
@@ -172,11 +171,11 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
             val tickLen : Int = 32)
         : IFFAStructView
     {
-        val imgBox = Hybrid.ui.ImageBox(ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR)))
+        val imgBox = Hybrid.ui.ImageBox(ImageBI(BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR)))
         override val component = Hybrid.ui.CrossPanel {
             cols.add(imgBox, width = tickLen)
             if( frame.length > 1) {
-                cols.add(SwComponent(ArrowPanel(null, Arrow.jcolor, Direction.RIGHT)), width = tickLen * (frame.length - 1))
+                cols.add(SwComponent(ArrowPanel(null, Arrow.jcolor, sgui.Direction.RIGHT)), width = tickLen * (frame.length - 1))
             }
         }
         override val height: Int get() = tickLen

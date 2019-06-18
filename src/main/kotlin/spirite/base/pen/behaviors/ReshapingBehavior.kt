@@ -11,7 +11,7 @@ import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rbJvm.owl.bindWeaklyTo
-import sgui.generic.components.events.MouseEvent.MouseButton
+import sgui.components.events.MouseEvent.MouseButton
 import rb.glow.GraphicsContext
 import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent

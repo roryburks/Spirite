@@ -5,8 +5,8 @@ import rb.owl.bindable.addObserver
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
-import sgui.generic.components.events.MouseEvent.MouseButton
-import sgui.generic.components.events.MouseEvent.MouseButton.LEFT
+import sgui.components.events.MouseEvent.MouseButton
+import sgui.components.events.MouseEvent.MouseButton.LEFT
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*

@@ -1,6 +1,6 @@
 package spirite.gui.components.dialogs
 
-import sgui.generic.components.crossContainer.ICrossPanel
+import sgui.components.crossContainer.ICrossPanel
 import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid

@@ -8,8 +8,6 @@ object VectrixMathLayer {
 
     inline fun arraycopy(src: IntArray, srcPos: Int, dest:IntArray, destPos: Int, len: Int) = mathLayer.arraycopy(src, srcPos, dest, destPos, len)
     inline fun arraycopy(src: FloatArray, srcPos: Int, dest:FloatArray, destPos: Int, len: Int) = mathLayer.arraycopy(src, srcPos, dest, destPos, len)
-    inline fun fastSin(theta: Float) = mathLayer.fastSin(theta)
-    inline fun fastCos(theta: Float) = mathLayer.fastCos(theta)
     inline fun fastSin(theta: Double) = mathLayer.fastSin(theta)
     inline fun fastCos(theta: Double) = mathLayer.fastCos(theta)
 
@@ -19,8 +17,6 @@ interface IMathLayer {
     fun arraycopy(src: FloatArray, srcPos: Int, dest:FloatArray, destPos: Int, len: Int)
     fun arraycopy(src: IntArray, srcPos: Int, dest:IntArray, destPos: Int, len: Int)
 
-    fun fastSin(theta: Float) : Float
-    fun fastCos(theta: Float) : Float
     fun fastSin(theta: Double) : Double
     fun fastCos(theta: Double) : Double
 }
@@ -35,8 +31,6 @@ object BaseMathLayer : IMathLayer {
         (0 until len).forEach { dest[destPos + it] = src[srcPos + len] }
     }
 
-    override fun fastSin(theta: Float) = sin(theta)
-    override fun fastCos(theta: Float) = cos(theta)
     override fun fastSin(theta: Double) = sin(theta)
     override fun fastCos(theta: Double) = cos(theta)
 }

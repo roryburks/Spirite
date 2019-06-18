@@ -12,8 +12,8 @@
 //import rb.glow.color.Colors
 //import spirite.hybrid.EngineLaunchpoint
 //import spirite.hybrid.Hybrid
-//import spirite.hybrid.ImageConverter
-//import spirite.pc.graphics.ImageBI
+//import rbJvm.glow.awt.AwtImageConverter
+//import rbJvm.glow.awt.ImageBI
 //import java.io.File
 //import javax.imageio.ImageIO
 //import kotlin.test.assertEquals
@@ -21,7 +21,7 @@
 //
 //class DynamicMediumTests {
 //    val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)
-//    val imageConverter = ImageConverter(EngineLaunchpoint.gle)
+//    val imageConverter = AwtImageConverter(EngineLaunchpoint.gle)
 //
 //    init {
 //        every { mockWorkspace.width } returns 100

@@ -1,9 +1,9 @@
 package spirite.gui.components.views
 
-import sgui.generic.components.IComponent
-import sgui.generic.components.ITextArea
-import sgui.generic.components.crossContainer.ICrossPanel
-import sgui.swing.SwIcon
+import sgui.components.IComponent
+import sgui.components.ITextArea
+import sgui.components.crossContainer.ICrossPanel
+import sguiSwing.SwIcon
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.hybrid.Hybrid
 

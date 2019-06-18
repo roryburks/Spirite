@@ -1,8 +1,8 @@
 package demonstration
 
-import sgui.generic.Orientation.HORIZONTAL
-import sgui.generic.components.IBoxList.IBoxComponent
-import sgui.swing.components.*
+import sgui.Orientation.HORIZONTAL
+import sgui.components.IBoxList.IBoxComponent
+import sguiSwing.components.*
 import spirite.hybrid.Hybrid
 import java.awt.Color
 import java.awt.GridLayout

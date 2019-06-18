@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2
 import rb.glow.IImage
 import rb.glow.gl.GLImage
 import spirite.base.util.linear.Rect
-import spirite.pc.graphics.ImageBI
+import rbJvm.glow.awt.ImageBI
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.awt.image.DataBufferInt

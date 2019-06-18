@@ -2,7 +2,7 @@ package sjunit
 
 import rb.glow.IImage
 import spirite.hybrid.Hybrid
-import spirite.pc.graphics.ImageBI
+import rbJvm.glow.awt.ImageBI
 import java.io.File
 import javax.imageio.ImageIO
 

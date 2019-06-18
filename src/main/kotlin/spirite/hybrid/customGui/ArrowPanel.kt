@@ -1,14 +1,14 @@
 package spirite.hybrid.customGui
 
 import rb.vectrix.mathUtil.round
-import sgui.generic.Direction
-import sgui.generic.Direction.*
-import sgui.swing.JColor
-import sgui.swing.components.SJPanel
+import sgui.Direction
+import sgui.Direction.*
+import sguiSwing.JColor
+import sguiSwing.components.SJPanel
 import java.awt.Graphics
 
 
-class ArrowPanel(val bgcol: JColor?, val fgcol: JColor, val dir: Direction) : SJPanel() {
+class ArrowPanel(val bgcol: JColor?, val fgcol: JColor, val dir: sgui.Direction) : SJPanel() {
     init {
         background = null
         isOpaque = false

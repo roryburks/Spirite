@@ -10,8 +10,8 @@
 //import rb.glow.color.Colors
 //import spirite.hybrid.EngineLaunchpoint
 //import spirite.hybrid.Hybrid
-//import spirite.hybrid.ImageConverter
-//import spirite.pc.graphics.ImageBI
+//import rbJvm.glow.awt.AwtImageConverter
+//import rbJvm.glow.awt.ImageBI
 //import java.io.File
 //import javax.imageio.ImageIO
 //import kotlin.test.assertEquals
@@ -19,7 +19,7 @@
 //
 //class FlatMediumTests {
 //    val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)
-//    val imageConverter = ImageConverter(EngineLaunchpoint.gle)
+//    val imageConverter = AwtImageConverter(EngineLaunchpoint.gle)
 //
 //    @test fun buildsDataCorrectly() {
 //        val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20), mockWorkspace.mediumRepository)

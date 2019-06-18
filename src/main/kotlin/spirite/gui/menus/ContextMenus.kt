@@ -1,7 +1,7 @@
 package spirite.gui.menus
 
-import sgui.generic.UIPoint
-import sgui.swing.SwIcon
+import sgui.UIPoint
+import sguiSwing.SwIcon
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.base.brains.commands.ICommand
 import spirite.base.brains.commands.NodeCommands

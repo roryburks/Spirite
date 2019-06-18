@@ -9,7 +9,7 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
 import spirite.hybrid.Hybrid
-import spirite.pc.toBufferedImage
+import rbJvm.glow.awt.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs

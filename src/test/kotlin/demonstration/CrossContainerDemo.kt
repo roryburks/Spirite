@@ -1,10 +1,10 @@
 package demonstration
 
-import sgui.generic.Orientation.HORIZONTAL
-import sgui.generic.Orientation.VERTICAL
-import sgui.swing.advancedComponents.CrossContainer.CrossContainer
-import sgui.swing.components.ResizeContainerPanel
-import sgui.swing.components.jcomponent
+import sgui.Orientation.HORIZONTAL
+import sgui.Orientation.VERTICAL
+import sguiSwing.advancedComponents.CrossContainer.CrossContainer
+import sguiSwing.components.ResizeContainerPanel
+import sguiSwing.components.jcomponent
 import spirite.hybrid.Hybrid
 import java.awt.GridLayout
 import javax.swing.JFrame

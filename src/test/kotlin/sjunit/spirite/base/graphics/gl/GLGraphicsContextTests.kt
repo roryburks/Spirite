@@ -8,7 +8,7 @@ import rb.glow.JoinMethod.MITER
 import rb.glow.LineAttributes
 import rb.glow.gl.GLImage
 import spirite.hybrid.Hybrid
-import spirite.pc.toBufferedImage
+import rbJvm.glow.awt.toBufferedImage
 import spirite.specialRendering.SpecialDrawerFactory
 import java.io.File
 import javax.imageio.ImageIO

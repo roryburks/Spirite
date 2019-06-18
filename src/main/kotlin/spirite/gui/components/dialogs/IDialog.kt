@@ -1,10 +1,10 @@
 package spirite.gui.components.dialogs
 
 import rb.glow.color.SColor
-import sgui.swing.components.jcomponent
-import sgui.swing.jcolor
-import sgui.swing.scolor
-import sgui.swing.skin.Skin.Global
+import sguiSwing.components.jcomponent
+import sguiSwing.jcolor
+import sguiSwing.scolor
+import sguiSwing.skin.Skin.Global
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract

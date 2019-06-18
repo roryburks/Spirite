@@ -24,7 +24,7 @@ import spirite.gui.components.dialogs.JDialog
 import spirite.gui.implementations.topLevelFeedback.SwTopLevelFeedbackSystem
 import spirite.gui.menus.ContextMenus
 import spirite.hybrid.Hybrid
-import spirite.hybrid.NativeImage
+import rbJvm.glow.awt.NativeImage
 import spirite.pc.menus.SwContextMenus
 
 /** MasterControl is a top-level container for all the global-level components.  From a dependency-injection perspective

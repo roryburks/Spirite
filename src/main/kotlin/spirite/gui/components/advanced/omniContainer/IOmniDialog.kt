@@ -1,6 +1,6 @@
 package spirite.gui.components.advanced.omniContainer
 
-import sgui.swing.components.jcomponent
+import sguiSwing.components.jcomponent
 import spirite.base.brains.SwFrameManager
 import java.awt.Dialog.ModalityType.MODELESS
 import java.awt.event.WindowEvent

@@ -1,8 +1,8 @@
 package spirite.gui.views
 
 import rbJvm.owl.addWeakObserver
-import sgui.swing.components.SwMenuBar
-import sgui.swing.components.jcomponent
+import sguiSwing.components.SwMenuBar
+import sguiSwing.components.jcomponent
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand

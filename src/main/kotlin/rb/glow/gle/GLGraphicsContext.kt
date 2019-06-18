@@ -244,7 +244,7 @@ class GLGraphicsContext : GraphicsContext {
             }
         }
 
-        params.texture1 = gle.converter.convert(rawImage, GLImage::class) as GLImage // ImageConverter(gle).convert<GLImage>(rawImage)
+        params.texture1 = gle.converter.convert(rawImage, GLImage::class) as GLImage // AwtImageConverter(gle).convert<GLImage>(rawImage)
 
         val tDraw = when( render) {
             null -> transform

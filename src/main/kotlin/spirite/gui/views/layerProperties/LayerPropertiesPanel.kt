@@ -1,8 +1,8 @@
 package spirite.gui.views.layerProperties
 
 import rbJvm.owl.addWeakObserver
-import sgui.generic.components.IComponent
-import sgui.swing.SwIcon
+import sgui.components.IComponent
+import sguiSwing.SwIcon
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.SimpleLayer

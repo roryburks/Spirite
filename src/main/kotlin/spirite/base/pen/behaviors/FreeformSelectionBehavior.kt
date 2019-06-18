@@ -3,7 +3,7 @@ package spirite.base.pen.behaviors
 import rb.glow.color.Colors
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
-import sgui.generic.components.events.MouseEvent.MouseButton
+import sgui.components.events.MouseEvent.MouseButton
 import rb.glow.GraphicsContext
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.pen.Penner

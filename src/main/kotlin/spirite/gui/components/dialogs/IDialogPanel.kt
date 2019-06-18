@@ -1,6 +1,6 @@
 package spirite.gui.components.dialogs
 
-import sgui.generic.components.IComponent
+import sgui.components.IComponent
 
 interface IDialogPanel<T> : IComponent {
 

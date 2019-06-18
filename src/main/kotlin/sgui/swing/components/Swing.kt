@@ -1,2 +1,0 @@
-package sgui.swing.components
-

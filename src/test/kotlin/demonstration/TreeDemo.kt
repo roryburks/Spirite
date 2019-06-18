@@ -1,11 +1,11 @@
 //package demonstration
 //
-//import sgui.generic.Orientation.VERTICAL
-//import sgui.generic.components.ITreeView.*
-//import sgui.generic.components.ITreeViewNonUI.*
-//import sgui.swing.components.ResizeContainerPanel
-//import sgui.swing.advancedComponents.SwTreeView
-//import sgui.generic.components.IComponent
+//import sgui.Orientation.VERTICAL
+//import sgui.components.ITreeView.*
+//import sgui.components.ITreeViewNonUI.*
+//import sguiSwing.components.ResizeContainerPanel
+//import sguiSwing.advancedComponents.SwTreeView
+//import sgui.components.IComponent
 //import sgui.basic.basic.SwButton
 //import sgui.basic.basic.SwLabel
 //import sgui.basic.basic.jcomponent

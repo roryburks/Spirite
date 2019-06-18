@@ -1,6 +1,6 @@
 package spirite.gui.components.advanced.omniContainer
 
-import sgui.generic.Orientation
+import sgui.Orientation
 
 sealed class OmniPart {
     abstract val components: List<IOmniComponent>
@@ -11,7 +11,7 @@ class OmniContainerPart(
         leading: List<IOmniComponent>,
         trailing: List<IOmniComponent>,
         center: IOmniComponent,
-        orientation: Orientation,
+        orientation: sgui.Orientation,
         defaultSize: Int,
         minSize: Int
 ) : OmniPart() {

@@ -6,7 +6,7 @@ import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import rb.glow.gl.GLImage
 import spirite.specialRendering.fill.GLFill
 import spirite.hybrid.EngineLaunchpoint
-import spirite.pc.toBufferedImage
+import rbJvm.glow.awt.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.system.measureTimeMillis

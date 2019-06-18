@@ -1,11 +1,12 @@
 package spirite.hybrid
 
 import rb.glow.gl.IGL
-import sgui.generic.components.IComponentProvider
-import sgui.generic.systems.IMouseSystem
-import sgui.swing.SwingComponentProvider
-import sgui.swing.mouseSystem.SwMouseSystem
+import sgui.components.IComponentProvider
+import sgui.systems.IMouseSystem
+import sguiSwing.SwingComponentProvider
+import sguiSwing.mouseSystem.SwMouseSystem
 import rb.glow.gle.IGLEngine
+import rbJvm.glow.awt.AwtImageConverter
 import spirite.hybrid.Transferables.IClipboard
 import spirite.hybrid.Transferables.SwClipboard
 import spirite.hybrid.inputSystems.IKeypressSystem
@@ -18,7 +19,7 @@ import rbJvm.glow.jogl.JOGLProvider
  */
 interface IHybrid {
     val imageCreator : IImageCreator
-    val imageConverter : ImageConverter
+    val imageConverter : AwtImageConverter
     val timing : ITimerEngine
     val ui : IComponentProvider
     val imageIO : IImageIO
@@ -43,7 +44,7 @@ object SwHybrid : IHybrid {
     override val gle: IGLEngine = EngineLaunchpoint.gle
     override val gl: IGL get() = JOGLProvider.gl
     override val imageCreator: IImageCreator get() = SwImageCreator
-    override val imageConverter: ImageConverter get() = ImageConverter(EngineLaunchpoint.gle)
+    override val imageConverter: AwtImageConverter get() = AwtImageConverter(EngineLaunchpoint.gle)
     override val imageIO: IImageIO get() = JImageIO
     override val clipboard: IClipboard get() = SwClipboard
 

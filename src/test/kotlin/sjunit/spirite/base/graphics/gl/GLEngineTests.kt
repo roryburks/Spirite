@@ -17,7 +17,7 @@ import rb.glow.JoinMethod.MITER
 import rb.glow.gle.RenderCall.RenderAlgorithm.*
 import spirite.base.pen.stroke.DrawPoints
 import spirite.hybrid.Hybrid
-import spirite.pc.toBufferedImage
+import rbJvm.glow.awt.toBufferedImage
 import spirite.specialRendering.*
 import spirite.specialRendering.SquareGradientCall.GradientType.V
 import java.io.File

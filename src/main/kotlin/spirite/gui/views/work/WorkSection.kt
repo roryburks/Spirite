@@ -7,11 +7,11 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
 import rbJvm.owl.addWeakObserver
-import sgui.generic.Orientation.HORIZONTAL
-import sgui.generic.Orientation.VERTICAL
-import sgui.generic.components.IComponent
-import sgui.generic.components.crossContainer.ICrossPanel
-import sgui.swing.components.SwPanel
+import sgui.Orientation.HORIZONTAL
+import sgui.Orientation.VERTICAL
+import sgui.components.IComponent
+import sgui.components.crossContainer.ICrossPanel
+import sguiSwing.components.SwPanel
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace

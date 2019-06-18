@@ -4,11 +4,11 @@ import rb.IContract
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
-import sgui.generic.Orientation.HORIZONTAL
-import sgui.generic.components.IComponent
-import sgui.swing.SwIcon
-import sgui.swing.components.ResizeContainerPanel
-import sgui.swing.components.jcomponent
+import sgui.Orientation.HORIZONTAL
+import sgui.components.IComponent
+import sguiSwing.SwIcon
+import sguiSwing.components.ResizeContainerPanel
+import sguiSwing.components.jcomponent
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation

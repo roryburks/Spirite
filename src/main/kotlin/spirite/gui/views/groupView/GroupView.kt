@@ -4,9 +4,9 @@ import rb.glow.color.ColorARGB32Normal
 import rb.glow.gle.RenderMethodType
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
-import sgui.generic.components.IComponent
-import sgui.generic.components.crossContainer.ICrossPanel
-import sgui.swing.SwIcon
+import sgui.components.IComponent
+import sgui.components.crossContainer.ICrossPanel
+import sguiSwing.SwIcon
 import spirite.base.brains.IMasterControl
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.hybrid.Hybrid

@@ -6,7 +6,7 @@ import spirite.base.imageData.layers.Layer
 import spirite.hybrid.Hybrid
 import spirite.hybrid.Transferables.IClipboard.ClipboardThings
 import spirite.hybrid.Transferables.IClipboard.ClipboardThings.Image
-import spirite.pc.graphics.ImageBI
+import rbJvm.glow.awt.ImageBI
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.image.BufferedImage

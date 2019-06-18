@@ -4,8 +4,8 @@ import rb.glow.color.ColorARGB32Normal
 import rb.glow.color.Colors
 import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.interpolation.CubicSplineInterpolator2D
-import sgui.generic.components.events.MouseEvent.MouseButton
-import sgui.generic.components.events.MouseEvent.MouseButton.*
+import sgui.components.events.MouseEvent.MouseButton
+import sgui.components.events.MouseEvent.MouseButton.*
 import rb.glow.GraphicsContext
 import spirite.base.imageData.deformation.StrokeDeformationPiece
 import spirite.base.imageData.deformation.StrokeDeformationV2

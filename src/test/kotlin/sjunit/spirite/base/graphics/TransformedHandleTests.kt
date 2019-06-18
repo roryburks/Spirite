@@ -11,8 +11,8 @@
 //import spirite.base.imageData.MediumHandle
 //import rb.glow.color.Colors
 //import spirite.hybrid.Hybrid
-//import spirite.hybrid.ImageConverter
-//import spirite.pc.graphics.ImageBI
+//import rbJvm.glow.awt.AwtImageConverter
+//import rbJvm.glow.awt.ImageBI
 //import java.io.File
 //import javax.imageio.ImageIO
 //import kotlin.test.assertEquals
@@ -20,7 +20,7 @@
 //
 //class TransformedHandleTests {
 //    val gle = Hybrid.gle
-//    val imageConverter = ImageConverter(gle)
+//    val imageConverter = AwtImageConverter(gle)
 //
 //    val workspace = TestHelper.makeShellWorkspace(100,100)
 //

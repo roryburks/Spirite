@@ -2,12 +2,12 @@ package spirite.gui.views.groupView
 
 import rb.glow.color.Colors
 import rb.owl.bindable.addObserver
-import sgui.generic.components.IComponent
-import sgui.generic.components.IComponent.BasicBorder.BASIC
-import sgui.generic.components.IToggleButton
-import sgui.generic.components.crossContainer.ICrossPanel
-import sgui.generic.components.events.MouseEvent.MouseButton.RIGHT
-import sgui.swing.skin.Skin.AnimSchemePanel.ActiveNodeBg
+import sgui.components.IComponent
+import sgui.components.IComponent.BasicBorder.BASIC
+import sgui.components.IToggleButton
+import sgui.components.crossContainer.ICrossPanel
+import sgui.components.events.MouseEvent.MouseButton.RIGHT
+import sguiSwing.skin.Skin.AnimSchemePanel.ActiveNodeBg
 import spirite.base.brains.IMasterControl
 import spirite.base.graphics.isolation.IIsolationManager.IsolationState
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract

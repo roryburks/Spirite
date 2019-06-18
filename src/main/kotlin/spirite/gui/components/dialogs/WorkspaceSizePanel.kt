@@ -1,6 +1,6 @@
 package spirite.gui.components.dialogs
 
-import sgui.generic.components.crossContainer.ICrossPanel
+import sgui.components.crossContainer.ICrossPanel
 import spirite.base.brains.IMasterControl
 import spirite.hybrid.Hybrid
 

@@ -1,11 +1,11 @@
 package spirite.gui.components.advanced.omniContainer
 
-import sgui.generic.Orientation
-import sgui.generic.Orientation.HORIZONTAL
-import sgui.generic.Orientation.VERTICAL
-import sgui.generic.components.IComponent
-import sgui.generic.components.crossContainer.ICrossPanel
-import sgui.swing.components.ResizeContainerPanel
+import sgui.Orientation
+import sgui.Orientation.HORIZONTAL
+import sgui.Orientation.VERTICAL
+import sgui.components.IComponent
+import sgui.components.crossContainer.ICrossPanel
+import sguiSwing.components.ResizeContainerPanel
 import spirite.hybrid.Hybrid
 
 class OmniContainer
@@ -32,7 +32,7 @@ private constructor( init: OmniInitializer.()->Unit, val root: ICrossPanel) : IC
 
 class OmniResizeContainer(
         stretchComponent: IComponent,
-        orientation: Orientation,
+        orientation: sgui.Orientation,
         defaultSize: Int = 100)
     : ResizeContainerPanel(stretchComponent, orientation, defaultSize)
 {
@@ -77,7 +77,7 @@ data class SubContainer(
 
 
 class OmniInitializer {
-    lateinit var orientation: Orientation; private set
+    lateinit var orientation: sgui.Orientation; private set
     lateinit var center : OmniThing
     var defaultSize : Int? = null
     var minSize : Int? = null

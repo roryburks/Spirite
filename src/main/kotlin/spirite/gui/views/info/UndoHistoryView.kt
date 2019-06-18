@@ -1,10 +1,10 @@
 package spirite.gui.views.info
 
 import rb.owl.observer
-import sgui.generic.components.IComponent
-import sgui.generic.components.ITreeViewNonUI.ITreeNodeAttributes
-import sgui.generic.components.ITreeViewNonUI.SimpleTreeComponent
-import sgui.swing.SwIcon
+import sgui.components.IComponent
+import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
+import sgui.components.ITreeViewNonUI.SimpleTreeComponent
+import sguiSwing.SwIcon
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import spirite.base.imageData.undo.UndoIndex

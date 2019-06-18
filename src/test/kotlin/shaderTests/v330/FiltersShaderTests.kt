@@ -9,7 +9,7 @@
 //import rb.glow.gle.IGLEngine
 //import rb.glow.gle.PreparedPrimitive
 //import rb.glow.gl.GLC
-//import spirite.pc.toBufferedImage
+//import rbJvm.glow.awt.toBufferedImage
 //import java.io.File
 //import javax.imageio.ImageIO
 //import org.junit.Test as test

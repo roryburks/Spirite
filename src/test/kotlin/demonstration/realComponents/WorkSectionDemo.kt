@@ -1,9 +1,9 @@
 package demonstration.realComponents
 
 import demonstration.DemoLauncher
-import sgui.generic.Orientation.HORIZONTAL
-import sgui.swing.components.ResizeContainerPanel
-import sgui.swing.components.jcomponent
+import sgui.Orientation.HORIZONTAL
+import sguiSwing.components.ResizeContainerPanel
+import sguiSwing.components.jcomponent
 import sjunit.TestHelper
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC

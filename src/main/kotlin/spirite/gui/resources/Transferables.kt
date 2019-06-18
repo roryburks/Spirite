@@ -1,6 +1,6 @@
 package spirite.gui.resources
 
-import sgui.generic.transfer.ITransferObject
+import sgui.transfer.ITransferObject
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.groupTree.GroupTree.Node
 import java.awt.datatransfer.DataFlavor

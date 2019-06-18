@@ -21,7 +21,7 @@ import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
-import spirite.hybrid.NativeImage
+import rbJvm.glow.awt.NativeImage
 import java.lang.ref.WeakReference
 
 interface IThumbnailStore<T>
@@ -44,7 +44,7 @@ class DerivedNativeThumbnailStore(private val rootThumbnailStore: ThumbnailStore
     //  (a) they aren't that big anyway (32x32)
     //  (b) BufferedImages handle themselves properly
 
-    private val cache = mutableMapOf<ReferenceObject,NativeImage>()
+    private val cache = mutableMapOf<ReferenceObject, NativeImage>()
     private val contracts = mutableMapOf<ReferenceObject,ContractSet>()
 
     private class ContractSet(val internalContract: IThumbnailAccessContract)

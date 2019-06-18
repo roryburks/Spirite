@@ -12,7 +12,7 @@
 //import rb.glow.gle.PreparedPrimitive
 //import rb.glow.gl.GLC
 //import spirite.base.util.linear.MatrixBuilder
-//import spirite.pc.toBufferedImage
+//import rbJvm.glow.awt.toBufferedImage
 //import java.io.File
 //import javax.imageio.ImageIO
 //import kotlin.test.assertEquals
