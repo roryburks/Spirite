@@ -44,7 +44,7 @@ object SwHybrid : IHybrid {
     override val gle: IGLEngine = EngineLaunchpoint.gle
     override val gl: IGL get() = JOGLProvider.gl
     override val imageCreator: IImageCreator get() = SwImageCreator
-    override val imageConverter: AwtImageConverter get() = AwtImageConverter(EngineLaunchpoint.gle)
+    override val imageConverter: AwtImageConverter get() = AwtImageConverter{EngineLaunchpoint.gle}
     override val imageIO: IImageIO get() = JImageIO
     override val clipboard: IClipboard get() = SwClipboard
 
