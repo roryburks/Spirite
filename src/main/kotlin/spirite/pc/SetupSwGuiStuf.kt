@@ -13,4 +13,9 @@ fun setupSwGuiStuff() {
     SwPrimaryIconSet.setIcon(SmallExpandedHighlighted, SpiriteIcons.SmallIcons.ExpandedHighlighted)
     SwPrimaryIconSet.setIcon(SmallUnexpanded, SpiriteIcons.SmallIcons.Unexpanded)
     SwPrimaryIconSet.setIcon(SmallUnexpandedHighlighted, SpiriteIcons.SmallIcons.UnexpandedHighlighted)
+
+    SwPrimaryIconSet.setIcon(SmallArrowN, SpiriteIcons.SmallIcons.ArrowN)
+    SwPrimaryIconSet.setIcon(SmallArrowS, SpiriteIcons.SmallIcons.ArrowS)
+    SwPrimaryIconSet.setIcon(SmallArrowE, SpiriteIcons.SmallIcons.ArrowE)
+    SwPrimaryIconSet.setIcon(SmallArrowW, SpiriteIcons.SmallIcons.ArrowW)
 }
