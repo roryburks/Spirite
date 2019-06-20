@@ -1,6 +1,10 @@
 package spirite.base.brains.commands.specific
 
+import kotlinx.coroutines.handleExceptionViaHandler
+import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.mathUtil.f
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.groupTree.GroupTree
@@ -24,6 +28,22 @@ object LayerFixes {
 
         workspace.undoEngine.doAsAggregateAction("Mass Scaline") {
             rec(node)
+        }
+    }
+
+    fun bakeOffset(workspace: IImageWorkspace, node: GroupTree.LayerNode) {
+        val layer = node.layer
+        val oldProperties = workspace.viewSystem.get(node)
+        val ox = workspace.viewSystem.get(node).ox
+        val oy = workspace.viewSystem.get(node).oy
+        val newProperties = oldProperties.copy(ox = 0, oy = 0)
+        val trans = ImmutableTransformF.Translation(ox.f, oy.f)
+
+        workspace.undoEngine.doAsAggregateAction("Bake Offset into Layer") {
+            workspace.viewSystem.set(node, newProperties)
+            layer.imageDependencies.forEach {
+                (layer.getDrawer(ArrangedMediumData(it)) as? IImageDrawer.ITransformModule)?.transform(trans)
+            }
         }
     }
 
