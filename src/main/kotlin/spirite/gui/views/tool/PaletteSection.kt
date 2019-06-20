@@ -16,7 +16,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.palette.Palette
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.menus.ContextMenus.MenuItem
+import spirite.gui.menus.MenuItem
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 import java.awt.BasicStroke
@@ -252,10 +252,12 @@ constructor(
                 master.paletteManager.savePaletteInPrefs(name, master.paletteManager.currentPalette)
         }
         btnLoadPalette.action = {
-            val scheme = master.settingsManager.paletteList.map { MenuItem(it, customAction = {
-                val data = master.settingsManager.getRawPalette(it)
-                currentWorkspace?.paletteSet?.addPalette(it, true, data)
-            })}
+            val scheme = master.settingsManager.paletteList.map {
+                MenuItem(it, customAction = {
+                    val data = master.settingsManager.getRawPalette(it)
+                    currentWorkspace?.paletteSet?.addPalette(it, true, data)
+                })
+            }
             master.contextMenus.LaunchContextMenu(btnLoadPalette.topLeft, scheme)
         }
     }

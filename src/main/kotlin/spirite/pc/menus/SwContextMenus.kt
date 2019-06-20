@@ -1,15 +1,15 @@
 package spirite.pc.menus
 
 import sgui.UIPoint
-import sguiSwing.SUIPoint
 import spirite.base.brains.commands.ICentralCommandExecutor
-import spirite.gui.menus.ContextMenus
+import spirite.gui.menus.IContextMenus
+import spirite.gui.menus.MenuItem
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
 import javax.swing.*
 
-class SwContextMenus(commandExecuter: ICentralCommandExecutor) : ContextMenus(commandExecuter) {
+class SwContextMenus(private val _commandExecuter: ICentralCommandExecutor) : IContextMenus {
     val cmenu = JPopupMenu()
 
     override fun LaunchContextMenu(point: UIPoint, scheme: List<MenuItem>, extra: Any?) {
@@ -69,7 +69,7 @@ class SwContextMenus(commandExecuter: ICentralCommandExecutor) : ContextMenus(co
                     node.setMnemonic(mnemonic)
 
                 if( item.command != null)
-                    node.addActionListener { Hybrid.gle.runInGLContext { commandExecuter.executeCommand(item.command.commandString, extra)} }
+                    node.addActionListener { Hybrid.gle.runInGLContext { _commandExecuter.executeCommand(item.command.commandString, extra)} }
                 if( item.customAction != null)
                     node.addActionListener { Hybrid.gle.runInGLContext { item.customAction.invoke()} }
 

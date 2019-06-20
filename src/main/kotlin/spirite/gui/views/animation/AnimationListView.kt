@@ -19,7 +19,7 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.menus.ContextMenus.MenuItem
+import spirite.gui.menus.MenuItem
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
 import spirite.hybrid.Hybrid
@@ -79,7 +79,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
                 val animation = list.getNodeFromY(evt.point.y)?.value
 
                 val menuItems = mutableListOf(
-                        MenuItem("Create New Fixed Frame Animation", customAction = {animationManager.addAnimation(FixedFrameAnimation("FixedFrameAnimation", this))})
+                        MenuItem("Create New Fixed Frame Animation", customAction = { animationManager.addAnimation(FixedFrameAnimation("FixedFrameAnimation", this)) })
                 )
 
 

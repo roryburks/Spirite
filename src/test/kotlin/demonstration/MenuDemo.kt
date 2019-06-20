@@ -3,7 +3,7 @@ package demonstration
 import sguiSwing.components.SwMenuBar
 import spirite.base.brains.MasterControl
 import spirite.base.brains.commands.GlobalCommands
-import spirite.gui.menus.ContextMenus.MenuItem
+import spirite.gui.menus.MenuItem
 import spirite.pc.menus.SwContextMenus
 import javax.swing.JFrame
 
@@ -16,7 +16,7 @@ class BlankFrameWithMenuFrame(val master: MasterControl) : JFrame() {
         val scheme = listOf(
                 MenuItem("&File"),
                 MenuItem(".&Ping", GlobalCommands.SaveWorkspace),
-                MenuItem(".P&ong", customAction = { println("Pong")})
+                MenuItem(".P&ong", customAction = { println("Pong") })
         )
 
         val bar = SwMenuBar()

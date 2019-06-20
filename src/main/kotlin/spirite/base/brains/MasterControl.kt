@@ -22,7 +22,7 @@ import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.gui.components.dialogs.IDialog
 import spirite.gui.components.dialogs.JDialog
 import spirite.gui.implementations.topLevelFeedback.SwTopLevelFeedbackSystem
-import spirite.gui.menus.ContextMenus
+import spirite.gui.menus.IContextMenus
 import spirite.hybrid.Hybrid
 import rbJvm.glow.awt.NativeImage
 import spirite.pc.menus.SwContextMenus
@@ -47,7 +47,7 @@ interface IMasterControl {
     val fileManager: IFileManager
 
     val frameManager: IFrameManager
-    val contextMenus : ContextMenus
+    val contextMenus : IContextMenus
     val dialog : IDialog
     val topLevelFeedbackSystem : ITopLevelFeedbackSystem
 
@@ -83,7 +83,7 @@ class MasterControl : IMasterControl {
 
     override val commandExecutor = CentralCommandExecutor(this, workspaceSet, dialog)
 
-    override val contextMenus: ContextMenus = SwContextMenus(commandExecutor)
+    override val contextMenus: IContextMenus = SwContextMenus(commandExecutor)
 
     override val thumbnailStore: IThumbnailStore<IImage>
     override val nativeThumbnailStore: IThumbnailStore<NativeImage>

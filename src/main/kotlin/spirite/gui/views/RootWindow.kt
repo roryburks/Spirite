@@ -5,17 +5,19 @@ import sguiSwing.components.SwMenuBar
 import sguiSwing.components.jcomponent
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
-import spirite.base.brains.commands.FrameCommandExecutor.FrameCommand
+import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand.*
+import spirite.base.brains.commands.FrameCommandExecutor.FrameCommand.*
 import spirite.base.brains.commands.GlobalCommands
-import spirite.base.brains.commands.SelectCommand
+import spirite.base.brains.commands.SelectCommand.All
+import spirite.base.brains.commands.SelectCommand.Invert
+import spirite.base.brains.commands.SelectCommand.None
 import spirite.base.brains.commands.WorkspaceCommands
 import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
 import spirite.gui.components.advanced.omniContainer.OmniTab
 import spirite.gui.components.advanced.omniContainer.SubContainer
 import spirite.gui.implementations.topLevelFeedback.TopLevelPopupView
-import spirite.gui.menus.ContextMenus.MenuItem
+import spirite.gui.menus.MenuItem
 import spirite.gui.views.animation.AnimationListView
 import spirite.gui.views.animation.structureView.AnimationStructureView
 import spirite.gui.views.groupView.GroupView
@@ -53,21 +55,21 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem(".Export Image As...", GlobalCommands.ExportAs),
 
                 MenuItem("&Edit"),
-                MenuItem(".&Undo", DrawCommand.UNDO),
-                MenuItem(".&Redo", DrawCommand.REDO),
+                MenuItem(".&Undo", UNDO),
+                MenuItem(".&Redo", REDO),
 
 
                 MenuItem("&Layer"),
-                MenuItem(".Auto&crop Layer", DrawCommand.AUTO_CROP),
+                MenuItem(".Auto&crop Layer", AUTO_CROP),
                 MenuItem(".Layer to &Image Size"),
 
                 MenuItem("&Select"),
-                MenuItem(".&All", SelectCommand.All),
-                MenuItem(".&None", SelectCommand.None),
-                MenuItem(".&Invert Selection", SelectCommand.Invert),
+                MenuItem(".&All", All),
+                MenuItem(".&None", None),
+                MenuItem(".&Invert Selection", Invert),
 
                 MenuItem("&Image"),
-                MenuItem(".&Invert", DrawCommand.INVERT),
+                MenuItem(".&Invert", INVERT),
                 MenuItem(".&To Color"),
                 MenuItem(".&Resize Workspace", WorkspaceCommands.ResizeWorkspace),
 
@@ -77,16 +79,16 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem("..&Tools"),
                 MenuItem("..-"),
                 MenuItem("..Animation &Scheme"),
-                MenuItem("..Undo &History", FrameCommand.UNDO_HISTORY),
+                MenuItem("..Undo &History", UNDO_HISTORY),
                 MenuItem("..&Reference Scheme"),
 
-                MenuItem(".&Animation View", FrameCommand.ANIMATION),
-                MenuItem(".Animation &State View", FrameCommand.ANIMATION_STATE),
+                MenuItem(".&Animation View", ANIMATION),
+                MenuItem(".Animation &State View", ANIMATION_STATE),
 
                 MenuItem("&Settings"),
                 MenuItem(".Manage &Hotkeys"),
                 MenuItem(".&Tablet Settings"),
-                MenuItem(".&Debug Stats", FrameCommand.DEBUG),
+                MenuItem(".&Debug Stats", DEBUG),
                 MenuItem(".Toggle &GL Mode"),
                 MenuItem(".Toggle GL Panel"),
                 MenuItem(".&__DB_GL")

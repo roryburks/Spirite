@@ -23,6 +23,7 @@ import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.gui.menus.NodeMenus
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables
 import spirite.hybrid.Hybrid
@@ -227,7 +228,7 @@ private constructor(
             if( evt.button == RIGHT && evt.type == RELEASED) {
                 val ws = workspace ?: return
                 val node = tree.getNodeFromY(point.y)?.value
-                master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(ws, node), node)
+                master.contextMenus.LaunchContextMenu(evt.point, NodeMenus.schemeForNode(ws, node), node)
             }
             else if(evt.button == LEFT && evt.type == RELEASED) {
                 val node = tree.getNodeFromY(point.y)?.value

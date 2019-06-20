@@ -17,8 +17,8 @@ import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.gui.components.dialogs.IDialog
-import spirite.gui.menus.ContextMenus
-import spirite.gui.menus.ContextMenus.MenuItem
+import spirite.gui.menus.IContextMenus
+import spirite.gui.menus.MenuItem
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
 import spirite.hybrid.Hybrid
 import spirite.hybrid.customGui.ArrowPanel
@@ -27,28 +27,30 @@ import rbJvm.glow.awt.ImageBI
 import java.awt.image.BufferedImage
 import java.io.InvalidClassException
 
-fun ContextMenus.launchContextMenuFor(point: UIPoint, layer: IFfaLayer, dialog: IDialog) {
+fun IContextMenus.launchContextMenuFor(point: UIPoint, layer: IFfaLayer, dialog: IDialog) {
     val schema = mutableListOf<MenuItem>()
 
 
-    schema.add(MenuItem("&Delete Layer", customAction = {layer.anim.removeLayer(layer)}))
+    schema.add(MenuItem("&Delete Layer", customAction = { layer.anim.removeLayer(layer) }))
     when( layer.asynchronous) {
         true -> schema.add(MenuItem("Make Layer &Synchronous", customAction = { layer.asynchronous = false }))
         false -> schema.add(MenuItem("Make Layer A&synchronous", customAction = { layer.asynchronous = true }))
     }
-    schema.add(MenuItem("&Rename Layer", customAction = {layer.name = dialog.promptForString("Rename Layer", layer.name) ?: layer.name}))
+    schema.add(MenuItem("&Rename Layer", customAction = {
+        layer.name = dialog.promptForString("Rename Layer", layer.name) ?: layer.name
+    }))
 
     this.LaunchContextMenu(point, schema)
 }
 
-fun ContextMenus.launchContextMenuFor(point: UIPoint, frame: IFfaFrame) {
+fun IContextMenus.launchContextMenuFor(point: UIPoint, frame: IFfaFrame) {
     val schema = mutableListOf<MenuItem>()
     val layer = frame.layer
 
     when(layer) {
         is FfaLayerGroupLinked -> {
-            schema.add(MenuItem("Add &Gap After", customAction = {layer.addGapFrameAfter(frame, 1)}))
-            schema.add(MenuItem("Add Gap &Before", customAction = {layer.addGapFrameAfter((frame as FFAFrame).previous, 1)}))
+            schema.add(MenuItem("Add &Gap After", customAction = { layer.addGapFrameAfter(frame, 1) }))
+            schema.add(MenuItem("Add Gap &Before", customAction = { layer.addGapFrameAfter((frame as FFAFrame).previous, 1) }))
         }
     }
     this.LaunchContextMenu(point, schema)
@@ -77,7 +79,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
     // region Menu Components
     private class NameView(
             val layer: FFALayer,
-            val contextMenu: ContextMenus,
+            val contextMenu: IContextMenus,
             val dialog: IDialog,
             private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         :IFFAStructView
@@ -107,7 +109,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
 
     private class LexicalNameView(
             val layer: FfaLayerLexical,
-            val contextMenu: ContextMenus,
+            val contextMenu: IContextMenus,
             val dialog: IDialog,
             private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         : IFFAStructView
@@ -146,7 +148,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
     // region Frame Components
     private class GapView(
             val frame: FFAFrame,
-            val contextMenu: ContextMenus)
+            val contextMenu: IContextMenus)
         :IFFAStructView
     {
         override val component = Hybrid.ui.CrossPanel {
@@ -167,7 +169,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
 
     private inner class ImageFrameView(
             val frame: FFAFrame,
-            val contextMenu: ContextMenus,
+            val contextMenu: IContextMenus,
             val tickLen : Int = 32)
         : IFFAStructView
     {
