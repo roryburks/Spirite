@@ -1,6 +1,9 @@
 package sgui.components
 
 import rb.extendo.delegates.OnChangeDelegate
+import rb.owl.GuardedObservable
+import rb.owl.IObservable
+import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
@@ -11,21 +14,20 @@ import kotlin.math.max
 
 interface IBoxList<T> : IComponent
 {
-    interface IMovementContract
-    {
-        fun canMove(from: Int, to:Int) : Boolean
-        fun doMove(from: Int, to: Int)
-    }
 
     val entries : List<T>
     var movementContract : IMovementContract?
 
+    // Selection
+    val selectionObs : IObservable<()->Unit>
+    var multiSelectEnabled: Boolean
+    val currentSelectedSet: Set<T>
     val selectedIndexBind : Bindable<Int>
     var selectedIndex: Int
     var selected : T?
+    fun addSelection(t: T)
+    fun removeSelection(t: T)
 
-    val numPerRow: Int
-    var renderer : (T) -> IBoxComponent
 
     var movable: Boolean
 
@@ -37,10 +39,19 @@ interface IBoxList<T> : IComponent
     fun remove( t: T)
     fun clear()
 
+    val numPerRow: Int
+    var renderer : (T) -> IBoxComponent
+
     interface IBoxComponent {
         val component: IComponent
         fun setSelected( selected: Boolean)
         fun setIndex( index: Int) {}
+    }
+
+    interface IMovementContract
+    {
+        fun canMove(from: Int, to:Int) : Boolean
+        fun doMove(from: Int, to: Int)
     }
 }
 
@@ -49,12 +60,30 @@ abstract class BoxList<T> constructor(
         boxHeight: Int,
         entries: Collection<T>?,
         private val _provider: IComponentProvider,
-        val del: IBoxListImp)
+        val del: IBoxListImp,
+        multiSelect: Boolean = false)
     : IBoxList<T>, IComponent by del.component
 {
     var boxWidth by OnChangeDelegate(boxWidth, { rebuild() })
     var boxHeight by OnChangeDelegate(boxHeight, { rebuild() })
 
+
+    // region Selection Module
+    override val selectionObs = GuardedObservable<()->Unit>()
+
+    private val _selectedSet = mutableSetOf<Int>()
+    override var multiSelectEnabled by OnChangeDelegate(multiSelect) {
+        if( !it){
+            val old = _selectedSet.size
+
+            _selectedSet.clear()
+            if( selectedIndex != -1)
+            {
+                _selectedSet.add(selectedIndex)
+            }
+
+        }
+    }
     override val selectedIndexBind = Bindable(0)
             .also { it.addObserver(false) { new, old ->
                 _entries.getOrNull(old)?.component?.setSelected(false)
@@ -70,6 +99,7 @@ abstract class BoxList<T> constructor(
         set(value) {
             selectedIndex = _entries.indexOfFirst { it.value == value }
         }
+    // endregion
 
     override val entries: List<T> get() = _entries.map { it.value }
 
@@ -152,24 +182,22 @@ abstract class BoxList<T> constructor(
     })
 
     protected fun rebuild(){
-        with( del) {
-            val w = width
+        val w = width
 
-            numPerRow = max( 1, w/boxWidth)
-            val actualWidthPer = w / numPerRow
+        numPerRow = max( 1, w/boxWidth)
+        val actualWidthPer = w / numPerRow
 
-            del.setLayout {
-                for( r in 0..(entries.size/numPerRow)) {
-                    rows += {
-                        for( c in 0 until numPerRow) {
-                            val entry = _entries.getOrNull(r*numPerRow + c)
-                            when( entry) {
-                                null -> addGap(actualWidthPer)
-                                else -> add(entry.component.component, width = actualWidthPer)
-                            }
+        del.setLayout {
+            for( r in 0..(entries.size/numPerRow)) {
+                rows += {
+                    for( c in 0 until numPerRow) {
+                        val entry = _entries.getOrNull(r*numPerRow + c)
+                        when( entry) {
+                            null -> addGap(actualWidthPer)
+                            else -> add(entry.component.component, width = actualWidthPer)
                         }
-                        height = boxHeight
                     }
+                    height = boxHeight
                 }
             }
         }

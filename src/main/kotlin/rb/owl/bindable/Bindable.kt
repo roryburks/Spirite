@@ -4,12 +4,12 @@ import rb.IContract
 import rb.extendo.extensions.mapRemoveIfNull
 import kotlin.reflect.KProperty
 
-class Bindable<T>(default: T) : IBindable<T>
+class Bindable<T>(default: T, private val mutator:  ((T)->T)? = null) : IBindable<T> where T: Any
 {
     // region Public
     override var field: T
         get() = underlying.value
-        set(value) {underlying.value = value}
+        set(value) {underlying.value = mutator?.invoke(value) ?: value}
 
     override fun addObserver(observer: IBindObserver<T>, trigger: Boolean): IContract = ObserverContract(observer)
         .also { if( trigger) observer.trigger?.invoke(field, field) }
@@ -42,7 +42,7 @@ class Bindable<T>(default: T) : IBindable<T>
     private val observers = mutableListOf<IBindObserver<T>>()
     private val bindList = mutableListOf<Bindable<T>>()
 
-    private class Underlying<T>( default: T, root: Bindable<T>) {
+    private class Underlying<T>( default: T, root: Bindable<T>) where T: Any {
         var value: T = default
             set(value) {
                 val prev = field

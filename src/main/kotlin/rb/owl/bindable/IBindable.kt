@@ -6,6 +6,6 @@ import rb.owl.IObserver
 
 typealias IBindObserver<T> = IObserver<OnChangeEvent<T>>
 
-interface IBindable<T> : IObservable<OnChangeEvent<T>> {
+interface IBindable<T> : IObservable<OnChangeEvent<T>> where T : Any{
     val field: T
 }
