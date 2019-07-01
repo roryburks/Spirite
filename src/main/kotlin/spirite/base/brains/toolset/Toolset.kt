@@ -1,6 +1,7 @@
 package spirite.base.brains.toolset
 
 import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.imageData.drawer.MultiMediumDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.mediums.magLev.MaglevImageDrawer
 
@@ -32,10 +33,12 @@ class Toolset( internal val manager: ToolsetManager) {
             ColorChanger, ColorPicker, Stencil)
     private val maglevTools = listOf(
             Pen, Eraser, Pixel, Flip, Reshape, ColorChanger, MagneticFill, Deformer, MagEraser)
+    private val multiTools = listOf(Flip, Reshape)
     fun toolsForDrawer(drawer: IImageDrawer) : List<Tool> {
         return when( drawer) {
             is NillImageDrawer -> listOf(Pen)
             is MaglevImageDrawer -> maglevTools
+            is MultiMediumDrawer -> multiTools
             else -> defaultTools
         }
     }

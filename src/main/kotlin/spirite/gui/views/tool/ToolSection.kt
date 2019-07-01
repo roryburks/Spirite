@@ -1,6 +1,7 @@
 package spirite.gui.views.tool
 
 import rb.glow.color.Colors
+import rb.owl.Observer
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import sgui.components.IBoxList
@@ -40,11 +41,11 @@ class ToolSection (
     val toolset get() = master.toolsetManager.toolset
     val workspace get() = master.workspaceSet.currentWorkspace
 
-    val activeDataBindK = master.centralObservatory.activeDataBind.addWeakObserver { _, _ ->
+    val activeDataBindK = master.centralObservatory.trackingActiveDrawerObserver.addObserver(Observer{
         imp.data.clear()
         imp.data.add(toolset.toolsForDrawer(workspace?.run { activeDrawer } ?: NillImageDrawer))
         imp.data.selected = currentTool
-    }
+    })
 
     init {
         imp.enabled = false

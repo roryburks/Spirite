@@ -3,6 +3,7 @@ package spirite.base.imageData
 import rb.extendo.dataStructures.SinglyList
 import rb.owl.GuardedObservable
 import rb.owl.IObservable
+import rb.owl.Observer
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
@@ -83,7 +84,8 @@ interface IImageWorkspace {
     val activeData : ArrangedMediumData?
     fun arrangeActiveDataForNode( node: LayerNode) : ArrangedMediumData
 
-    val activeDraweObs: IObservable<()->Unit>
+    val activeDrawerObs: IObservable<()->Unit>
+    fun triggerActiveDrawerChange() // wrong-minded but for now it's easier
     val activeDrawer : IImageDrawer
     val anchorDrawer: IImageDrawer
     fun getDrawerForNode( node: Node) : IImageDrawer
@@ -179,7 +181,23 @@ class ImageWorkspace(
         return layerData.copy(tMediumToWorkspace =  node.tNodeToContext * layerData.tMediumToWorkspace)
     }
 
-    override val activeDraweObs = GuardedObservable<()->Unit>()
+    // region ActiveDrawer Tracking
+    override val activeDrawerObs = GuardedObservable<()->Unit>()
+    private val _amK = activeMediumBind.addObserver { _, _ -> triggerActiveDrawerChange()}
+    private val _aDrawTreeK = groupTree.treeObservable.addObserver(Observer(object : TreeObserver {
+        override fun treeStructureChanged(evt: TreeChangeEvent) {}
+        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {
+            if( groupTree.selectedNode == node)
+                triggerActiveDrawerChange()
+        }
+    }))
+
+    override fun triggerActiveDrawerChange() {
+        activeDrawerObs.trigger { it() }
+    }
+
+    // endregion
+
     override val activeDrawer: IImageDrawer get() {
         val currentLayerNode = (currentNode as? LayerNode)
         if( !settingsManager.allowDrawOnInvisibleLayers && currentLayerNode?.isVisible == false)

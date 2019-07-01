@@ -29,6 +29,7 @@ interface ICentralObservatory {
     val trackingPrimaryTreeObserver : IObservable<TreeObserver>
     val trackingAnimationObservable : IObservable<AnimationObserver>
     val trackingAnimationStateObserver: IObservable<AnimationStructureChangeObserver>
+    val trackingActiveDrawerObserver : IObservable<()->Unit>
 
     val activeDataBind : IBindable<MediumHandle?>
     val selectedNode : IBindable<Node?>
@@ -46,6 +47,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObservable }
     override val trackingAnimationObservable: IObservable<AnimationObserver> = TrackingObserver { it.animationManager.animationObservable }
     override val trackingAnimationStateObserver: IObservable<AnimationStructureChangeObserver> = TrackingObserver { it.animationManager.animationStructureChangeObservable }
+    override val trackingActiveDrawerObserver: IObservable<() -> Unit> = TrackingObserver { it.activeDrawerObs }
 
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
     override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }

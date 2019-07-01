@@ -2,11 +2,13 @@ package spirite.base.imageData.layers.sprite
 
 import rb.extendo.dataStructures.SinglyList
 import rb.extendo.dataStructures.SinglySequence
+import rb.extendo.delegates.OnChangeDelegate
 import rb.extendo.extensions.toHashMap
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
+import rb.owl.bindable.onChangeObserver
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.ceil
@@ -18,6 +20,8 @@ import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.drawer.DefaultImageDrawer
+import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.imageData.drawer.MultiMediumDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.traverse
@@ -76,13 +80,18 @@ class SpriteLayer : Layer {
         activePart = _parts.first()
     }
 
-    val workspace: MImageWorkspace
+    lateinit var workspace: MImageWorkspace ; private set
     val undoEngine get() = workspace.undoEngine
     val parts : List<SpritePart> get() = _parts
     private val _parts = mutableListOf<SpritePart>()
     private var workingId = 0
 
-    var multiSelect: Set<SpritePart>? = null
+    var multiSelect by OnChangeDelegate<Set<SpritePart>?>(null) {
+        if( it != null) {
+            println("trigger")
+            workspace.triggerActiveDrawerChange()
+        }
+    }
     var activePartBind = Bindable<SpritePart?>(null)
             .also { it.addObserver(false) { new, _ ->
                 cAlphaBind.field = new?.alpha ?: 1f
@@ -157,10 +166,31 @@ class SpriteLayer : Layer {
             return ArrangedMediumData( part.handle, part.tPartToWhole)
         }
 
-    override fun getDrawer(arranged: ArrangedMediumData) = when(val med = arranged.handle.medium) {
-        is MaglevMedium -> MaglevImageDrawer(arranged, med)
-        is DynamicMedium -> DefaultImageDrawer(arranged)
-        else -> NillImageDrawer
+    override fun getDrawer(arranged: ArrangedMediumData) : IImageDrawer {
+        val multiSelect = multiSelect
+
+        return when {
+            multiSelect != null && multiSelect.count() > 2-> buildMultiDrawer(multiSelect, arranged)
+            else -> when(val med = arranged.handle.medium) {
+                is MaglevMedium -> MaglevImageDrawer(arranged, med)
+                is DynamicMedium -> DefaultImageDrawer(arranged)
+                else -> NillImageDrawer
+            }
+        }
+    }
+
+    private fun buildMultiDrawer( set: Set<SpritePart>, original: ArrangedMediumData) =
+            MultiMediumDrawer(set.map { getDrawer(it, original) }).also { print("using multimed drawer") }
+    private fun getDrawer(part: SpritePart, original: ArrangedMediumData) : IImageDrawer {
+        val arranged =
+                if( part.handle == original.handle) original
+                else ArrangedMediumData(part.handle, part.tPartToWhole) // TODO: Do this better (find the mutating transform and apply)
+
+        return when (val med = arranged.handle.medium) {
+            is MaglevMedium -> MaglevImageDrawer(arranged, med)
+            is DynamicMedium -> DefaultImageDrawer(arranged)
+            else -> NillImageDrawer
+        }
     }
 
     override val imageDependencies: List<MediumHandle> get() = parts.map { it.handle }

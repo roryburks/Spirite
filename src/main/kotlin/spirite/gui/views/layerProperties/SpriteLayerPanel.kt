@@ -2,6 +2,7 @@ package spirite.gui.views.layerProperties
 
 import rb.IContract
 import rb.glow.color.Colors
+import rb.owl.Observer
 import rb.owl.bindable.Bindable
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
@@ -205,6 +206,8 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
     private val _primarySelectK = boxList.data.selectedIndexBind.addWeakObserver { new, old -> linkedSprite?.activePart = boxList.data.selected }
 
-    // This is my hack-y solution to solve the "press on already-selected object to go from multi to single" UI behavior getting reflected in linkedpart
-    private val _otherSelectK = boxList.data.selectionObs.addWeakObserver({if(boxList.data.currentSelectedSet.size <= 1) linkedSprite?.multiSelect = null})
+    private val _otherSelectK = boxList.data.selectionObs.addObserver(Observer{
+        if(boxList.data.currentSelectedSet.size <= 1) linkedSprite?.multiSelect = null
+        else linkedSprite?.multiSelect = boxList.data.currentSelectedSet.toSet()
+    })
 }
