@@ -4,7 +4,7 @@ import rb.IContract
 import rb.extendo.extensions.mapRemoveIfNull
 import kotlin.reflect.KProperty
 
-class Bindable<T>(default: T, private val mutator:  ((T)->T)? = null) : IBindable<T> where T: Any
+class Bindable<T>(default: T, private val mutator:  ((T)->T)? = null) : IBindable<T>
 {
     // region Public
     override var field: T
@@ -42,7 +42,7 @@ class Bindable<T>(default: T, private val mutator:  ((T)->T)? = null) : IBindabl
     private val observers = mutableListOf<IBindObserver<T>>()
     private val bindList = mutableListOf<Bindable<T>>()
 
-    private class Underlying<T>( default: T, root: Bindable<T>) where T: Any {
+    private class Underlying<T>( default: T, root: Bindable<T>)  {
         var value: T = default
             set(value) {
                 val prev = field
