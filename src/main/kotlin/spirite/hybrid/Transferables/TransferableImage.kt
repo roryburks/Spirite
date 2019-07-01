@@ -12,7 +12,7 @@ val IImageDataFlavor = DataFlavor(IImage::class.java, "SpiriteInternalImage")
 
 class TransferableImage(image: IImage) : Transferable {
     val image = image.deepCopy()
-    val bImage = Hybrid.imageConverter.convert<ImageBI>(this.image).bi
+    val bImage = (Hybrid.imageConverter.convert(this.image,ImageBI::class) as ImageBI).bi
 
     override fun getTransferData(flavor: DataFlavor?): Any {
         return when( flavor) {

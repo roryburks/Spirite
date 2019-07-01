@@ -41,9 +41,9 @@ class ToolSection (
     val workspace get() = master.workspaceSet.currentWorkspace
 
     val activeDataBindK = master.centralObservatory.activeDataBind.addWeakObserver { _, _ ->
-        imp.clear()
-        imp.addAll(toolset.toolsForDrawer(workspace?.run { activeDrawer } ?: NillImageDrawer))
-        imp.selected = currentTool
+        imp.data.clear()
+        imp.data.add(toolset.toolsForDrawer(workspace?.run { activeDrawer } ?: NillImageDrawer))
+        imp.data.selected = currentTool
     }
 
     init {
@@ -60,7 +60,7 @@ class ToolSection (
             }
         }
     }
-    private val _selectedToolK = master.toolsetManager.selectedToolBinding.addObserver { new, _ -> imp.selected = new }
+    private val _selectedToolK = master.toolsetManager.selectedToolBinding.addObserver { new, _ -> imp.data.selected = new }
 
     override fun close() {
         _selectedToolK.void()

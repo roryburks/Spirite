@@ -2,6 +2,7 @@ package spirite.base.file
 
 import rb.glow.IImage
 import rb.glow.color.Colors
+import rb.glow.gl.GLImage
 import rb.glow.using
 import spirite.base.brains.IMasterControl
 import spirite.base.file.load.BadSifFileException

@@ -50,7 +50,7 @@ private constructor(private val imp: Imp) : IComponent by SwComponent(imp)
 
                 anim.drawFrame(gc,context.frame)
 
-                val bi = Hybrid.imageConverter.convert<ImageBI>(image)
+                val bi = Hybrid.imageConverter.convert(image,ImageBI::class) as ImageBI
                 image.flush()
                 g.drawImage(bi.bi, 0, 0, null)
                 bi.flush()

@@ -35,16 +35,16 @@ object MediumPreparer
 {
     fun prepare( medium: IMedium) : IPreparedMedium? {
         return when( medium) {
-            is FlatMedium ->  PreparedFlatMedium(Hybrid.imageConverter.convert(medium.image))
+            is FlatMedium ->  PreparedFlatMedium( Hybrid.imageConverter.convert(medium.image, ImageBI::class) as ImageBI)
             is DynamicMedium -> PreparedDynamicMedium(
-                    medium.image.base?.run { Hybrid.imageConverter.convert<ImageBI>(this) },
+                    medium.image.base?.run { Hybrid.imageConverter.convert(this, ImageBI::class) as ImageBI},
                     medium.image.xOffset,
                     medium.image.yOffset)
             is MaglevMedium -> PreparedMaglevMedium(
                     medium.getThings(),
                     medium.builtImage.xOffset,
                     medium.builtImage.yOffset,
-                    medium.builtImage.base?.run { Hybrid.imageConverter.convert<ImageBI>(this) })
+                    medium.builtImage.base?.run { Hybrid.imageConverter.convert(this, ImageBI::class) as ImageBI })
             else -> null
         }
     }

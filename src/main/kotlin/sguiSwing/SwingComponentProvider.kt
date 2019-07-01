@@ -11,7 +11,7 @@ import sguiSwing.components.*
 
 object SwingComponentProvider : IComponentProvider {
 
-    override fun <T> BoxList(boxWidth: Int, boxHeight: Int, entries: Collection<T>? ): IBoxList<T>
+    override fun <T:Any> BoxList(boxWidth: Int, boxHeight: Int, entries: Collection<T>? ): IBoxList<T>
         = SwBoxList(boxWidth, boxHeight, entries)
 
     override fun Button(str: String?) : IButton = SwButton(str)

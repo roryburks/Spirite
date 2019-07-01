@@ -1,6 +1,7 @@
 package rbJvm.glow.awt
 
 import rb.glow.IImage
+import rb.glow.RawImage
 import rb.glow.exceptions.GLEException
 import rb.glow.gl.GLC
 import rb.glow.gl.IGL
@@ -65,7 +66,7 @@ class AwtImageConverter(
     }
     inline fun <reified T> convert(from: IImage) : T = convertOrNull<T>(from) ?: throw Exception("Unsupported Conversion")
 
-    fun convertToInternal( from: IImage) = convert<InternalImage>(from)
+    override fun convertToInternal( from: IImage) = convert<InternalImage>(from)
 
     fun loadImageIntoGL(image: IImage, gl: IGL) {
         when( image) {

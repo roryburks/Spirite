@@ -51,7 +51,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
                 if( value != null) {
                     _activePartK = activePartBind.bindWeaklyTo(value.activePartBind)
-                    boxList.resetAllWithSelected(value.parts, value.activePart)
+                    boxList.data.resetAllWithSelection(value.parts,  setFromPart(value.activePart) , value.activePart)
                     _layerChangeObsK = value.layerChangeObserver.addWeakObserver(onPartChange)
 
                     _tfTypeK = tfType.textBind.bindTo(value.cPartNameBind)
@@ -64,15 +64,17 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                     _opacitySliderK = opacitySlider.valueBind.bindTo(value.cAlphaBind)
                     _btnVisibilityK = btnVisibility.checkBind.bindTo(value.cVisibleBind)
                 }
-                else boxList.clear()
+                else boxList.data.clear()
             }
         }
+
+    private fun setFromPart(part:SpritePart?) = if( part == null) setOf() else setOf(part)
 
     private val onPartChange = {
         val linked = linkedSprite
         when(linked) {
-            null -> boxList.clear()
-            else -> boxList.resetAllWithSelected(linked.parts, linked.activePart)
+            null -> boxList.data.clear()
+            else -> boxList.data.resetAllWithSelection(linked.parts, setFromPart(linked.activePart), linked.activePart)
         }
     }
 
@@ -138,8 +140,8 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                             }
                         }
                     }.apply {
-                        onMouseClick +={ boxList.selected = part ; boxList.requestFocus()}
-                        if( boxList.selected == part) setBasicBorder(BEVELED_RAISED)
+                        onMouseClick +={ boxList.data.selected = part ; boxList.requestFocus()}
+                        if( boxList.data.selected == part) setBasicBorder(BEVELED_RAISED)
                     }
 
                 override fun setSelected(selected: Boolean) {

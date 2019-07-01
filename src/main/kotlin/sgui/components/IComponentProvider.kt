@@ -39,7 +39,7 @@ interface IComponentProvider {
     fun Separator( orientation: sgui.Orientation) : ISeparator
     fun ColorSquare( color: SColor = Colors.BLACK) : IColorSquare
 
-    fun <T> BoxList(boxWidth: Int, boxHeight: Int, entries: Collection<T>? = null) : IBoxList<T>
+    fun <T:Any> BoxList(boxWidth: Int, boxHeight: Int, entries: Collection<T>? = null) : IBoxList<T>
 
     fun Slider(min: Int = 0, max:Int = 100, value: Int = 0) : ISlider
 

@@ -20,18 +20,18 @@ interface IImageIO {
 
 object JImageIO : IImageIO {
     override fun saveImage(image: IImage, file: File) {
-        ImageIO.write((Hybrid.imageConverter.convert<ImageBI>(image)).bi, file.ext, file)
+        ImageIO.write((Hybrid.imageConverter.convert(image,ImageBI::class) as ImageBI).bi, file.ext, file)
     }
 
     override fun writePNG(image: IImage): ByteArray {
         return ByteArrayOutputStream()
-                .apply { ImageIO.write(Hybrid.imageConverter.convert<ImageBI>(image).bi, "png", this)}
+                .apply { ImageIO.write((Hybrid.imageConverter.convert(image, ImageBI::class)as ImageBI).bi, "png", this)}
                 .toByteArray()
     }
 
     override fun loadImage(byteArray: ByteArray): RawImage {
         val bi = ImageIO.read(ByteArrayInputStream(byteArray))
-        return Hybrid.imageConverter.convert<GLImage>(ImageBI(bi))
+        return Hybrid.imageConverter.convertToInternal(ImageBI(bi))
     }
 }
 

@@ -240,7 +240,7 @@ private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationView
 
                 anim.drawFrame(gc,anim.state.met)
 
-                val bi = Hybrid.imageConverter.convert<ImageBI>(image)
+                val bi = Hybrid.imageConverter.convert(image,ImageBI::class) as ImageBI
                 image.flush()
                 g.drawImage(bi.bi, 0, 0, null)
                 bi.flush()
