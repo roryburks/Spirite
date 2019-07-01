@@ -6,6 +6,7 @@ import sgui.systems.IMouseSystem
 import sguiSwing.SwingComponentProvider
 import sguiSwing.mouseSystem.SwMouseSystem
 import rb.glow.gle.IGLEngine
+import rb.glow.gle.IImageConverter
 import rbJvm.glow.awt.AwtImageConverter
 import spirite.hybrid.Transferables.IClipboard
 import spirite.hybrid.Transferables.SwClipboard
@@ -19,7 +20,7 @@ import rbJvm.glow.jogl.JOGLProvider
  */
 interface IHybrid {
     val imageCreator : IImageCreator
-    val imageConverter : AwtImageConverter
+    val imageConverter : IImageConverter
     val timing : ITimerEngine
     val ui : IComponentProvider
     val imageIO : IImageIO
