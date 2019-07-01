@@ -14,6 +14,7 @@ import java.awt.event.ComponentEvent
 import java.awt.event.KeyEvent
 import javax.swing.Action
 import javax.swing.KeyStroke
+import javax.swing.SwingUtilities
 import kotlin.math.max
 import kotlin.math.min
 
@@ -25,7 +26,9 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, priv
     constructor(boxWidth:Int, boxHeight: Int, entries: Collection<T>? = null) : this(boxWidth, boxHeight, entries, SwBoxListImp())
 
     fun getIndexFromComponent( component: Component) : Int?{
-        val t = _componentMap.entries.firstOrNull { it.value.component.jcomponent == component } ?: return null
+        val t = _componentMap.entries
+                .firstOrNull { SwingUtilities.isDescendingFrom(it.value.component.jcomponent,component) }
+                ?: return null
         val ti = data.entries.indexOf(t.key)
         return if( ti == -1) null else ti
     }
@@ -40,7 +43,7 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, priv
                 val comp = imp.content.getComponentAt(Point(e.point.x, e.point.y))
                 val index = getIndexFromComponent(comp )
                 if( index != null)
-                    data.selectedIndex = index
+                    data.setSelection(data.entries.getOrNull(index))
             }
         }
     }

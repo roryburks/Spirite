@@ -4,6 +4,7 @@ import rb.extendo.delegates.OnChangeDelegate
 import rb.extendo.extensions.then
 import rb.owl.GuardedObservable
 import rb.owl.IObservable
+import rb.owl.Observer
 import rb.owl.bindable.Bindable
 
 interface ISelectableDataModule<T> where T:Any
@@ -16,6 +17,7 @@ interface ISelectableDataModule<T> where T:Any
     var selectedIndex: Int
     var selected : T?
 
+    fun setSelection(t: T?)
     fun addSelection(t: T)
     fun removeSelection(t: T)
     fun setSelection(selectionSet: Set<T>, primarySelected: T? = null)
@@ -46,12 +48,26 @@ class SelectableDataModule<T>(
     override val currentSelectedSet: List<T> get() = _selectedSet
             .mapNotNull { _entries.getOrNull(it) }
     override val selectedIndexBind = Bindable(if( entries.any()) 0 else -1)
-            { if( selectedIndex  in -1 until _entries.size) selectedIndex else -1}
+            { if( it  in -1 until _entries.size) it else -1}
     override var selectedIndex: Int by selectedIndexBind
+    private val selectedIndexK = selectedIndexBind.addObserver(Observer{new,_->
+        val set = when {
+            multiSelectEnabled && new in 0 until entries.size -> _selectedSet.then(new)
+            multiSelectEnabled -> _selectedSet
+            new in 0 until entries.size ->  setOf(new)
+            else -> emptySet()
+        }
+        reconcileSelectionSet(set, new)
+    }, false)
 
     override var selected: T?
         get() = _entries.getOrNull(selectedIndex)
         set(value) {selectedIndex = _entries.indexOf(value)}
+
+    override fun setSelection(t: T?) {
+        val ti = if( t == null) -1 else entries.indexOf(t)
+        reconcileSelectionSet(if( ti in 0 until entries.size) setOf(ti) else emptySet(), ti)
+    }
 
     override fun addSelection(t: T) {
         if( !_entries.contains(t))
@@ -88,7 +104,7 @@ class SelectableDataModule<T>(
                 _recursiveBlock = true
                 val oldSelectionSet = _selectedSet.toSet()
                 val newSelectionSet = selectionSet
-                        .filter { it != 1 && it < _entries.size }
+                        .filter { it != -1 && it < _entries.size }
                         .run { if( multiSelectEnabled) this else take(1) }  // rare actual necessary use of run or bad design?
                         .toSet()
                 val fromSelectedIndex = selectedIndex
@@ -151,6 +167,7 @@ class SelectableDataModule<T>(
         _entries.addAll(set)
 
         setSelection(selected, primarySelected)
+        entryObs.trigger { it() }
     }
 
 }

@@ -120,8 +120,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
         boxList.renderer = {part ->
             object : IBoxComponent {
-                override val component: IComponent
-                    get() = Hybrid.ui.CrossPanel {
+                override val component: IComponent = Hybrid.ui.CrossPanel {
                         cols += {
                             width = 32
                             addFlatGroup(22) {
@@ -140,13 +139,17 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                             }
                         }
                     }.apply {
-                        onMouseClick +={ boxList.data.selected = part ; boxList.requestFocus()}
+                        onMouseClick +={ boxList.data.setSelection(part) ; boxList.requestFocus()}
                         if( boxList.data.selected == part) setBasicBorder(BEVELED_RAISED)
                     }
 
                 override fun setSelected(selected: Boolean) {
-                    if( selected)
-                        activePart = part
+                    if( selected) {
+                        //activePart = part
+                        component.setBasicBorder(BEVELED_RAISED)
+                    }
+                    else
+                        component.setBasicBorder(null)
                 }
             }
         }
@@ -197,4 +200,6 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             }
         }
     }
+
+    private val _primarySelectK = boxList.data.selectedIndexBind.addWeakObserver { new, old -> linkedSprite?.activePart = boxList.data.selected }
 }

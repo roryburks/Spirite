@@ -105,10 +105,11 @@ abstract class BoxList<T> constructor(
         }
     }
 
-    private val _modifyK = data.entryObs.addObserver(Observer{reconcileUi()})
-    private val _selectK = data.selectionObs.addObserver(Observer{reconcileUi()})
+    private val _modifyK = data.entryObs.addObserver(Observer{rebuild()})
+    private val _selectK = data.selectionObs.addObserver(Observer{rebuild()})
 
     protected fun rebuild(){
+        reconcileUi()
         val w = width
 
         numPerRow = max( 1, w/boxWidth)
