@@ -6,6 +6,7 @@ import sgui.components.crossContainer.CrossInitializer
 import sguiSwing.SwUtil
 import sguiSwing.SwingComponentProvider
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
+import spirite.hybrid.Hybrid
 import java.awt.Component
 import java.awt.GridLayout
 import java.awt.Point
@@ -41,9 +42,15 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, priv
             if( enabled) {
                 imp.requestFocus()
                 val comp = imp.content.getComponentAt(Point(e.point.x, e.point.y))
-                val index = getIndexFromComponent(comp )
-                if( index != null)
-                    data.setSelection(data.entries.getOrNull(index))
+                val index = getIndexFromComponent(comp)
+                if (index != null) {
+                    if (data.multiSelectEnabled && e.holdingCtrl)
+                        data.addSelection(data.entries[index])
+                    else if (data.multiSelectEnabled && e.holdingShift)
+                        data.removeSelection(data.entries[index])
+                    else
+                        data.setSelection(data.entries.getOrNull(index))
+                }
             }
         }
     }

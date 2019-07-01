@@ -118,6 +118,8 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             }
         }
 
+        boxList.data.multiSelectEnabled = true
+
         boxList.renderer = {part ->
             object : IBoxComponent {
                 override val component: IComponent = Hybrid.ui.CrossPanel {
@@ -202,4 +204,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
     }
 
     private val _primarySelectK = boxList.data.selectedIndexBind.addWeakObserver { new, old -> linkedSprite?.activePart = boxList.data.selected }
+
+    // This is my hack-y solution to solve the "press on already-selected object to go from multi to single" UI behavior getting reflected in linkedpart
+    private val _otherSelectK = boxList.data.selectionObs.addWeakObserver({if(boxList.data.currentSelectedSet.size <= 1) linkedSprite?.multiSelect = null})
 }

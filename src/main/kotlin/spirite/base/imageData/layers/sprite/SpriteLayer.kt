@@ -82,6 +82,7 @@ class SpriteLayer : Layer {
     private val _parts = mutableListOf<SpritePart>()
     private var workingId = 0
 
+    var multiSelect: Set<SpritePart>? = null
     var activePartBind = Bindable<SpritePart?>(null)
             .also { it.addObserver(false) { new, _ ->
                 cAlphaBind.field = new?.alpha ?: 1f
@@ -93,6 +94,7 @@ class SpriteLayer : Layer {
                 cScaleXBind.field = new?.scaleX ?: 1f
                 cScaleYBind.field = new?.scaleY ?: 1f
                 cRotBind.field = new?.rot ?: 0f
+                multiSelect = null
 
                 val name = new?.partName
                 if( name != null) {

@@ -1,6 +1,8 @@
 package spirite.base.imageData
 
 import rb.extendo.dataStructures.SinglyList
+import rb.owl.GuardedObservable
+import rb.owl.IObservable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
@@ -65,6 +67,8 @@ interface IImageWorkspace {
     val paletteSet : PaletteSet
     val viewSystem: IViewSystem
     val paletteMediumMap: IPaletteMediumMap
+    val imageObservatory: IImageObservatory
+    val compositor : Compositor
 //	public StagingManager getStageManager() {return stagingManager;}
 
     // Super-Components
@@ -74,17 +78,17 @@ interface IImageWorkspace {
     val strokeProvider : IStrokeDrawerProvider
     val toolset : Toolset
 
+    // Root level stuff
     val activeMediumBind : IBindable<MediumHandle?>
     val activeData : ArrangedMediumData?
     fun arrangeActiveDataForNode( node: LayerNode) : ArrangedMediumData
 
+    val activeDraweObs: IObservable<()->Unit>
     val activeDrawer : IImageDrawer
     val anchorDrawer: IImageDrawer
     fun getDrawerForNode( node: Node) : IImageDrawer
 
-    val imageObservatory: IImageObservatory
 
-    val compositor : Compositor
 }
 
 interface MImageWorkspace : IImageWorkspace
@@ -117,7 +121,6 @@ class ImageWorkspace(
     override val animationSpaceManager: IAnimationSpaceManager = AnimationSpaceManager(this)
     override val filterManager: IFilterManager = FilterManager()
     override val paletteMediumMap: IPaletteMediumMap
-
     override val compositor = Compositor()
 
     override var width: Int by UndoableDelegate(width, undoEngine, "Changed Workspace Width")
@@ -176,6 +179,7 @@ class ImageWorkspace(
         return layerData.copy(tMediumToWorkspace =  node.tNodeToContext * layerData.tMediumToWorkspace)
     }
 
+    override val activeDraweObs = GuardedObservable<()->Unit>()
     override val activeDrawer: IImageDrawer get() {
         val currentLayerNode = (currentNode as? LayerNode)
         if( !settingsManager.allowDrawOnInvisibleLayers && currentLayerNode?.isVisible == false)
