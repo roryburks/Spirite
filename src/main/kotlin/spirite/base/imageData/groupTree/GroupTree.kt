@@ -1,6 +1,7 @@
 package spirite.base.imageData.groupTree
 
 import rb.extendo.dataStructures.Deque
+import rb.extendo.extensions.then
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.vectrix.linear.ImmutableTransformF
@@ -185,6 +186,15 @@ open class GroupTree(
             }
             sub(listOf(this))
             return list
+        }
+        fun getAllNodesSuchThatSeq(predicate : (Node) -> Boolean, checkChildren : ((GroupNode) -> Boolean)? = null) : Sequence<Node> {
+            return when {
+                predicate.invoke(this) -> sequenceOf(this)
+                else -> emptySequence()
+            }.then(when {
+                this is GroupNode && checkChildren?.invoke(this) ?: true -> children.asSequence().flatMap { getAllNodesSuchThatSeq(predicate, checkChildren) }
+                else -> emptySequence()
+            })
         }
 
         val ancestors : List<GroupNode> get() {

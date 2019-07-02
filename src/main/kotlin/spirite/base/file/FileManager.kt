@@ -58,6 +58,8 @@ class FileManager( val master: IMasterControl)  : IFileManager{
     class FileLock
     private val locks = mutableListOf<FileLock>()
     override fun saveWorkspace(workspace: IImageWorkspace, file: File, track: Boolean) {
+        workspace.paletteMediumMap.clearUnused()
+
         val lock = FileLock().apply { locks.add(this) }
         SaveEngine.saveWorkspace(file, workspace)
         workspace.fileSaved(file)
