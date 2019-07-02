@@ -7,7 +7,7 @@
 //import spirite.base.graphics.rendering.NodeRenderer
 //import spirite.base.imageData.layers.SimpleLayer
 //import spirite.base.imageData.mediums.ArrangedMediumData
-//import spirite.base.imageData.mediums.CompositeSource
+//import spirite.base.imageData.mediums.HandleCompositeSource
 //import spirite.base.imageData.mediums.DynamicMedium
 //import spirite.base.imageData.mediums.FlatMedium
 //import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
@@ -40,7 +40,7 @@
 //        gc.fillRect(0,0,20,20)
 //
 //        val tMediumToWS = MutableTransformF.TranslationMatrix(10f,10f)
-//        workspace.compositor.compositeSource = CompositeSource(
+//        workspace.compositor.compositeSource = HandleCompositeSource(
 //                ArrangedMediumData(mediumHandle, tMediumToWS))
 //                {it.color = Colors.RED
 //                    it.fillRect( 10,10, 20, 20)}
@@ -83,7 +83,7 @@
 //
 //
 //        val tMediumToWS = MutableTransformF.TranslationMatrix(10f,10f)
-//        workspace.compositor.compositeSource = CompositeSource(
+//        workspace.compositor.compositeSource = HandleCompositeSource(
 //                ArrangedMediumData(mediumHandle, tMediumToWS))
 //                {it.color = Colors.RED
 //                    it.fillRect( 40,40, 10, 10)}

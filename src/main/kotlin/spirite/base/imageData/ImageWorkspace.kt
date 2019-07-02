@@ -173,6 +173,7 @@ class ImageWorkspace(
 
 
     // region Active Stuff
+    // TODO: Extract this stuff into it's own service
 
     private val currentNode get() = groupTree.selectedNode
 

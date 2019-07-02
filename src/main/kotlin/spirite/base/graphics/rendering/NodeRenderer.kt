@@ -233,8 +233,6 @@ class NodeRenderer(
                 }
             }
             gc.popTransform()
-
-
         }
     }
 }

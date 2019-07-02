@@ -19,7 +19,7 @@ import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
-import spirite.base.imageData.mediums.CompositeSource
+import spirite.base.imageData.mediums.HandleCompositeSource
 import spirite.base.imageData.mediums.magLev.MaglevFill.StrokeSegment
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.DrawPoints
@@ -67,7 +67,7 @@ class MaglevStrokeModule(val arranged: ArrangedMediumData) : IStrokeModule {
         val strokeDrawer = workspace.strokeProvider.getStrokeDrawer(params)
         strokeBuilder = StrokeBuilder( strokeDrawer, params, arranged)
 
-        workspace.compositor.compositeSource = CompositeSource(arranged) {strokeDrawer.draw(it)}
+        workspace.compositor.compositeSource = HandleCompositeSource(arranged) {strokeDrawer.draw(it)}
 
         if( strokeBuilder.start(ps))
             arranged.handle.refresh()
@@ -137,7 +137,7 @@ class MaglevTransformModule(val arranged: ArrangedMediumData)
     override fun startManipulatingTransform(): Rect? {
         val tool = workspace.toolset.Reshape
 
-        workspace.compositor.compositeSource = CompositeSource(arranged, false) {gc ->
+        workspace.compositor.compositeSource = HandleCompositeSource(arranged, false) { gc ->
             val medium = arranged.handle.medium
             val cx = medium.width / 2f + medium.x
             val cy = medium.height / 2f + medium.y

@@ -14,7 +14,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
-import spirite.base.imageData.mediums.CompositeSource
+import spirite.base.imageData.mediums.HandleCompositeSource
 import spirite.base.imageData.selection.ILiftedData
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
@@ -56,7 +56,7 @@ class DefaultImageDrawer(
             val sb = StrokeBuilder(strokeDrawer, params, arranged)
             strokeBuilder = sb
 
-            workspace.compositor.compositeSource = CompositeSource(arranged) {strokeDrawer.draw(it)}
+            workspace.compositor.compositeSource = HandleCompositeSource(arranged) {strokeDrawer.draw(it)}
 
             if(sb.start(ps))
                 arranged.handle.refresh()
@@ -269,7 +269,7 @@ class DefaultImageDrawer(
         if( selected != null)
             workspace.selectionEngine.setSelection(null)
 
-        workspace.compositor.compositeSource = CompositeSource(arranged, false ) { gc ->
+        workspace.compositor.compositeSource = HandleCompositeSource(arranged, false ) { gc ->
             val medium = arranged.handle.medium
             val cx = medium.width / 2f + medium.x
             val cy = medium.height / 2f + medium.y
