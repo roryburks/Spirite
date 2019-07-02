@@ -37,7 +37,8 @@ interface IDialog {
         OPEN,
         SAVE_SIF,
         EXPORT,
-        AAF
+        AAF,
+        GIF
     }
     fun pickFile( type: FilePickType) : File?
     fun pickColor( defaultColor: SColor) : SColor?
@@ -105,6 +106,7 @@ class JDialog(private val master: IMasterControl) : IDialog
             SAVE_SIF -> master.settingsManager.workspaceFilePath
             EXPORT -> master.settingsManager.imageFilePath
             AAF -> master.settingsManager.aafFilePath
+            GIF -> master.settingsManager.aafFilePath
         }
 
         fc.choosableFileFilters.forEach { fc.removeChoosableFileFilter(it) }
@@ -123,6 +125,9 @@ class JDialog(private val master: IMasterControl) : IDialog
             AAF -> listOf(
                     FileNameExtensionFilter("AAF File", "aaf"),
                     FileNameExtensionFilter("PNG File", "png"),
+                    fc.acceptAllFileFilter)
+            GIF -> listOf(
+                    FileNameExtensionFilter("GIF File", "gif"),
                     fc.acceptAllFileFilter)
         }
         filters.forEach { fc.addChoosableFileFilter(it) }

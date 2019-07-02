@@ -2,11 +2,14 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
+import spirite.base.file.ExportToGif
 import spirite.base.file.aaf.defaultAafExporter
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.dialogs.IDialog.FilePickType.AAF
+import spirite.gui.components.dialogs.IDialog.FilePickType.GIF
+import java.io.File
 
 class AnimationCommandExecutor (val master: IMasterControl)
     : ICommandExecutor
@@ -49,6 +52,18 @@ object ExportAafCommand : AnimationCommand()
         defaultAafExporter.export(animation, file.absolutePath)
         return true
     }
+}
+object ExportGifCommand : AnimationCommand() {
+    override val name: String get() = "exportAsGif"
+
+    override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
+        val anim = animation as? FixedFrameAnimation ?: return false
+        val file = master.dialog.pickFile(GIF) ?: return false
+
+        ExportToGif.exportAnim(animation,file, animation.state.speed)
+        return true
+    }
+
 }
 object RenameAnimationCommand : AnimationCommand() {
     override val name: String get() = "rename"
