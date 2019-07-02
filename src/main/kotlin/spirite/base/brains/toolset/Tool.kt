@@ -253,7 +253,7 @@ class MagneticFillTool(toolset: Toolset) : Tool(toolset) {
     override val iconY: Int get() = 3
     override val description: String get() = "Magnetic Fill Tool"
 
-    val modeBind by scheme.Property(DropDownProperty("Fill Mode", MagneticFillMode.NORMAL, MagneticFillMode.values()))
+    val modeBind by scheme.Property(DropDownProperty("Fill Mode", MagneticFillMode.BEHIND, MagneticFillMode.values()))
     val mode by modeBind
 }
 
