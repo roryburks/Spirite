@@ -96,6 +96,7 @@ private constructor(private val imp : SwTreeViewImp<T>,
     override var buildingPaused = false
     private fun rebuildTree() {
         if( buildingPaused) return
+        println("Intenal build event")
         compToNodeMap.clear()
         bindKs.forEach { it.void() }
         bindKs.clear()
@@ -172,19 +173,26 @@ private constructor(private val imp : SwTreeViewImp<T>,
     }
 
     override fun constructTree(constructor: ITreeElementConstructor<T>.() -> Unit) {
-        val roots = ITreeElementConstructor<T>().apply { constructor.invoke(this) }.elements
+        val paused = buildingPaused
+        try {
+            buildingPaused = true
+            val roots = ITreeElementConstructor<T>().apply { constructor.invoke(this) }.elements
 
-        fun addNode(context: TreeNode<T>, node: ITNode<T>) {
-            val treeNode = context.addChild( node.value, node.attributes, node.expanded )
-            node.children?.forEach { addNode(treeNode, it) }
-            node.onNodeCreated?.invoke(treeNode)
+            fun addNode(context: TreeNode<T>, node: ITNode<T>) {
+                val treeNode = context.addChild(node.value, node.attributes, node.expanded)
+                node.children?.forEach { addNode(treeNode, it) }
+                node.onNodeCreated?.invoke(treeNode)
+            }
+
+            for (root in roots) {
+                val treeNode = TreeNode(root.value, root.attributes, root.expanded)
+                _rootNodes.add(treeNode)
+                root.children?.forEach { addNode(treeNode, it) }
+                root.onNodeCreated?.invoke(treeNode)
+            }
         }
-
-        for (root in roots) {
-            val treeNode = TreeNode(root.value, root.attributes, root.expanded)
-            _rootNodes.add(treeNode)
-            root.children?.forEach { addNode(treeNode, it) }
-            root.onNodeCreated?.invoke(treeNode)
+        finally {
+            buildingPaused = paused
         }
         rebuildTree()
     }
