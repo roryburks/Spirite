@@ -50,11 +50,15 @@ open class MovableGroupTree(
         moveNode( nodeToMove, nodeInto, if( top) nodeInto.children.firstOrNull() else null)
     }
 
-    internal fun insertNode(contextNode: Node?, nodeToInsert: Node) {
+    internal fun insertNode(contextNode: Node?, nodeToInsert: Node, notInside: Boolean = false) {
+        if(notInside && contextNode is GroupNode) {
+            contextNode.parent?.add(nodeToInsert, contextNode.nextNode)
+        }
         val parent = parentFromContext(contextNode)
         val before = beforeFromContext(contextNode)
         parent.add(nodeToInsert, before)
     }
+
 
     protected fun moveNode( nodeToMove: Node, newParent: GroupNode, newBefore: Node?) {
         val parent = nodeToMove.parent

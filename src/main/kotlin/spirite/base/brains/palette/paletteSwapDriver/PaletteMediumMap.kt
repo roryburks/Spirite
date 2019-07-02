@@ -13,6 +13,9 @@ interface IPaletteMediumMap
 {
     fun clearUnused()
 
+    fun set(node: Node, colors: List<Color>)
+    fun set(node: GroupNode, partName: String, colors: List<Color>)
+
     fun getNodeMappings() : Map<Node,List<Color>>
     fun getSpriteMappings() : Map<Pair<GroupNode,String>,List<Color>>
 
@@ -30,7 +33,9 @@ class PaletteMediumMap(private val _workspace: IImageWorkspace)
     private var _oldSpritePart : Pair<GroupNode, SpritePart>? = null
     private var _oldNode : Node? = null
 
-    // region IPaletteMediumMap
+    override fun set(node: Node, colors: List<Color>) { _nodeMap[node] = colors}
+    override fun set(node: GroupNode, partName: String, colors: List<Color>) {_spriteMap[Pair(node,partName)] = colors}
+
     override fun getNodeMappings() : Map<Node,List<Color>>{
         forgetAllUnlinked()
         return _nodeMap
