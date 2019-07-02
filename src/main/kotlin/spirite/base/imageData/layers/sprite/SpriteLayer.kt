@@ -165,6 +165,7 @@ class SpriteLayer : Layer {
             val part = activePart ?: parts.first()
             return ArrangedMediumData( part.handle, part.tPartToWhole)
         }
+    override val allArrangedData: List<ArrangedMediumData> get() = parts.map { ArrangedMediumData(it.handle, it.tPartToWhole) }
 
     override fun getDrawer(arranged: ArrangedMediumData) : IImageDrawer {
         val multiSelect = multiSelect

@@ -8,6 +8,8 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.brains.palette.paletteSwapDriver.IPaletteMediumMap
@@ -23,6 +25,7 @@ import spirite.base.imageData.animation.IAnimationManager
 import spirite.base.imageData.animationSpaces.AnimationSpaceManager
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager
 import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.imageData.drawer.MultiMediumDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree
@@ -199,13 +202,43 @@ class ImageWorkspace(
     // endregion
 
     override val activeDrawer: IImageDrawer get() {
-        val currentLayerNode = (currentNode as? LayerNode)
-        if( !settingsManager.allowDrawOnInvisibleLayers && currentLayerNode?.isVisible == false)
-            return NillImageDrawer
-        selectionEngine.liftedData?.also { return it.getImageDrawer(this) }
-        currentLayerNode?.also { return it.layer.getDrawer(arrangeActiveDataForNode(it)) }
-        return NillImageDrawer
+        val currentNode = currentNode
+        val liftedData = selectionEngine.liftedData
+        return when {
+            currentNode == null -> NillImageDrawer
+            !settingsManager.allowDrawOnInvisibleLayers && !currentNode.isVisible -> NillImageDrawer
+            liftedData != null -> liftedData.getImageDrawer(this)
+            currentNode is GroupNode -> buildDrawerForGroup(currentNode)
+            currentNode is LayerNode -> currentNode.layer.getDrawer(arrangeActiveDataForNode(currentNode))
+            else -> NillImageDrawer
+        }
     }
+    fun buildDrawerForGroup(group: GroupNode) : IImageDrawer {
+        fun buildRec(sub: Node) : Iterable<IImageDrawer>{
+            return when( sub) {
+                is LayerNode -> {
+                    val localTrans = getTransformForNode(sub)
+                    sub.layer.allArrangedData
+                            .map { it.copy( tMediumToWorkspace = localTrans * it.tMediumToWorkspace) }
+                            .map { sub.layer.getDrawer(it) }
+                }
+                is GroupNode -> sub.children.flatMap { buildRec(it) }
+                else -> listOf()
+            }
+        }
+
+        return MultiMediumDrawer(buildRec(group).toList())
+    }
+
+
+    fun getTransformForNode(node: Node) : ITransformF{
+        val preTrans = when(val parent = node.parent) {
+            null -> ImmutableTransformF.Identity
+            else -> getTransformForNode(parent)
+        }
+        return preTrans * node.tNodeToContext
+    }
+
     override val anchorDrawer: IImageDrawer get() {
         (currentNode as? LayerNode)?.also { return it.layer.getDrawer(arrangeActiveDataForNode(it)) }
         return NillImageDrawer

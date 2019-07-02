@@ -13,6 +13,7 @@ interface Layer {
     val width: Int
     val height: Int
     val activeData: ArrangedMediumData
+    val allArrangedData : List<ArrangedMediumData>
     fun getDrawer( arranged: ArrangedMediumData): IImageDrawer
 
     val imageDependencies: List<MediumHandle>
