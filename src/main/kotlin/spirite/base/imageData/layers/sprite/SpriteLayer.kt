@@ -88,8 +88,8 @@ class SpriteLayer : Layer {
 
     var multiSelect by OnChangeDelegate<Set<SpritePart>?>(null) {
         if( it != null) {
-            println("trigger")
             workspace.triggerActiveDrawerChange()
+            triggerChange()
         }
     }
     var activePartBind = Bindable<SpritePart?>(null)

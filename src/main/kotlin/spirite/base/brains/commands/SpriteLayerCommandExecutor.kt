@@ -76,4 +76,7 @@ object SpriteCommands {
             ws.groupTree.importLayer(ws.groupTree.selectedNode, "Split Sprite",  layer)
         }
     }
+    val SelectAll = SpriteCommand("selectAll") {sprite, part, master ->
+        sprite.multiSelect = sprite.parts.toSet()
+    }
 }

@@ -9,6 +9,7 @@ object SpriteLayerContextMenus {
         val menuItems = mutableListOf<MenuItem>()
 
         menuItems.add(MenuItem("Split into new Sprite", SpriteCommands.SplitParts))
+        menuItems.add(MenuItem("Select All", SpriteCommands.SelectAll))
 
         return menuItems
     }

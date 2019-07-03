@@ -55,7 +55,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
                 if( value != null) {
                     _activePartK = activePartBind.bindWeaklyTo(value.activePartBind)
-                    boxList.data.resetAllWithSelection(value.parts,  setFromPart(value.activePart) , value.activePart)
+                    boxList.data.resetAllWithSelection(value.parts,  selectionSetForSprite(value) , value.activePart)
                     _layerChangeObsK = value.layerChangeObserver.addWeakObserver(onPartChange)
 
                     _tfTypeK = tfType.textBind.bindTo(value.cPartNameBind)
@@ -72,13 +72,21 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             }
         }
 
-    private fun setFromPart(part:SpritePart?) = if( part == null) setOf() else setOf(part)
+    private fun selectionSetForSprite(sprite: SpriteLayer) = when(val set = sprite.multiSelect) {
+        null -> when( val part = sprite.activePart) {
+            null -> setOf()
+            else -> setOf(part)
+        }
+        else -> set
+    }
 
     private val onPartChange = {
         val linked = linkedSprite
         when(linked) {
             null -> boxList.data.clear()
-            else -> boxList.data.resetAllWithSelection(linked.parts, setFromPart(linked.activePart), linked.activePart)
+            else -> {
+                boxList.data.resetAllWithSelection(linked.parts, selectionSetForSprite(linked), linked.activePart)
+            }
         }
     }
 
