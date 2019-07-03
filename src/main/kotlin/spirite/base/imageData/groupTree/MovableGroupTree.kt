@@ -18,9 +18,9 @@ open class MovableGroupTree(
         else -> context
     }
 
-    fun addGroupNode( contextNode: Node?, name: String) : GroupNode {
+    fun addGroupNode( contextNode: Node?, name: String, notInside: Boolean = false) : GroupNode {
         val new = GroupNode(null, name)
-        insertNode(contextNode, new)
+        insertNode(contextNode, new, notInside)
         return new
     }
 
@@ -54,9 +54,11 @@ open class MovableGroupTree(
         if(notInside && contextNode is GroupNode) {
             contextNode.parent?.add(nodeToInsert, contextNode.nextNode)
         }
-        val parent = parentFromContext(contextNode)
-        val before = beforeFromContext(contextNode)
-        parent.add(nodeToInsert, before)
+        else {
+            val parent = parentFromContext(contextNode)
+            val before = beforeFromContext(contextNode)
+            parent.add(nodeToInsert, before)
+        }
     }
 
 

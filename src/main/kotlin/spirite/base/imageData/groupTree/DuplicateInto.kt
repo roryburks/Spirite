@@ -36,7 +36,7 @@ fun MovableGroupTree.duplicateInto(toDupe: Node, context: Node = selectedNode ?:
                 data class NodeContext(val toDupe: Node, val parentInDuper: GroupNode, val noRecBlock : Boolean= false)
 
                 val dupeQ = Deque<NodeContext>()
-                val dupeRoot = addGroupNode(context, getNonduplicateName(toDupe.name))
+                val dupeRoot = addGroupNode(context, getNonduplicateName(toDupe.name), true)
 
                 toDupe.children.forEach { dupeQ.addBack(NodeContext(it, dupeRoot)) }
 
