@@ -1,8 +1,9 @@
-package spirite.base.file
+package spirite.base.file.save
 
 import rb.clicker.telemetry.TelemetryEvent
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
+import spirite.base.file.*
 import spirite.base.file.SaveLoadUtil.FFALAYER_CASCADING
 import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
 import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
@@ -39,7 +40,7 @@ class SaveContext(
 
     val root = workspace.groupTree.root
     val floatingData = workspace.mediumRepository.dataList
-            .mapNotNull { workspace.mediumRepository.floatData(it) { medium -> MediumPreparer.prepare(medium)} }
+            .mapNotNull { workspace.mediumRepository.floatData(it) { medium -> MediumPreparer.prepare(medium) } }
 
 
     inline fun writeChunk(tag: String, crossinline writer : (RandomAccessFile)->Unit) {
@@ -95,6 +96,7 @@ object SaveEngine {
         if( workspace.animationSpaceManager.animationSpaces.any())
             saveAnimationSpaceChunk(context)
         savePaletteData(context)
+        PaletteMapSaver.savePaletteData(context)
 
         ra.close()
     }
@@ -104,7 +106,7 @@ object SaveEngine {
         val workspace = context.workspace
 
         // [4] Header
-        ra.write( SaveLoadUtil.header)
+        ra.write(SaveLoadUtil.header)
         // [4] Version
         ra.writeInt(SaveLoadUtil.version)
 
@@ -148,7 +150,7 @@ object SaveEngine {
                 when( node) {
                     is GroupNode -> {
                         // [1] : NodeTypeId
-                        ra.writeByte( SaveLoadUtil.NODE_GROUP)
+                        ra.writeByte(SaveLoadUtil.NODE_GROUP)
 
                         // Go through each of the Group GroupNode's children recursively and save them
                         when( depth) {
@@ -161,7 +163,7 @@ object SaveEngine {
                         when( layer) {
                             is SimpleLayer -> {
                                 // [1] : NodeTypeId
-                                ra.writeByte( SaveLoadUtil.NODE_SIMPLE_LAYER)
+                                ra.writeByte(SaveLoadUtil.NODE_SIMPLE_LAYER)
 
                                 // [4] : MediumId of Medium attatched to the SimpleLayer
                                 ra.writeInt( layer.medium.id)
@@ -177,7 +179,7 @@ object SaveEngine {
 
                                 parts.forEach { part ->
                                     // Per Part:
-                                    ra.write(SaveLoadUtil.strToByteArrayUTF8( part.partName)) // n : PartTypeName
+                                    ra.write(SaveLoadUtil.strToByteArrayUTF8(part.partName)) // n : PartTypeName
                                     ra.writeFloat(part.transX)  // 4 : TranslationX
                                     ra.writeFloat(part.transY)  // 4 : TranslationY
                                     ra.writeFloat(part.scaleX)  // 4 : ScaleX
@@ -206,7 +208,7 @@ object SaveEngine {
         context.writeChunk("PLTT") {ra ->
             context.workspace.paletteSet.palettes.forEach {
                 // [n], UTF8 : Palette Name
-                ra.write( SaveLoadUtil.strToByteArrayUTF8(it.name))
+                ra.write(SaveLoadUtil.strToByteArrayUTF8(it.name))
 
                 val raw = it.compress()
                 ra.writeShort(raw.size) // [2] Palette Data Size
@@ -348,7 +350,7 @@ object SaveEngine {
                         ra.writeShort(anim.state.zoom)                          // [2] : Anim Zoom
                         ra.writeByte(SaveLoadUtil.ANIM_FFA)                     // [1] : Anim TypeId
 
-                        if(anim.layers.size > MaxFFALayers) MDebug.handleWarning(UNSUPPORTED, "Too many Animation layers (num: ${anim.layers.size} max: ${MaxFFALayers}), taking only the first N")
+                        if(anim.layers.size > MaxFFALayers) MDebug.handleWarning(UNSUPPORTED, "Too many Animation layers (num: ${anim.layers.size} max: $MaxFFALayers), taking only the first N")
 
                         val writtenExplicits = hashSetOf<Node>()
 

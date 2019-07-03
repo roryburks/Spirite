@@ -2,11 +2,11 @@ package spirite.base.file
 
 import rb.glow.IImage
 import rb.glow.color.Colors
-import rb.glow.gl.GLImage
 import rb.glow.using
 import spirite.base.brains.IMasterControl
 import spirite.base.file.load.BadSifFileException
 import spirite.base.file.load.LoadEngine
+import spirite.base.file.save.SaveEngine
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium

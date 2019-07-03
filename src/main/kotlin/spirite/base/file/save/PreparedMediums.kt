@@ -1,4 +1,4 @@
-package spirite.base.file
+package spirite.base.file.save
 
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
@@ -35,9 +35,9 @@ object MediumPreparer
 {
     fun prepare( medium: IMedium) : IPreparedMedium? {
         return when( medium) {
-            is FlatMedium ->  PreparedFlatMedium( Hybrid.imageConverter.convert(medium.image, ImageBI::class) as ImageBI)
+            is FlatMedium -> PreparedFlatMedium(Hybrid.imageConverter.convert(medium.image, ImageBI::class) as ImageBI)
             is DynamicMedium -> PreparedDynamicMedium(
-                    medium.image.base?.run { Hybrid.imageConverter.convert(this, ImageBI::class) as ImageBI},
+                    medium.image.base?.run { Hybrid.imageConverter.convert(this, ImageBI::class) as ImageBI },
                     medium.image.xOffset,
                     medium.image.yOffset)
             is MaglevMedium -> PreparedMaglevMedium(
