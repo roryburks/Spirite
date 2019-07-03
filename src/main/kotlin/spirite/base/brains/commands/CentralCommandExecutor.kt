@@ -3,7 +3,7 @@ package spirite.base.brains.commands
 import rb.extendo.extensions.toHashMap
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MWorkspaceSet
-import spirite.gui.components.dialogs.IDialog
+import spirite.gui.menus.dialogs.IDialog
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 

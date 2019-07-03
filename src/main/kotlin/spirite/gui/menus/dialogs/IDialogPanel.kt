@@ -1,4 +1,4 @@
-package spirite.gui.components.dialogs
+package spirite.gui.menus.dialogs
 
 import sgui.components.IComponent
 

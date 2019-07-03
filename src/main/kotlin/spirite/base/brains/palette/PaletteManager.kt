@@ -10,7 +10,7 @@ import spirite.base.brains.ICentralObservatory
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.settings.ISettingsManager
-import spirite.gui.components.dialogs.IDialog
+import spirite.gui.menus.dialogs.IDialog
 
 interface IPaletteManager {
     val activeBelt : PaletteBelt

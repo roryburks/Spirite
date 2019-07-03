@@ -7,9 +7,8 @@ import spirite.base.file.aaf.defaultAafExporter
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.gui.components.dialogs.IDialog.FilePickType.AAF
-import spirite.gui.components.dialogs.IDialog.FilePickType.GIF
-import java.io.File
+import spirite.gui.menus.dialogs.IDialog.FilePickType.AAF
+import spirite.gui.menus.dialogs.IDialog.FilePickType.GIF
 
 class AnimationCommandExecutor (val master: IMasterControl)
     : ICommandExecutor

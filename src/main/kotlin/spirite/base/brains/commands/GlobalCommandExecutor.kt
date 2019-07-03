@@ -29,8 +29,8 @@ import spirite.base.imageData.mutations.ImportInto
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Rect
-import spirite.gui.components.dialogs.IDialog.FilePickType
-import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
+import spirite.gui.menus.dialogs.IDialog.FilePickType
+import spirite.gui.menus.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
 import spirite.hybrid.Transferables.IClipboard.ClipboardThings.Image
 import spirite.hybrid.Transferables.ILayerBuilder

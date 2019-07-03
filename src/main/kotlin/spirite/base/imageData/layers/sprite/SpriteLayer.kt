@@ -219,7 +219,7 @@ class SpriteLayer : Layer {
     // endregion
 
 
-    // region Part Add/Move/Remove
+    // region Part Add/Insert/Move/Remove
     fun addPart(partName: String, depth: Int? = null, linked: Boolean = false)
     {
         val namesToAccountFor =
@@ -261,6 +261,10 @@ class SpriteLayer : Layer {
         }
 
         activePart = _parts.firstOrNull { it.partName == realName } ?: activePart
+    }
+
+    fun insertPart( handle: MediumHandle, structure: SpritePartStructure) {
+        _addPart(structure, handle)
     }
 
     fun removePart( toRemove: SpritePart, linked: Boolean = false) {

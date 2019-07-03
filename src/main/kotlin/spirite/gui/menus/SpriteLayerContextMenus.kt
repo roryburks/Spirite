@@ -10,6 +10,7 @@ object SpriteLayerContextMenus {
 
         menuItems.add(MenuItem("Split into new Sprite", SpriteCommands.SplitParts))
         menuItems.add(MenuItem("Select All", SpriteCommands.SelectAll))
+        menuItems.add(MenuItem("Move parts to other Sprite", SpriteCommands.MoveParts))
 
         return menuItems
     }

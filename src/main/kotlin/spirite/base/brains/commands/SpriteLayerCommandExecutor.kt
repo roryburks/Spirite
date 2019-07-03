@@ -6,6 +6,7 @@ import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
+import spirite.base.util.StringUtil
 
 
 class SpriteLayerCommandExecutor (
@@ -78,5 +79,21 @@ object SpriteCommands {
     }
     val SelectAll = SpriteCommand("selectAll") {sprite, part, master ->
         sprite.multiSelect = sprite.parts.toSet()
+    }
+
+    val MoveParts = SpriteCommand("moveParts") {sprite, part, master ->
+        val multiGroup = sprite.multiSelect ?: part?.run { setOf(this) } ?: throw CommandNotValidException
+        val toLayer = master.dialog.invokeMoveSpriteParts(multiGroup.toList()) ?: throw CommandNotValidException
+
+        val ws = sprite.workspace
+        ws.undoEngine.doAsAggregateAction("Move Sprite Parts") {
+            multiGroup.forEach { sprite.removePart(it)}
+
+            multiGroup.forEach{
+                val nonduplicateName = StringUtil.getNonDuplicateName(toLayer.parts.map { it.partName }, it.partName)
+                toLayer.insertPart(it.handle, it.structure.copy(partName = nonduplicateName))
+            }
+        }
+
     }
 }

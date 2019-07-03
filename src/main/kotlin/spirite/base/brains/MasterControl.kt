@@ -19,8 +19,8 @@ import spirite.base.graphics.rendering.*
 import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.pen.stroke.IStrokeDrawerProvider
-import spirite.gui.components.dialogs.IDialog
-import spirite.gui.components.dialogs.JDialog
+import spirite.gui.menus.dialogs.IDialog
+import spirite.gui.menus.dialogs.JDialog
 import spirite.gui.implementations.topLevelFeedback.SwTopLevelFeedbackSystem
 import spirite.gui.menus.IContextMenus
 import spirite.hybrid.Hybrid
