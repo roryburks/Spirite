@@ -6,6 +6,7 @@ import rb.owl.Observer
 import sgui.components.IBoxList.IBoxComponent
 import sgui.components.IBoxList.IMovementContract
 import sgui.components.crossContainer.CrossInitializer
+import sgui.components.events.MouseEvent
 import sgui.modules.ISelectableDataModule
 import sgui.modules.SelectableDataModule
 import kotlin.math.max
@@ -24,6 +25,7 @@ interface IBoxList<T> : IComponent where T : Any
 
     interface IBoxComponent {
         val component: IComponent
+        fun onClick( mouseEvent: MouseEvent) {}
         fun setSelected( selected: Boolean)
         fun setIndex( index: Int) {}
         fun onCleared() {}

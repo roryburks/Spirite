@@ -11,9 +11,12 @@ import sgui.components.IBoxList.IMovementContract
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.components.crossContainer.ICrossPanel
+import sgui.components.events.MouseEvent
+import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
+import spirite.gui.menus.SpriteLayerContextMenus
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 
@@ -119,6 +122,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             }
         }
 
+        // Box List
         boxList.data.multiSelectEnabled = true
 
         boxList.renderer = {part ->
@@ -142,7 +146,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                             }
                         }
                     }.apply {
-                        onMouseClick +={ boxList.data.setSelection(part) ; boxList.requestFocus()}
+                        onMouseClick +={boxList.requestFocus()}
                         if( boxList.data.selected == part) setBasicBorder(BEVELED_RAISED)
                     }
 
@@ -153,6 +157,15 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                     }
                     else
                         component.setBasicBorder(null)
+                }
+
+                override fun onClick(mouseEvent: MouseEvent) {
+                    if( mouseEvent.button == RIGHT) {
+                        master.contextMenus.LaunchContextMenu(
+                                mouseEvent.point,
+                                SpriteLayerContextMenus.schemeForSprite(part),
+                                part)
+                    }
                 }
             }
         }
