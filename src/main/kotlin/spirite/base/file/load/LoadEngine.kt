@@ -7,7 +7,7 @@ import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.i
 import spirite.base.brains.IMasterControl
 import spirite.base.file.SaveLoadUtil
-import spirite.base.file.readNullTerminatedStringUTF8
+import spirite.base.file.readUTF8NT
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
@@ -161,7 +161,7 @@ object LoadEngine {
                 ra.close()
             }
         }catch( e: Exception) {
-            throw BadSifFileException("Error Reading File: " + e.stackTrace)
+            throw BadSifFileException("Error Reading File: ${e.message}\n${e.printStackTrace()}" )
         }
     }
 
@@ -346,7 +346,7 @@ object LoadEngine {
         val numSpriteMaps = ra.readInt()
         val spriteMap = List(numSpriteMaps) {
                     val group = context.nodes.getOrNull(ra.readInt()) as? GroupNode
-                    val partName = ra.readNullTerminatedStringUTF8()
+                    val partName = ra.readUTF8NT()
                     val colorSize = ra.readUnsignedByte()
                     val colors = List<Color>(colorSize) { ColorARGB32Normal(ra.readInt()) }
 
@@ -364,7 +364,7 @@ object LoadEngine {
         val endPointer = ra.filePointer + chunkSize
 
         while( ra.filePointer < endPointer) {
-            val name = ra.readNullTerminatedStringUTF8()
+            val name = ra.readUTF8NT()
             val type = ra.readByte().i
 
             val space = AnimationSpaceLoaderFactory

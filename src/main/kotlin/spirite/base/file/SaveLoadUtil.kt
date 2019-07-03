@@ -83,7 +83,7 @@ fun RandomAccessFile.writeUFT8NT(str: String) {
     write(bytes)
 }
 
-fun RandomAccessFile.readNullTerminatedStringUTF8() = SaveLoadUtil.readNullTerminatedStringUTF8(this)
+fun RandomAccessFile.readUTF8NT() = SaveLoadUtil.readNullTerminatedStringUTF8(this)
 
 fun RandomAccessFile.writeFloatArray( floatArray: FloatArray) {
     val buf = ByteBuffer.allocate(floatArray.size * 4)
