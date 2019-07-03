@@ -79,8 +79,9 @@ object SaveEngine {
             val backup = File(file.absolutePath+"~")
             if( backup.exists())
                 backup.delete()
-            file.renameTo(backup)
-            file.delete()
+            val canWrite = file.canWrite()
+            val x = file.renameTo(backup)
+            val deleted = file.delete()
         }
 
         file.createNewFile()
