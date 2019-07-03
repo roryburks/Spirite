@@ -30,7 +30,7 @@ class Toolset( internal val manager: ToolsetManager) {
 
     private val defaultTools = listOf(
             Pen, Eraser, Fill, ShapeSelection, FreeSelection, Rigger, Move, Pixel, Crop, Flip, Reshape,
-            ColorChanger, ColorPicker, Stencil)
+            ColorChanger, ColorPicker, Stencil, MagneticFill)
     private val maglevTools = listOf(
             Pen, Eraser, Pixel, Flip, Reshape, ColorChanger, MagneticFill, Deformer, MagEraser)
     private val multiTools = listOf(Flip, Reshape)
