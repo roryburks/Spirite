@@ -16,6 +16,8 @@ import spirite.base.brains.MWorkspaceSet
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.file.workspaceFromImage
 import rb.glow.Composite.SRC_IN
+import spirite.base.file.aaf.AafImportFactory
+import spirite.base.file.aaf.AafImporter
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
@@ -30,6 +32,7 @@ import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Rect
 import spirite.gui.menus.dialogs.IDialog.FilePickType
+import spirite.gui.menus.dialogs.IDialog.FilePickType.AAF
 import spirite.gui.menus.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
 import spirite.hybrid.Transferables.IClipboard.ClipboardThings.Image
@@ -100,6 +103,11 @@ object GlobalCommands
     }
     val Open = GlobalCommand("open") {master, _ ->
         master.fileManager.openFile(master.dialog.pickFile(FilePickType.OPEN) ?: throw CommandNotValidException)}
+    val ImportAaf = GlobalCommand("importAaf") {master, workspaceSet ->
+        val workspace = workspaceSet.currentMWorkspace  ?: throw CommandNotValidException
+        val file = master.dialog.pickFile(AAF) ?: throw CommandNotValidException
+        AafImporter.importIntoWorkspace(file, workspace)
+    }
     val Export = GlobalCommand("export") {master, workspaceSet ->
         master.fileManager.exportToImage(
                 master.workspaceSet.currentWorkspace ?: throw CommandNotValidException,

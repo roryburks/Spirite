@@ -47,6 +47,8 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem(".&New Image", GlobalCommands.NewWorkspace),
                 MenuItem(".-"),
                 MenuItem(".&Open", GlobalCommands.Open),
+                MenuItem(".&Import"),
+                MenuItem("..Import &AAF", GlobalCommands.ImportAaf),
                 MenuItem(".-"),
                 MenuItem(".&Save Workspace", GlobalCommands.SaveWorkspace),
                 MenuItem(".Save Workspace &As...", GlobalCommands.SaveWorkspaceAs),
