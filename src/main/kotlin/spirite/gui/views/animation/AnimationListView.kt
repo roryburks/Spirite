@@ -11,10 +11,7 @@ import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import sguiSwing.SwIcon
 import sguiSwing.components.jcomponent
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.commands.DeleteAnimationCommand
-import spirite.base.brains.commands.DuplicateAnimationCommand
-import spirite.base.brains.commands.ExportAafCommand
-import spirite.base.brains.commands.RenameAnimationCommand
+import spirite.base.brains.commands.*
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -90,6 +87,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
                 }
                 if( animation is FixedFrameAnimation) {
                     menuItems.add(MenuItem("Export Animation To Aaf", ExportAafCommand))
+                    menuItems.add(MenuItem("Export Animation To Gif", ExportGifCommand))
                 }
 
                 master.contextMenus.LaunchContextMenu(evt.point, menuItems, animation)

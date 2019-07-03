@@ -16,6 +16,13 @@ import spirite.base.util.debug.SpiriteException
 import spirite.hybrid.Hybrid
 
 class PrimaryGroupTree(workspace: MImageWorkspace) : MovableGroupTree( workspace) {
+    enum class InsertBehavior {
+        Above,
+        Bellow,
+        InsertTop,
+        InsertBottom
+    }
+
     override val treeDescription: String get() = "Primary Group Tree"
 
     fun addNewSimpleLayer(contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null, select: Boolean = true) : LayerNode{
@@ -40,9 +47,9 @@ class PrimaryGroupTree(workspace: MImageWorkspace) : MovableGroupTree( workspace
         return importLayer(contextNode, name, SpriteLayer(workspace, type), select)
     }
 
-    fun importLayer( contextNode: Node?, name: String, layer:Layer, select: Boolean = true) : LayerNode {
+    fun importLayer( contextNode: Node?, name: String, layer:Layer, select: Boolean = true, behavior: InsertBehavior? = null) : LayerNode {
         val layerNode = LayerNode(null, getNonDuplicateName(name), layer)
-        insertNode( contextNode, layerNode)
+        insertNode( contextNode, layerNode, behavior)
 
         if( select)
             selectedNode = layerNode

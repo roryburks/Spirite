@@ -1,6 +1,8 @@
 package spirite.base.imageData.groupTree
 
 import spirite.base.imageData.MImageWorkspace
+import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior
+import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.*
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 
@@ -18,9 +20,9 @@ open class MovableGroupTree(
         else -> context
     }
 
-    fun addGroupNode( contextNode: Node?, name: String) : GroupNode {
+    fun addGroupNode( contextNode: Node?, name: String, behavior: InsertBehavior? = null) : GroupNode {
         val new = GroupNode(null, name)
-        insertNode(contextNode, new)
+        insertNode(contextNode, new, behavior)
         return new
     }
 
@@ -50,11 +52,34 @@ open class MovableGroupTree(
         moveNode( nodeToMove, nodeInto, if( top) nodeInto.children.firstOrNull() else null)
     }
 
-    internal fun insertNode(contextNode: Node?, nodeToInsert: Node) {
-        val parent = parentFromContext(contextNode)
-        val before = beforeFromContext(contextNode)
+    internal fun insertNode(contextNode: Node?, nodeToInsert: Node, behavior: InsertBehavior? = null) {
+        val parent : GroupNode
+        val before: Node?
+        when( behavior) {
+            Above -> {
+                parent = nodeToInsert.parent ?: root
+                before = nodeToInsert
+            }
+            Bellow -> {
+                parent = nodeToInsert.parent ?: root
+                before = nodeToInsert.nextNode
+            }
+            InsertBottom -> {
+                parent = nodeToInsert as? GroupNode ?: nodeToInsert.parent ?: root
+                before = null
+            }
+            InsertTop -> {
+                parent = nodeToInsert as? GroupNode ?: nodeToInsert.parent ?: root
+                before = parent.children.firstOrNull()
+            }
+            null -> {
+                parent = parentFromContext(contextNode)
+                before = beforeFromContext(contextNode)
+            }
+        }
         parent.add(nodeToInsert, before)
     }
+
 
     protected fun moveNode( nodeToMove: Node, newParent: GroupNode, newBefore: Node?) {
         val parent = nodeToMove.parent

@@ -3,6 +3,7 @@ package sguiSwing.components
 import sgui.components.BoxList
 import sgui.components.IComponent
 import sgui.components.crossContainer.CrossInitializer
+import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import sguiSwing.SwUtil
 import sguiSwing.SwingComponentProvider
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
@@ -44,12 +45,18 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, priv
                 val comp = imp.content.getComponentAt(Point(e.point.x, e.point.y))
                 val index = getIndexFromComponent(comp)
                 if (index != null) {
-                    if (data.multiSelectEnabled && e.holdingCtrl)
-                        data.addSelection(data.entries[index])
-                    else if (data.multiSelectEnabled && e.holdingShift)
-                        data.removeSelection(data.entries[index])
-                    else
-                        data.setSelection(data.entries.getOrNull(index))
+                    val t = data.entries[index]
+
+                    if( e.button != RIGHT) {
+                        if (data.multiSelectEnabled && e.holdingCtrl)
+                            data.addSelection(t)
+                        else if (data.multiSelectEnabled && e.holdingShift)
+                            data.removeSelection(t)
+                        else
+                            data.setSelection(t)
+                    }
+
+                    _componentMap[t]?.onClick(e)
                 }
             }
         }

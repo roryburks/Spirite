@@ -4,7 +4,7 @@ import sgui.components.IComponent
 import sgui.components.crossContainer.ICrossPanel
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFALexicalPlayback
-import spirite.gui.components.dialogs.IDialog
+import spirite.gui.menus.dialogs.IDialog
 import spirite.hybrid.Hybrid
 
 class FFALexicalStagingView(

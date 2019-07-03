@@ -20,6 +20,9 @@ import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ITimer
 import rbJvm.glow.awt.ImageBI
+import spirite.base.imageData.animation.AnimationUtil
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.gui.resources.ToolIcons
 import java.awt.Graphics
 import kotlin.math.floor
 import kotlin.math.max
@@ -40,6 +43,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     private val btnPrev = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.BigIcons.Anim_StepB) }
     private val btnPlay = Hybrid.ui.ToggleButton().also { it.setOffIcon(SpiriteIcons.BigIcons.Anim_Play) }
     private val btnNext = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.BigIcons.Anim_StepF) }
+    private val btnRecenter = Hybrid.ui.Button("Center")
     private val ffFps = Hybrid.ui.FloatField()
     private val sliderMet = Hybrid.ui.Slider(0,100,0).also { it.snapsToTick = false }
     private val bgColorBox = Hybrid.ui.ColorSquare(Skin.Global.Bg.scolor).also { it.setBasicBorder(BEVELED_RAISED) }
@@ -78,6 +82,8 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         rows += {
             add(sliderMet, width = 184)
             add(ifMet, width = 64, height = 24)
+            addGap(0, 0, Short.MAX_VALUE.i)
+            add(btnRecenter)
         }
         rows.padding = 3
 
@@ -211,6 +217,13 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         bgColorBox.colorBind.addObserver { _, _ -> viewPanel.redraw() }
         btnNext.action = {animation?.also {it.state.met = MathUtil.cycle(it.startFrame, it.endFrame, it.state.met + 1f)  }}
         btnPrev.action = {animation?.also {it.state.met = MathUtil.cycle(it.startFrame, it.endFrame, it.state.met - 1f)  }}
+        btnRecenter.action = {
+            (animation as? FixedFrameAnimation)?.run {
+                val drawBoundary = AnimationUtil.getAnimationBoundaries(this)
+                offsetX = -drawBoundary.x1i
+                offsetY = -drawBoundary.y1i
+            }
+        }
     }
 
     override fun close() {

@@ -44,6 +44,8 @@ private constructor(
     val workspace get() = master.workspaceSet.currentWorkspace
 
     private fun rebuild() {
+        val startTime = Hybrid.timing.currentMilli
+
         _nodeMap.clear()
         _hangingContracts.forEach { it.void() }
         _hangingContracts.clear()
@@ -69,9 +71,12 @@ private constructor(
             }
         }
 
-        tree.buildingPaused = false
         val constructor = makeConstructor(pTree.root)
+        tree.buildingPaused = false
         tree.constructTree (constructor)
+
+
+        println("Rebuilt Tree in ${Hybrid.timing.currentMilli - startTime} ms")
     }
 
     // region SubComponents

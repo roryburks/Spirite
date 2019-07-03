@@ -88,8 +88,8 @@ class SpriteLayer : Layer {
 
     var multiSelect by OnChangeDelegate<Set<SpritePart>?>(null) {
         if( it != null) {
-            println("trigger")
             workspace.triggerActiveDrawerChange()
+            triggerChange()
         }
     }
     var activePartBind = Bindable<SpritePart?>(null)
@@ -165,6 +165,7 @@ class SpriteLayer : Layer {
             val part = activePart ?: parts.first()
             return ArrangedMediumData( part.handle, part.tPartToWhole)
         }
+    override val allArrangedData: List<ArrangedMediumData> get() = parts.map { ArrangedMediumData(it.handle, it.tPartToWhole) }
 
     override fun getDrawer(arranged: ArrangedMediumData) : IImageDrawer {
         val multiSelect = multiSelect
@@ -218,7 +219,7 @@ class SpriteLayer : Layer {
     // endregion
 
 
-    // region Part Add/Move/Remove
+    // region Part Add/Insert/Move/Remove
     fun addPart(partName: String, depth: Int? = null, linked: Boolean = false)
     {
         val namesToAccountFor =
@@ -260,6 +261,10 @@ class SpriteLayer : Layer {
         }
 
         activePart = _parts.firstOrNull { it.partName == realName } ?: activePart
+    }
+
+    fun insertPart( handle: MediumHandle, structure: SpritePartStructure) {
+        _addPart(structure, handle)
     }
 
     fun removePart( toRemove: SpritePart, linked: Boolean = false) {

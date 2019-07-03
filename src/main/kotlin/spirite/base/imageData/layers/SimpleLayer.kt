@@ -14,6 +14,7 @@ class SimpleLayer(val medium: MediumHandle) : Layer {
     override val height: Int get() = medium.height
 
     override val activeData: ArrangedMediumData get() = ArrangedMediumData(medium)
+    override val allArrangedData: List<ArrangedMediumData> get() = listOf(activeData)
 
     override fun getDrawer(arranged: ArrangedMediumData) = arranged.handle.medium.getImageDrawer(arranged)
 

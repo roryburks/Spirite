@@ -2,6 +2,7 @@ package rb.glow.color
 
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
+import kotlin.math.sqrt
 
 
 // TODO: Eventually I will need a more robust color space... space.
@@ -109,4 +110,15 @@ object Colors {
 //        val da = getAlpha(color1) - getAlpha(color2)
 //        return Math.sqrt((dr * dr + dg * dg + db * db + da * da).toDouble())
 //    }
+}
+
+object ColorUtil {
+    fun colorDistance( c1: Color, c2: Color) : Double {
+        // I don't have to explain.  sqrt(2)^2 + 1^2 = c^2, c = sqrt(3), d = sqrt(4) = 2
+        val dr = (c1.red - c2.red) * 255.0/2
+        val dg = (c1.green - c2.green) * 255.0/2
+        val db = (c1.blue - c2.blue) * 255.0/2
+        val da = (c1.alpha - c2.alpha) * 255.0/2
+        return sqrt(dr*dr+dg*dg+db*db+da*da)
+    }
 }

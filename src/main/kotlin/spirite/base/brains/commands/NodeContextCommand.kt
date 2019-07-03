@@ -17,7 +17,7 @@ import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
-import spirite.gui.components.dialogs.IDialog
+import spirite.gui.menus.dialogs.IDialog
 import spirite.hybrid.Hybrid
 
 class NodeContextCommand(

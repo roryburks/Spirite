@@ -11,9 +11,12 @@ import sgui.components.IBoxList.IMovementContract
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.components.crossContainer.ICrossPanel
+import sgui.components.events.MouseEvent
+import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
+import spirite.gui.menus.SpriteLayerContextMenus
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 
@@ -52,7 +55,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
                 if( value != null) {
                     _activePartK = activePartBind.bindWeaklyTo(value.activePartBind)
-                    boxList.data.resetAllWithSelection(value.parts,  setFromPart(value.activePart) , value.activePart)
+                    boxList.data.resetAllWithSelection(value.parts,  selectionSetForSprite(value) , value.activePart)
                     _layerChangeObsK = value.layerChangeObserver.addWeakObserver(onPartChange)
 
                     _tfTypeK = tfType.textBind.bindTo(value.cPartNameBind)
@@ -69,13 +72,21 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             }
         }
 
-    private fun setFromPart(part:SpritePart?) = if( part == null) setOf() else setOf(part)
+    private fun selectionSetForSprite(sprite: SpriteLayer) = when(val set = sprite.multiSelect) {
+        null -> when( val part = sprite.activePart) {
+            null -> setOf()
+            else -> setOf(part)
+        }
+        else -> set
+    }
 
     private val onPartChange = {
         val linked = linkedSprite
         when(linked) {
             null -> boxList.data.clear()
-            else -> boxList.data.resetAllWithSelection(linked.parts, setFromPart(linked.activePart), linked.activePart)
+            else -> {
+                boxList.data.resetAllWithSelection(linked.parts, selectionSetForSprite(linked), linked.activePart)
+            }
         }
     }
 
@@ -119,6 +130,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             }
         }
 
+        // Box List
         boxList.data.multiSelectEnabled = true
 
         boxList.renderer = {part ->
@@ -142,7 +154,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                             }
                         }
                     }.apply {
-                        onMouseClick +={ boxList.data.setSelection(part) ; boxList.requestFocus()}
+                        onMouseClick +={boxList.requestFocus()}
                         if( boxList.data.selected == part) setBasicBorder(BEVELED_RAISED)
                     }
 
@@ -153,6 +165,15 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                     }
                     else
                         component.setBasicBorder(null)
+                }
+
+                override fun onClick(mouseEvent: MouseEvent) {
+                    if( mouseEvent.button == RIGHT) {
+                        master.contextMenus.LaunchContextMenu(
+                                mouseEvent.point,
+                                SpriteLayerContextMenus.schemeForSprite(part),
+                                part)
+                    }
                 }
             }
         }

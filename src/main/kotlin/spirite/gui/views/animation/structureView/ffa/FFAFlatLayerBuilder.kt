@@ -16,7 +16,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
-import spirite.gui.components.dialogs.IDialog
+import spirite.gui.menus.dialogs.IDialog
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.MenuItem
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel

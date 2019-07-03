@@ -4,7 +4,7 @@ import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.MImageWorkspace
-import spirite.gui.components.dialogs.IDialog
+import spirite.gui.menus.dialogs.IDialog
 
 class WorkspaceCommandExecutor (
         val workspaceSet: MWorkspaceSet,

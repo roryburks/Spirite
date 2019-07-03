@@ -1,16 +1,36 @@
 package spirite.base.imageData.mediums
 
 import rb.glow.GraphicsContext
+import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.groupTree.GroupTree.Node
 
 
-data class CompositeSource(
+interface ICompositeSource {
+    fun appliedToMedium(medium: MediumHandle) = false
+    fun appliedToNode( node: Node) = false
+    val drawsSource : Boolean
+    val drawer: (GraphicsContext) -> Unit
+}
+
+data class HandleCompositeSource(
         val arranged: ArrangedMediumData,
-        val drawsSource : Boolean = true,
-        val drawer : (GraphicsContext) -> Unit)
+        override val drawsSource : Boolean = true,
+        override val drawer : (GraphicsContext) -> Unit) : ICompositeSource
+{
+    override fun appliedToMedium(medium: MediumHandle) = arranged.handle == medium
+}
+
+data class NodeCompositeSource(
+        val node: Node,
+        override val drawsSource : Boolean = true,
+        override val drawer : (GraphicsContext) -> Unit) : ICompositeSource
+{
+    override fun appliedToNode(node: Node) = node == this.node
+}
 
 
 class Compositor {
-    var compositeSource : CompositeSource? = null
+    var compositeSource : HandleCompositeSource? = null
         set(value) {
             field = value
             triggerCompositeChanged()

@@ -1,4 +1,4 @@
-package spirite.gui.components.dialogs
+package spirite.gui.menus.dialogs
 
 import rb.glow.color.Color
 import rb.glow.color.Colors
@@ -9,7 +9,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.MediumType
 import spirite.base.imageData.mediums.MediumType.FLAT
-import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
+import spirite.gui.menus.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
 import spirite.hybrid.Hybrid
 
 class NewSimpleLayerPanel(

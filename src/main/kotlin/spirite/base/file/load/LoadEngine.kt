@@ -7,7 +7,7 @@ import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.i
 import spirite.base.brains.IMasterControl
 import spirite.base.file.SaveLoadUtil
-import spirite.base.file.readNullTerminatedStringUTF8
+import spirite.base.file.readUTF8NT
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
@@ -55,108 +55,113 @@ object LoadEngine {
                 throw BadSifFileException("File does not exist.")
 
             val ra = RandomAccessFile(file, "r")
-            val workspace = master.createWorkspace(1,1)
-            val paletteDriving = workspace.paletteManager.drivePalette
-            workspace.paletteManager.drivePalette = false
-            val context = LoadContext(ra, workspace)
 
-            // Verify Header
-            ra.seek(0)
-            val header = ByteArray(4).apply { ra.read(this)}
+            try {
+                val workspace = master.createWorkspace(1, 1)
+                val paletteDriving = workspace.paletteManager.drivePalette
+                workspace.paletteManager.drivePalette = false
+                val context = LoadContext(ra, workspace)
 
-            if( ! header.contentEquals(SaveLoadUtil.header))
-                throw BadSifFileException("Bad Fileheader (not an SIF File or corrupt)")
+                // Verify Header
+                ra.seek(0)
+                val header = ByteArray(4).apply { ra.read(this) }
 
-            context.version = ra.readInt()
+                if (!header.contentEquals(SaveLoadUtil.header))
+                    throw BadSifFileException("Bad Fileheader (not an SIF File or corrupt)")
 
-            var width = 0
-            var height = 0
-            if( context.version >= 1) {
-                width = ra.readShort().toInt()
-                height = ra.readShort().toInt()
-            }
+                context.version = ra.readInt()
 
-            parseChunks(context)
-
-            // Medium Data (Required)
-            context.chunkInfo.single { it.header == "IMGD" }.apply {
-                context.telemetry.runAction("Load IMGD") {
-                    ra.seek(startPointer)
-                    parseImageDataSection(context, size)
-                    context.telemetry.mark("size", size.d)
+                var width = 0
+                var height = 0
+                if (context.version >= 1) {
+                    width = ra.readShort().toInt()
+                    height = ra.readShort().toInt()
                 }
-            }
 
-            // Group Data (Required), Dependent on Image Data
-            context.chunkInfo.single { it.header == "GRPT" }.apply {
-                context.telemetry.runAction("Load GRPT") {
-                    ra.seek(startPointer)
-                    parseGroupTreeSection(context, size)
-                    context.telemetry.mark("size", size.d)
+                parseChunks(context)
+
+                // Medium Data (Required)
+                context.chunkInfo.single { it.header == "IMGD" }.apply {
+                    context.telemetry.runAction("Load IMGD") {
+                        ra.seek(startPointer)
+                        parseImageDataSection(context, size)
+                        context.telemetry.mark("size", size.d)
+                    }
                 }
-            }
 
-            // Animation Data (optional), dependent on Group Data and Image Data
-            context.chunkInfo.singleOrNull { it.header == "ANIM" }?.apply {
-                context.telemetry.runAction("Load ANIM") {
-                    ra.seek(startPointer)
-                    parseAnimationData(context, size)
-                    context.telemetry.mark("size", size.d)
+                // Group Data (Required), Dependent on Image Data
+                context.chunkInfo.single { it.header == "GRPT" }.apply {
+                    context.telemetry.runAction("Load GRPT") {
+                        ra.seek(startPointer)
+                        parseGroupTreeSection(context, size)
+                        context.telemetry.mark("size", size.d)
+                    }
                 }
-            }
-            // Animation Space Data (optional)
-            context.chunkInfo.singleOrNull { it.header == "ANSP" }?.apply {
-                context.telemetry.runAction("Load ANSP") {
-                    ra.seek(startPointer)
-                    parseAnimationSpaceData(context, size)
-                    context.telemetry.mark("size", size.d)
+
+                // Animation Data (optional), dependent on Group Data and Image Data
+                context.chunkInfo.singleOrNull { it.header == "ANIM" }?.apply {
+                    context.telemetry.runAction("Load ANIM") {
+                        ra.seek(startPointer)
+                        parseAnimationData(context, size)
+                        context.telemetry.mark("size", size.d)
+                    }
                 }
-            }
-
-            // Palette Data (optional)
-            context.chunkInfo.singleOrNull { it.header == "PLTT" }?.apply {
-                context.telemetry.runAction("Load PLTT") {
-                    ra.seek(startPointer)
-                    parsePaletteData(context, size)
-                    context.telemetry.mark("size", size.d)
+                // Animation Space Data (optional)
+                context.chunkInfo.singleOrNull { it.header == "ANSP" }?.apply {
+                    context.telemetry.runAction("Load ANSP") {
+                        ra.seek(startPointer)
+                        parseAnimationSpaceData(context, size)
+                        context.telemetry.mark("size", size.d)
+                    }
                 }
-            }
 
-            // Palette Map Data (optional)
-            context.chunkInfo.singleOrNull { it.header == "TPLT" }?.apply {
-                context.telemetry.runAction("Load TPLT") {
-                    ra.seek(startPointer)
-                    parsePaletteMapData(context, size)
-                    context.telemetry.mark("size", size.d)
+                // Palette Data (optional)
+                context.chunkInfo.singleOrNull { it.header == "PLTT" }?.apply {
+                    context.telemetry.runAction("Load PLTT") {
+                        ra.seek(startPointer)
+                        parsePaletteData(context, size)
+                        context.telemetry.mark("size", size.d)
+                    }
                 }
+
+                // Palette Map Data (optional)
+                context.chunkInfo.singleOrNull { it.header == "TPLT" }?.apply {
+                    context.telemetry.runAction("Load TPLT") {
+                        ra.seek(startPointer)
+                        parsePaletteMapData(context, size)
+                        context.telemetry.mark("size", size.d)
+                    }
+                }
+
+
+                if (context.version <= 2) {
+                    width = workspace.mediumRepository.dataList
+                            .map { workspace.mediumRepository.getData(it)?.width ?: 0 }
+                            .max() ?: 100
+                    height = workspace.mediumRepository.dataList
+                            .map { workspace.mediumRepository.getData(it)?.height ?: 0 }
+                            .max() ?: 100
+                }
+
+                workspace.width = width
+                workspace.height = height
+
+                print(context.telemetry)
+
+                workspace.finishBuilding()
+
+                //adHocSave(workspace)
+                workspace.mediumRepository.clearUnusedCache(emptySet())
+
+                workspace.paletteManager.drivePalette = paletteDriving
+
+
+                return workspace
+            }finally {
+                ra.close()
             }
-
-
-            if( context.version <= 2) {
-                width = workspace.mediumRepository.dataList
-                        .map { workspace.mediumRepository.getData(it)?.width ?: 0}
-                        .max() ?: 100
-                height = workspace.mediumRepository.dataList
-                        .map { workspace.mediumRepository.getData(it)?.height ?: 0}
-                        .max() ?: 100
-            }
-
-            workspace.width = width
-            workspace.height = height
-
-            print(context.telemetry)
-
-            workspace.finishBuilding()
-
-            //adHocSave(workspace)
-            workspace.mediumRepository.clearUnusedCache(emptySet())
-
-            workspace.paletteManager.drivePalette = paletteDriving
-
-
-            return workspace
         }catch( e: Exception) {
-            throw BadSifFileException("Error Reading File: " + e.stackTrace)
+            throw BadSifFileException("Error Reading File: ${e.message}\n${e.printStackTrace()}" )
         }
     }
 
@@ -341,7 +346,7 @@ object LoadEngine {
         val numSpriteMaps = ra.readInt()
         val spriteMap = List(numSpriteMaps) {
                     val group = context.nodes.getOrNull(ra.readInt()) as? GroupNode
-                    val partName = ra.readNullTerminatedStringUTF8()
+                    val partName = ra.readUTF8NT()
                     val colorSize = ra.readUnsignedByte()
                     val colors = List<Color>(colorSize) { ColorARGB32Normal(ra.readInt()) }
 
@@ -359,7 +364,7 @@ object LoadEngine {
         val endPointer = ra.filePointer + chunkSize
 
         while( ra.filePointer < endPointer) {
-            val name = ra.readNullTerminatedStringUTF8()
+            val name = ra.readUTF8NT()
             val type = ra.readByte().i
 
             val space = AnimationSpaceLoaderFactory

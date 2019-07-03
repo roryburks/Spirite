@@ -2,7 +2,7 @@ package spirite.base.file.load
 
 import rb.vectrix.mathUtil.i
 import spirite.base.file.SaveLoadUtil
-import spirite.base.file.readNullTerminatedStringUTF8
+import spirite.base.file.readUTF8NT
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.base.imageData.animation.ffa.FfaFrameStructure
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
@@ -24,7 +24,7 @@ object FfaLoader : IAnimationLoader {
         repeat(numLayers){_->
             val layerName : String =
                     if( context.version <= 0x1_000A ) "FFA Layer"
-                    else ra.readNullTerminatedStringUTF8()
+                    else ra.readUTF8NT()
             val asynchronous : Boolean =
                     if( context.version <= 0x1_000A ) false
                     else ra.readByte().i == 1
@@ -59,14 +59,14 @@ object FfaCascadingLayerLoader : IFfaLayerLoader {
         val nodes = context.nodes
 
         val group = nodes.getOrNull(ra.readInt()) as? GroupNode
-        val lexicon = ra.readNullTerminatedStringUTF8()
+        val lexicon = ra.readUTF8NT()
 
         val subinfoCount = ra.readUnsignedByte()
         val subinfos = (0 until subinfoCount).mapNotNull {
             val infoGroup= nodes.getOrNull(ra.readInt()) as? GroupNode
             val plen = ra.readUnsignedShort()
             val key = ra.readByte().toChar()
-            val subLexicon = if( context.version < 0x0001_000D) "" else ra.readNullTerminatedStringUTF8()
+            val subLexicon = if( context.version < 0x0001_000D) "" else ra.readUTF8NT()
 
             if( infoGroup == null) null
             else FfaCascadingSublayerContract(infoGroup, key, plen, if( subLexicon == "") null else subLexicon)
@@ -83,7 +83,7 @@ object FfaLexicalLayerLoader : IFfaLayerLoader {
         val nodes = context.nodes
 
         val group = nodes.getOrNull(ra.readInt()) as? GroupNode
-        val lexicon = ra.readNullTerminatedStringUTF8()
+        val lexicon = ra.readUTF8NT()
 
         val explicitCount = ra.readUnsignedByte()
         val map =

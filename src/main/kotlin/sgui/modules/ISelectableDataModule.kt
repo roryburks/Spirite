@@ -32,12 +32,12 @@ interface ISelectableDataModule<T> where T:Any
 }
 
 class SelectableDataModule<T>(
-        entries: List<T>,
+        startingEntries: List<T>,
         multiSelectStartsEnabled : Boolean = false)
     : ISelectableDataModule<T> where T:Any
 {
     private val _selectedSet = mutableSetOf<Int>()
-    private val _entries = mutableListOf<T>()
+    private val _entries = startingEntries.toMutableList()
 
     override val selectionObs = GuardedObservable<() -> Unit>()
     override var multiSelectEnabled: Boolean by OnChangeDelegate(multiSelectStartsEnabled) {
@@ -47,10 +47,10 @@ class SelectableDataModule<T>(
 
     override val currentSelectedSet: List<T> get() = _selectedSet
             .mapNotNull { _entries.getOrNull(it) }
-    override val selectedIndexBind = Bindable(if( entries.any()) 0 else -1)
+    override val selectedIndexBind = Bindable(if( startingEntries.any()) 0 else -1)
             { if( it  in -1 until _entries.size) it else -1}
     override var selectedIndex: Int by selectedIndexBind
-    private val selectedIndexK = selectedIndexBind.addObserver(Observer{new,_->
+    private val _selectedIndexK = selectedIndexBind.addObserver(Observer{ new, _->
         val set = when {
             multiSelectEnabled && new in 0 until entries.size -> _selectedSet.then(new)
             multiSelectEnabled -> _selectedSet
@@ -95,43 +95,6 @@ class SelectableDataModule<T>(
         reconcileSelectionSet(newSelectionSet, toSelectIndex)
     }
 
-    private var _recursiveBlock = false
-    private fun reconcileSelectionSet(selectionSet: Iterable<Int> = _selectedSet, toSelect: Int = selectedIndex)
-    {
-        if(!_recursiveBlock)
-        {
-            try {
-                _recursiveBlock = true
-                val oldSelectionSet = _selectedSet.toSet()
-                val newSelectionSet = selectionSet
-                        .filter { it != -1 && it < _entries.size }
-                        .run { if( multiSelectEnabled) this else take(1) }  // rare actual necessary use of run or bad design?
-                        .toSet()
-                val fromSelectedIndex = selectedIndex
-                val toSelectedIndex = when {
-                    !newSelectionSet.contains(toSelect ) -> -1
-                    toSelect  in -1 until _entries.size -> toSelect
-                    else -> -1
-                }
-
-                _selectedSet.clear()
-                _selectedSet.addAll(newSelectionSet)
-                selectedIndex = toSelectedIndex
-
-                if( toSelectedIndex != fromSelectedIndex
-                        || oldSelectionSet.any{!newSelectionSet.contains(it)}
-                        || newSelectionSet.any{!oldSelectionSet.contains(it)})
-                {
-                    selectionObs.trigger { it() }
-                }
-            }
-            finally {
-                _recursiveBlock = false
-            }
-        }
-    }
-
-
     override val entryObs = GuardedObservable<() -> Unit>()
     override val entries: List<T> get() = _entries
 
@@ -167,4 +130,39 @@ class SelectableDataModule<T>(
         entryObs.trigger { it() }
     }
 
+    private var _recursiveBlock = false
+    private fun reconcileSelectionSet(selectionSet: Iterable<Int> = _selectedSet, toSelect: Int = selectedIndex)
+    {
+        if(!_recursiveBlock)
+        {
+            try {
+                _recursiveBlock = true
+                val oldSelectionSet = _selectedSet.toSet()
+                val newSelectionSet = selectionSet
+                        .filter { it != -1 && it < _entries.size }
+                        .run { if( multiSelectEnabled) this else take(1) }  // rare actual necessary use of run or bad design?
+                        .toSet()
+                val fromSelectedIndex = selectedIndex
+                val toSelectedIndex = when {
+                    !newSelectionSet.contains(toSelect ) -> -1
+                    toSelect  in -1 until _entries.size -> toSelect
+                    else -> -1
+                }
+
+                _selectedSet.clear()
+                _selectedSet.addAll(newSelectionSet)
+                selectedIndex = toSelectedIndex
+
+                if( toSelectedIndex != fromSelectedIndex
+                        || oldSelectionSet.any{!newSelectionSet.contains(it)}
+                        || newSelectionSet.any{!oldSelectionSet.contains(it)})
+                {
+                    selectionObs.trigger { it() }
+                }
+            }
+            finally {
+                _recursiveBlock = false
+            }
+        }
+    }
 }

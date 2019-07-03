@@ -11,6 +11,11 @@ import kotlin.math.min
 
 interface IPaletteMediumMap
 {
+    fun clearUnused()
+
+    fun set(node: Node, colors: List<Color>)
+    fun set(node: GroupNode, partName: String, colors: List<Color>)
+
     fun getNodeMappings() : Map<Node,List<Color>>
     fun getSpriteMappings() : Map<Pair<GroupNode,String>,List<Color>>
 
@@ -28,7 +33,9 @@ class PaletteMediumMap(private val _workspace: IImageWorkspace)
     private var _oldSpritePart : Pair<GroupNode, SpritePart>? = null
     private var _oldNode : Node? = null
 
-    // region IPaletteMediumMap
+    override fun set(node: Node, colors: List<Color>) { _nodeMap[node] = colors}
+    override fun set(node: GroupNode, partName: String, colors: List<Color>) {_spriteMap[Pair(node,partName)] = colors}
+
     override fun getNodeMappings() : Map<Node,List<Color>>{
         forgetAllUnlinked()
         return _nodeMap
@@ -41,6 +48,18 @@ class PaletteMediumMap(private val _workspace: IImageWorkspace)
     override fun import(nodeMappings: Map<Node, List<Color>>, spriteMappings: Map<Pair<GroupNode, String>, List<Color>>) {
         _nodeMap = nodeMappings.toMutableMap()
         _spriteMap = spriteMappings.toMutableMap()
+    }
+
+    override fun clearUnused() {
+        val usedNodes = _workspace.groupTree.root.getAllNodesSuchThat({true})
+                .toSet()
+        _nodeMap.entries.removeIf{!usedNodes.contains(it.key)}
+
+        val usedSpriteNames = _workspace.groupTree.root.getLayerNodes()
+                .filter { it.layer is SpriteLayer }
+                .flatMap { node -> (node.layer as SpriteLayer).parts.map {  Pair(node.parent!!, it.partName)} }
+                .toSet()
+        _spriteMap.entries.removeIf{ !usedSpriteNames.contains(it.key) }
     }
     // endregion
 

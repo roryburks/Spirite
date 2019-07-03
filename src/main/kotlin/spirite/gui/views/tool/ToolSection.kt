@@ -61,7 +61,7 @@ class ToolSection (
             }
         }
     }
-    private val _selectedToolK = master.toolsetManager.selectedToolBinding.addObserver { new, _ -> imp.data.selected = new }
+    private val _selectedToolK = master.toolsetManager.selectedToolBinding.addObserver { new, _ ->imp.data.selected = new }
 
     override fun close() {
         _selectedToolK.void()

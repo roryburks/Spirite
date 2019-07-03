@@ -2,11 +2,11 @@ package spirite.base.file
 
 import rb.glow.IImage
 import rb.glow.color.Colors
-import rb.glow.gl.GLImage
 import rb.glow.using
 import spirite.base.brains.IMasterControl
 import spirite.base.file.load.BadSifFileException
 import spirite.base.file.load.LoadEngine
+import spirite.base.file.save.SaveEngine
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
@@ -58,6 +58,8 @@ class FileManager( val master: IMasterControl)  : IFileManager{
     class FileLock
     private val locks = mutableListOf<FileLock>()
     override fun saveWorkspace(workspace: IImageWorkspace, file: File, track: Boolean) {
+        workspace.paletteMediumMap.clearUnused()
+
         val lock = FileLock().apply { locks.add(this) }
         SaveEngine.saveWorkspace(file, workspace)
         workspace.fileSaved(file)

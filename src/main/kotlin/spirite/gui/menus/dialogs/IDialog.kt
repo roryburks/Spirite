@@ -1,4 +1,4 @@
-package spirite.gui.components.dialogs
+package spirite.gui.menus.dialogs
 
 import rb.glow.color.SColor
 import sguiSwing.components.jcomponent
@@ -9,10 +9,12 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.base.imageData.animation.ffa.FfaLayerCascading
-import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
-import spirite.gui.components.dialogs.IDialog.FilePickType
-import spirite.gui.components.dialogs.IDialog.FilePickType.*
-import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
+import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
+import spirite.gui.menus.dialogs.DisplayOptionsPanel.DisplayOptions
+import spirite.gui.menus.dialogs.IDialog.FilePickType
+import spirite.gui.menus.dialogs.IDialog.FilePickType.*
+import spirite.gui.menus.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
 import spirite.gui.resources.SpiriteIcons
 import java.io.File
 import javax.swing.JColorChooser
@@ -26,6 +28,7 @@ interface IDialog {
     fun invokeWorkspaceSizeDialog(description: String): WorkspaceSizeReturn?
     fun invokeNewFfaCascadingLayerDetails(defaultInfo: FfaCascadingSublayerContract) : FfaCascadingSublayerContract?
     fun invokeNewFfaJsonImport(layer: FfaLayerCascading) : List<FfaCascadingSublayerContract>?
+    fun invokeMoveSpriteParts(parts: List<SpritePart>) : SpriteLayer?
 
     fun invokeDisplayOptions(title: String = "Display Options", default: DisplayOptions? = null) : DisplayOptions?
 
@@ -37,7 +40,8 @@ interface IDialog {
         OPEN,
         SAVE_SIF,
         EXPORT,
-        AAF
+        AAF,
+        GIF
     }
     fun pickFile( type: FilePickType) : File?
     fun pickColor( defaultColor: SColor) : SColor?
@@ -67,19 +71,16 @@ class JDialog(private val master: IMasterControl) : IDialog
         JOptionPane.showConfirmDialog(null, message,"",JOptionPane.OK_OPTION)
     }
 
-    fun <T> runDialogPanel(panel: IDialogPanel<T>) : T? {
-        val result =JOptionPane.showConfirmDialog(
+    fun <T> runDialogPanel(panel: IDialogPanel<T>) = when(JOptionPane.showConfirmDialog(
                 null,
                 panel.jcomponent,
                 "New Layer",
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE,
-                SpiriteIcons.BigIcons.NewLayer.icon)
-
-        return when(result) {
-            JOptionPane.OK_OPTION -> panel.result
-            else -> null
-        }
+                SpiriteIcons.BigIcons.NewLayer.icon))
+    {
+        JOptionPane.OK_OPTION -> panel.result
+        else -> null
     }
 
     override fun invokeNewSimpleLayer(workspace: IImageWorkspace)
@@ -97,6 +98,9 @@ class JDialog(private val master: IMasterControl) : IDialog
     override fun invokeNewFfaJsonImport(layer: FfaLayerCascading)
             = runDialogPanel(FfaCascadingJsonPanel(layer))
 
+    override fun invokeMoveSpriteParts(parts: List<SpritePart>): SpriteLayer?
+            = runDialogPanel(MoveSpritePartsPanel(parts))
+
     override fun pickFile(type: FilePickType): File? {
         val fc = JFileChooser()
 
@@ -105,6 +109,7 @@ class JDialog(private val master: IMasterControl) : IDialog
             SAVE_SIF -> master.settingsManager.workspaceFilePath
             EXPORT -> master.settingsManager.imageFilePath
             AAF -> master.settingsManager.aafFilePath
+            GIF -> master.settingsManager.aafFilePath
         }
 
         fc.choosableFileFilters.forEach { fc.removeChoosableFileFilter(it) }
@@ -123,6 +128,9 @@ class JDialog(private val master: IMasterControl) : IDialog
             AAF -> listOf(
                     FileNameExtensionFilter("AAF File", "aaf"),
                     FileNameExtensionFilter("PNG File", "png"),
+                    fc.acceptAllFileFilter)
+            GIF -> listOf(
+                    FileNameExtensionFilter("GIF File", "gif"),
                     fc.acceptAllFileFilter)
         }
         filters.forEach { fc.addChoosableFileFilter(it) }
