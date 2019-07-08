@@ -142,8 +142,9 @@ object SaveEngine {
 
                 // [1] : bitmask
                 ra.writeByte(
-                        if( node.visible) SaveLoadUtil.VISIBLE_MASK else 0 +
-                        if( node.expanded) SaveLoadUtil.EXPANDED_MASK else 0 )
+                        if( node.visible) SaveLoadUtil.VisibleMask else 0 or
+                        if( node.expanded) SaveLoadUtil.ExpandedMask else 0 or
+                        if( node is GroupNode && node.flatenned) SaveLoadUtil.FlattenedMask else 0)
 
                 // [n], UTF8 : Layer Name
                 ra.write(SaveLoadUtil.strToByteArrayUTF8(node.name))

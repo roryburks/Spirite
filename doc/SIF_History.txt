@@ -49,3 +49,5 @@
     - Added in Lexicon to Cascade FFA Layer
 0x0001_000E:
     - Added Palette Map saving / loading
+0x0001_000F:
+    - Save / Load Node Flatness (non-breaking?)

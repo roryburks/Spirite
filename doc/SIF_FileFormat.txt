@@ -1,4 +1,4 @@
-Version 0x0001_000E
+Version 0x0001_000F
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -22,6 +22,7 @@ Header
  [1, byte] : various single-bit settings
     1st bit: Visibility
     2nd bit: Expanded
+    3rd bit: Flatness
  [n, UTF8 str] : Node name
  [1, byte] : Node Type ID:
     0x00 : Group Node
