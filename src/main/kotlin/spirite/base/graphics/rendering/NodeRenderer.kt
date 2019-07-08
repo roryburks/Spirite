@@ -74,7 +74,7 @@ class NodeRenderer(
                 .forEach { it.draw(gc) }
     }
 
-    private fun _getDrawListUnsorted(node: GroupNode, depth: Int, isolator: IIsolator? ) : List<DrawThing>{
+    private fun _getDrawListUnsorted(node: GroupNode, depth: Int, isolator: IIsolator?, flat: Boolean = false ) : List<DrawThing>{
         if( depth < 0 || depth >= buffer.size) {
             MDebug.handleError(STRUCTURAL, "NodeRenderer out of expected layers count.  Expected: [${0},${buffer.size}), Actual: $depth")
             return emptyList()
@@ -94,7 +94,7 @@ class NodeRenderer(
                         when (child) {
                             is GroupNode -> {
                                 when {
-                                    child.flatenned -> drawList.addAll(_getDrawListUnsorted(child, depth + 1, subIsolator))
+                                    flat || child.flatenned -> drawList.addAll(_getDrawListUnsorted(child, depth + 1, subIsolator, true))
                                     else -> drawList.add(GroupDrawThing(depth, child, subIsolator))
                                 }
                             }

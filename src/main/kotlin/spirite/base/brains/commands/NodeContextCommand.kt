@@ -196,6 +196,10 @@ object NodeCommands {
             }
         }
     }
+    val ToggleFlatness = NodeCommand("toggleFlatness") {workspace, node, dialogs ->
+        val group = node as? GroupNode ?: throw CommandNotValidException
+        group.flatenned = !group.flatenned
+    }
 
     //region Sprite Layer
     val DiffuseSpriteLayer = NodeCommand("diffuseSpriteLayer") {_, node, dialogs ->
