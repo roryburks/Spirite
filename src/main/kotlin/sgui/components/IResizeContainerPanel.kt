@@ -1,7 +1,5 @@
 package sgui.components
 
-import sgui.Orientation
-
 interface IResizeContainerPanel : IComponent
 {
 

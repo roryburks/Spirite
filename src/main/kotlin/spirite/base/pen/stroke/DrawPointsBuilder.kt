@@ -1,8 +1,8 @@
 package spirite.base.pen.stroke
 
-import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.interpolation.Interpolator2D
+import rb.vectrix.mathUtil.MathUtil
 import spirite.base.pen.PenState
 
 object DrawPointsBuilder {

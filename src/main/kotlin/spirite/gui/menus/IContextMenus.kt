@@ -1,7 +1,6 @@
 package spirite.gui.menus
 
 import sgui.UIPoint
-import spirite.base.brains.commands.ICentralCommandExecutor
 
 
 interface IContextMenus {

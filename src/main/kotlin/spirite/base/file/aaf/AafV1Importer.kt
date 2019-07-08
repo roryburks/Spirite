@@ -2,7 +2,6 @@ package spirite.base.file.aaf
 
 import rb.glow.IImage
 import rb.glow.RawImage
-import rb.vectrix.mathUtil.f
 import rb.vectrix.shapes.RectI
 import spirite.base.file.readUTF8NT
 import spirite.base.graphics.DynamicImage

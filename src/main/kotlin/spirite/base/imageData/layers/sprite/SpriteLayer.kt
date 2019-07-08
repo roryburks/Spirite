@@ -8,7 +8,6 @@ import rb.owl.IObservable
 import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import rb.owl.bindable.onChangeObserver
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.ceil

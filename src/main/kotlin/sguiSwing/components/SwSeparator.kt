@@ -1,6 +1,5 @@
 package sguiSwing.components
 
-import sgui.Orientation
 import sgui.components.ISeparator
 import sguiSwing.mouseSystem.adaptMouseSystem
 import javax.swing.JSeparator

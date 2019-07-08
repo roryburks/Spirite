@@ -1,8 +1,8 @@
 package sjunit
 
 import rb.glow.IImage
-import spirite.hybrid.Hybrid
 import rbJvm.glow.awt.ImageBI
+import spirite.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 

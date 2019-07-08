@@ -5,7 +5,6 @@ import com.jogamp.opengl.glu.GLUtessellatorCallback
 import rb.glow.gle.GLPrimitive
 import rb.glow.glu.IPolygonTesselator
 import rb.vectrix.compaction.FloatCompactor
-import java.lang.Exception
 
 class GluPolytessException(message:String) : Exception(message)
 

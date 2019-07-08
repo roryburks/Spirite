@@ -1,8 +1,8 @@
 package spirite.hybrid.Transferables
 
 import rb.glow.IImage
-import spirite.hybrid.Hybrid
 import rbJvm.glow.awt.ImageBI
+import spirite.hybrid.Hybrid
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException

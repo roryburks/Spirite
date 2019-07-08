@@ -3,10 +3,10 @@ package sjunit.spirite.base.graphics.gl
 
 import rb.glow.color.ColorARGB32Normal
 import rb.glow.color.Colors
-import sjunit.TestConfig
 import rb.glow.gl.GLImage
-import spirite.hybrid.Hybrid
 import rbJvm.glow.awt.toBufferedImage
+import sjunit.TestConfig
+import spirite.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs

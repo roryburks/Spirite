@@ -12,11 +12,11 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
+import spirite.base.pen.stroke.DrawPoints
+import spirite.base.pen.stroke.StrokeParams
 import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod
 import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
 import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
-import spirite.base.pen.stroke.DrawPoints
-import spirite.base.pen.stroke.StrokeParams
 import spirite.specialRendering.StrokeV2LinePass
 import spirite.specialRendering.StrokeV3LinePass
 import kotlin.math.PI

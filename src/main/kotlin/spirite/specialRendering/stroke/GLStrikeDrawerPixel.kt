@@ -9,11 +9,11 @@ import rb.glow.gle.PolyRenderCall
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.floor
-import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod
-import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.specialRendering.StrokePixelCall
+import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod
+import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
 
 class GLStrikeDrawerPixel(gle: IGLEngine)
     : GLStrokeDrawer(gle)

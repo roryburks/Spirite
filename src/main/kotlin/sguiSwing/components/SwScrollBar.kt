@@ -1,7 +1,6 @@
 package sguiSwing.components
 
 import rb.owl.bindable.addObserver
-import sgui.Orientation
 import sgui.Orientation.HORIZONTAL
 import sgui.Orientation.VERTICAL
 import sgui.components.IComponent

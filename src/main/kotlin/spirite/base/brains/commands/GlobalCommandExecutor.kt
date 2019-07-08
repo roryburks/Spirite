@@ -1,6 +1,7 @@
 package spirite.base.brains.commands
 
 import rb.extendo.dataStructures.SinglySet
+import rb.glow.Composite.SRC_IN
 import rb.glow.IImage
 import rb.glow.RawImage
 import rb.glow.color.Colors
@@ -14,10 +15,8 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.exceptions.CommandNotValidException
-import spirite.base.file.workspaceFromImage
-import rb.glow.Composite.SRC_IN
-import spirite.base.file.aaf.AafImportFactory
 import spirite.base.file.aaf.AafImporter
+import spirite.base.file.workspaceFromImage
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode

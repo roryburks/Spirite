@@ -3,11 +3,11 @@ package sguiSwing.components
 import rb.extendo.delegates.OnChangeDelegate
 import rb.glow.IImage
 import rb.glow.color.Colors
+import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
 import sgui.components.IImageBox
-import sguiSwing.jcolor
-import rbJvm.glow.awt.ImageBI
 import sguiSwing.SwProvider
+import sguiSwing.jcolor
 import java.awt.Graphics
 import java.awt.Image
 

@@ -3,10 +3,12 @@ package spirite.base.file.save
 import rb.clicker.telemetry.TelemetryEvent
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
-import spirite.base.file.*
+import spirite.base.file.SaveLoadUtil
 import spirite.base.file.SaveLoadUtil.FFALAYER_CASCADING
 import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
 import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
+import spirite.base.file.writeFloatArray
+import spirite.base.file.writeUFT8NT
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame

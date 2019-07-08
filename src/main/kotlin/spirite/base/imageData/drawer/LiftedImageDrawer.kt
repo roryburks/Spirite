@@ -1,5 +1,6 @@
 package spirite.base.imageData.drawer
 
+import rb.glow.Composite.DST_IN
 import rb.glow.RawImage
 import rb.glow.color.Color
 import rb.vectrix.linear.ITransformF
@@ -8,7 +9,6 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import spirite.base.brains.toolset.ColorChangeMode
-import rb.glow.Composite.DST_IN
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.LiftedImageData

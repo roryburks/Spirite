@@ -1,9 +1,9 @@
 package spirite.base.brains.commands
 
+import rb.glow.gle.RenderMethod
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.exceptions.CommandNotValidException
-import rb.glow.gle.RenderMethod
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*

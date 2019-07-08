@@ -1,5 +1,7 @@
 package rb.glow.gle
 
+import rb.glow.CapMethod
+import rb.glow.JoinMethod
 import rb.glow.exceptions.GLEException
 import rb.glow.gl.*
 import rb.glow.glu.IPolygonTesselator
@@ -9,9 +11,6 @@ import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec3f
-import rb.glow.CapMethod
-import rb.glow.JoinMethod
-import rb.glow.gl.GLImage
 import rb.vectrix.mathUtil.f
 
 interface IGLEngine

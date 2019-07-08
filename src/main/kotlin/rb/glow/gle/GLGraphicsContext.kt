@@ -1,23 +1,26 @@
 package rb.glow.gle
 
-import rb.glow.*
 import rb.glow.CapMethod.NONE
+import rb.glow.Composite
+import rb.glow.Composite.SRC_OVER
+import rb.glow.GraphicsContext
+import rb.glow.IImage
+import rb.glow.JoinMethod.ROUNDED
+import rb.glow.LineAttributes
 import rb.glow.color.Color
 import rb.glow.color.Colors
 import rb.glow.gl.GLC
 import rb.glow.gl.GLImage
+import rb.glow.gle.RenderCall.RenderAlgorithm
+import rb.glow.gle.RenderCall.RenderAlgorithm.*
+import rb.glow.gle.RenderMethodType.*
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
-import rb.glow.Composite.SRC_OVER
-import rb.glow.JoinMethod.ROUNDED
-import rb.glow.gle.RenderCall.RenderAlgorithm
-import rb.glow.gle.RenderCall.RenderAlgorithm.*
 import rb.vectrix.shapes.IShape
-import rb.vectrix.shapes.RectI
-import rb.glow.gle.RenderMethodType.*
 import rb.vectrix.shapes.OvalShape
+import rb.vectrix.shapes.RectI
 
 // These need to be separated out of GraphicsContext and into a separate IDrawer only Spirite has
 //import spirite.specialRendering.BorderCall

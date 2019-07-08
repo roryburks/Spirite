@@ -1,11 +1,11 @@
 package spirite.base.graphics.rendering
 
+import rb.glow.GraphicsContext
 import rb.glow.RawImage
+import rb.glow.gle.RenderRubric
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.ceil
-import rb.glow.GraphicsContext
-import rb.glow.gle.RenderRubric
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle

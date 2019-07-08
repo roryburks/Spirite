@@ -1,13 +1,8 @@
 package spirite.base.file
 
-import rb.extendo.extensions.then
 import rb.glow.gl.GLImage
 import rb.vectrix.linear.ImmutableTransformF
-import rb.vectrix.linear.Vec2f
-import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.floor
-import rb.vectrix.shapes.RectI
 import rbJvm.glow.awt.ImageBI
 import rbJvm.util.GifSequenceWriter
 import spirite.base.imageData.animation.AnimationUtil
@@ -18,7 +13,7 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.hybrid.Hybrid
 import java.awt.image.BufferedImage
 import java.io.File
-import java.util.ArrayList
+import java.util.*
 import javax.imageio.stream.FileImageOutputStream
 
 

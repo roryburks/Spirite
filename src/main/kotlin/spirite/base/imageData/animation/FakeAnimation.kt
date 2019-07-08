@@ -1,9 +1,9 @@
 package spirite.base.imageData.animation
 
-import rb.glow.color.Colors
-import rb.vectrix.mathUtil.MathUtil
 import rb.glow.GraphicsContext
 import rb.glow.LineAttributes
+import rb.glow.color.Colors
+import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.IImageWorkspace
 
 class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace,

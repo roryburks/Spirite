@@ -1,12 +1,12 @@
 package spirite.pc
 
+import rbJvm.glow.awt.RasterHelper
 import rbJvm.vectrix.SetupVectrixForJvm
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.hybrid.EngineLaunchpoint
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
-import rbJvm.glow.awt.RasterHelper
 import java.awt.image.BufferedImage
 import javax.swing.SwingUtilities
 import javax.swing.UIManager

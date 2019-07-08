@@ -1,7 +1,6 @@
 package spirite.gui.menus.dialogs
 
 import rb.owl.bindable.addObserver
-import sgui.components.IComboBox
 import sgui.components.crossContainer.ICrossPanel
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer

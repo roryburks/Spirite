@@ -1,6 +1,5 @@
 package spirite.gui.components.advanced.omniContainer
 
-import sgui.Orientation
 import sgui.Orientation.HORIZONTAL
 import sgui.Orientation.VERTICAL
 import sgui.components.IComponent

@@ -6,6 +6,7 @@ import rb.glow.color.SColor
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
+import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
 import sgui.components.IToggleButton
 import sgui.components.ITreeElementConstructor
@@ -14,6 +15,8 @@ import sgui.components.ITreeView
 import sgui.components.ITreeViewNonUI.*
 import sgui.components.ITreeViewNonUI.DropDirection.*
 import sgui.components.crossContainer.CrossColInitializer
+import sguiSwing.*
+import sguiSwing.PrimaryIcon.*
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SJPanel
 import sguiSwing.components.SwComponent
@@ -23,9 +26,6 @@ import sguiSwing.mouseSystem.SimpleMouseListener
 import sguiSwing.skin.Skin.ContentTree.Background
 import sguiSwing.skin.Skin.ContentTree.SelectedBackground
 import sguiSwing.transfer.SwTransferObjectConverter
-import rbJvm.glow.awt.ImageBI
-import sguiSwing.*
-import sguiSwing.PrimaryIcon.*
 import java.awt.*
 import java.awt.dnd.*
 import java.awt.event.ActionEvent

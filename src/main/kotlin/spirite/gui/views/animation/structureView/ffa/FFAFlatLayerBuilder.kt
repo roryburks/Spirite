@@ -1,6 +1,7 @@
 package spirite.gui.views.animation.structureView.ffa
 
 import rb.owl.bindable.addObserver
+import rbJvm.glow.awt.ImageBI
 import sgui.UIPoint
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
@@ -16,14 +17,13 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
-import spirite.gui.menus.dialogs.IDialog
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.MenuItem
+import spirite.gui.menus.dialogs.IDialog
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
 import spirite.hybrid.Hybrid
 import spirite.hybrid.customGui.ArrowPanel
 import spirite.hybrid.customGui.DashedOutPanel
-import rbJvm.glow.awt.ImageBI
 import java.awt.image.BufferedImage
 import java.io.InvalidClassException
 

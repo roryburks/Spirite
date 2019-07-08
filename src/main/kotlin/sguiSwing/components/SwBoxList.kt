@@ -7,7 +7,6 @@ import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import sguiSwing.SwUtil
 import sguiSwing.SwingComponentProvider
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
-import spirite.hybrid.Hybrid
 import java.awt.Component
 import java.awt.GridLayout
 import java.awt.Point

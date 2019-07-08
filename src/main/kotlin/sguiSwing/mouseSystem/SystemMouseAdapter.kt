@@ -3,7 +3,6 @@ package sguiSwing.mouseSystem
 import sgui.components.events.MouseEvent.MouseButton.*
 import sgui.components.events.MouseEvent.MouseEventType
 import sgui.components.events.MouseEvent.MouseEventType.*
-import sguiSwing.SUIPoint
 import sguiSwing.components.SwComponent
 import java.awt.Component
 import java.awt.event.InputEvent

@@ -1,10 +1,10 @@
 package spirite.base.pen.behaviors
 
+import rb.glow.GraphicsContext
 import rb.glow.color.Colors
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import sgui.components.events.MouseEvent.MouseButton
-import rb.glow.GraphicsContext
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.pen.Penner
 import spirite.base.pen.selectionBuilders.FreeformSelectionBuilder

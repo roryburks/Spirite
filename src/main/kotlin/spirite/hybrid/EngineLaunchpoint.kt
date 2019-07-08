@@ -1,13 +1,13 @@
 package spirite.hybrid
 
-import rbJvm.glow.jogl.GluPolygonTesselater
 import rb.glow.gle.GLEngine
 import rb.glow.gle.IGLEngine
 import rbJvm.glow.awt.AwtImageConverter
+import rbJvm.glow.jogl.GluPolygonTesselater
 import rbJvm.glow.jogl.JOGLContext
 import rbJvm.glow.jogl.JOGLProvider
-import spirite.specialRendering.GL330ShaderLoader
 import spirite.pc.shaders.JClassScriptService
+import spirite.specialRendering.GL330ShaderLoader
 
 /** This serves little purpose other than being the single place that everything else gets its GLEngine singleton */
 object EngineLaunchpoint {

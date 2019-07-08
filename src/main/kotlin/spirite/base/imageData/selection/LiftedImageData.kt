@@ -1,9 +1,9 @@
 package spirite.base.imageData.selection
 
+import rb.glow.GraphicsContext
 import rb.glow.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.mathUtil.f
-import rb.glow.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.LiftedImageDrawer

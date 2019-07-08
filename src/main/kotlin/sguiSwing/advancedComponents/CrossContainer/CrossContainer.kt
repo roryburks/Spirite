@@ -1,6 +1,5 @@
 package sguiSwing.advancedComponents.CrossContainer
 
-import sgui.Orientation
 import sgui.components.crossContainer.CSE_Group
 import sgui.components.crossContainer.CrossInitializer
 import sguiSwing.components.SwPanel
