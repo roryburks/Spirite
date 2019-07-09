@@ -96,7 +96,6 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
         if( workspace != null && Rect(0,0,workspace.width, workspace.height).contains(x, y))
             coordinateLabel.text = "$x,$y"
         else coordinateLabel.text = ""
-
     }
 
     // Region UI
