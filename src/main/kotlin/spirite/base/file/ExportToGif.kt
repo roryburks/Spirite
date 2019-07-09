@@ -1,6 +1,9 @@
 package spirite.base.file
 
 import rb.extendo.extensions.then
+import rb.glow.color.ColorARGB32Normal
+import rb.glow.color.ColorARGB32Premultiplied
+import rb.glow.color.Colors
 import rb.glow.gl.GLImage
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
@@ -60,8 +63,10 @@ object ExportToGif {
 
         val biList = drawFrames
                 .map { frame ->
-                    val gl = GLImage(drawRect.wi, drawRect.hi, Hybrid.gle)
+                    val gl = GLImage(drawRect.wi, drawRect.hi, Hybrid.gle,false)
                     val gc = gl.graphics
+                    gc.color = Colors.LIGHT_GRAY
+                    gc.fillRect(0,0,drawRect.wi, drawRect.hi)
                     val trans = ImmutableTransformF.Translation(-drawRect.x1i.f, -drawRect.y1i.f)
 
                     frame
@@ -72,6 +77,21 @@ object ExportToGif {
                 }
                 .map { Hybrid.imageConverter.convert(it, ImageBI::class) as ImageBI }
                 .map { it.bi }
+
+        biList.forEach {
+            (0 until it.width).forEach{x ->
+                (0 until it.height).forEach { y ->
+                    val argb  = it.getRGB(x,y)
+                    val c = ColorARGB32Normal(argb)
+                    val c2 = ColorARGB32Normal.FromComponents(
+                            if( c.alpha == 0f) 0f else c.alpha / c.alpha,
+                            if( c.alpha == 0f) 0f else c.red/ c.alpha,
+                            if( c.alpha == 0f) 0f else c.green/ c.alpha,
+                            if( c.alpha == 0f) 0f else c.blue/ c.alpha)
+                    it.setRGB(x, y, c2.argb)
+                }
+            }
+        }
 
         val ios = FileImageOutputStream(file)
 

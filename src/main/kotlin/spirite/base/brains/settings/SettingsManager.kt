@@ -23,6 +23,7 @@ interface ISettingsManager {
     var workspaceFilePath : File
     var imageFilePath : File
     var aafFilePath : File
+    var gifFilePath: File
     val openFilePath : File
 
     var paletteDoubleclickTime: Int
@@ -106,6 +107,11 @@ class SettingsManager (
         get() = File(_aafFilePath)
         set(value) { _aafFilePath = value.path}
     private var _aafFilePath : String by PreferenceStringDelegate("aafPath", System.getProperty("user.dir"))
+
+    override var gifFilePath: File
+        get() = File(_gifFilePath)
+        set(value) { _gifFilePath = value.path}
+    private var _gifFilePath : String by PreferenceStringDelegate("gifPath", System.getProperty("user.dir"))
 
     override val openFilePath get() = if( lastUsedWorkspace) workspaceFilePath else imageFilePath
 

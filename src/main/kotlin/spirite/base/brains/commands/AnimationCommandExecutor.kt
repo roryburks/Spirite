@@ -9,6 +9,7 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.menus.dialogs.IDialog.FilePickType.AAF
 import spirite.gui.menus.dialogs.IDialog.FilePickType.GIF
+import java.io.File
 
 class AnimationCommandExecutor (val master: IMasterControl)
     : ICommandExecutor
@@ -57,7 +58,10 @@ object ExportGifCommand : AnimationCommand() {
 
     override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
         val anim = animation as? FixedFrameAnimation ?: return false
-        val file = master.dialog.pickFile(GIF) ?: return false
+        var file = master.dialog.pickFile(GIF) ?: return false
+        if( file.extension == "") {
+            file = File(file.absolutePath + ".gif")
+        }
 
         ExportToGif.exportAnim(animation,file, animation.state.speed)
         return true
