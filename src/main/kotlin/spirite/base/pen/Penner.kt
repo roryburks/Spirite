@@ -1,5 +1,6 @@
 package spirite.base.pen
 
+import rb.glow.GraphicsContext
 import rb.glow.color.Colors
 import rb.owl.bindable.addObserver
 import rb.vectrix.linear.Vec2f
@@ -10,7 +11,6 @@ import sgui.components.events.MouseEvent.MouseButton.LEFT
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
-import rb.glow.GraphicsContext
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree

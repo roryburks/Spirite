@@ -1,8 +1,6 @@
 package spirite.base.imageData.selection
 
 import rb.glow.GraphicsContext
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.imageData.IImageWorkspace
 
 fun drawLiftedTransform(gc: GraphicsContext, workspace: IImageWorkspace) {

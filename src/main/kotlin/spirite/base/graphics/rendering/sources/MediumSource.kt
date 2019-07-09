@@ -1,8 +1,8 @@
 package spirite.base.graphics.rendering.sources
 
 import rb.extendo.dataStructures.SinglyList
-import rb.vectrix.mathUtil.f
 import rb.glow.GraphicsContext
+import rb.vectrix.mathUtil.f
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle

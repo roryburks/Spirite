@@ -1,6 +1,8 @@
 package sjunit.spirite.base.graphics.gl
 
 
+import rb.glow.CapMethod.NONE
+import rb.glow.JoinMethod.MITER
 import rb.glow.color.Colors
 import rb.glow.gl.GLImage
 import rb.glow.gle.BasicCall
@@ -8,16 +10,14 @@ import rb.glow.gle.GLParameters
 import rb.glow.gle.PolyRenderCall
 import rb.glow.gle.PolyType.STRIP
 import rb.glow.gle.RenderCall
+import rb.glow.gle.RenderCall.RenderAlgorithm.*
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
+import rbJvm.glow.awt.toBufferedImage
 import sjunit.TestConfig
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
-import rb.glow.CapMethod.NONE
-import rb.glow.JoinMethod.MITER
-import rb.glow.gle.RenderCall.RenderAlgorithm.*
 import spirite.base.pen.stroke.DrawPoints
 import spirite.hybrid.Hybrid
-import rbJvm.glow.awt.toBufferedImage
 import spirite.specialRendering.*
 import spirite.specialRendering.SquareGradientCall.GradientType.V
 import java.io.File

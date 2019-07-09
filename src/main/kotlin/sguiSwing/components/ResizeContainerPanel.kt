@@ -4,7 +4,6 @@ import rb.extendo.extensions.then
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
-import sgui.Orientation
 import sgui.Orientation.HORIZONTAL
 import sgui.Orientation.VERTICAL
 import sgui.components.IComponent
@@ -16,7 +15,6 @@ import sgui.components.events.MouseEvent.MouseEventType.DRAGGED
 import sgui.components.events.MouseEvent.MouseEventType.PRESSED
 import sgui.systems.IGlobalMouseHook
 import sguiSwing.PrimaryIcon.*
-import sguiSwing.SwIcon
 import sguiSwing.SwPrimaryIconSet
 import sguiSwing.SwingComponentProvider
 import sguiSwing.mouseSystem.SwMouseSystem

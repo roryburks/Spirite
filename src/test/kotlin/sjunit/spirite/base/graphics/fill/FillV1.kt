@@ -1,9 +1,9 @@
 package sjunit.spirite.base.graphics.fill
 
 import rb.glow.color.Colors
-import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import rb.glow.gl.GLImage
 import spirite.hybrid.EngineLaunchpoint
+import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import spirite.specialRendering.fill.toIntArray
 import kotlin.system.measureTimeMillis
 import org.junit.Test as test

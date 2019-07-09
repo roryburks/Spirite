@@ -3,7 +3,6 @@ package spirite.gui.views.tool
 import rb.glow.color.Colors
 import rb.owl.Observer
 import rb.owl.bindable.addObserver
-import rbJvm.owl.addWeakObserver
 import sgui.components.IBoxList
 import sgui.components.IBoxList.IBoxComponent
 import sgui.components.IComponent

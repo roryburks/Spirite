@@ -1,7 +1,6 @@
 package spirite.base.file.aaf
 
 import rb.glow.IImage
-import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.awt.ImageBI
 import spirite.base.imageData.MImageWorkspace
 import spirite.hybrid.Hybrid

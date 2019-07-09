@@ -6,7 +6,6 @@ import org.junit.Test
 import rb.glow.color.Colors
 import sjunit.TestConfig
 import sjunit.TestHelper
-import spirite.specialRendering.stroke.GLStrokeDrawerV2
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.imageData.layers.SimpleLayer
@@ -18,6 +17,7 @@ import spirite.base.pen.PenState
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams
 import spirite.hybrid.Hybrid
+import spirite.specialRendering.stroke.GLStrokeDrawerV2
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 

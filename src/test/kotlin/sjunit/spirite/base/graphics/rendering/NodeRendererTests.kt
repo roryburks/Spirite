@@ -2,18 +2,18 @@ package sjunit.spirite.base.graphics.rendering
 
 import rb.glow.RawImage
 import rb.glow.color.Colors
-import sjunit.TestConfig
-import sjunit.TestHelper
 import rb.glow.gle.RenderMethod
 import rb.glow.gle.RenderMethodType.MULTIPLY
+import rbJvm.glow.awt.AwtImageConverter
+import rbJvm.glow.awt.ImageBI
+import sjunit.TestConfig
+import sjunit.TestHelper
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.hybrid.Hybrid
-import rbJvm.glow.awt.AwtImageConverter
-import rbJvm.glow.awt.ImageBI
 import java.io.File
 import javax.imageio.ImageIO
 import org.junit.Test as test

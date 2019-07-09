@@ -10,7 +10,7 @@ object SaveLoadUtil {
     val header : ByteArray get() =ByteArray(4).apply {
         System.arraycopy("SIFF".toByteArray(charset("UTF-8")), 0, this, 0, 4)
     }
-    const val version = 0x0001_000E
+    const val version = 0x0001_000F
 
 
     // :::: GroupNode Type Identifiers for the SIFF GroupTree Section
@@ -48,8 +48,9 @@ object SaveLoadUtil {
     const val FFALAYER_CASCADING = 0x03
 
     // GroupNode Attribute Masks
-    const val VISIBLE_MASK = 0x01
-    const val EXPANDED_MASK = 0x02
+    const val VisibleMask = 0b1
+    const val ExpandedMask = 0b10
+    const val FlattenedMask = 0b100
 
     fun strToByteArrayUTF8( str: String) : ByteArray
     {

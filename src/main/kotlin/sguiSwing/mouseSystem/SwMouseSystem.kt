@@ -9,7 +9,6 @@ import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseEventType.*
 import sgui.systems.IGlobalMouseHook
 import sgui.systems.IMouseSystem
-import sguiSwing.SUIPoint
 import sguiSwing.components.SwComponent
 import java.awt.Component
 import java.lang.ref.WeakReference

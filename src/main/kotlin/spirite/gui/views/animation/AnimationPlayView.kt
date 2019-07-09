@@ -2,6 +2,7 @@ package spirite.gui.views.animation
 
 import rb.extendo.delegates.OnChangeDelegate
 import rb.glow.color.SColor
+import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
 import sguiSwing.components.SwComponent
 import sguiSwing.jcolor
@@ -9,7 +10,6 @@ import sguiSwing.skin.Skin.Global.Bg
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.hybrid.Hybrid
-import rbJvm.glow.awt.ImageBI
 import java.awt.Graphics
 import javax.swing.JPanel
 import kotlin.math.floor

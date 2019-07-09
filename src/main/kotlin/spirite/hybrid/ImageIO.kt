@@ -2,7 +2,6 @@ package spirite.hybrid
 
 import rb.glow.IImage
 import rb.glow.RawImage
-import rb.glow.gl.GLImage
 import rbJvm.glow.awt.ImageBI
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

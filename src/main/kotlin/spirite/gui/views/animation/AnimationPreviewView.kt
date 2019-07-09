@@ -5,6 +5,7 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer
 import rb.vectrix.mathUtil.*
+import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sguiSwing.SwIcon
@@ -14,15 +15,13 @@ import sguiSwing.jcolor
 import sguiSwing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.AnimationUtil
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ITimer
-import rbJvm.glow.awt.ImageBI
-import spirite.base.imageData.animation.AnimationUtil
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.gui.resources.ToolIcons
 import java.awt.Graphics
 import kotlin.math.floor
 import kotlin.math.max

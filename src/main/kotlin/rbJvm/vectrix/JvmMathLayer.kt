@@ -1,9 +1,8 @@
 package rbJvm.vectrix
 
 import rb.vectrix.IMathLayer
-import rb.vectrix.mathUtil.d
-import kotlin.math.sin
 import kotlin.math.cos
+import kotlin.math.sin
 
 object JvmMathLayer : IMathLayer {
     override fun fastSin(theta: Double) = sin(theta)

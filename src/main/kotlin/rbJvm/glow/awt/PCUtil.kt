@@ -1,10 +1,10 @@
 package rbJvm.glow.awt
 
 import rb.glow.gl.GLC
-import rb.vectrix.linear.ITransformF
-import rb.vectrix.linear.MutableTransformF
 import rb.glow.gl.GLImage
 import rb.glow.gle.IGLEngine
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.MutableTransformF
 import rbJvm.glow.jogl.JOGL.JOGLInt32Source
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage

@@ -1,7 +1,6 @@
 package sjunit.pc.JOGL
 
 import spirite.hybrid.Hybrid
-import spirite.pc.JOGL.JOGL.JOGLTexture
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import org.junit.Test as test

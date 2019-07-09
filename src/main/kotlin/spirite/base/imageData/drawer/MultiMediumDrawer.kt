@@ -2,7 +2,6 @@ package spirite.base.imageData.drawer
 
 import rb.vectrix.linear.ITransformF
 import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
-import spirite.base.util.linear.Rect
 
 class MultiMediumDrawer(val subDrawers: List<IImageDrawer>) : IImageDrawer,
         ITransformModule {

@@ -1,11 +1,11 @@
 package sjunit.spirite.base.graphics
 
 
+import rbJvm.glow.awt.AwtImageConverter
+import rbJvm.glow.awt.ImageBI
 import sjunit.TestConfig
 import spirite.base.graphics.DynamicImage
 import spirite.hybrid.Hybrid
-import rbJvm.glow.awt.AwtImageConverter
-import rbJvm.glow.awt.ImageBI
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.test.assertEquals

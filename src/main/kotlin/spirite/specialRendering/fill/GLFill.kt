@@ -2,14 +2,14 @@ package spirite.specialRendering.fill
 
 import rb.glow.color.SColor
 import rb.glow.gl.GLC
-import rb.vectrix.linear.Vec4f
-import rb.vectrix.mathUtil.f
-import rbJvm.glow.jogl.JOGL.JOGLTextureSource
-import spirite.specialRendering.FillAfterpassCall
 import rb.glow.gl.GLImage
 import rb.glow.gle.GLGraphicsContext
 import rb.glow.gle.GLParameters
+import rb.vectrix.linear.Vec4f
+import rb.vectrix.mathUtil.f
 import rb.vectrix.shapes.RectI
+import rbJvm.glow.jogl.JOGL.JOGLTextureSource
+import spirite.specialRendering.FillAfterpassCall
 import java.nio.IntBuffer
 
 

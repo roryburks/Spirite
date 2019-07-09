@@ -11,11 +11,11 @@ import rb.glow.glu.PrimitiveBuilder
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
+import spirite.base.pen.stroke.DrawPoints
+import spirite.base.pen.stroke.StrokeParams
 import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod
 import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
 import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
-import spirite.base.pen.stroke.DrawPoints
-import spirite.base.pen.stroke.StrokeParams
 import spirite.specialRendering.StrokeV2LinePass
 
 class GLStrokeDrawerV2(

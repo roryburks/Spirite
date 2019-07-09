@@ -42,6 +42,8 @@ object NodeMenus {
                         scheme.add(MenuItem("Add Group To Animation As New &Cascading Layer", NodeCommands.InsertCascadingLayer))
                     }
                     scheme.add(MenuItem("Write Group To GIF Animation", NodeCommands.GifFromGroup))
+
+                    scheme.add(MenuItem(if(node.flatenned)"Unflatten Group Node" else "Flatten Group Node", NodeCommands.ToggleFlatness))
                 }
                 is LayerNode -> {
                     scheme.add(MenuItem("-"))

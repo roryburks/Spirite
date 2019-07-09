@@ -1,17 +1,15 @@
 package rbJvm.glow.awt
 
 import rb.glow.IImage
-import rb.glow.RawImage
 import rb.glow.exceptions.GLEException
 import rb.glow.gl.GLC
-import rb.glow.gl.IGL
 import rb.glow.gl.GLImage
+import rb.glow.gl.IGL
 import rb.glow.gle.IGLEngine
 import rb.glow.gle.IImageConverter
 import rbJvm.glow.jogl.JOGL.JOGLTextureSource
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
-import kotlin.UnsupportedOperationException
 import kotlin.reflect.KClass
 
 typealias NativeImage = ImageBI

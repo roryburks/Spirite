@@ -3,10 +3,12 @@ package spirite.base.file.save
 import rb.clicker.telemetry.TelemetryEvent
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
-import spirite.base.file.*
+import spirite.base.file.SaveLoadUtil
 import spirite.base.file.SaveLoadUtil.FFALAYER_CASCADING
 import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
 import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
+import spirite.base.file.writeFloatArray
+import spirite.base.file.writeUFT8NT
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
@@ -142,8 +144,9 @@ object SaveEngine {
 
                 // [1] : bitmask
                 ra.writeByte(
-                        if( node.visible) SaveLoadUtil.VISIBLE_MASK else 0 +
-                        if( node.expanded) SaveLoadUtil.EXPANDED_MASK else 0 )
+                        if( node.visible) SaveLoadUtil.VisibleMask else 0 or
+                        if( node.expanded) SaveLoadUtil.ExpandedMask else 0 or
+                        if( node is GroupNode && node.flatenned) SaveLoadUtil.FlattenedMask else 0)
 
                 // [n], UTF8 : Layer Name
                 ra.write(SaveLoadUtil.strToByteArrayUTF8(node.name))

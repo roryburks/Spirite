@@ -1,6 +1,7 @@
 package spirite.base.brains
 
 import rb.glow.IImage
+import rbJvm.glow.awt.NativeImage
 import spirite.base.brains.commands.CentralCommandExecutor
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.base.brains.palette.IPaletteManager
@@ -14,18 +15,17 @@ import spirite.base.file.FileManager
 import spirite.base.file.IFileManager
 import spirite.base.graphics.DetailedResourceUseTracker
 import spirite.base.graphics.IDetailedResourceUseTracker
-import spirite.specialRendering.stroke.GLStrokeDrawerProvider
 import spirite.base.graphics.rendering.*
 import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.pen.stroke.IStrokeDrawerProvider
-import spirite.gui.menus.dialogs.IDialog
-import spirite.gui.menus.dialogs.JDialog
 import spirite.gui.implementations.topLevelFeedback.SwTopLevelFeedbackSystem
 import spirite.gui.menus.IContextMenus
+import spirite.gui.menus.dialogs.IDialog
+import spirite.gui.menus.dialogs.JDialog
 import spirite.hybrid.Hybrid
-import rbJvm.glow.awt.NativeImage
 import spirite.pc.menus.SwContextMenus
+import spirite.specialRendering.stroke.GLStrokeDrawerProvider
 
 /** MasterControl is a top-level container for all the global-level components.  From a dependency-injection perspective
  * you can think of it as the primary provider.

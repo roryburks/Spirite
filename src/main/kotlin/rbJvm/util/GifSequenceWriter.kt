@@ -1,11 +1,11 @@
 package rbJvm.util
 
+import java.awt.image.RenderedImage
+import java.io.IOException
 import javax.imageio.*
 import javax.imageio.metadata.IIOMetadata
 import javax.imageio.metadata.IIOMetadataNode
 import javax.imageio.stream.ImageOutputStream
-import java.awt.image.RenderedImage
-import java.io.IOException
 
 //
 //  GifSequenceWriter.java

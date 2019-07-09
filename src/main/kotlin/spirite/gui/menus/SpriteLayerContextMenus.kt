@@ -1,7 +1,6 @@
 package spirite.gui.menus
 
 import spirite.base.brains.commands.SpriteCommands
-import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 
 object SpriteLayerContextMenus {

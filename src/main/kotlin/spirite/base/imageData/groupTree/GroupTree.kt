@@ -244,16 +244,16 @@ open class GroupTree(
     }
 
     inner class GroupNode(parent: GroupNode?, name: String) : Node(parent, name) {
+        private val _children = mutableListOf<Node>()
+
+        val children: List<Node> get() = _children
+        var flatenned : Boolean by UndoableDelegate(false, undoEngine, "Toggled Group GroupNode Flattened")
+
         override val imageDependencies : Collection<MediumHandle> get() {
             val set = mutableSetOf<MediumHandle>()
             children.forEach { set.addAll(it.imageDependencies) }
             return set
         }
-
-        val children: List<Node> get() = _children
-        var flatenned : Boolean by UndoableDelegate(false, undoEngine, "Toggled Group GroupNode Flattened")
-
-        private val _children = mutableListOf<Node>()
 
         fun getAllAncestors() : List<Node>{
             val list = mutableListOf<Node>()

@@ -1,7 +1,6 @@
 package spirite.hybrid.customGui
 
 import rb.vectrix.mathUtil.round
-import sgui.Direction
 import sgui.Direction.*
 import sguiSwing.JColor
 import sguiSwing.components.SJPanel

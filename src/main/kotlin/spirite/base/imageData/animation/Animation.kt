@@ -1,7 +1,7 @@
 package spirite.base.imageData.animation
 
-import rb.owl.bindable.Bindable
 import rb.glow.GraphicsContext
+import rb.owl.bindable.Bindable
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
 

@@ -3,7 +3,6 @@ package sgui.components
 import rb.glow.IImage
 import rb.glow.color.Colors
 import rb.glow.color.SColor
-import sgui.Orientation
 import sgui.components.crossContainer.CrossInitializer
 import sgui.components.crossContainer.ICrossPanel
 

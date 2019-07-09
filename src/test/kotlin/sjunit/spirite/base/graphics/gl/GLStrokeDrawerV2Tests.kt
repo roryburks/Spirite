@@ -2,14 +2,14 @@ package sjunit.spirite.base.graphics.gl
 
 import org.junit.Test
 import rb.glow.color.Colors
-import sjunit.TestConfig
 import rb.glow.gl.GLImage
-import spirite.specialRendering.stroke.GLStrokeDrawerV2
+import rbJvm.glow.awt.toBufferedImage
+import sjunit.TestConfig
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
 import spirite.hybrid.Hybrid
-import rbJvm.glow.awt.toBufferedImage
+import spirite.specialRendering.stroke.GLStrokeDrawerV2
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs

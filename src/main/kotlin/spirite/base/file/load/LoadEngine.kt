@@ -251,6 +251,10 @@ object LoadEngine {
                 bitmask = ra.readUnsignedByte()
             }
 
+            val expanded = bitmask and SaveLoadUtil.ExpandedMask != 0
+            val visble = bitmask and SaveLoadUtil.VisibleMask != 0
+            val flatenned = bitmask and SaveLoadUtil.FlattenedMask != 0
+
             val name = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
             val type =  ra.readUnsignedByte()
 
@@ -262,7 +266,10 @@ object LoadEngine {
             val node = when( type) {
                 SaveLoadUtil.NODE_GROUP -> {
                     workspace.groupTree.addGroupNode(nodeLayer[depth - 1], name)
-                            .apply { nodeLayer[depth] = this }
+                            .apply {
+                                nodeLayer[depth] = this
+                                this.flatenned = flatenned
+                            }
                 }
                 else -> {
                     val layer = LayerLoaderFactory.getLayerLoader(context.version, type)
@@ -277,8 +284,8 @@ object LoadEngine {
             if( node != null) {
                 context.nodes.add(node)
                 node.alpha = alpha
-                node.expanded = bitmask and SaveLoadUtil.EXPANDED_MASK != 0
-                node.visible = bitmask and SaveLoadUtil.VISIBLE_MASK != 0
+                node.expanded = expanded
+                node.visible = visble
                 node.x = x
                 node.y = y
             }

@@ -1,8 +1,8 @@
 package spirite.base.imageData.view
 
+import rb.glow.gle.RenderMethod
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import rb.glow.gle.RenderMethod
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
