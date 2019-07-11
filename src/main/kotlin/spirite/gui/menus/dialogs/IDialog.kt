@@ -1,5 +1,6 @@
 package spirite.gui.menus.dialogs
 
+import cwShared.dialogSystem.IDialogPanel
 import rb.glow.color.SColor
 import sguiSwing.components.jcomponent
 import sguiSwing.jcolor
@@ -71,18 +72,6 @@ class JDialog(private val master: IMasterControl) : IDialog
         JOptionPane.showConfirmDialog(null, message,"",JOptionPane.OK_OPTION)
     }
 
-    fun <T> runDialogPanel(panel: IDialogPanel<T>) = when(JOptionPane.showConfirmDialog(
-                null,
-                panel.jcomponent,
-                "New Layer",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE,
-                SpiriteIcons.BigIcons.NewLayer.icon))
-    {
-        JOptionPane.OK_OPTION -> panel.result
-        else -> null
-    }
-
     override fun invokeNewSimpleLayer(workspace: IImageWorkspace)
             = runDialogPanel(NewSimpleLayerPanel(master,workspace))
 
@@ -100,6 +89,18 @@ class JDialog(private val master: IMasterControl) : IDialog
 
     override fun invokeMoveSpriteParts(parts: List<SpritePart>): SpriteLayer?
             = runDialogPanel(MoveSpritePartsPanel(parts))
+
+    fun <T> runDialogPanel(panel: IDialogPanel<T>) = when(JOptionPane.showConfirmDialog(
+            null,
+            panel.jcomponent,
+            "New Layer",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE,
+            SpiriteIcons.BigIcons.NewLayer.icon))
+    {
+        JOptionPane.OK_OPTION -> panel.result
+        else -> null
+    }
 
     override fun pickFile(type: FilePickType): File? {
         val fc = JFileChooser()

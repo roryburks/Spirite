@@ -1,5 +1,6 @@
 package spirite.gui.menus.dialogs
 
+import cwShared.dialogSystem.IDialogPanel
 import sgui.components.crossContainer.ICrossPanel
 import spirite.gui.menus.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.resources.SpiriteIcons

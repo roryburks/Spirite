@@ -1,5 +1,6 @@
 package spirite.gui.menus.dialogs
 
+import cwShared.dialogSystem.IDialogPanel
 import rb.owl.bindable.addObserver
 import sgui.components.crossContainer.ICrossPanel
 import spirite.base.imageData.groupTree.GroupTree.LayerNode

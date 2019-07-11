@@ -1,4 +1,4 @@
-package spirite.gui.menus.dialogs
+package cwShared.dialogSystem
 
 import sgui.components.IComponent
 

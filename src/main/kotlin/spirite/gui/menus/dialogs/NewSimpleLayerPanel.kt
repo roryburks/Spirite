@@ -1,5 +1,6 @@
 package spirite.gui.menus.dialogs
 
+import cwShared.dialogSystem.IDialogPanel
 import rb.glow.color.Color
 import rb.glow.color.Colors
 import sgui.Orientation.HORIZONTAL
