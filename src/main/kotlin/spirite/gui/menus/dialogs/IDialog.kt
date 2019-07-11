@@ -109,7 +109,7 @@ class JDialog(private val master: IMasterControl) : IDialog
             SAVE_SIF -> master.settingsManager.workspaceFilePath
             EXPORT -> master.settingsManager.imageFilePath
             AAF -> master.settingsManager.aafFilePath
-            GIF -> master.settingsManager.aafFilePath
+            GIF -> master.settingsManager.gifFilePath
         }
 
         fc.choosableFileFilters.forEach { fc.removeChoosableFileFilter(it) }
@@ -160,6 +160,7 @@ class JDialog(private val master: IMasterControl) : IDialog
                 }
                 SAVE_SIF -> master.settingsManager.workspaceFilePath = saveFile
                 AAF -> master.settingsManager.aafFilePath = saveFile
+                GIF -> master.settingsManager.gifFilePath = saveFile
             }
 
             return saveFile

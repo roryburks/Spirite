@@ -2,6 +2,8 @@ package rb.glow.color
 
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
+import rb.vectrix.mathUtil.MathUtil
+import rb.vectrix.mathUtil.round
 import kotlin.math.sqrt
 
 
@@ -34,6 +36,17 @@ class ColorARGB32Normal(argb: Int)
     override val green: Float get() = (g / 255.0f)
     override val blue: Float get() = (b / 255.0f)
     override val alpha: Float get() = (a / 255.0f)
+
+    companion object {
+        fun FromComponents( alpha: Float, red: Float, green: Float, blue: Float) : ColorARGB32Normal{
+            val a = MathUtil.clip(0, (alpha*255).round, 255)
+            val r = MathUtil.clip(0, (red*255).round, 255)
+            val g = MathUtil.clip(0, (green*255).round, 255)
+            val b = MathUtil.clip(0, (blue*255).round, 255)
+
+            return ColorARGB32Normal( (a shl 24) or (r shl 16) or (g shl 8) or (b shl 0))
+        }
+    }
 }
 fun Int.toColor() = ColorARGB32Normal(this)
 fun Int.toColorPremultiplied() = ColorARGB32Premultiplied(this)
@@ -41,9 +54,9 @@ fun Int.toColorPremultiplied() = ColorARGB32Premultiplied(this)
 class ColorARGB32Premultiplied(argb: Int)
     : ColorARGB32(argb)
 {
-    override val red: Float get() = (r/255.0f) / alpha
-    override val green: Float get() = (g/255.0f) / alpha
-    override val blue: Float get() = (b/255.0f) / alpha
+    override val red: Float get() = if( alpha == 0f) 0f else (r/255.0f) / alpha
+    override val green: Float get() = if( alpha == 0f) 0f else (g/255.0f) / alpha
+    override val blue: Float get() = if( alpha == 0f) 0f else (b/255.0f) / alpha
     override val alpha: Float get() = (a/255.0f)
 }
 
