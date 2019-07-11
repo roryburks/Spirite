@@ -72,7 +72,7 @@ object SpiriteIcons {
 
         Rig_New(0,1),
         Rig_Remove(1,1),
-        Rig_VisibileOn(2,1),
+        Rig_VisibleOn(2,1),
         Rig_VisibleOff(3,1),
 
         Expanded( 0, 2),

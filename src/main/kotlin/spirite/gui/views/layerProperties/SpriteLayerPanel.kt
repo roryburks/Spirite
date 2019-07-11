@@ -109,7 +109,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
     private val btnVisibility = Hybrid.ui.ToggleButton()
 
     init {
-        btnVisibility.setOnIcon(SpiriteIcons.SmallIcons.Rig_VisibileOn)
+        btnVisibility.setOnIcon(SpiriteIcons.SmallIcons.Rig_VisibleOn)
         btnVisibility.setOffIcon(SpiriteIcons.SmallIcons.Rig_VisibleOff)
         btnNewPart.setIcon(SpiriteIcons.SmallIcons.Rig_New)
         btnRemovePart.setIcon(SpiriteIcons.SmallIcons.Rig_Remove)

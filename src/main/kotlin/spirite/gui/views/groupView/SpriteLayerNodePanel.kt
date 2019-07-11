@@ -108,7 +108,7 @@ private constructor(
             //btn.plainStyle = true
             background = ActiveNodeBg.scolor
             setBasicBorder(BASIC)
-            setOnIcon(Rig_VisibileOn)
+            setOnIcon(Rig_VisibleOn)
             setOffIcon(Rig_VisibleOff)
             onMouseClick += {evt->
                 if( evt.button == RIGHT) {
