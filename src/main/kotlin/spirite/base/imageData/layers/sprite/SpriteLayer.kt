@@ -11,6 +11,7 @@ import rb.owl.bindable.addObserver
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.ceil
+import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.graphics.isolation.ISpriteLayerIsolator
@@ -180,7 +181,10 @@ class SpriteLayer : Layer {
     }
 
     private fun buildMultiDrawer( set: Set<SpritePart>, original: ArrangedMediumData) =
-            MultiMediumDrawer(set.map { getDrawer(it, original) }).also { print("using multimed drawer") }
+            MultiMediumDrawer(
+                    set.map { getDrawer(it, original) },
+                    cx = set.map { it.handle.x + it.handle.width/2f }.average().f,
+                    cy = set.map { it.handle.y + it.handle.height/2f }.average().f)
     private fun getDrawer(part: SpritePart, original: ArrangedMediumData) : IImageDrawer {
         val arranged =
                 if( part.handle == original.handle) original
