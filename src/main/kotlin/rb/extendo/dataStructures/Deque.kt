@@ -6,9 +6,11 @@ class Deque<T> : Iterable<T> {
     private var backNode: Node<T>? = null
 
     private class Node<T>(val t: T, var previous: Node<T>?, var next: Node<T>?)
+    var length: Int = 0 ; private set
 
 
     fun addBack(t: T) {
+        ++length
         val prevBackNode = backNode
         val newNode = Node(t, prevBackNode, null)
         if (prevBackNode == null) {
@@ -20,6 +22,7 @@ class Deque<T> : Iterable<T> {
     }
 
     fun addFront(t: T) {
+        ++length
         val prevFrontNode = frontNode
         val newNode = Node(t, null, prevFrontNode)
         if (prevFrontNode == null) {
@@ -38,11 +41,13 @@ class Deque<T> : Iterable<T> {
         return when (previousFront) {
             null -> null
             backNode -> {
+                --length
                 frontNode = null
                 backNode = null
                 previousFront.t
             }
             else -> {
+                --length
                 frontNode = previousFront.next
                 frontNode?.previous = null
                 previousFront.t
@@ -55,11 +60,13 @@ class Deque<T> : Iterable<T> {
         return when (previousBack) {
             null -> null
             frontNode -> {
+                --length
                 frontNode = null
                 backNode = null
                 previousBack.t
             }
             else -> {
+                --length
                 backNode = previousBack.previous
                 backNode?.next = null
                 previousBack.t

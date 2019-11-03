@@ -1,5 +1,6 @@
 package spirite.base.brains.commands
 
+import rb.extendo.dataStructures.Deque
 import rb.extendo.extensions.toHashMap
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MWorkspaceSet
@@ -11,12 +12,16 @@ interface ICentralCommandExecutor {
     val commandDomains : List<String>
     val validCommands: List<String>
     fun executeCommand( command: String, extra: Any?) : Boolean
+
+    data class CommandPair(val command: String, val extra: String?)
+    val executedCommands : Iterable<CommandPair>
 }
 
 class CentralCommandExecutor(
         val master: IMasterControl,
         val workspaceSet: MWorkspaceSet,
-        val dialog: IDialog)
+        val dialog: IDialog,
+        private val _maxHistorySize : Int? = 100)
     : ICentralCommandExecutor
 {
     private val commandExecutors = listOf(
@@ -39,6 +44,9 @@ class CentralCommandExecutor(
     override val validCommands: List<String> get() = commandExecutors.values.flatMap { it.validCommands }
 
     override fun executeCommand(command: String, extra: Any?) : Boolean {
+        if( _maxHistorySize != null && executedCommands.length >= _maxHistorySize)
+            executedCommands.popBack()
+        executedCommands.addFront(ICentralCommandExecutor.CommandPair(command, extra?.toString()))
         var executed = false
         Hybrid.gle.runInGLContext {
             val space = command.substring(0, command.indexOf("."))
@@ -57,6 +65,7 @@ class CentralCommandExecutor(
             }
         }
         return executed
-
     }
+
+    override val executedCommands = Deque<ICentralCommandExecutor.CommandPair>()
 }
