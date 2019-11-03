@@ -1,8 +1,9 @@
 package rbJvm.glow.awt
 
-import sun.awt.image.ByteInterleavedRaster
-import sun.awt.image.IntegerInterleavedRaster
 import java.awt.image.BufferedImage
+import java.awt.image.DataBufferByte
+
+
 
 object RasterHelper
 {
@@ -15,11 +16,10 @@ object RasterHelper
          * out and in the future I might just use wrapped WritableRaster functionality to get the data.
          */
 
-        val raster = bi.raster
-        return when( raster) {
-            is ByteInterleavedRaster -> {raster.dataStorage}
-            is IntegerInterleavedRaster -> {raster.dataStorage}
-            else -> null
-        }
+        //val raster = bi.raster
+        val buff = bi.raster.dataBuffer as? DataBufferByte
+        if(buff != null)
+            return buff.data
+        return bi.getRGB(0, 0, bi.width, bi.height, null, 0, bi.width )
     }
 }

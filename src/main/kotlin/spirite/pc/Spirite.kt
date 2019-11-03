@@ -20,8 +20,8 @@ fun main( args: Array<String>) {
 
         UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName())
         SwingUtilities.invokeAndWait {
-            val bi = BufferedImage(10,10,BufferedImage.TYPE_4BYTE_ABGR)
-            RasterHelper.getDataStorageFromBi(bi)
+            //val bi = BufferedImage(10,10,BufferedImage.TYPE_4BYTE_ABGR)
+            //RasterHelper.getDataStorageFromBi(bi)
 
             EngineLaunchpoint.gle
             master = MasterControl()
