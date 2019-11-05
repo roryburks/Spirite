@@ -14,7 +14,7 @@ import org.junit.Test as test
 
 class DynamicImageTests {
     val gle = Hybrid.gle
-    val imageConverter = AwtImageConverter(gle)
+    val imageConverter = AwtImageConverter{gle}
 
     @test fun testWorks() {
         val dynamicImage = DynamicImage()

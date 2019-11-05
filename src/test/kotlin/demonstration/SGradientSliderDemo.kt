@@ -1,5 +1,6 @@
 package demonstration
 
+import rb.glow.color.Colors
 import rb.vectrix.functions.InvertibleFunction
 import sgui.Orientation.HORIZONTAL
 import sgui.components.IButton
@@ -32,8 +33,8 @@ class SGradientSliderDemo : JFrame() {
             override fun invert(x: Float): Float= Math.pow(x.toDouble(), 1.0/2.0).toFloat()
         }
         sliderBound2.valueBind.bindTo(sliderBound1.valueBind)
-        sliderBound1.fgGradLeft = Color(30, 160, 30)
-        sliderBound1.fgGradRight = Color.BLACK
+        sliderBound1.fgGradLeft = Colors.BLUE
+        sliderBound1.fgGradRight = Colors.BLACK
 
         val disabledSlider = Hybrid.ui.GradientSlider(label = "Disabled")
         disabledSlider.value = 0.4f

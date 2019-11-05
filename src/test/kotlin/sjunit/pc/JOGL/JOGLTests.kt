@@ -1,5 +1,6 @@
 package sjunit.pc.JOGL
 
+import rbJvm.glow.jogl.JOGL
 import spirite.hybrid.Hybrid
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -12,7 +13,7 @@ class JOGLTests {
 
         val tex = gl.createTexture()
 
-        assertNotEquals(0, (tex as JOGLTexture).texId)
+        assertNotEquals(0, (tex as JOGL.JOGLTexture).texId)
         assertEquals( 0, gl.getError())
     }
 }

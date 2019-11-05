@@ -12,7 +12,7 @@ object TestConfig {
 
     fun trySave(image: IImage, name: String) {
         if( TestConfig.save) {
-            val imageBI = Hybrid.imageConverter.convert<ImageBI>(image)
+            val imageBI = Hybrid.imageConverter.convert(image,ImageBI::class) as ImageBI
             ImageIO.write(imageBI.bi, "png", File("${saveLocation}\\$name.png"))
         }
     }

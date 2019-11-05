@@ -32,9 +32,9 @@ class BoxListDemo : JFrame() {
 
         var num = 100
 
-        resize.addPanel(Hybrid.ui.Button("Clear").apply { action = {x.clear()} }, 100,100,-999)
-        resize.addPanel(Hybrid.ui.Button("Add").apply { action = {x.addEntry(++num)} }, 100,100,-999)
-        resize.addPanel(Hybrid.ui.Button("Remove").apply { action = {x.remove(x.selected?:0)} }, 100,100,999)
+        //resize.addPanel(Hybrid.ui.Button("Clear").apply { action = {x.clear()} }, 100,100,-999)
+        //resize.addPanel(Hybrid.ui.Button("Add").apply { action = {x.addEntry(++num)} }, 100,100,-999)
+        //resize.addPanel(Hybrid.ui.Button("Remove").apply { action = {x.remove(x.selected?:0)} }, 100,100,999)
 
         add( resize.jcomponent)
     }

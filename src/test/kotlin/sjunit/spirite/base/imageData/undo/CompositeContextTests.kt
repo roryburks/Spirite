@@ -4,6 +4,7 @@ package sjunit.spirite.base.imageData.undo
 import io.mockk.mockk
 import sjunit.spirite.base.imageData.undo.NullContextTests.TestNullAction
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.CompositeAction
@@ -14,12 +15,12 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class CompositeContextTests {
-    val mockWorkspace = mockk<IImageWorkspace>(relaxed = true)
+    val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)
     val mockMediumRepo = mockk<MMediumRepository>(relaxed = true)
     val mediumHandle = MediumHandle(mockWorkspace, 9)
     val imageContexts = mutableListOf<ImageContext>()
     val nullContext = NullContext()
-    val contextUnderTest = CompositeContext(nullContext, imageContexts,mockMediumRepo)
+    val contextUnderTest = CompositeContext(nullContext, imageContexts,mockWorkspace)
 
     @test fun doesUndoRedo5() {
         val actions = List(5, { CompositeAction(List(2,{ TestNullAction() }), "action$it") })

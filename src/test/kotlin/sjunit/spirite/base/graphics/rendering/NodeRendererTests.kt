@@ -20,7 +20,7 @@ import org.junit.Test as test
 
 class NodeRendererTests {
     val gle = Hybrid.gle
-    val imageConverter = AwtImageConverter(gle)
+    val imageConverter = AwtImageConverter{gle}
     val workspace = TestHelper.makeShellWorkspace(100,100)
 
     @test fun RendersGroup() {

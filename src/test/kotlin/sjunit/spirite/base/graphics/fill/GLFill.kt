@@ -29,7 +29,7 @@ class GLFillTests {
         image.graphics.drawLine( 0, 0, w,h)
 
         println(measureTimeMillis {
-            GLFill(V0FillArrayAlgorithm).fill(image, 3, 2, Colors.BLUE)
+            GLFill(V0FillArrayAlgorithm).fill(image.graphics, 3, 2, Colors.BLUE)
         })
 
 
