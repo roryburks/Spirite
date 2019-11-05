@@ -36,7 +36,9 @@ class CentralCommandExecutor(
             IsolationCommandExecutor(workspaceSet),
             AnimationCommandExecutor(master),
             WorkspaceCommandExecutor(workspaceSet, dialog),
-            SpriteLayerCommandExecutor(master))
+            SpriteLayerCommandExecutor(master),
+            DebugCommandExecutor(master)
+            )
             .toHashMap { it.domain }
 
 

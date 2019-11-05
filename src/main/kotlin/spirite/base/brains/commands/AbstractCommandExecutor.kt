@@ -5,14 +5,12 @@ import spirite.base.brains.KeyCommand
 import spirite.base.exceptions.CommandNotValidException
 
 abstract class AbstractCommandExecutor<DataSet>(
-         override val domain : String,
-         commmands: Collection<CommandStub<DataSet>>)
+         override val domain : String)
      : ICommandExecutor
 {
     abstract fun makeSet(command: String, extra: Any?) : DataSet
 
-    private val _commands = commmands
-            .toHashMap { it.name }
+    protected val _commands = hashMapOf<String,CommandStub>()
 
     override val validCommands: List<String> get() = _commands.keys.toList()
 
@@ -27,13 +25,11 @@ abstract class AbstractCommandExecutor<DataSet>(
         }
     }
 
-    inner class WrappedStub<DataSet>(private val _stub: CommandStub<DataSet>) : ICommand {
-        override val commandString: String get() = "$domain.${_stub.name}"
+    inner class CommandStub(val name: String, val action: (DataSet)->Unit) : ICommand {
+        init {
+            _commands[name] = this
+        }
+        override val commandString: String get() = "$domain.${name}"
         override val keyCommand: KeyCommand get() = KeyCommand(commandString)
     }
 }
-
-class CommandStub<DataSet>(
-    val name: String,
-    val action: (DataSet)->Unit
-)

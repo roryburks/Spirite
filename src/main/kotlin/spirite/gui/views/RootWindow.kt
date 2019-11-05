@@ -5,6 +5,7 @@ import sguiSwing.components.SwMenuBar
 import sguiSwing.components.jcomponent
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.commands.DebugCommands
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand.*
 import spirite.base.brains.commands.FrameCommandExecutor.FrameCommand.*
 import spirite.base.brains.commands.GlobalCommands
@@ -93,7 +94,10 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem(".&Debug Stats", DEBUG),
                 MenuItem(".Toggle &GL Mode"),
                 MenuItem(".Toggle GL Panel"),
-                MenuItem(".&__DB_GL")
+                MenuItem(".&__DB_GL"),
+
+                MenuItem("&Debug"),
+                MenuItem(".Commands To Clipboard", DebugCommands.CommandHistoryToClipboard)
         )
 
         val bar = SwMenuBar()

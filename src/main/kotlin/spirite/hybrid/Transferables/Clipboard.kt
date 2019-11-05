@@ -31,6 +31,7 @@ object SwClipboard : IClipboard
             is GroupNode -> TransferableGroupNode(any)
             is Layer ->  TransferableSpiriteLayer(any)
             is IImage -> TransferableImage(any)
+            is String -> TransferableString(any)
             else -> throw NotImplementedError("Don't know how to convert object into a Transferable")
         }
 
