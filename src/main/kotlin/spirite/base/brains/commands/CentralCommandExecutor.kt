@@ -21,7 +21,7 @@ class CentralCommandExecutor(
         val master: IMasterControl,
         val workspaceSet: MWorkspaceSet,
         val dialog: IDialog,
-        private val _maxHistorySize : Int? = 100)
+        private val _maxHistorySize : Int? = 3000)
     : ICentralCommandExecutor
 {
     private val commandExecutors = listOf(
@@ -47,6 +47,7 @@ class CentralCommandExecutor(
         if( _maxHistorySize != null && executedCommands.length >= _maxHistorySize)
             executedCommands.popBack()
         executedCommands.addFront(ICentralCommandExecutor.CommandPair(command, extra?.toString()))
+
         var executed = false
         Hybrid.gle.runInGLContext {
             val space = command.substring(0, command.indexOf("."))
