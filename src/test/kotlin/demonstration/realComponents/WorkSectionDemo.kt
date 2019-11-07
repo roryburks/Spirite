@@ -4,7 +4,7 @@ import demonstration.DemoLauncher
 import sgui.Orientation.HORIZONTAL
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
-import sjunit.TestHelper
+import old.TestHelper
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.gui.views.work.WorkTabPane

@@ -1,4 +1,4 @@
-package sjunit.spirite.base.util;
+package old.spirite.base.util;
 
 import org.junit.Test;
 import rb.vectrix.compaction.DoubleEndedFloatCompactor;

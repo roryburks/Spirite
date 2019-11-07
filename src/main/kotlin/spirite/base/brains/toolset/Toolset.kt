@@ -6,7 +6,7 @@ import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.mediums.magLev.MaglevImageDrawer
 
 /** A Toolset is a complete set of every tool */
-class Toolset( internal val manager: ToolsetManager) {
+class Toolset( internal val manager: IToolsetManager) {
     val Pen = Pen(this)
     val Eraser = Eraser(this)
     val Fill = Fill( this)

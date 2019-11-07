@@ -15,6 +15,8 @@ interface IToolsetManager {
         fun onToolPropertyChanged( tool: Tool, property: ToolProperty<*>)
     }
     val toolsetObservable : IObservable<ToolsetPropertyObserver>
+
+    fun triggerToolsetChanged(tool: Tool, property: ToolProperty<*>)
 }
 
 class ToolsetManager : IToolsetManager{
@@ -24,7 +26,7 @@ class ToolsetManager : IToolsetManager{
     override val selectedToolBinding = Bindable<Tool>(toolset.Pen)
     override var selectedTool by selectedToolBinding
 
-    internal fun triggerToolsetChanged(tool: Tool, property: ToolProperty<*>) {
+    override fun triggerToolsetChanged(tool: Tool, property: ToolProperty<*>) {
         toolsetObservable.trigger { it.onToolPropertyChanged(tool, property) }
     }
 }

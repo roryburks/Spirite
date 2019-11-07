@@ -5,7 +5,7 @@
 //import rb.vectrix.linear.ImmutableTransformF
 //import rb.vectrix.linear.Mat4f
 //import rb.vectrix.mathUtil.i
-//import sjunit.TestConfig
+//import old.TestConfig
 //import rb.glow.gl.GLImage
 //import rb.glow.gle.GLPrimitive
 //import rb.glow.gle.IGLEngine

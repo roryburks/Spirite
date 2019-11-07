@@ -3,7 +3,7 @@
 //import io.mockk.every
 //import io.mockk.mockk
 //import rb.vectrix.mathUtil.f
-//import sjunit.TestConfig
+//import old.TestConfig
 //import rb.glow.gl.GLImage
 //import rb.glow.gle.GLPrimitive
 //import rb.glow.gle.IGLEngine
