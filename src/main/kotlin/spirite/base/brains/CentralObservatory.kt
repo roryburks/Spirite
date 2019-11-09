@@ -7,7 +7,6 @@ import rb.owl.bindable.IBindObserver
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.OnChangeEvent
 import rb.owl.bindable.addObserver
-import rb.owl.observer
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -103,13 +102,13 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
             when(new) {
                 null -> {
                     currentContract = null
-                    binds.removeIf { it.observer.trigger?.invoke(null, oldF) == null }
+                    binds.removeIf { it.observer.triggers?.forEach { it(null, oldF) } == null }
                 }
                 else -> {
                     val newBind = finder(new)
                     val newF = newBind.field
                     currentContract = newBind.addObserver(newF != oldF){ newT: T, oldT: T ->
-                        binds.removeIf { it.observer.trigger?.invoke(newT, oldT) == null }
+                        binds.removeIf { it.observer.triggers?.forEach { it(newT, oldT) } == null }
                     }
                 }
             }

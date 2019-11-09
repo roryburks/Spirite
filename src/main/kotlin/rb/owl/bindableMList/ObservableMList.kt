@@ -18,7 +18,7 @@ class ObservableMList<T>
     override fun addObserver(observer: IObserver<IListTriggers<T>>, trigger: Boolean): IContract {
         observers.add(observer)
         if( trigger && list.any())
-            observer.trigger?.elementsAdded(0, list)
+            observer.triggers?.forEach { it.elementsAdded(0, list)}
         return ObserverContract(observer)
     }
 
@@ -43,24 +43,24 @@ class ObservableMList<T>
         if( !list.add(element))
             return false
         val removed= SinglyCollection(element)
-        observers.removeAll { it.trigger?.elementsAdded(list.lastIndex, removed) == null }
+        observers.removeAll { it.triggers?.forEach { it.elementsAdded(list.lastIndex, removed)} == null }
         return true
     }
     override fun add(index: Int, element: T) {
         list.add(index, element)
-        observers.removeAll { it.trigger?.elementsAdded(index, SinglyCollection(element)) == null }
+        observers.removeAll { it.triggers?.forEach { it.elementsAdded(index, SinglyCollection(element))} == null }
     }
     override fun addAll(index: Int, elements: Collection<T>): Boolean {
         if(!list.addAll(index, elements))
             return false
-        observers.removeAll { it.trigger?.elementsAdded(index, elements) == null }
+        observers.removeAll { it.triggers?.forEach { it.elementsAdded(index, elements)} == null }
         return true
     }
     override fun addAll(elements: Collection<T>): Boolean {
         val index = list.size
         if(!list.addAll(elements))
             return false
-        observers.removeAll { it.trigger?.elementsAdded(index, elements) == null }
+        observers.removeAll { it.triggers?.forEach { it.elementsAdded(index, elements) }== null }
         return true
     }
     // endregion
@@ -69,13 +69,13 @@ class ObservableMList<T>
     override fun clear() {
         val elements = list.toSet()
         list.clear()
-        observers.removeAll { it.trigger?.elementsRemoved(elements) == null }
+        observers.removeAll { it.triggers?.forEach { it.elementsRemoved(elements)} == null }
     }
     override fun remove(element: T): Boolean {
         if( !list.remove(element))
             return false
         val removed = SinglyCollection(element)
-        observers.removeAll { it.trigger?.elementsRemoved(removed) == null }
+        observers.removeAll { it.triggers?.forEach { it.elementsRemoved(removed) }== null }
         return true
     }
     override fun removeAll(elements: Collection<T>): Boolean {
@@ -90,14 +90,14 @@ class ObservableMList<T>
                 false -> false
             }}
         if( !removed.any()) return false
-        observers.removeAll { it.trigger?.elementsRemoved(removed) == null }
+        observers.removeAll { it.triggers?.forEach { it.elementsRemoved(removed) } == null }
         return true
     }
     override fun removeAt(index: Int): T {
         return list.removeAt(index)
             .also { t ->
                 val removed = SinglyCollection(t)
-                observers.removeAll { it.trigger?.elementsRemoved(removed) == null } }
+                observers.removeAll { it.triggers?.forEach { it.elementsRemoved(removed) }== null } }
     }
 
     override fun retainAll(elements: Collection<T>): Boolean {
@@ -112,7 +112,7 @@ class ObservableMList<T>
                 false -> false
             }}
         if(!removed.any()) return false
-        observers.removeAll { it.trigger?.elementsRemoved(removed) == null }
+        observers.removeAll { it.triggers?.forEach { it.elementsRemoved(removed) }== null }
         return true
     }
     // endregion
@@ -120,7 +120,7 @@ class ObservableMList<T>
     override fun set(index: Int, element: T): T {
         val old = list.set(index, element)
         val changed = SinglySet(ListChange(index, element))
-        observers.removeAll { it.trigger?.elementsChanged(changed) == null }
+        observers.removeAll { it.triggers?.forEach { it.elementsChanged(changed) }== null }
         return old
     }
 
@@ -129,7 +129,7 @@ class ObservableMList<T>
             .map { (index, new) -> ListChange(index, list.set(index, new)) }
             .toSet()
         val asSet = change.toSet()
-        observers.removeAll { it.trigger?.elementsChanged(asSet) == null }
+        observers.removeAll { it.triggers?.forEach { it.elementsChanged(asSet) }== null }
         return oldSet
     }
 

@@ -13,7 +13,7 @@ class GuardedObservable<T> : IObservable<T>
         if( !_isRunning) {
             _isRunning = true
             try {
-                _observers.removeAll { it.observer.trigger?.apply(lambda) == null }
+                _observers.removeAll { it.observer.triggers?.forEach(lambda) == null }
             }
             finally {
                 _isRunning = false

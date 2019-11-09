@@ -1,13 +1,16 @@
 package rb.owl
 
 import rb.IContract
+import rb.extendo.dataStructures.SinglySequence
 
 
 interface IObserver<T> {
-    val trigger: T?
+    val triggers: Sequence<T>?
 }
 
-class Observer<T>(override val trigger: T) : IObserver<T>
+class Observer<T>( val trigger: T) : IObserver<T>{
+    override val triggers: Sequence<T>? get() = SinglySequence(trigger)
+}
 fun <T> T.observer() = Observer(this)
 
 interface IObservable<T> {
@@ -19,7 +22,7 @@ class Observable<T> : IObservable<T>
     override fun addObserver(observer: IObserver<T>, trigger: Boolean): IContract = MetaContract(observer)
 
     fun trigger(lambda : (T)->Unit) {
-        observers.removeAll { it.observer.trigger?.apply(lambda) == null }
+        observers.removeAll { it.observer.triggers ?.forEach(lambda) == null }
     }
 
     private val observers = mutableListOf<MetaContract>()

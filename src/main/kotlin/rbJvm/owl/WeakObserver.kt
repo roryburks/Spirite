@@ -1,6 +1,7 @@
 package rbJvm.owl
 
 import rb.IContract
+import rb.extendo.dataStructures.SinglySequence
 import rb.extendo.extensions.mapRemoveIfNull
 import rb.owl.IObservable
 import rb.owl.IObserver
@@ -15,7 +16,8 @@ class WeakObserver<T>(trigger: T) : IObserver<T>
 {
     val description = trigger.toString()
     private val weakTrigger = WeakReference(trigger)
-    override val trigger : T? =  weakTrigger.get() ?: null.also{ println("$description fallen out of workspace.")}
+    override val triggers : Sequence<T>? =  weakTrigger.get()?.run { SinglySequence(this) }
+            ?: null.also{ println("$description fallen out of workspace.")}
 }
 
 /** Note: the contract strongly references the Trigger, so the t is preserved as long as the contract is. */
@@ -66,7 +68,7 @@ class WeakBindable<T>(default: T) : IObservable<OnChangeEvent<T>>
     }
 
     private val binds = mutableListOf<BindContract>()
-    private val triggers get() = observers.mapRemoveIfNull { it.trigger }
+    //private val triggers get() = observers.mapRemoveIfNull { it.triggers }
     private val observers = mutableListOf<IBindObserver<T>>()
 
     operator fun getValue(thisRef: Any, prop: KProperty<*>): T = bind.field

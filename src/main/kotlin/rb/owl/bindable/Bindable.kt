@@ -12,7 +12,7 @@ class Bindable<T>(default: T, private val mutator:  ((T)->T)? = null) : IBindabl
         set(value) {underlying.value = mutator?.invoke(value) ?: value}
 
     override fun addObserver(observer: IBindObserver<T>, trigger: Boolean): IContract = ObserverContract(observer)
-        .also { if( trigger) observer.trigger?.invoke(field, field) }
+        .also { if( trigger) observer.triggers?.forEach { it(field,field) }}
     fun bindTo( root: Bindable<T>): IContract
     {
         val oldUnderlying = underlying
@@ -38,7 +38,9 @@ class Bindable<T>(default: T, private val mutator:  ((T)->T)? = null) : IBindabl
 
     private var underlying = Underlying(default, this)
 
-    private val triggers get() = observers.mapRemoveIfNull { it.trigger }
+    private val triggers get() = observers
+            .mapRemoveIfNull { it.triggers }
+            .flatten()
     private val observers = mutableListOf<IBindObserver<T>>()
     private val bindList = mutableListOf<Bindable<T>>()
 

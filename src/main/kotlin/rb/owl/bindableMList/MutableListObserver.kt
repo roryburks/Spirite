@@ -1,5 +1,6 @@
 package rb.owl.bindableMList
 
+import rb.extendo.dataStructures.SinglySequence
 import rb.owl.IObservable
 import rb.owl.IObserver
 
@@ -29,5 +30,8 @@ typealias IMutableListObservable<T> = IObservable<IListTriggers<T>>
 
 fun <T> IListTriggers<T>.observer() = MutableListObserver(this)
 
-class MutableListObserver<T>(override val trigger: IListTriggers<T>) :
+class MutableListObserver<T>(val trigger: IListTriggers<T>) :
     IMutableListObserver<T>
+{
+    override val triggers get() = SinglySequence(trigger)
+}

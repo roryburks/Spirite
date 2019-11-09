@@ -15,17 +15,19 @@ class BindableMList<T>(col: Collection<T> = emptyList()) : IBindableMList<T>
     override val list: MutableList<T> get() = underlying.list
 
     override fun addObserver(observer: IMutableListObserver<T>, trigger: Boolean) : IContract = ObserverContract(observer)
-        .also { if( trigger) observer.trigger?.elementsAdded(0, list.toList()) }
+        .also { if( trigger) observer.triggers?.forEach { it.elementsAdded(0, list.toList()) }}
 
     fun bindTo( root: BindableMList<T>) : IContract
     {
         val oldUnderlying = underlying
         val newUnderlying = root.underlying
         if( oldUnderlying != newUnderlying){
-            oldUnderlying.triggers.forEach {
-                it.elementsRemoved(oldUnderlying.list)
-                it.elementsAdded(0, newUnderlying.list)
-            }
+            oldUnderlying.triggers
+                    .flatten()
+                    .forEach {
+                        it.elementsRemoved(oldUnderlying.list)
+                        it.elementsAdded(0, newUnderlying.list)
+                    }
         }
         bindList.add(root)
 
@@ -48,7 +50,7 @@ class BindableMList<T>(col: Collection<T> = emptyList()) : IBindableMList<T>
 
     private var underlying = Underlying(col, this)
 
-    private val triggers get() = observers.mapRemoveIfNull{it.trigger}
+    private val triggers get() = observers.mapRemoveIfNull{it.triggers}
     private val observers = mutableListOf<IMutableListObserver<T>>()
     private val bindList = mutableListOf<BindableMList<T>>()
 
@@ -59,13 +61,13 @@ class BindableMList<T>(col: Collection<T> = emptyList()) : IBindableMList<T>
         init {
             list.addObserver(object : IListTriggers<T> {
                 override fun elementsAdded(index: Int, elements: Collection<T>)
-                {triggers.forEach { it.elementsAdded(index, elements) }}
+                {triggers.flatten().forEach { it.elementsAdded(index, elements) }}
                 override fun elementsRemoved(elements: Collection<T>)
-                {triggers.forEach { it.elementsRemoved(elements) }}
+                {triggers.flatten().forEach { it.elementsRemoved(elements) }}
                 override fun elementsChanged(changes: Set<ListChange<T>>)
-                {triggers.forEach { it.elementsChanged(changes) }}
+                {triggers.flatten().forEach { it.elementsChanged(changes) }}
                 override fun elementsPermuted(permutation: ListPermuation)
-                {triggers.forEach { it.elementsPermuted(permutation) }}
+                {triggers.flatten().forEach { it.elementsPermuted(permutation) }}
             }.observer())
         }
 
