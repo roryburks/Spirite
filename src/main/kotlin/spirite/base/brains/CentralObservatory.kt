@@ -7,6 +7,7 @@ import rb.owl.bindable.IBindObserver
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.OnChangeEvent
 import rb.owl.bindable.addObserver
+import rb.owl.observer
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -22,7 +23,7 @@ import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
  * regardless of which Workspace is active should get their Observables from.  It automatically adds and removes ovservers
  * as the currentWorkspace is changed.*/
 interface ICentralObservatory {
-    //val omniImageObserver : ICruddyOldObservable<ImageObserver>
+    val omniImageObserver : IObservable<ImageObserver>
 
     val trackingUndoHistoryObserver : IObservable<(UndoHistoryChangeEvent)->Any?>
     val trackingImageObserver : IObservable<ImageObserver>
@@ -40,7 +41,7 @@ interface ICentralObservatory {
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     : ICentralObservatory
 {
-    //override val omniImageObserver: ICruddyOldObservable<ImageObserver> = CruddyOldOmniObserver { it.imageObservatory.imageObservable }
+    override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservable }
 
     override val trackingUndoHistoryObserver: IObservable<(UndoHistoryChangeEvent) -> Any?> = TrackingObserver { it.undoEngine.undoHistoryObserver }
     override val trackingImageObserver : IObservable<ImageObserver> = TrackingObserver {it.imageObservatory.imageObservable}
@@ -54,7 +55,6 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind}
     override val currentAnimationSpaceBind: IBindable<AnimationSpace?> = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
 
-/*
     private inner  class OmniObserver<T>(val finder: (IImageWorkspace) -> IObservable<T>) : IObservable<T> {
         override fun addObserver(observer: IObserver<T>, trigger: Boolean): IContract = ObserverContract(observer)
 
@@ -65,9 +65,10 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
        }
 
         private val _pipingObs = object : IObserver<T> {
-            override val trigger: T?
-                get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-
+            // TODO: Clear out empty Triggers (or maybe rethink that entire relationship)
+            override val triggers get() = _binds.asSequence()
+                        .mapNotNull { it.observer.triggers }
+                        .flatten()
         }
 
         private val _wsKs = mutableMapOf<IImageWorkspace,IContract>()
@@ -77,12 +78,11 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
             override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) { }
             override fun workspaceCreated(newWorkspace: IImageWorkspace) {
                 // Shouldn't have to check for map re-population of same node
-                _wsKs[newWorkspace] = finder(newWorkspace).addObserver()
+                _wsKs[newWorkspace] = finder(newWorkspace).addObserver(_pipingObs)
             }
 
         }.observer())
     }
-*/
 
     private inner class TrackingBinder<T>(val finder: (IImageWorkspace) -> IBindable<T>) : IBindable<T?>
     {
