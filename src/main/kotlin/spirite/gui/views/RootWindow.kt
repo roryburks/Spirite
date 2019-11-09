@@ -97,7 +97,9 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem(".&__DB_GL"),
 
                 MenuItem("&Debug"),
-                MenuItem(".Commands To Clipboard", DebugCommands.CommandHistoryToClipboard)
+                MenuItem(".Commands To Clipboard", DebugCommands.CommandHistoryToClipboard),
+                MenuItem(".Brk", DebugCommands.Breakpoint)
+
         )
 
         val bar = SwMenuBar()

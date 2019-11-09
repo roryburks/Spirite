@@ -45,4 +45,7 @@ object DebugCommands
                 .joinToString("\n")
         Hybrid.clipboard.postToClipboard( executedCmdString )
     }
+    val Breakpoint = DebugCmd("brk"){
+        println("brk")
+    }
 }

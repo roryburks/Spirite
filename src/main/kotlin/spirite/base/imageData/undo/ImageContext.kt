@@ -5,9 +5,11 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
+import spirite.base.imageData.mediums.DynamicMedium
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
+import spirite.pc.TestConfig
 
 val MAX_TICKS_PER_KEY = 10
 
@@ -150,7 +152,11 @@ constructor(
         }
 
         override fun performImageAction(built: BuiltMediumData) {
-            workspace.mediumRepository.replaceMediumDirect( medium, frame.dupe(workspace))
+
+            (frame as? DynamicMedium)?.image?.base?.apply { TestConfig.trySave(this,"1.png") }
+            val duped = frame.dupe(workspace)
+            (duped as? DynamicMedium)?.image?.base?.apply { TestConfig.trySave(this,"2.png") }
+            workspace.mediumRepository.replaceMediumDirect( medium, duped)
             medium.refresh()
         }
 

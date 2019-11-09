@@ -12,6 +12,7 @@ import spirite.base.graphics.rendering.RenderEngine
 import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumRepository
+import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
@@ -38,11 +39,15 @@ class ImageContextTests {
             val ws = master.createWorkspace(100,100)
             val medium = DynamicMedium(ws)
             val handle = ws.mediumRepository.addMedium(medium)
+            val layer = SimpleLayer(handle)
+            ws.groupTree.importLayer(null, "thing", layer, true)
             val drawer = medium.getImageDrawer(ArrangedMediumData(handle, 0f, 0f))
             drawer.startStroke(StrokeParams(), PenState(0f, 0f, 1f))
             drawer.stepStroke(PenState(100f, 100f, 1f))
             drawer.endStroke()
-            println("zzz:"+medium.getColor(50, 50).argb32)
+
+            val img1 = ws.renderEngine.renderWorkspace(ws)
+            println("G:${img1.getARGB(50,50)}")
 
             ws.undoEngine.undo()
             for (x in 0..99){
@@ -50,6 +55,9 @@ class ImageContextTests {
                     assertEquals(0, medium.getColor(x, y).argb32)
                 }
             }
+
+            val img2 = ws.renderEngine.renderWorkspace(ws)
+            println("H:${img2.getARGB(50,50)}")
         }
     }
 

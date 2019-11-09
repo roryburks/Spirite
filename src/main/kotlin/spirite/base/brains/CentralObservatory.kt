@@ -7,6 +7,7 @@ import rb.owl.bindable.IBindObserver
 import rb.owl.bindable.IBindable
 import rb.owl.bindable.OnChangeEvent
 import rb.owl.bindable.addObserver
+import rb.owl.observer
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -53,6 +54,36 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
     override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind}
     override val currentAnimationSpaceBind: IBindable<AnimationSpace?> = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
+
+/*
+    private inner  class OmniObserver<T>(val finder: (IImageWorkspace) -> IObservable<T>) : IObservable<T> {
+        override fun addObserver(observer: IObserver<T>, trigger: Boolean): IContract = ObserverContract(observer)
+
+        private val _binds = mutableListOf<ObserverContract>()
+        private inner class ObserverContract(val observer: IObserver<T>):IContract {
+            init{ _binds.add(this)}
+            override fun void() { _binds.remove(this) }
+       }
+
+        private val _pipingObs = object : IObserver<T> {
+            override val trigger: T?
+                get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+        }
+
+        private val _wsKs = mutableMapOf<IImageWorkspace,IContract>()
+
+        private val workspacK = workspaceSet.workspaceObserver.addObserver(object : IWorkspaceSet.WorkspaceObserver{
+            override fun workspaceRemoved(removedWorkspace: IImageWorkspace) { _wsKs.remove(removedWorkspace)?.void() }
+            override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) { }
+            override fun workspaceCreated(newWorkspace: IImageWorkspace) {
+                // Shouldn't have to check for map re-population of same node
+                _wsKs[newWorkspace] = finder(newWorkspace).addObserver()
+            }
+
+        }.observer())
+    }
+*/
 
     private inner class TrackingBinder<T>(val finder: (IImageWorkspace) -> IBindable<T>) : IBindable<T?>
     {
