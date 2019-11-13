@@ -55,7 +55,7 @@ class RenderEngine(
 {
 
     init {
-        centralObservatory.trackingImageObserver.addObserver(this.observer())
+        centralObservatory.omniImageObserver.addObserver(this.observer())
     }
 
     override fun pullImage(target: RenderTarget): RawImage {

@@ -1,6 +1,7 @@
 package spirite.base.brains
 
 import rb.IContract
+import rb.extendo.extensions.toHashMap
 import rb.owl.IObservable
 import rb.owl.IObserver
 import rb.owl.bindable.IBindObserver
@@ -71,7 +72,8 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
                         .flatten()
         }
 
-        private val _wsKs = mutableMapOf<IImageWorkspace,IContract>()
+        private val _wsKs = workspaceSet.workspaces
+                .toHashMap({it}, {finder(it).addObserver(_pipingObs)})
 
         private val workspacK = workspaceSet.workspaceObserver.addObserver(object : IWorkspaceSet.WorkspaceObserver{
             override fun workspaceRemoved(removedWorkspace: IImageWorkspace) { _wsKs.remove(removedWorkspace)?.void() }
@@ -80,7 +82,6 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
                 // Shouldn't have to check for map re-population of same node
                 _wsKs[newWorkspace] = finder(newWorkspace).addObserver(_pipingObs)
             }
-
         }.observer())
     }
 
