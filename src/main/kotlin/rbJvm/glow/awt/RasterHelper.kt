@@ -2,7 +2,7 @@ package rbJvm.glow.awt
 
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
-
+import java.awt.image.DataBufferInt
 
 
 object RasterHelper
@@ -20,6 +20,10 @@ object RasterHelper
         val buff = bi.raster.dataBuffer as? DataBufferByte
         if(buff != null)
             return buff.data
+        val buffInt = bi.raster.dataBuffer as? DataBufferInt
+        if( buffInt != null)
+            return buffInt.data
+        println("bad ${bi.raster.dataBuffer.javaClass}")
         return bi.getRGB(0, 0, bi.width, bi.height, null, 0, bi.width )
     }
 }

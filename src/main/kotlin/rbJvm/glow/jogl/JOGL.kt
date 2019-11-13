@@ -147,8 +147,10 @@ class JOGL(
 
     override fun texImage2D(target: Int, level: Int, internalformat: Int, format: Int, type: Int, source: ITextureSource) {
         when( source) {
-            is JOGLBlankTexture ->
-                gl.glTexImage2D( target, level, internalformat, source.width, source.height, 0, format, type, null)
+            is JOGLBlankTexture -> {
+                val buff = ByteBuffer.allocate(source.width * source.height * 4)
+                gl.glTexImage2D(target, level, internalformat, source.width, source.height, 0, format, type, buff)
+            }
             is JOGLTextureSource ->
                 gl.glTexImage2D( target, level, internalformat, source.width, source.height, 0, format, type, source.buffer)
         }

@@ -12,6 +12,7 @@ import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.hybrid.Hybrid
+import spirite.pc.TestConfig
 
 /**
  * The Render Engine has two primary jobs:
