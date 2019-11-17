@@ -50,7 +50,7 @@ class SpriteLayer : Layer {
     {
         this.type = type
         this.workspace = workspace
-        _parts.add(SpritePart(SpritePartStructure(0, "base"), workspace.mediumRepository.addMedium(makeThing(workspace)), workingId++))
+        _parts.add(SpritePart(SpritePartStructure(0, "base"), workspace.mediumRepository.addMedium(makeThing(workspace)), _workingId++))
         activePart = _parts.first()
     }
 
@@ -61,7 +61,7 @@ class SpriteLayer : Layer {
     {
         this.type = type
         this.workspace = workspace
-        toImport.forEach {_parts.add(SpritePart(it.second, it.first, workingId++))}
+        toImport.forEach {_parts.add(SpritePart(it.second, it.first, _workingId++))}
         _sort()
         activePart = _parts.first()
     }
@@ -74,7 +74,7 @@ class SpriteLayer : Layer {
         this.type = type
         this.workspace = workspace
         toImport.forEach {
-            _parts.add(SpritePart(it, workspace.mediumRepository.addMedium(makeThing(workspace)), workingId++))
+            _parts.add(SpritePart(it, workspace.mediumRepository.addMedium(makeThing(workspace)), _workingId++))
         }
         _sort()
         activePart = _parts.first()
@@ -84,7 +84,7 @@ class SpriteLayer : Layer {
     val undoEngine get() = workspace.undoEngine
     val parts : List<SpritePart> get() = _parts
     private val _parts = mutableListOf<SpritePart>()
-    private var workingId = 0
+    private var _workingId = 0
 
     var multiSelect by OnChangeDelegate<Set<SpritePart>?>(null) {
         if( it != null) {
@@ -105,6 +105,7 @@ class SpriteLayer : Layer {
                 cRotBind.field = new?.rot ?: 0f
                 multiSelect = null
 
+                // For all Linked SpriteLayes, also set the active part to the one selected.
                 val name = new?.partName
                 if( name != null) {
                     getAllLinkedLayers()
@@ -220,7 +221,6 @@ class SpriteLayer : Layer {
     override fun dupe(workspace: MImageWorkspace) =
             SpriteLayer( workspace, parts.map { Pair(workspace.mediumRepository.addMedium(it.handle.medium.dupe(workspace)), SpritePartStructure(it)) }, type)
     // endregion
-
 
     // region Part Add/Insert/Move/Remove
     fun addPart(partName: String, depth: Int? = null, linked: Boolean = false)
@@ -352,7 +352,7 @@ class SpriteLayer : Layer {
 
         val name = StringUtil.getNonDuplicateName( _parts.map { it.partName }, structure.partName)
         val newStructure = structure.copy(partName =  name)
-        val toAdd = SpritePart(newStructure, handle, workingId++)
+        val toAdd = SpritePart(newStructure, handle, _workingId++)
 
 
         undoEngine.performAndStore( object: NullAction() {
@@ -457,7 +457,6 @@ class SpriteLayer : Layer {
 
         // region Shadowing SpritePartStructure scroll with Undoable Wrapper
         var visible get() = structure.visible ; set(value) { if( value != structure.visible) replaceStructure(structure.copy(visible = value), 1)}
-        var partName get() = structure.partName ; set(value) { if( value != structure.partName) replaceStructure(structure.copy(partName = value), 2)}
         var alpha get() = structure.alpha ; set(value) { if( value != structure.alpha) replaceStructure(structure.copy(alpha = value), 3)}
         var transX get() = structure.transX ; set(value) { if( value != structure.transX) replaceStructure(structure.copy(transX = value), 4)}
         var transY get() = structure.transY ; set(value) { if( value != structure.transY) replaceStructure(structure.copy(transY = value), 5)}
@@ -467,6 +466,20 @@ class SpriteLayer : Layer {
         var centerX get() = structure.centerX ; set(value) { if( value != structure.centerX) replaceStructure(structure.copy(centerX = value), 9)}
         var centerY get() = structure.centerY ; set(value) { if( value != structure.centerY) replaceStructure(structure.copy(centerY = value), 10)}
 
+        var partName
+            get() = structure.partName
+            set(value) {
+                if( value != structure.partName) {
+                    // Avoid Creating a dupe name as that is a key.  Note: we purposefully do not check for nondupe
+                    // across linked sprites because that is a valid action(it creates the link)
+                    val currentNames = parts
+                            .filter { it != this }
+                            .map { it.partName }
+                    val nondupeName = StringUtil.getNonDuplicateName(currentNames, value)
+                    replaceStructure(structure.copy(partName = nondupeName), 2)
+                }
+
+            }
 
         private fun replaceStructure( newStructure: SpritePartStructure, structureCode: Int) {
             if( structure != newStructure) {
