@@ -107,24 +107,34 @@ class RootWindow( val master: IMasterControl) : JFrame() {
         jMenuBar = bar
     }
 
+    // Structure and Reference Region:
+    // Note: when I have the Omni Components and containers more fleshed out, getting these will be more
+    // the job of the FrameManager than the Root View
     val groupView = GroupView(master)
     val topLevelView = TopLevelPopupView()
+    val toolSection = ToolSection(master)
+    val animStrutView = AnimationStructureView(master)
+    val toolSettingSection = ToolSettingsSection(master)
+    val paletteSection = PaletteSection(master)
+    val refView = ReferenceView()
+    val animListView = AnimationListView(master)
+    val layerPropertiesView = LayerPropertiesPanel(master)
 
     private val omni = OmniContainer {
         left += OmniSegment(groupView, 100, 300)
         center = SubContainer(200,200) {
             center = OmniSegment(workTabPane, 200)
-            bottom += OmniSegment(AnimationStructureView(master), 100, 200, false)
+            bottom += OmniSegment(animStrutView, 100, 200, false)
         }
         right += SubContainer(100, 120) {
-            top += OmniSegment(ToolSection(master), 64, 100)
-            top += OmniSegment(ToolSettingsSection(master), 200, 200)
+            top += OmniSegment(toolSection, 64, 100)
+            top += OmniSegment(toolSettingSection, 200, 200)
 
-            center = OmniSegment( PaletteSection(master), 100)
+            center = OmniSegment( paletteSection , 100)
         }
         right += SubContainer(100,120) {
-            center = OmniTab(listOf(ReferenceView(), AnimationListView(master)), 100)
-            bottom += OmniSegment( LayerPropertiesPanel(master), 200)
+            center = OmniTab(listOf(refView, animListView), 100)
+            bottom += OmniSegment( layerPropertiesView, 200)
         }
     }
 

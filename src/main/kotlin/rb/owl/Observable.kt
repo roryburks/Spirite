@@ -19,7 +19,9 @@ interface IObservable<T> {
 
 class Observable<T> : IObservable<T>
 {
-    override fun addObserver(observer: IObserver<T>, trigger: Boolean): IContract = MetaContract(observer)
+    override fun addObserver(observer: IObserver<T>, trigger: Boolean): IContract {
+        return MetaContract(observer)
+    }
 
     fun trigger(lambda : (T)->Unit) {
         observers.removeAll { it.observer.triggers ?.forEach(lambda) == null }

@@ -44,7 +44,7 @@ class ToolSection (
         imp.data.clear()
         imp.data.add(toolset.toolsForDrawer(workspace?.run { activeDrawer } ?: NillImageDrawer))
         imp.data.selected = currentTool
-    })
+    }, true)
 
     init {
         imp.enabled = false

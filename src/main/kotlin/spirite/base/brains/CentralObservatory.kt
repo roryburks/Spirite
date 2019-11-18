@@ -42,19 +42,33 @@ interface ICentralObservatory {
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     : ICentralObservatory
 {
-    override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservable }
+    // OmniObservers (trigger any time something happens on any Workspace regardless of it it's currently active)
+    override val omniImageObserver: IObservable<ImageObserver>
+            = OmniObserver { it.imageObservatory.imageObservable }
 
-    override val trackingUndoHistoryObserver: IObservable<(UndoHistoryChangeEvent) -> Any?> = TrackingObserver { it.undoEngine.undoHistoryObserver }
-    override val trackingImageObserver : IObservable<ImageObserver> = TrackingObserver {it.imageObservatory.imageObservable}
-    override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObservable }
-    override val trackingAnimationObservable: IObservable<AnimationObserver> = TrackingObserver { it.animationManager.animationObservable }
-    override val trackingAnimationStateObserver: IObservable<AnimationStructureChangeObserver> = TrackingObserver { it.animationManager.animationStructureChangeObservable }
-    override val trackingActiveDrawerObserver: IObservable<() -> Unit> = TrackingObserver { it.activeDrawerObs }
+    // Tracking Observers (triggers only for active workspace)
+    override val trackingUndoHistoryObserver: IObservable<(UndoHistoryChangeEvent) -> Any?>
+            = TrackingObserver ({ it.undoEngine.undoHistoryObserver })
+    override val trackingImageObserver : IObservable<ImageObserver>
+            = TrackingObserver ({it.imageObservatory.imageObservable})
+    override val trackingPrimaryTreeObserver: IObservable<TreeObserver>
+            = TrackingObserver ({ it.groupTree.treeObservable })
+    override val trackingAnimationObservable: IObservable<AnimationObserver>
+            = TrackingObserver ({ it.animationManager.animationObservable })
+    override val trackingAnimationStateObserver: IObservable<AnimationStructureChangeObserver>
+            = TrackingObserver ({ it.animationManager.animationStructureChangeObservable })
+    override val trackingActiveDrawerObserver: IObservable<() -> Unit>
+            = TrackingObserver ({ it.activeDrawerObs }, {it.triggerActiveDrawerChange()})
 
-    override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
-    override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
-    override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind}
-    override val currentAnimationSpaceBind: IBindable<AnimationSpace?> = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
+    // Tracking Binders
+    override val activeDataBind: IBindable<MediumHandle?>
+            = TrackingBinder { it.activeMediumBind }
+    override val selectedNode : IBindable<Node?>
+            = TrackingBinder { it.groupTree.selectedNodeBind }
+    override val currentAnimationBind : IBindable<Animation?>
+            = TrackingBinder { it.animationManager.currentAnimationBind}
+    override val currentAnimationSpaceBind: IBindable<AnimationSpace?>
+            = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
 
     private inner  class OmniObserver<T>(val finder: (IImageWorkspace) -> IObservable<T>) : IObservable<T> {
         override fun addObserver(observer: IObserver<T>, trigger: Boolean): IContract = ObserverContract(observer)
@@ -116,7 +130,10 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
         }
     }
 
-    private inner class TrackingObserver<T>(val finder : (IImageWorkspace) -> IObservable<T>) : IObservable<T>
+    private inner class TrackingObserver<T>(
+            val finder : (IImageWorkspace) -> IObservable<T>,
+            val onChangeTrigger: ((IImageWorkspace)->Unit)? = null)
+        : IObservable<T>
     {
         override fun addObserver(observer: IObserver<T>, trigger: Boolean) : IContract {
             current?.also { currentContracts.add(it.addObserver(observer, trigger)) }
@@ -138,7 +155,8 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
                 current = newT
                 binds.asSequence()
                         .map { it.observer }
-                        .forEach { newT.addObserver(it, false) }    // TODO Should trigger be saved, defaulted to false, or removed?
+                        .forEach { newT.addObserver(it, true) }    // TODO Should trigger be saved, defaulted to false, or removed?
+                onChangeTrigger?.invoke(new)
             }
             else current = null
         }
