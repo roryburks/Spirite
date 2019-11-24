@@ -25,4 +25,4 @@ jobs:
     - name: Test
       uses: eskatos/gradle-command-action@v1
       with: 
-        arguments: test --tests "sjunit.pc.InitializationTests.basicInitializeTest"
+        arguments: --version
