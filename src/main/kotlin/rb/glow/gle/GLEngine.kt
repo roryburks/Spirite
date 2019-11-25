@@ -86,6 +86,7 @@ class GLEngine(
     override var width : Int = 1 ; private set
     override var height : Int = 1 ; private set
 
+    class GlBindFramebufferException(msg: String) : GLEException(msg)
     override var target: IGLTexture? = null
         set(value) {
             
@@ -116,7 +117,7 @@ class GLEngine(
                     val status = gl.checkFramebufferStatus(GLC.FRAMEBUFFER)
                     when(status) {
                         GLC.FRAMEBUFFER_COMPLETE -> {}
-                        else -> throw GLEException("Failed to bind Framebuffer: $status")
+                        else -> throw GlBindFramebufferException("Failed to bind Framebuffer: $status")
                     }
                 }
             }

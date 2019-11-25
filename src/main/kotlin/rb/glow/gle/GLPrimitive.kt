@@ -41,7 +41,8 @@ class PreparedPrimitive(
         val gl: IGL)
     : IPreparedPrimitive
 {
-    val buffer = gl.createBuffer() ?: throw GLEException("Failed to create Buffer")
+    class GlCreateBufferException(msg: String) : GLEException(msg)
+    val buffer = gl.createBuffer() ?: throw GlCreateBufferException("Failed to create Buffer")
 
     init {
         gl.bindBuffer(GLC.ARRAY_BUFFER, buffer)

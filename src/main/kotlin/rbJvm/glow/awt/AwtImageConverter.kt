@@ -35,6 +35,7 @@ class AwtImageConverter(
 
     val c = GLImage::class.java
 
+    class GLCreateTextureException(msg: String) : GLEException(msg)
     inline fun <reified T> convertOrNull(from: IImage) : T? {
         // Ugly
         if( from is T)
@@ -45,7 +46,7 @@ class AwtImageConverter(
                 val gle = gleGetter()
                 val gl = gle!!.gl
 
-                val tex = gl.createTexture() ?: throw GLEException("Failed to create texture.")
+                val tex = gl.createTexture() ?: throw GLCreateTextureException("Failed to create texture.")
                 gl.bindTexture(GLC.TEXTURE_2D, tex)
                 gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_MIN_FILTER, GLC.NEAREST)
                 gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_MAG_FILTER, GLC.NEAREST)

@@ -124,19 +124,23 @@ class GL330ShaderLoader(val gl: IGL, val scriptService: IScriptService) : IGLSha
         return program
     }
 
+    class GlCreateShaderException(msg: String) : GLEException(msg)
+    class GlCompileShaderException(msg: String) : GLEException(msg)
     private fun compileShader(type: Int, source: String) : IGLShader {
-        val shader = gl.createShader( type) ?: throw GLEException("Couldn't allocate OpenGL shader resources of type $type")
+        val shader = gl.createShader( type) ?: throw GlCreateShaderException("Couldn't allocate OpenGL shader resources of type $type")
 
         val linkedSource = source.replace(GLOBAL, globalFrag)
         gl.shaderSource(shader, linkedSource)
         gl.compileShader(shader)
 
         if( !gl.shaderCompiledSuccessfully(shader))
-            throw GLEException("Failed to compile shader: ${gl.getShaderInfoLog(shader)}\n $source")
+            throw GlCompileShaderException("Failed to compile shader: ${gl.getShaderInfoLog(shader)}\n $source")
 
         return shader
     }
 
+    class GlCreateProgramException( msg: String) : GLEException(msg)
+    class GlLinkShaderException( msg: String) : GLEException(msg)
     private fun linkProgram( shaders: List<IGLShader>) : IGLProgram {
         val program = gl.createProgram() ?: throw GLEException("Couldn't allocate OpenGL program resources.")
 
@@ -144,7 +148,7 @@ class GL330ShaderLoader(val gl: IGL, val scriptService: IScriptService) : IGLSha
         gl.linkProgram( program)
 
         if( !gl.programLinkedSuccessfully( program))
-            throw GLEException("Failed to groupLink shader: ${gl.getProgramInfoLog(program)}\n")
+            throw GlLinkShaderException("Failed to groupLink shader: ${gl.getProgramInfoLog(program)}\n")
 
         shaders.forEach { gl.detatchShader(program, it) }
         return program
