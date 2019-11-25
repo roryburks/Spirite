@@ -11,17 +11,18 @@ import org.junit.Test as test
 class InitializationTests {
     fun doInitTest(lambda : (MasterControl)->Unit) {
         var ran = false
-        runBlocking {
+        //runBlocking {
             val root = Spirite()
             root.run()
 
             while(!root.ready){
-                delay(100)
+                Thread.sleep(100)
+                //delay(100)
             }
 
             ran = true
             lambda(root.master)
-        }
+        //}
         assertTrue(ran)
     }
 
