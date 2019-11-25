@@ -15,6 +15,7 @@ import kotlin.reflect.KClass
 typealias NativeImage = ImageBI
 typealias InternalImage = GLImage
 
+class GLCreateTextureException(msg: String) : GLEException(msg)
 
 class AwtImageConverter(
         val gleGetter : () -> IGLEngine?)
@@ -35,7 +36,6 @@ class AwtImageConverter(
 
     val c = GLImage::class.java
 
-    class GLCreateTextureException(msg: String) : GLEException(msg)
     inline fun <reified T> convertOrNull(from: IImage) : T? {
         // Ugly
         if( from is T)

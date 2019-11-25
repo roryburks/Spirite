@@ -13,6 +13,8 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.f
 
+class GlBindFramebufferException(msg: String) : GLEException(msg)
+
 interface IGLEngine
 {
     val tesselator : IPolygonTesselator
@@ -86,7 +88,6 @@ class GLEngine(
     override var width : Int = 1 ; private set
     override var height : Int = 1 ; private set
 
-    class GlBindFramebufferException(msg: String) : GLEException(msg)
     override var target: IGLTexture? = null
         set(value) {
             

@@ -8,6 +8,10 @@ import rb.glow.gl.IGLShader
 import rb.glow.gle.*
 import spirite.base.resources.IScriptService
 
+class GlCreateProgramException( msg: String) : GLEException(msg)
+class GlLinkShaderException( msg: String) : GLEException(msg)
+class GlCreateShaderException(msg: String) : GLEException(msg)
+class GlCompileShaderException(msg: String) : GLEException(msg)
 
 class GL330ShaderLoader(val gl: IGL, val scriptService: IScriptService) : IGLShaderLoader {
     private val root = "shaders/330"
@@ -124,8 +128,6 @@ class GL330ShaderLoader(val gl: IGL, val scriptService: IScriptService) : IGLSha
         return program
     }
 
-    class GlCreateShaderException(msg: String) : GLEException(msg)
-    class GlCompileShaderException(msg: String) : GLEException(msg)
     private fun compileShader(type: Int, source: String) : IGLShader {
         val shader = gl.createShader( type) ?: throw GlCreateShaderException("Couldn't allocate OpenGL shader resources of type $type")
 
@@ -139,10 +141,8 @@ class GL330ShaderLoader(val gl: IGL, val scriptService: IScriptService) : IGLSha
         return shader
     }
 
-    class GlCreateProgramException( msg: String) : GLEException(msg)
-    class GlLinkShaderException( msg: String) : GLEException(msg)
     private fun linkProgram( shaders: List<IGLShader>) : IGLProgram {
-        val program = gl.createProgram() ?: throw GLEException("Couldn't allocate OpenGL program resources.")
+        val program = gl.createProgram() ?: throw GlCreateProgramException("Couldn't allocate OpenGL program resources.")
 
         shaders.forEach { gl.attachShader(program, it) }
         gl.linkProgram( program)

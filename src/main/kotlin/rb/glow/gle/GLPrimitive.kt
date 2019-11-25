@@ -36,12 +36,12 @@ data class GLPrimitive(
     override fun prepare(gl: IGL) = PreparedPrimitive(this, gl)
 }
 
+class GlCreateBufferException(msg: String) : GLEException(msg)
 class PreparedPrimitive(
         val primative: GLPrimitive,
         val gl: IGL)
     : IPreparedPrimitive
 {
-    class GlCreateBufferException(msg: String) : GLEException(msg)
     val buffer = gl.createBuffer() ?: throw GlCreateBufferException("Failed to create Buffer")
 
     init {
