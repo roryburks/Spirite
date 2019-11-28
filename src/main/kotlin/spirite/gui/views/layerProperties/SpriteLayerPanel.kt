@@ -4,6 +4,7 @@ import rb.IContract
 import rb.glow.color.Colors
 import rb.owl.Observer
 import rb.owl.bindable.Bindable
+import rbJvm.glow.awt.NativeImage
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
 import sgui.components.IBoxList.IBoxComponent
@@ -14,14 +15,23 @@ import sgui.components.crossContainer.ICrossPanel
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.IWorkspaceSet
+import spirite.base.graphics.rendering.DerivedNativeThumbnailStore
+import spirite.base.graphics.rendering.IThumbnailStore
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
+import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.SpriteLayerContextMenus
 import spirite.gui.resources.SpiriteIcons
 import spirite.hybrid.Hybrid
 
-class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
+class SpriteLayerPanel(
+        workspaceSet: IWorkspaceSet,
+        nativeThumbnailStore: IThumbnailStore<NativeImage>,
+        contextMenus: IContextMenus) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
+    constructor(master: IMasterControl) : this(master.workspaceSet, master.nativeThumbnailStore, master.contextMenus)
+
     private var _activePartK : IContract? = null
     private var _layerChangeObsK : IContract? = null
 
@@ -54,7 +64,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                 _btnVisibilityK?.void()
 
                 if( value != null) {
-                    _activePartK = activePartBind.bindWeaklyTo(value.activePartBind)
+                    _activePartK = activePartBind.bindTo(value.activePartBind)
                     boxList.data.resetAllWithSelection(value.parts,  selectionSetForSprite(value) , value.activePart)
                     _layerChangeObsK = value.layerChangeObserver.addWeakObserver(onPartChange)
 
@@ -93,7 +103,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
     private val activePartBind = Bindable<SpritePart?>(null)
     private var activePart: SpritePart? by activePartBind
 
-    private val boxList = Hybrid.ui.BoxList<SpritePart>(32, 32)
+    val boxList = Hybrid.ui.BoxList<SpritePart>(32, 32)
     private val tfTransX = Hybrid.ui.FloatField()
     private val tfTransY = Hybrid.ui.FloatField()
     private val tfScaleX =  Hybrid.ui.FloatField()
@@ -105,7 +115,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
 
     private val btnNewPart = Hybrid.ui.Button()
-    private val btnRemovePart = Hybrid.ui.Button()
+    val btnRemovePart = Hybrid.ui.Button()
     private val btnVisibility = Hybrid.ui.ToggleButton()
 
     init {
@@ -144,8 +154,8 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                             this += {
                                 val thumbnail = Hybrid.ui.ImageBox()
                                 thumbnail.checkeredBackground = true
-                                thumbnail.ref = master.workspaceSet.currentWorkspace?.run {
-                                    master.nativeThumbnailStore.contractThumbnail(part, this) {
+                                thumbnail.ref = workspaceSet.currentWorkspace?.run {
+                                    nativeThumbnailStore.contractThumbnail(part, this) {
                                         thumbnail.setImage(it)
                                     }
                                 }
@@ -169,7 +179,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
                 override fun onClick(mouseEvent: MouseEvent) {
                     if( mouseEvent.button == RIGHT) {
-                        master.contextMenus.LaunchContextMenu(
+                        contextMenus.LaunchContextMenu(
                                 mouseEvent.point,
                                 SpriteLayerContextMenus.schemeForSprite(part),
                                 part)
