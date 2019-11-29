@@ -28,7 +28,7 @@ fun <T> IObservable<T>.addWeakObserver(t: T, trigger: Boolean = true) : IContrac
 fun <T> IBindable<T>.addWeakObserver(trigger: Boolean = true, t: (new: T, old: T)->Unit) : IContract =
         WeakObserverContract(this.addObserver(WeakObserver(t)),t)
 
-private class WeakObserverContract<T>(private val bindContract: IContract, val t: T) : IContract {
+private class WeakObserverContract<T>(private val bindContract: IContract, t: T) : IContract {
     override fun void() {bindContract.void()}
 }
 
@@ -79,13 +79,19 @@ fun <T> Bindable<T>.bindWeaklyTo(root: Bindable<T>) : IContract
 {
     this.field = root.field
     val weakBind = WeakBindable(root.field)
-    return DoubleContract(weakBind.bindTo(root), weakBind.bindTo(this))
+    return DoubleContract(
+            WeakObserverContract(weakBind.bindTo(root),root),
+            WeakObserverContract(weakBind.bindTo(this),this))
 }
 
-private class DoubleContract(val contract1: IContract, val contract2: IContract) : IContract
+private class DoubleContract(contract1: IContract, contract2: IContract) : IContract
 {
+    var c1 : IContract? = contract1
+    var c2: IContract? = contract2
     override fun void() {
-        contract1.void()
-        contract2.void()
+        c1?.void()
+        c2?.void()
+        c1 = null
+        c2 = null
     }
 }
