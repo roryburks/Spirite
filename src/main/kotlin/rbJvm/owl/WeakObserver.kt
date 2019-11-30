@@ -12,11 +12,15 @@ import rb.owl.bindable.OnChangeEvent
 import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
 
+/** A WeakObserver is an Observer that does not have a strong reference to the trigger.  The idea being that the trigger
+ * will have strong references to several potentially-large objects.  Someone else should keep a firm rederence to the
+ * trigger.
+ */
 class WeakObserver<T>(trigger: T) : IObserver<T>
 {
     val description = trigger.toString()
     private val weakTrigger = WeakReference(trigger)
-    override val triggers : Sequence<T>? =  weakTrigger.get()?.run { SinglySequence(this) }
+    override val triggers : Sequence<T>? get() =   weakTrigger.get()?.run { SinglySequence(this) }
             ?: null.also{ println("$description fallen out of workspace.")}
 }
 
@@ -29,7 +33,11 @@ fun <T> IBindable<T>.addWeakObserver(trigger: Boolean = true, t: (new: T, old: T
         WeakObserverContract(this.addObserver(WeakObserver(t)),t)
 
 private class WeakObserverContract<T>(private val bindContract: IContract, t: T) : IContract {
-    override fun void() {bindContract.void()}
+    var t: T? = t
+    override fun void() {
+        bindContract.void()
+        t = null
+    }
 }
 
 class WeakBindable<T>(default: T) : IObservable<OnChangeEvent<T>>
