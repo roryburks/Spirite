@@ -8,7 +8,7 @@ import spirite.base.brains.WorkspaceSet
 import spirite.base.imageData.IImageObservatory
 import spirite.base.imageData.ImageObservatory
 import spirite.base.imageData.MImageWorkspace
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 open class CentralObservatoryTests {

@@ -6,7 +6,7 @@ import spirite.base.util.linear.Rect
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
 import kotlin.test.assertEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class ContentBoundsFinderTest {
     val gle = Hybrid.gle

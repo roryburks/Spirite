@@ -6,7 +6,7 @@ import spirite.base.brains.MasterControl
 import spirite.pc.Spirite
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class InitializationTests {
     fun doInitTest(lambda : (MasterControl)->Unit) {

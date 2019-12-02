@@ -3,7 +3,7 @@
 //
 //import rb.vectrix.linear.MatrixSpace
 //import rb.vectrix.linear.Vec2f
-//import org.junit.Test as test
+//import org.junit.jupiter.api.Test as test
 //
 //class MatrixSpaceTests {
 //

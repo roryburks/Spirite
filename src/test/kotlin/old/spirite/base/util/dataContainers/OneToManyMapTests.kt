@@ -3,7 +3,7 @@ package old.spirite.base.util.dataContainers
 
 import rb.extendo.dataStructures.MutableOneToManyMap
 import kotlin.test.assertEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class OneToManyMapTests {
     @test fun Inserts() {

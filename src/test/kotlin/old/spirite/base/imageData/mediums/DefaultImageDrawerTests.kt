@@ -2,7 +2,7 @@ package old.spirite.base.imageData.mediums
 
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import rb.glow.color.Colors
 import old.TestConfig
 import old.TestHelper

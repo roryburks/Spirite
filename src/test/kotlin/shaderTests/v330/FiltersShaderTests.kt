@@ -12,7 +12,7 @@
 //import rbJvm.glow.awt.toBufferedImage
 //import java.io.File
 //import javax.imageio.ImageIO
-//import org.junit.Test as test
+//import org.junit.jupiter.api.Test as test
 //
 //
 //class FiltersShaderTests {

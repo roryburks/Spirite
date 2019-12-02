@@ -1,6 +1,6 @@
 package old.spirite.base.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import rb.vectrix.compaction.DoubleEndedFloatCompactor;
 import rb.vectrix.compaction.FloatCompactor;
 import rb.vectrix.compaction.ReverseFloatCompactor;

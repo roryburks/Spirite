@@ -8,7 +8,7 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.NullContext
 import kotlin.test.assertEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class NullContextTests {
     val underTest = NullContext()

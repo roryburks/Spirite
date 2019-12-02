@@ -24,7 +24,7 @@ import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.test.assertEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class GLEngineTests {
     val gle = Hybrid.gle

@@ -10,7 +10,7 @@
 //import spirite.base.imageData.undo.*
 //import kotlin.test.assertEquals
 //import kotlin.test.assertSame
-//import org.junit.Test as test
+//import org.junit.jupiter.api.Test as test
 //
 //class UndoEngineTests {
 //    private val _mockImageWorkspace = mockk<IImageWorkspace>(relaxed = true)

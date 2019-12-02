@@ -1,6 +1,6 @@
 package old.spirite.gui
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import sguiSwing.advancedComponents.CrossContainer.CrossContainer
 import spirite.hybrid.Hybrid
 

@@ -9,7 +9,7 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.views.layerProperties.SpriteLayerPanel
 import kotlin.test.assertTrue
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class SpriteLayerTests{
     class MockUndo {

@@ -16,7 +16,7 @@ import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class NodeRendererTests {
     val gle = Hybrid.gle

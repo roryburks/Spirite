@@ -27,7 +27,7 @@ import javax.swing.SwingUtilities
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class ImageContextTests {
     @test fun basic(){

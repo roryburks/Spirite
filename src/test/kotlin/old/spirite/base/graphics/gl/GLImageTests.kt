@@ -12,7 +12,7 @@ import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class GLImageTests {
     val gle = Hybrid.gle

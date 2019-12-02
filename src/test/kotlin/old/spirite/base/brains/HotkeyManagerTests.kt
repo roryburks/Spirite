@@ -6,7 +6,7 @@ import spirite.base.brains.KeyCommand
 import spirite.base.brains.settings.JPreferences
 import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class HotkeyManagerTests {
     val preferences = JPreferences(HotkeyManagerTests::class.java)

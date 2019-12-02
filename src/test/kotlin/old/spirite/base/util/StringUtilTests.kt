@@ -3,7 +3,7 @@ package old.spirite.base.util
 
 import spirite.base.util.StringUtil
 import kotlin.test.assertEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class StringUtilTests {
 

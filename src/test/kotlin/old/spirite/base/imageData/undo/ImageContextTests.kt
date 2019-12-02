@@ -9,7 +9,7 @@ import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.undo.ImageAction
 import spirite.base.imageData.undo.ImageContext
 import kotlin.test.assertEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class ImageContextTests {
     val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)

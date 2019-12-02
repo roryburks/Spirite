@@ -2,7 +2,7 @@ package sjunit.rb.owl
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class BindableTests{

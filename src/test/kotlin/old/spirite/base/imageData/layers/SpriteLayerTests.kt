@@ -5,7 +5,7 @@ import old.TestHelper
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import kotlin.test.assertEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class SpriteLayerTests {
     val workspace = TestHelper.makeShellWorkspace(100,100)

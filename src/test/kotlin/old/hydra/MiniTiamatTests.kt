@@ -5,7 +5,7 @@ import kotlinx.coroutines.runBlocking
 import rb.hydra.miniTiamatGrind
 import rb.vectrix.mathUtil.d
 import kotlin.test.assertEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class MiniTiamatTests {
     @test fun Minimizes_Basic(){

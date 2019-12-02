@@ -1,6 +1,6 @@
 package old.spirite.base.graphics.gl
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import rb.glow.color.Colors
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage

@@ -4,7 +4,7 @@ import rbJvm.glow.jogl.JOGL
 import spirite.hybrid.Hybrid
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 class JOGLTests {
     @test fun StartsUp() {

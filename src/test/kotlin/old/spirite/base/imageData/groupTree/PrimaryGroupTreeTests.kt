@@ -9,7 +9,7 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
 import kotlin.test.assertEquals
-import org.junit.Test as test
+import org.junit.jupiter.api.Test as test
 
 open class PrimaryGroupTreeTests {
     val workspace = TestHelper.makeShellWorkspace(100,100)

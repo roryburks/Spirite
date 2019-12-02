@@ -3,7 +3,7 @@
 //import spirite.base.brains.palette.IPaletteManager.PaletteObserver
 //import spirite.base.brains.palette.PaletteManager
 //import kotlin.test.assertEquals
-//import org.junit.Test as test
+//import org.junit.jupiter.api.Test as test
 //
 //class PaletteManagerTests {
 //    val paletteManager = PaletteManager()
