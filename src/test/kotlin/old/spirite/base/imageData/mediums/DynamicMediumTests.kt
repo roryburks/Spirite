@@ -17,7 +17,7 @@
 //import java.io.File
 //import javax.imageio.ImageIO
 //import kotlin.test.assertEquals
-//import org.junit.jupiter.api.Test as test
+//import org.junit.jupiter.api.Test
 //
 //class DynamicMediumTests {
 //    val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)
@@ -28,7 +28,7 @@
 //        every { mockWorkspace.height } returns 100
 //    }
 //
-//    @test fun buildsDataAndDrawsToWSCorrectly() {
+//    @Test fun buildsDataAndDrawsToWSCorrectly() {
 //
 //        val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage(), mockWorkspace.mediumRepository)
 //        val built = dynamicMedium.buildInto(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
@@ -53,7 +53,7 @@
 //        assertEquals(0, workspaceImage.getARGB(15,15))
 //    }
 //
-//    @test fun buildsTransformedDataCorrectly() {
+//    @Test fun buildsTransformedDataCorrectly() {
 //        val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage(),mockWorkspace.mediumRepository)
 //        val tMediumToWorkspace = MutableTransformF.TranslationMatrix(-10f, -10f)
 //        val built = dynamicMedium.buildInto(ArrangedMediumData(MediumHandle(mockWorkspace, 0), tMediumToWorkspace))

@@ -10,13 +10,13 @@ import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.system.measureTimeMillis
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class GLFillTests {
-    @test fun TestFill400() {
+    @Test fun TestFill400() {
         TestFill(400)
     }
-    @test fun TestFill2000() {
+    @Test fun TestFill2000() {
         TestFill(2000)
     }
 

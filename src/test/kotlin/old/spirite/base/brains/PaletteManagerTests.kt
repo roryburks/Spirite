@@ -3,12 +3,12 @@
 //import spirite.base.brains.palette.IPaletteManager.PaletteObserver
 //import spirite.base.brains.palette.PaletteManager
 //import kotlin.test.assertEquals
-//import org.junit.jupiter.api.Test as test
+//import org.junit.jupiter.api.Test
 //
 //class PaletteManagerTests {
 //    val paletteManager = PaletteManager()
 //
-//    @test fun SetsAndGets() {
+//    @Test fun SetsAndGets() {
 //        paletteManager.setActiveColor(0, 1)
 //        paletteManager.setActiveColor(1, 2)
 //        paletteManager.setActiveColor(2, 3)
@@ -20,7 +20,7 @@
 //        assertEquals(4, paletteManager.getActiveColor(3))
 //    }
 //
-//    @test fun Cycles() {
+//    @Test fun Cycles() {
 //        paletteManager.setActiveColor(0, 1)
 //        paletteManager.setActiveColor(1, 2)
 //        paletteManager.setActiveColor(2, 3)
@@ -41,7 +41,7 @@
 //        assertEquals(2, paletteManager.getActiveColor(3))
 //    }
 //
-//    @test fun Triggers() {
+//    @Test fun Triggers() {
 //        // Arrange
 //        var triggered = false
 //        paletteManager.paletteObservable.addObserver( object : PaletteObserver {

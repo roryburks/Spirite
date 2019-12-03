@@ -1,13 +1,16 @@
 package old
 
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Tags
 import rbJvm.glow.jogl.JOGL
 import spirite.hybrid.Hybrid
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class JOGLTests {
-    @test fun StartsUp() {
+    @Tags(Tag("Old"), Tag("GPU"))
+    @Test fun StartsUp() {
         var x = false
         val gl = Hybrid.gl
 

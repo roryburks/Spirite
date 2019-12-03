@@ -6,18 +6,21 @@ import rb.glow.color.Colors
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
 import old.TestConfig
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Tags
 import spirite.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
+@Tags(Tag("Old"), Tag(("GPU")))
 class GLImageTests {
     val gle = Hybrid.gle
 
-    @test fun BasicGLFunctionality() {
+    @Test fun BasicGLFunctionality() {
         val glimage = GLImage(10, 10, gle)
 
         val gc = glimage.graphics
@@ -29,14 +32,14 @@ class GLImageTests {
 
         assertEquals(Colors.RED.argb, color)
     }
-    @test fun SuperBasicFunctionality() {
+    @Test fun SuperBasicFunctionality() {
         val glimage = GLImage(10, 12, gle)
 
         assertEquals( 10, glimage.width)
         assertEquals( 12, glimage.height)
     }
 
-    @test fun DeepCopy() {
+    @Test fun DeepCopy() {
         val glimage = GLImage(10, 10, gle)
 
         val gc = glimage.graphics
@@ -49,7 +52,7 @@ class GLImageTests {
 
         assertEquals(Colors.RED.argb, color)
     }
-    @test fun TestConvertToBi() {
+    @Test fun TestConvertToBi() {
         val glimage = GLImage(10, 12, gle)
         glimage.graphics.clear()
 
@@ -62,7 +65,7 @@ class GLImageTests {
             ImageIO.write(bi, "png", File("${TestConfig.saveLocation}\\testConversion.png"))
     }
 
-    @test fun SwitchesTargets() {
+    @Test fun SwitchesTargets() {
         val img1 = GLImage(25, 25, gle, false)
         val img2 = GLImage(25, 25, gle, false)
 
@@ -85,7 +88,7 @@ class GLImageTests {
             ImageIO.write(img3.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\testSwitches2.png"))
     }
 
-    @test fun DrawsNotPremultiplied() {
+    @Test fun DrawsNotPremultiplied() {
         val img1 = GLImage(25, 25, gle, true)
         val img2 = GLImage(25, 25, gle, false)
         val img3 = GLImage(25, 25, gle, true)

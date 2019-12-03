@@ -11,7 +11,7 @@ import spirite.base.imageData.undo.CompositeContext
 import spirite.base.imageData.undo.ImageContext
 import spirite.base.imageData.undo.NullContext
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class CompositeContextTests {
     val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)
@@ -21,7 +21,7 @@ class CompositeContextTests {
     val nullContext = NullContext()
     val contextUnderTest = CompositeContext(nullContext, imageContexts,mockWorkspace)
 
-    @test fun doesUndoRedo5() {
+    @Test fun doesUndoRedo5() {
         val actions = List(5, { CompositeAction(List(2,{ TestNullAction() }), "action$it") })
         actions.forEach { contextUnderTest.addAction(it) }
         actions.forEach { contextUnderTest.undo() }
@@ -30,7 +30,7 @@ class CompositeContextTests {
         assertEquals(5, contextUnderTest.size)
     }
 
-    @test fun clipsHead() {
+    @Test fun clipsHead() {
         val actions = List(5, { CompositeAction(List(2,{ TestNullAction() }), "action$it") })
         actions.forEach { contextUnderTest.addAction(it) }
         contextUnderTest.undo()
@@ -40,7 +40,7 @@ class CompositeContextTests {
         assertEquals(3, contextUnderTest.size)
     }
 
-    @test fun clipsTail()
+    @Test fun clipsTail()
     {
         val actions = List(5, { CompositeAction(List(2,{ TestNullAction() }), "action$it") })
         actions.forEach { contextUnderTest.addAction(it) }

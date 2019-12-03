@@ -1,10 +1,13 @@
 package old.spirite.base.util;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import rb.vectrix.interpolation.CubicSplineInterpolatorND;
 
 public class InterpolationTests {
 
+
+	@Tag("Old")
 	@Test
 	public void TestCubicND() {
 		float[][] points = new float[][] {

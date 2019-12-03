@@ -4,19 +4,22 @@ package old.spirite.base.graphics
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.awt.ImageBI
 import old.TestConfig
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Tags
 import spirite.base.graphics.DynamicImage
 import spirite.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
+@Tags(Tag("Old"),Tag("GPU"))
 class DynamicImageTests {
     val gle = Hybrid.gle
     val imageConverter = AwtImageConverter{gle}
 
-    @test fun testWorks() {
+    @Test fun testWorks() {
         val dynamicImage = DynamicImage()
         dynamicImage.drawToImage(100, 100, drawer = { raw ->
             raw.graphics.drawLine(20,20,50,30)
@@ -32,7 +35,7 @@ class DynamicImageTests {
             ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\dynamicImage.png"))
         }
     }
-    @test fun testNullsGracefully() {
+    @Test fun testNullsGracefully() {
         val dynamicImage = DynamicImage()
         dynamicImage.drawToImage(100, 100, drawer = { raw ->
             // NOTHING
@@ -40,7 +43,7 @@ class DynamicImageTests {
 
         assertNull( dynamicImage.base)
     }
-    @test fun testMultipleDraws() {
+    @Test fun testMultipleDraws() {
         val dynamicImage = DynamicImage()
         dynamicImage.drawToImage(100, 100, drawer = { raw ->
             raw.graphics.drawLine(20,20,50,30)

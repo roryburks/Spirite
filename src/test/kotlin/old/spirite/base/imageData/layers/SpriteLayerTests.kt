@@ -5,12 +5,12 @@ import old.TestHelper
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class SpriteLayerTests {
     val workspace = TestHelper.makeShellWorkspace(100,100)
 
-    @test fun makesSpriteLayer() {
+    @Test fun makesSpriteLayer() {
         val spriteLayer = SpriteLayer(workspace)
         (spriteLayer.parts[0].handle.medium as DynamicMedium).image.drawToImage(100, 100, drawer = {
             it.graphics.drawLine(0f,0f,10f,10f)
@@ -20,7 +20,7 @@ class SpriteLayerTests {
         assertEquals(10, spriteLayer.height)
     }
 
-    @test fun addsLayer() {
+    @Test fun addsLayer() {
         val spriteLayer = SpriteLayer(workspace)
         spriteLayer.addPart("foot")
 
@@ -38,7 +38,7 @@ class SpriteLayerTests {
         assertEquals( 1, spriteLayer.parts[1].depth)
     }
 
-    @test fun editsProperties() {
+    @Test fun editsProperties() {
         val layer1 = SpriteLayer(workspace)
         val layer2 = SpriteLayer(workspace)
 
@@ -61,7 +61,7 @@ class SpriteLayerTests {
         assertEquals(2, workspace.undoEngine.undoHistory.count())
     }
 
-    @test fun sortsByDepth() {
+    @Test fun sortsByDepth() {
         // Todo
     }
 }

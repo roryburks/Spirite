@@ -16,7 +16,7 @@
 //import java.io.File
 //import javax.imageio.ImageIO
 //import kotlin.test.assertEquals
-//import org.junit.jupiter.api.Test as test
+//import org.junit.jupiter.api.Test
 //
 //class TransformedHandleTests {
 //    val gle = Hybrid.gle
@@ -24,7 +24,7 @@
 //
 //    val workspace = TestHelper.makeShellWorkspace(100,100)
 //
-//    @test fun testStacks() {
+//    @Test fun testStacks() {
 //        val tf = TransformedHandle(
 //                MediumHandle(workspace, 0),
 //                0,
@@ -48,7 +48,7 @@
 //        assertEquals( 0.25f, tf3.renderRubric.alpha)
 //    }
 //
-//    @test fun renders() {
+//    @Test fun renders() {
 //        val rotate = MutableTransformF.TranslationMatrix(-50f,-50f)
 //        rotate.preRotate(1f)
 //        rotate.preTranslate(50f,50f)

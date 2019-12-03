@@ -2,6 +2,8 @@ package sjunit.base.imageData.undo
 
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Tags
 import rb.glow.color.Colors
 import rb.glow.gl.GLImage
 import rbJvm.vectrix.SetupVectrixForJvm
@@ -27,10 +29,11 @@ import javax.swing.SwingUtilities
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
+@Tags(Tag("Integration"))
 class ImageContextTests {
-    @test fun basic(){
+    @Test fun basic(){
         runTest {
             EngineLaunchpoint.gle
 
@@ -68,7 +71,7 @@ class ImageContextTests {
         }
     }
 
-    @test fun basicCreateContextTest(){
+    @Test fun basicCreateContextTest(){
         SetupVectrixForJvm()
         setupSwGuiStuff()
 

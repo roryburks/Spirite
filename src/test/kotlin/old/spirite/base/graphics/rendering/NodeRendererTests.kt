@@ -16,14 +16,14 @@ import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class NodeRendererTests {
     val gle = Hybrid.gle
     val imageConverter = AwtImageConverter{gle}
     val workspace = TestHelper.makeShellWorkspace(100,100)
 
-    @test fun RendersGroup() {
+    @Test fun RendersGroup() {
         val group = workspace.groupTree.addGroupNode(null,"Group1")
         val simpleLayer1 = workspace.groupTree.addNewSimpleLayer(group, "Layer1", FLAT, 50, 50)
         val simpleLayer2 = workspace.groupTree.addNewSimpleLayer(group, "Layer2", FLAT, 50, 50)
@@ -55,7 +55,7 @@ class NodeRendererTests {
         }
     }
 
-    @test fun RendersSubGroup() {
+    @Test fun RendersSubGroup() {
         val group = workspace.groupTree.addGroupNode(null,"Group1")
         val simpleLayer1 = workspace.groupTree.addNewSimpleLayer(group, "Layer1", FLAT, 50, 50)
         val groupInner = workspace.groupTree.addGroupNode(group,"Group1")
@@ -100,7 +100,7 @@ class NodeRendererTests {
         }
     }
 
-    @test fun RendersSubScaled() {
+    @Test fun RendersSubScaled() {
         val group = workspace.groupTree.addGroupNode(null,"Group1")
         val simpleLayer1 = workspace.groupTree.addNewSimpleLayer(group, "Layer1", FLAT, 50, 50)
         val groupInner = workspace.groupTree.addGroupNode(group,"Group1")

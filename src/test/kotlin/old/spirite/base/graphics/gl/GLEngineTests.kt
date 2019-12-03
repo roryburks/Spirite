@@ -24,15 +24,15 @@ import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class GLEngineTests {
     val gle = Hybrid.gle
 
-    @test fun StartsWithRealScripts() {
+    @Test fun StartsWithRealScripts() {
     }
 
-    @test fun TestBasicRendering() {
+    @Test fun TestBasicRendering() {
         val img = GLImage(50, 50, gle)
         val gc = img.graphics
         gc.clear()
@@ -61,7 +61,7 @@ class GLEngineTests {
             ImageIO.write(img.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\basicRendering.png"))
     }
 
-    @test fun TestComplexLineProgram() {
+    @Test fun TestComplexLineProgram() {
         val img = GLImage(50, 50, gle)
         val gc = img.graphics
         gc.clear()
@@ -93,7 +93,7 @@ class GLEngineTests {
     }
 
     // Draws using all the shaders and outputs it to an image
-    @test fun writeOutPassShaders() {
+    @Test fun writeOutPassShaders() {
         // Draw the base star
         val star = GLImage(50, 50, gle)
         val gc = star.graphics
@@ -141,7 +141,7 @@ class GLEngineTests {
             ImageIO.write(image.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\shaders.png"))
     }
 
-    @test fun doStroke() {
+    @Test fun doStroke() {
         val image = GLImage(100, 100, gle)
 
         gle.setTarget(image)

@@ -6,7 +6,7 @@ import spirite.base.brains.MasterControl
 import spirite.pc.Spirite
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class InitializationTests {
     fun doInitTest(lambda : (MasterControl)->Unit) {
@@ -26,13 +26,13 @@ class InitializationTests {
         assertTrue(ran)
     }
 
-    @test fun basicInitializeTest() {
+    @Test fun basicInitializeTest() {
         doInitTest {
             assertNotNull(it)
         }
     }
 
-    @test fun initializeToolsets(){
+    @Test fun initializeToolsets(){
         doInitTest {
             val tools = it.frameManager.root.toolSection.imp.data.entries
 

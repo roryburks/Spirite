@@ -9,13 +9,13 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 open class PrimaryGroupTreeTests {
     val workspace = TestHelper.makeShellWorkspace(100,100)
     val tree = workspace.groupTree
 
-    @test fun CreatesSimpleLayer() {
+    @Test fun CreatesSimpleLayer() {
         tree.addNewSimpleLayer(null, "Simple", FLAT, 30, 45)
 
         val ancestors = tree.root.getAllAncestors()
@@ -26,7 +26,7 @@ open class PrimaryGroupTreeTests {
         assert( (layerNode.layer as SimpleLayer).medium.medium is FlatMedium)
     }
 
-    @test fun UndoesAndRedoes_AddNewSimpleLayer() {
+    @Test fun UndoesAndRedoes_AddNewSimpleLayer() {
         tree.addNewSimpleLayer(null, "Simple", FLAT, 30, 45)
 
         assertEquals(1, tree.root.getAllAncestors().count())
@@ -45,7 +45,7 @@ open class PrimaryGroupTreeTests {
         assert( (layerNode.layer as SimpleLayer).medium.medium is FlatMedium)
     }
 
-    @test fun UndoesAndRedoes_PropertyEdit() {
+    @Test fun UndoesAndRedoes_PropertyEdit() {
         tree.addNewSimpleLayer(null, "Simple", FLAT, 30, 45)
 
         val layerNode = tree.root.getLayerNodes().first()
@@ -65,7 +65,7 @@ open class PrimaryGroupTreeTests {
         assertEquals(20, layerNode.x)
     }
 
-    @test fun CreatesNestedGroups() {
+    @Test fun CreatesNestedGroups() {
         // Group 1
         // ---- Group 2
         // -------- Group 4
@@ -131,7 +131,7 @@ open class PrimaryGroupTreeTests {
         assert( group4.parent == group2)
     }
 
-    @test fun DeletesInNestedGroups() {
+    @Test fun DeletesInNestedGroups() {
         // Group 1
         // ---- Group 2
         // -------- Group 4
@@ -175,7 +175,7 @@ open class PrimaryGroupTreeTests {
         assert( group3.parent == tree.root)
     }
 
-    @test fun MovesAbove() {
+    @Test fun MovesAbove() {
         // Group 1
         // ---- Layer1
         // ---- Layer2
@@ -222,7 +222,7 @@ open class PrimaryGroupTreeTests {
         assertEquals(3, group1.getLayerNodes().count())
     }
 
-    @test fun MoveBelow() {
+    @Test fun MoveBelow() {
         // Group 1
         // ---- Layer1
         // ---- Layer2
@@ -249,7 +249,7 @@ open class PrimaryGroupTreeTests {
         assertEquals(layer3, layer4.nextNode)
     }
 
-    @test fun MoveInto() {
+    @Test fun MoveInto() {
         // Group 1
         // ---- Layer1
         // ---- Layer2
@@ -326,7 +326,7 @@ open class PrimaryGroupTreeTests {
         // endregion
     }
 
-    @test fun DuplicateLayerNode() {
+    @Test fun DuplicateLayerNode() {
         val layer1 = tree.addNewSimpleLayer(null, "Layer1",FLAT,30,30)
 
         tree.duplicateInto(layer1)
@@ -341,7 +341,7 @@ open class PrimaryGroupTreeTests {
         assertEquals(layer1, tree.root.children.last())
     }
 
-    @test fun DuplicateGroupNode() {
+    @Test fun DuplicateGroupNode() {
         // Layer0
         // Group
         // ---- Layer1

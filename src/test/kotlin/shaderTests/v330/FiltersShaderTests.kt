@@ -12,7 +12,7 @@
 //import rbJvm.glow.awt.toBufferedImage
 //import java.io.File
 //import javax.imageio.ImageIO
-//import org.junit.jupiter.api.Test as test
+//import org.junit.jupiter.api.Test
 //
 //
 //class FiltersShaderTests {
@@ -55,7 +55,7 @@
 //    }
 //
 //
-//    @test fun ChangeColor() {
+//    @Test fun ChangeColor() {
 //        // Arrange
 //
 //        val gli = GLImage(100, 100, mockGle)

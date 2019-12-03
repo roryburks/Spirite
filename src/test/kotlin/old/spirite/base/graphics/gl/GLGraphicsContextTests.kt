@@ -13,12 +13,12 @@ import spirite.specialRendering.SpecialDrawerFactory
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class GLGraphicsContextTests {
     val gle = Hybrid.gle
 
-    @test fun drawBounds() {
+    @Test fun drawBounds() {
         val img = GLImage(30, 30, gle)
 
         val gc = img.graphics
@@ -31,7 +31,7 @@ class GLGraphicsContextTests {
         if( TestConfig.save)
             ImageIO.write(toImage.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_drawBounds.png"))
     }
-    @test fun drawImage() {
+    @Test fun drawImage() {
         val subImg = GLImage(30, 30, gle)
 
         val gc = subImg.graphics
@@ -50,7 +50,7 @@ class GLGraphicsContextTests {
             ImageIO.write(toImage.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_drawImage.png"))
     }
 
-    @test fun drawRect(){
+    @Test fun drawRect(){
         val img = GLImage(30, 30, gle)
         val gc = img.graphics
 
@@ -83,7 +83,7 @@ class GLGraphicsContextTests {
             ImageIO.write(img.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_drawRect.png"))
     }
 
-    @test fun fillRect(){
+    @Test fun fillRect(){
         val img = GLImage(30, 30, gle)
         val gc = img.graphics
 
@@ -104,7 +104,7 @@ class GLGraphicsContextTests {
             ImageIO.write(img.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_fillRect.png"))
     }
 
-    @test fun fillPoly() {
+    @Test fun fillPoly() {
         val img = GLImage(50, 50, gle)
         val gc = img.graphics
 

@@ -9,7 +9,7 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.views.layerProperties.SpriteLayerPanel
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class SpriteLayerTests{
     class MockUndo {
@@ -19,7 +19,7 @@ class SpriteLayerTests{
             every { _mockWorkspace.undoEngine }.returns(PassthroughUndoEngine)
         }
 
-        @test fun basicAddLayers() {
+        @Test fun basicAddLayers() {
             _layer.addPart("layer2")
             _layer.addPart("layer3")
 
@@ -30,7 +30,7 @@ class SpriteLayerTests{
             assertTrue { partNames.contains("layer3") }
         }
 
-        @test fun addChangeLayersNameToDupe(){
+        @Test fun addChangeLayersNameToDupe(){
             _layer.addPart("layer2")
             _layer.addPart("layer3")
 
@@ -49,7 +49,7 @@ class SpriteLayerTests{
         val mockSet = MockedWorkspaceSet()
         val ws get() = mockSet.ws
 
-        @test fun tryToDuplicateWrongDeleteBug(){
+        @Test fun tryToDuplicateWrongDeleteBug(){
             val layer = SpriteLayer(ws)
             layer.activePart = layer.parts.firstOrNull()
             layer.activePart?.partName = "layer1"
@@ -72,7 +72,7 @@ class SpriteLayerTests{
             assertTrue { layer.parts.any { it.partName == "layer5" } }
         }
 
-        @test fun wrongSelectedPartBug_Task118(){
+        @Test fun wrongSelectedPartBug_Task118(){
             val panel = SpriteLayerPanel(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
             val layer = SpriteLayer(ws)
             panel.linkedSprite = layer

@@ -16,7 +16,7 @@
 //import java.io.File
 //import javax.imageio.ImageIO
 //import kotlin.test.assertEquals
-//import org.junit.jupiter.api.Test as test
+//import org.junit.jupiter.api.Test
 //
 //class ShapesShaderTests
 //{
@@ -32,7 +32,7 @@
 //    }
 //
 //
-//    @test fun PolyRender() {
+//    @Test fun PolyRender() {
 //        // Arrange
 //        val program = ShaderTests.loadProgram(
 //                "${root}/shapes/poly_render.vert",
@@ -67,7 +67,7 @@
 //        assertEquals(0, gli.getARGB(99,99))
 //    }
 //
-//    @test fun LineRender() {
+//    @Test fun LineRender() {
 //        // Arrange
 //        val program = ShaderTests.loadProgram(
 //                "${root}/shapes/line_render.vert",

@@ -10,21 +10,21 @@
 //import spirite.base.imageData.undo.*
 //import kotlin.test.assertEquals
 //import kotlin.test.assertSame
-//import org.junit.jupiter.api.Test as test
+//import org.junit.jupiter.api.Test
 //
 //class UndoEngineTests {
 //    private val _mockImageWorkspace = mockk<IImageWorkspace>(relaxed = true)
 //    val mockMediumRepo = mockk<MMediumRepository>(relaxed = true)
 //    private val engine = UndoEngine( _mockImageWorkspace, mockMediumRepo)
 //
-//    @test fun testPerforms() {
+//    @Test fun testPerforms() {
 //        val action1 = TestNullAction()
 //        engine.performAndStore( action1)
 //        assertEquals(1, action1.performCount)
 //        assertEquals(1, engine.queuePosition)
 //    }
 //
-//    @test fun testPerforms3() {
+//    @Test fun testPerforms3() {
 //        val action1 = TestNullAction()
 //        val action2 = TestNullAction()
 //        val action3 = TestNullAction()
@@ -36,7 +36,7 @@
 //        assertEquals(1, action3.performCount)
 //        assertEquals(3, engine.queuePosition)
 //    }
-//    @test fun testPerformsAndUndos3() {
+//    @Test fun testPerformsAndUndos3() {
 //        val action1 = TestNullAction()
 //        val action2 = TestNullAction()
 //        val action3 = TestNullAction()
@@ -60,7 +60,7 @@
 //        assertEquals(1, action3.met)
 //        assertEquals(3, engine.queuePosition)
 //    }
-//    @test fun handlesOverflowUndosAndRedos() {
+//    @Test fun handlesOverflowUndosAndRedos() {
 //        val action1 = TestNullAction()
 //        val action2 = TestNullAction()
 //        engine.performAndStore( action1)
@@ -84,7 +84,7 @@
 //        assertEquals(2, engine.queuePosition)
 //    }
 //
-//    @test fun clipsHeads() {
+//    @Test fun clipsHeads() {
 //        val action1 = TestNullAction()
 //        val action2 = TestNullAction()
 //        val action3 = TestNullAction()
@@ -99,7 +99,7 @@
 //        assert( history[1].action == action3)
 //    }
 //
-//    @test fun constructsProperHistory() {
+//    @Test fun constructsProperHistory() {
 //        val actions = listOf(
 //                TestNullAction(),
 //                TestImageAction(ArrangedMediumData(MediumHandle(_mockImageWorkspace, 1))),
@@ -113,7 +113,7 @@
 //        actions.zip(history, {action, history -> assertSame(action, history.action)})
 //    }
 //
-//    @test fun stacksActions() {
+//    @Test fun stacksActions() {
 //        val action1 = TestNullAction()
 //        val action2 = TestStackAction(0, 5)
 //        val action3 = TestStackAction(0, 10)
@@ -155,7 +155,7 @@
 //        }
 //    }
 //
-//    @test fun TestRecursiveAggregate() {
+//    @Test fun TestRecursiveAggregate() {
 //        val action1 = TestNullAction()
 //        val action2 = TestNullAction()
 //        val action3 = TestNullAction()

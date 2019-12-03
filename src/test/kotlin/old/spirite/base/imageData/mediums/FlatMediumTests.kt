@@ -15,13 +15,13 @@
 //import java.io.File
 //import javax.imageio.ImageIO
 //import kotlin.test.assertEquals
-//import org.junit.jupiter.api.Test as test
+//import org.junit.jupiter.api.Test
 //
 //class FlatMediumTests {
 //    val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)
 //    val imageConverter = AwtImageConverter(EngineLaunchpoint.gle)
 //
-//    @test fun buildsDataCorrectly() {
+//    @Test fun buildsDataCorrectly() {
 //        val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20), mockWorkspace.mediumRepository)
 //        val built = flatMedium.buildInto(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
 //
@@ -41,7 +41,7 @@
 //        }
 //    }
 //
-//    @test fun buildsTransformedDataCorrectly() {
+//    @Test fun buildsTransformedDataCorrectly() {
 //        val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20),mockWorkspace.mediumRepository)
 //        val transform = MutableTransformF.TranslationMatrix(-10f,-10f)
 //
@@ -67,7 +67,7 @@
 //            ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\flatMediumTransformed.png"))
 //        }
 //    }
-//    @test fun buildsTransformedDataCorrectlyThenDisplaysCorrectly() {
+//    @Test fun buildsTransformedDataCorrectlyThenDisplaysCorrectly() {
 //        val workspaceImage = Hybrid.imageCreator.createImage( 50, 50)
 //        val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20),mockWorkspace.mediumRepository)
 //        val transform = MutableTransformF.TranslationMatrix(-10f,-10f)

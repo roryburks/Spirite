@@ -5,6 +5,8 @@ import rb.glow.color.Colors
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
 import old.TestConfig
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Tags
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
@@ -18,6 +20,7 @@ class GLStrokeDrawerV2Tests {
     val gle = Hybrid.gle
     val drawer = GLStrokeDrawerV2(gle)
 
+    @Tags(Tag("Old"),Tag("GPU"))
     @Test
     fun drawsStroke() {
         val drawPoints = DrawPoints(

@@ -9,7 +9,7 @@ import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.undo.ImageAction
 import spirite.base.imageData.undo.ImageContext
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class ImageContextTests {
     val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)
@@ -17,7 +17,7 @@ class ImageContextTests {
     val mockMediumRepo = mockk<MMediumRepository>(relaxed = true)
     val contextUnderTest = ImageContext(mediumHandle, mockWorkspace)
 
-    @test fun doesUndoRedo3() {
+    @Test fun doesUndoRedo3() {
         val action1 = TestImageAction(ArrangedMediumData(mediumHandle))
         val action2 = TestImageAction(ArrangedMediumData(mediumHandle))
         val action3 = TestImageAction(ArrangedMediumData(mediumHandle))
@@ -38,7 +38,7 @@ class ImageContextTests {
         assertEquals(1, action3.performCount)
     }
 
-    @test fun doesUndoRedo30() {
+    @Test fun doesUndoRedo30() {
         val actions = List<ImageAction>(30, { TestImageAction(ArrangedMediumData(mediumHandle))})
         actions.forEach { contextUnderTest.addAction(it)}
         actions.forEach { contextUnderTest.undo() }
@@ -47,7 +47,7 @@ class ImageContextTests {
         actions.forEach { contextUnderTest.redo() }
     }
 
-    @test fun clipsHead() {
+    @Test fun clipsHead() {
         val actions = List<TestImageAction>(5, { TestImageAction(ArrangedMediumData(mediumHandle))})
         actions.forEach { contextUnderTest.addAction(it)}
         contextUnderTest.undo()
@@ -60,7 +60,7 @@ class ImageContextTests {
         assertEquals(3, contextUnderTest.size)
     }
 
-    @test fun clipsTail() {
+    @Test fun clipsTail() {
         val actions = List<TestImageAction>(5, { TestImageAction(ArrangedMediumData(mediumHandle))})
         actions.forEach { contextUnderTest.addAction(it)}
         contextUnderTest.undo()
@@ -71,7 +71,7 @@ class ImageContextTests {
         assertEquals(2, contextUnderTest.effectivePointer)
         assertEquals(4, contextUnderTest.size)
     }
-    @test fun clipsTail15() {
+    @Test fun clipsTail15() {
         val actions = List<TestImageAction>(15, { TestImageAction(ArrangedMediumData(mediumHandle))})
         actions.forEach { contextUnderTest.addAction(it)}
         contextUnderTest.undo()

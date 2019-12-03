@@ -6,19 +6,19 @@ import spirite.hybrid.EngineLaunchpoint
 import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import spirite.specialRendering.fill.toIntArray
 import kotlin.system.measureTimeMillis
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class FillV1Tests {
-    @test fun TestFill9() {
+    @Test fun TestFill9() {
         TestFill(9)
     }
-    @test fun TestFill18() {
+    @Test fun TestFill18() {
         TestFill(18)
     }
-    @test fun TestFill400() {
+    @Test fun TestFill400() {
         TestFill(400)
     }
-    @test fun TestFill2000() {
+    @Test fun TestFill2000() {
             TestFill(2000)
     }
     fun TestFill( r: Int) {

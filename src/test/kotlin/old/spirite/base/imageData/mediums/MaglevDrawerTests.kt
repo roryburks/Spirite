@@ -6,7 +6,7 @@ import old.TestHelper
 class MaglevDrawerTests {
     val ws = TestHelper.makeShellWorkspace()
 
-//    @test fun findsClosestStroke() {
+//    @Test fun findsClosestStroke() {
 //        val maglev = MaglevMedium(ws, mockk())
 //
 //        maglev.addThing(MaglevStroke(StrokeParams(), DrawPoints(

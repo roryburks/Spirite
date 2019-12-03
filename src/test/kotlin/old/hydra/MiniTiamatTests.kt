@@ -5,10 +5,10 @@ import kotlinx.coroutines.runBlocking
 import rb.hydra.miniTiamatGrind
 import rb.vectrix.mathUtil.d
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class MiniTiamatTests {
-    @test fun Minimizes_Basic(){
+    @Test fun Minimizes_Basic(){
         val things = listOf(1, 2, 3, 4, 6, -4)
 
         val min =  runBlocking {things.asSequence().miniTiamatGrind { it.d }}
@@ -16,7 +16,7 @@ class MiniTiamatTests {
         assertEquals(-4, min!!.second)
     }
 
-    @test fun Minimizes_LessThan(){
+    @Test fun Minimizes_LessThan(){
         val things = listOf(1, -2, 3)
 
         val min =  runBlocking {things.asSequence().miniTiamatGrind { it.d }}

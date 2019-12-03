@@ -8,13 +8,13 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.NullContext
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class NullContextTests {
     val underTest = NullContext()
     val mockWorkspace = mockk<IImageWorkspace>(relaxed = true)
 
-    @test fun doesUndoRedo3() {
+    @Test fun doesUndoRedo3() {
         val action1 = TestNullAction()
         val action2 = TestNullAction()
         val action3 = TestNullAction()
@@ -35,7 +35,7 @@ class NullContextTests {
         assert(action3.performCount == 1)
     }
 
-    @test fun clipsHead() {
+    @Test fun clipsHead() {
         val action1 = TestNullAction()
         val action2 = TestNullAction()
         val action3 = TestNullAction()
@@ -60,7 +60,7 @@ class NullContextTests {
         assertEquals(1, underTest.pointer)
     }
 
-    @test fun clipsTail() {
+    @Test fun clipsTail() {
         val action1 = TestNullAction()
         val action2 = TestNullAction()
         val action3 = TestNullAction()
@@ -80,7 +80,7 @@ class NullContextTests {
         assert(action3.dispatched)
     }
 
-    @test fun getsDependencies() {
+    @Test fun getsDependencies() {
         val mediumHandle1 = MediumHandle(mockWorkspace, 1)
         val mediumHandle2 = MediumHandle(mockWorkspace, 2)
         val action1 = TestNullAction(mediumHandle1)

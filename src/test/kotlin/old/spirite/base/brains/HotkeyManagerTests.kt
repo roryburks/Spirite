@@ -1,21 +1,23 @@
 package old.spirite.base.brains
 
+import org.junit.jupiter.api.Tag
 import spirite.base.brains.Hotkey
 import spirite.base.brains.HotkeyManager
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.settings.JPreferences
 import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
+@Tag("Old")
 class HotkeyManagerTests {
     val preferences = JPreferences(HotkeyManagerTests::class.java)
     val hotketManager = HotkeyManager(preferences)
 
-    @test fun verifyDefaults() {
+    @Test fun verifyDefaults() {
         assertEquals("view.zoomIn", hotketManager.getCommand(Hotkey(KeyEvent.VK_ADD, 0))?.commandString)
     }
-    @test fun do1() {
+    @Test fun do1() {
         hotketManager.setCommand(Hotkey(KeyEvent.VK_A,0), KeyCommand("global.paste"))
         //        // Can see its entry in the Registry
     }

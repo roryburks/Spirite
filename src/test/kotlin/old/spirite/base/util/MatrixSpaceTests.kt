@@ -3,11 +3,11 @@
 //
 //import rb.vectrix.linear.MatrixSpace
 //import rb.vectrix.linear.Vec2f
-//import org.junit.jupiter.api.Test as test
+//import org.junit.jupiter.api.Test
 //
 //class MatrixSpaceTests {
 //
-//    @test fun TestConnectedness() {
+//    @Test fun TestConnectedness() {
 //        val map = mapOf(
 //                Pair("S1","S2") to ImmutableTransformF.Translation(50f,50f),
 //                Pair("S2", "S3") to ImmutableTransformF.Translation(25f, 25f),

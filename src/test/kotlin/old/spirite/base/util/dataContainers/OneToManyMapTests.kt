@@ -3,10 +3,10 @@ package old.spirite.base.util.dataContainers
 
 import rb.extendo.dataStructures.MutableOneToManyMap
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class OneToManyMapTests {
-    @test fun Inserts() {
+    @Test fun Inserts() {
         val map = MutableOneToManyMap<Int, String>()
 
         map.assosciate("a", 1)
@@ -19,7 +19,7 @@ class OneToManyMapTests {
         assertEquals( 3, map.getMany(1)!!.size)
     }
 
-    @test fun Removes() {
+    @Test fun Removes() {
         val map = MutableOneToManyMap<Int, String>()
 
         map.assosciate("a", 1)
@@ -35,7 +35,7 @@ class OneToManyMapTests {
         assertEquals( 2, map.getMany(1)!!.size)
     }
 
-    @test fun RemovesAndDeletes() {
+    @Test fun RemovesAndDeletes() {
         val map = MutableOneToManyMap<Int, String>()
 
         map.assosciate("a", 1)
@@ -48,7 +48,7 @@ class OneToManyMapTests {
         assertEquals( null, map.getMany(1))
     }
 
-    @test fun Reassosciates() {
+    @Test fun Reassosciates() {
         val map = MutableOneToManyMap<Int, String>()
 
         map.assosciate("a", 1)

@@ -1,17 +1,20 @@
-package old.hybrid
+package sjunit.rb.hydra
 
 
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Tags
 import rb.glow.gl.GLImage
 import spirite.base.util.linear.Rect
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test as test
+import org.junit.jupiter.api.Test
 
 class ContentBoundsFinderTest {
     val gle = Hybrid.gle
 
-    @test fun testContentBounds() {
+    @Tags(Tag("Old"), Tag("GPU"))
+    @Test fun testContentBounds() {
         val img = GLImage(20, 20, gle)
         val gc = img.graphics
         gc.drawLine(5,5,13,17)
