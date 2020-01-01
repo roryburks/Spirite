@@ -1,4 +1,4 @@
-package demonstration
+package sandbox
 
 import sguiSwing.components.SwMenuBar
 import spirite.base.brains.MasterControl

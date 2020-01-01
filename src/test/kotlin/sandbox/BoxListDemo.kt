@@ -1,9 +1,8 @@
-package demonstration
+package sandbox
 
 import sgui.Orientation.HORIZONTAL
 import sgui.components.IBoxList.IBoxComponent
 import sguiSwing.components.*
-import spirite.hybrid.Hybrid
 import java.awt.Color
 import java.awt.GridLayout
 import javax.swing.BorderFactory

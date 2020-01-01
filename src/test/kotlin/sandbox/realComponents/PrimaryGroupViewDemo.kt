@@ -1,6 +1,6 @@
-package demonstration.realComponents
+package sandbox.realComponents
 
-import demonstration.DemoLauncher
+import sandbox.DemoLauncher
 import sgui.Orientation.HORIZONTAL
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent

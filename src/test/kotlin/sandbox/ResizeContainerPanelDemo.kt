@@ -1,4 +1,4 @@
-package demonstration
+package sandbox
 
 import sgui.Orientation.HORIZONTAL
 import sguiSwing.components.ResizeContainerPanel

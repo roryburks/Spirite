@@ -1,4 +1,4 @@
-package demonstration
+package sandbox
 
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL

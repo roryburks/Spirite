@@ -1,4 +1,4 @@
-package demonstration
+package sandbox
 
 import rb.glow.color.Colors
 import rb.vectrix.functions.InvertibleFunction
@@ -7,7 +7,6 @@ import sgui.components.IButton
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
 import spirite.hybrid.Hybrid
-import java.awt.Color
 import java.awt.GridLayout
 import javax.swing.JFrame
 

@@ -1,4 +1,4 @@
-package demonstration
+package sandbox
 
 import com.jogamp.opengl.*
 import com.jogamp.opengl.awt.GLJPanel
