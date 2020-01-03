@@ -1,5 +1,6 @@
 package spirite.base.file.save
 
+import rb.alexandria.io.IWriteStream
 import rb.clicker.telemetry.TelemetryEvent
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
@@ -7,8 +8,6 @@ import spirite.base.file.SaveLoadUtil
 import spirite.base.file.SaveLoadUtil.FFALAYER_CASCADING
 import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
 import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
-import spirite.base.file.writeFloatArray
-import spirite.base.file.writeUFT8NT
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
@@ -34,7 +33,7 @@ import kotlin.math.min
 
 class SaveContext(
         val workspace: IImageWorkspace,
-        val ra: RandomAccessFile)
+        val ws: IWriteStream)
 {
     val nodeMap = mutableMapOf<Node, Int>()
     val animationMap = mutableMapOf<Animation,Int>()
@@ -45,7 +44,7 @@ class SaveContext(
             .mapNotNull { workspace.mediumRepository.floatData(it) { medium -> MediumPreparer.prepare(medium) } }
 
 
-    inline fun writeChunk(tag: String, crossinline writer : (RandomAccessFile)->Unit) {
+    inline fun writeChunk(tag: String, crossinline writer : (IWriteStream)->Unit) {
         telemetry.runAction("Write Chunk: $tag") {
             if (tag.length != 4) {
                 // Perhaps overkill, but this really should be a hard truth
@@ -53,20 +52,20 @@ class SaveContext(
             }
 
             // [4] : Chunk Tag
-            ra.write(tag.toByteArray(charset("UTF-8")))
+            ws.write(tag.toByteArray(charset("UTF-8")))
 
-            val start = ra.filePointer
+            val start = ws.pointer
             // [4] : ChunkLength (placeholder for now
-            ra.writeInt(0)
+            ws.writeInt(0)
 
-            writer.invoke(ra)
+            writer.invoke(ws)
 
-            val end = ra.filePointer
-            ra.seek(start)
+            val end = ws.pointer
+            ws.goto(start)
             if (end - start > Integer.MAX_VALUE)
                 MDebug.handleError(ErrorType.OUT_OF_BOUNDS, "Image Data Too Big (>2GB).")
-            ra.writeInt((end - start - 4).toInt())
-            ra.seek(end)
+            ws.writeInt((end - start - 4).toInt())
+            ws.goto(end)
 
             telemetry.mark("size", (end - start).d)
         }
@@ -88,6 +87,8 @@ object SaveEngine {
 
         file.createNewFile()
 
+        // TODO: Fix this
+/*
         val ra = RandomAccessFile(file, "rw")
         val context = SaveContext(workspace, ra)
 
@@ -102,26 +103,27 @@ object SaveEngine {
         PaletteMapSaver.savePaletteData(context)
 
         ra.close()
+*/
     }
 
     private fun saveHeader(context: SaveContext) {
-        val ra = context.ra
+        val ws = context.ws
         val workspace = context.workspace
 
         // [4] Header
-        ra.write(SaveLoadUtil.header)
+        ws.write(SaveLoadUtil.header)
         // [4] Version
-        ra.writeInt(SaveLoadUtil.version)
+        ws.writeInt(SaveLoadUtil.version)
 
         // [2] Width, [2] Height
-        ra.writeShort(workspace.width)
-        ra.writeShort(workspace.height)
+        ws.writeShort(workspace.width)
+        ws.writeShort(workspace.height)
     }
 
     /** GRPT chunk saving the structure of the PrimaryGroupTree and all Nodes/Layers within it */
     private fun saveGroupTree( context: SaveContext)
     {
-        context.writeChunk("GRPT") {ra->
+        context.writeChunk("GRPT") {ws->
             val depth = 0
             var met = 0
 
@@ -133,28 +135,28 @@ object SaveEngine {
             }
             fun writeNode( node: Node, depth: Int) {
                 // [1] : Depth of GroupNode in GroupTree
-                ra.writeByte(depth)
+                ws.writeByte(depth)
 
                 // [4] : alpha
-                ra.writeFloat( node.alpha)
+                ws.writeFloat( node.alpha)
 
                 // [2] : xi offset, [2] : yi offset
-                ra.writeShort(node.x)
-                ra.writeShort(node.y)
+                ws.writeShort(node.x)
+                ws.writeShort(node.y)
 
                 // [1] : bitmask
-                ra.writeByte(
+                ws.writeByte(
                         if( node.visible) SaveLoadUtil.VisibleMask else 0 or
                         if( node.expanded) SaveLoadUtil.ExpandedMask else 0 or
                         if( node is GroupNode && node.flatenned) SaveLoadUtil.FlattenedMask else 0)
 
                 // [n], UTF8 : Layer Name
-                ra.write(SaveLoadUtil.strToByteArrayUTF8(node.name))
+                ws.write(SaveLoadUtil.strToByteArrayUTF8(node.name))
 
                 when( node) {
                     is GroupNode -> {
                         // [1] : NodeTypeId
-                        ra.writeByte(SaveLoadUtil.NODE_GROUP)
+                        ws.writeByte(SaveLoadUtil.NODE_GROUP)
 
                         // Go through each of the Group GroupNode's children recursively and save them
                         when( depth) {
@@ -167,31 +169,31 @@ object SaveEngine {
                         when( layer) {
                             is SimpleLayer -> {
                                 // [1] : NodeTypeId
-                                ra.writeByte(SaveLoadUtil.NODE_SIMPLE_LAYER)
+                                ws.writeByte(SaveLoadUtil.NODE_SIMPLE_LAYER)
 
                                 // [4] : MediumId of Medium attatched to the SimpleLayer
-                                ra.writeInt( layer.medium.id)
+                                ws.writeInt( layer.medium.id)
                             }
                             is SpriteLayer -> {
-                                ra.writeByte(SaveLoadUtil.NODE_SPRITE_LAYER) // [1] : NodeTypeId
-                                ra.writeByte(layer.type.permanentCode)  // [1] : Sprite LAyer Medium Type
+                                ws.writeByte(SaveLoadUtil.NODE_SPRITE_LAYER) // [1] : NodeTypeId
+                                ws.writeByte(layer.type.permanentCode)  // [1] : Sprite LAyer Medium Type
 
                                 val parts = layer.parts.toList()
 
                                 // [1] : Number of parts
-                                ra.writeByte( parts.size)
+                                ws.writeByte( parts.size)
 
                                 parts.forEach { part ->
                                     // Per Part:
-                                    ra.write(SaveLoadUtil.strToByteArrayUTF8(part.partName)) // n : PartTypeName
-                                    ra.writeFloat(part.transX)  // 4 : TranslationX
-                                    ra.writeFloat(part.transY)  // 4 : TranslationY
-                                    ra.writeFloat(part.scaleX)  // 4 : ScaleX
-                                    ra.writeFloat(part.scaleY)  // 4 : ScaleY
-                                    ra.writeFloat(part.rot)     // 4 : rotation
-                                    ra.writeInt(part.depth)     // 4 : draw depth
-                                    ra.writeInt(part.handle.id) // 4 : MediumId
-                                    ra.writeFloat(part.alpha)   // 4 : Alpha
+                                    ws.write(SaveLoadUtil.strToByteArrayUTF8(part.partName)) // n : PartTypeName
+                                    ws.writeFloat(part.transX)  // 4 : TranslationX
+                                    ws.writeFloat(part.transY)  // 4 : TranslationY
+                                    ws.writeFloat(part.scaleX)  // 4 : ScaleX
+                                    ws.writeFloat(part.scaleY)  // 4 : ScaleY
+                                    ws.writeFloat(part.rot)     // 4 : rotation
+                                    ws.writeInt(part.depth)     // 4 : draw depth
+                                    ws.writeInt(part.handle.id) // 4 : MediumId
+                                    ws.writeFloat(part.alpha)   // 4 : Alpha
                                 }
                             }
                             //is ReferenceLayer -> {}
@@ -209,80 +211,80 @@ object SaveEngine {
 
     /** PLTT chunk containing the Palettes saved in the workspace */
     private fun savePaletteData( context: SaveContext) {
-        context.writeChunk("PLTT") {ra ->
+        context.writeChunk("PLTT") {ws ->
             context.workspace.paletteSet.palettes.forEach {
                 // [n], UTF8 : Palette Name
-                ra.write(SaveLoadUtil.strToByteArrayUTF8(it.name))
+                ws.write(SaveLoadUtil.strToByteArrayUTF8(it.name))
 
                 val raw = it.compress()
-                ra.writeShort(raw.size) // [2] Palette Data Size
-                ra.write(raw)           // [n] Compressed Palette Data
+                ws.writeShort(raw.size) // [2] Palette Data Size
+                ws.write(raw)           // [n] Compressed Palette Data
             }
         }
     }
 
     /** IMGD chunk containing all Medium Data, with images saved in PNG Format*/
     private fun saveImageData( context: SaveContext) {
-        context.writeChunk("IMGD") {ra->
+        context.writeChunk("IMGD") {ws->
             context.floatingData.forEach { floatingMedium ->
                 // [4] : Medium Handle Id
-                ra.writeInt( floatingMedium.id)
+                ws.writeInt( floatingMedium.id)
 
                 val prepared = floatingMedium.condensed
                 when( prepared) {
                     is PreparedFlatMedium -> {
-                        ra.writeByte(SaveLoadUtil.MEDIUM_PLAIN) // [1] : Medium Type
+                        ws.writeByte(SaveLoadUtil.MEDIUM_PLAIN) // [1] : Medium Type
 
                         val byteArray = Hybrid.imageIO.writePNG(prepared.image)
-                        ra.writeInt( byteArray.size)    // [4] : Size of Image Data
-                        ra.write(byteArray)             // [n] : Image Data
+                        ws.writeInt( byteArray.size)    // [4] : Size of Image Data
+                        ws.write(byteArray)             // [n] : Image Data
                     }
                     is PreparedDynamicMedium -> {
-                        ra.writeByte(SaveLoadUtil.MEDIUM_DYNAMIC) // [1] : Medium Type
-                        ra.writeShort( prepared.offsetX)        // [2] : Dynamic AnimationCommand Offset
-                        ra.writeShort( prepared.offsetY)        // [2] : Dynamic Y Offset
+                        ws.writeByte(SaveLoadUtil.MEDIUM_DYNAMIC) // [1] : Medium Type
+                        ws.writeShort( prepared.offsetX)        // [2] : Dynamic AnimationCommand Offset
+                        ws.writeShort( prepared.offsetY)        // [2] : Dynamic Y Offset
 
                         val byteArray = prepared.image?.run { Hybrid.imageIO.writePNG(this)}
-                        ra.writeInt( byteArray?.size ?: 0)  // [4] : Size of Image Data (note: May be 0)
-                        byteArray?.run { ra.write(this)}    // [n] : Image Data
+                        ws.writeInt( byteArray?.size ?: 0)  // [4] : Size of Image Data (note: May be 0)
+                        byteArray?.run { ws.write(this)}    // [n] : Image Data
                     }
                     is PreparedMaglevMedium -> {
-                        ra.writeByte(SaveLoadUtil.MEDIUM_MAGLEV)    // [1] : Medium Type
-                        ra.writeShort(prepared.things.size)     // [2] : number of things
+                        ws.writeByte(SaveLoadUtil.MEDIUM_MAGLEV)    // [1] : Medium Type
+                        ws.writeShort(prepared.things.size)     // [2] : number of things
                         prepared.things.forEach {thing ->
                             when(thing) {
                                 is MaglevStroke -> {
-                                    ra.writeByte(SaveLoadUtil.MAGLEV_THING_STROKE)  // [1] : Thing type
-                                    ra.writeInt(thing.params.color.argb32)             // [4] : Color
-                                    ra.writeByte(thing.params.method.fileId)            // [1] : Method
-                                    ra.writeFloat(thing.params.width)                  // [4] : Stroke Width
-                                    ra.writeByte(thing.params.mode.fileId)        // [1] : Mode
-                                    ra.writeInt(thing.drawPoints.length)     // [4] : Num Vertices
+                                    ws.writeByte(SaveLoadUtil.MAGLEV_THING_STROKE)  // [1] : Thing type
+                                    ws.writeInt(thing.params.color.argb32)             // [4] : Color
+                                    ws.writeByte(thing.params.method.fileId)            // [1] : Method
+                                    ws.writeFloat(thing.params.width)                  // [4] : Stroke Width
+                                    ws.writeByte(thing.params.mode.fileId)        // [1] : Mode
+                                    ws.writeInt(thing.drawPoints.length)     // [4] : Num Vertices
 
-                                    ra.writeFloatArray(thing.drawPoints.x)
-                                    ra.writeFloatArray(thing.drawPoints.y)
-                                    ra.writeFloatArray(thing.drawPoints.w)
+                                    ws.writeFloatArray(thing.drawPoints.x)
+                                    ws.writeFloatArray(thing.drawPoints.y)
+                                    ws.writeFloatArray(thing.drawPoints.w)
                                 }
                                 is MaglevFill -> {
-                                    ra.writeByte(SaveLoadUtil.MAGLEV_THING_FILL)    // [1] : ThingType
-                                    ra.writeInt(thing.color.argb32) // [4] : Color
-                                    ra.writeByte(thing.mode.fileId) // [1] : FillMode
+                                    ws.writeByte(SaveLoadUtil.MAGLEV_THING_FILL)    // [1] : ThingType
+                                    ws.writeInt(thing.color.argb32) // [4] : Color
+                                    ws.writeByte(thing.mode.fileId) // [1] : FillMode
 
                                     val numSegs = min(65535, thing.segments.size)
-                                    ra.writeShort(numSegs)  // [2] : Num Segments
+                                    ws.writeShort(numSegs)  // [2] : Num Segments
                                     thing.segments.forEach { seg ->
-                                        ra.writeInt(seg.strokeId)   // [4]: StrokeId
-                                        ra.writeInt(seg.start)  // [4] : Start
-                                        ra.writeInt(seg.end)    // [4]
+                                        ws.writeInt(seg.strokeId)   // [4]: StrokeId
+                                        ws.writeInt(seg.start)  // [4] : Start
+                                        ws.writeInt(seg.end)    // [4]
                                     }
                                 }
                             }
                         }
                         val byteArray = prepared.image?.run { Hybrid.imageIO.writePNG(this)}
-                        ra.writeInt( byteArray?.size ?: 0)  // [4] : Size of Image Data
-                        ra.writeShort( prepared.offsetX)        // [2] : Dynamic AnimationCommand Offset
-                        ra.writeShort( prepared.offsetY)        // [2] : Dynamic Y Offset
-                        byteArray?.run { ra.write(this)}    // [n] : Image Data
+                        ws.writeInt( byteArray?.size ?: 0)  // [4] : Size of Image Data
+                        ws.writeShort( prepared.offsetX)        // [2] : Dynamic AnimationCommand Offset
+                        ws.writeShort( prepared.offsetY)        // [2] : Dynamic Y Offset
+                        byteArray?.run { ws.write(this)}    // [n] : Image Data
                     }
                 }
             }
@@ -292,43 +294,43 @@ object SaveEngine {
     private fun saveAnimationSpaceChunk(context: SaveContext) {
         val animMap = context.animationMap
 
-        context.writeChunk("ANSP") {ra ->
+        context.writeChunk("ANSP") {ws ->
             context.workspace.animationSpaceManager.animationSpaces.forEach { space ->
-                ra.writeUFT8NT(space.name)
+                ws.writeStringUft8Nt(space.name)
 
                 when( space) {
                     is FFAAnimationSpace -> {
-                        ra.writeByte(SaveLoadUtil.ANIMSPACE_FFA) // [1] : Type
+                        ws.writeByte(SaveLoadUtil.ANIMSPACE_FFA) // [1] : Type
 
                         val animations = space.animationStructs.toList()
                         val links = space.links.toList()
 
-                        ra.writeShort(animations.size)  // [2] : Number of Animations
+                        ws.writeShort(animations.size)  // [2] : Number of Animations
                         animations.forEach { struct ->
                             val anim = struct.animation
-                            ra.writeInt(animMap[anim] ?: -1)    // 4: AnimationId
+                            ws.writeInt(animMap[anim] ?: -1)    // 4: AnimationId
                             val onEnd = struct.onEndLink
                             val onEndLink =  if( onEnd == null) -1 else animMap[onEnd.first] ?: -1
 
-                            ra.writeInt(onEndLink) // 4: AnimationId of on-end groupLink
+                            ws.writeInt(onEndLink) // 4: AnimationId of on-end groupLink
                             if(onEndLink != -1)
-                                ra.writeInt(onEnd!!.second)    // 4: on-end Frame
+                                ws.writeInt(onEnd!!.second)    // 4: on-end Frame
 
                             val logSpace = space.stateView.logicalSpace[anim] ?: Vec2i.Zero
-                            ra.writeShort(logSpace.xi)    // 2: Logical AnimationCommand
-                            ra.writeShort(logSpace.yi)    // 2: Logical Y
+                            ws.writeShort(logSpace.xi)    // 2: Logical AnimationCommand
+                            ws.writeShort(logSpace.yi)    // 2: Logical Y
                         }
 
-                        ra.writeShort(links.size)   // [2] : Number of Links
+                        ws.writeShort(links.size)   // [2] : Number of Links
                         links.forEach {
-                            ra.writeInt(animMap[it.origin] ?: -1)
-                            ra.writeInt(it.originFrame)
-                            ra.writeInt(animMap[it.destination] ?: -1)
-                            ra.writeInt(it.destinationFrame)
+                            ws.writeInt(animMap[it.origin] ?: -1)
+                            ws.writeInt(it.originFrame)
+                            ws.writeInt(animMap[it.destination] ?: -1)
+                            ws.writeInt(it.destinationFrame)
                         }
                     }
                     else -> {
-                        ra.writeByte(0)
+                        ws.writeByte(0)
                         MDebug.handleWarning(UNSUPPORTED, "Do not know how to save Animation Space: $space.  Skipping it")
                     }
                 }
@@ -341,7 +343,7 @@ object SaveEngine {
 
     /** ANIM chunk containing all Animation Data */
     private fun saveAnimationData( context: SaveContext) {
-        context.writeChunk("ANIM") {ra ->
+        context.writeChunk("ANIM") {ws ->
             var met = 0
 
             context.workspace.animationManager.animations.forEach { anim ->
@@ -349,29 +351,29 @@ object SaveEngine {
 
                 when( anim) {
                     is FixedFrameAnimation -> {
-                        ra.write(SaveLoadUtil.strToByteArrayUTF8(anim.name))    // [n] Anim name
-                        ra.writeFloat(anim.state.speed)                         // [4] : Anim Speed
-                        ra.writeShort(anim.state.zoom)                          // [2] : Anim Zoom
-                        ra.writeByte(SaveLoadUtil.ANIM_FFA)                     // [1] : Anim TypeId
+                        ws.write(SaveLoadUtil.strToByteArrayUTF8(anim.name))    // [n] Anim name
+                        ws.writeFloat(anim.state.speed)                         // [4] : Anim Speed
+                        ws.writeShort(anim.state.zoom)                          // [2] : Anim Zoom
+                        ws.writeByte(SaveLoadUtil.ANIM_FFA)                     // [1] : Anim TypeId
 
                         if(anim.layers.size > MaxFFALayers) MDebug.handleWarning(UNSUPPORTED, "Too many Animation layers (num: ${anim.layers.size} max: $MaxFFALayers), taking only the first N")
 
                         val writtenExplicits = hashSetOf<Node>()
 
-                        ra.writeShort( min(anim.layers.size, MaxFFALayers))  // [2] : Number of layers
+                        ws.writeShort( min(anim.layers.size, MaxFFALayers))  // [2] : Number of layers
                         for (layer in anim.layers.asSequence().take(MaxFFALayers)){
-                            ra.writeUFT8NT(layer.name)  // [n] : Layer Name
-                            ra.writeByte( if(layer.asynchronous) 1 else 0)  // [1] : IsAsynchronous
+                            ws.writeStringUft8Nt(layer.name)  // [n] : Layer Name
+                            ws.writeByte( if(layer.asynchronous) 1 else 0)  // [1] : IsAsynchronous
                             when(layer) {
                                 is FfaLayerGroupLinked -> {
-                                    ra.writeByte(FFALAYER_GROUPLINKED)  // [1] : Layer TypeId
+                                    ws.writeByte(FFALAYER_GROUPLINKED)  // [1] : Layer TypeId
 
-                                    ra.writeInt(context.nodeMap[layer.groupLink] ?: -1)    // [4] : NodeId of GroupNode Bount
-                                    ra.writeByte(if(layer.includeSubtrees) 1 else 0)    // [1] : 0 bit : whether or not subgroups are linked
+                                    ws.writeInt(context.nodeMap[layer.groupLink] ?: -1)    // [4] : NodeId of GroupNode Bount
+                                    ws.writeByte(if(layer.includeSubtrees) 1 else 0)    // [1] : 0 bit : whether or not subgroups are linked
 
                                     if( layer.frames.size > MaxFFALayerFrames) MDebug.handleWarning(UNSUPPORTED, "Too many Frames in a layer (max: ${Short.MAX_VALUE}, only writing first N)")
 
-                                    ra.writeShort(min(layer.frames.size, MaxFFALayerFrames)) // [2] : Number of Frames
+                                    ws.writeShort(min(layer.frames.size, MaxFFALayerFrames)) // [2] : Number of Frames
                                     for( frame in layer.frames.asSequence().take(MaxFFALayerFrames)) {
                                         val type = when((frame as FFAFrame).marker) {
                                             GAP -> SaveLoadUtil.FFAFRAME_GAP
@@ -379,39 +381,39 @@ object SaveEngine {
                                             FRAME -> SaveLoadUtil.FFAFRAME_FRAME
                                             END_LOCAL_LOOP -> null
                                         } ?: continue
-                                        ra.writeByte(type)
-                                        ra.writeInt(context.nodeMap[frame.structure.node] ?: -1 ) // [4] : NodeId
-                                        ra.writeShort(frame.length)    // [2]: Length
+                                        ws.writeByte(type)
+                                        ws.writeInt(context.nodeMap[frame.structure.node] ?: -1 ) // [4] : NodeId
+                                        ws.writeShort(frame.length)    // [2]: Length
                                     }
                                 }
                                 is FfaLayerLexical -> {
-                                    ra.writeByte(FFALAYER_LEXICAL)  // [1] : Layer TypeId
-                                    ra.writeInt(context.nodeMap[layer.groupLink] ?: -1) // [4] NodeIf of GroupNode
-                                    ra.writeUFT8NT(layer.lexicon)   // [n] : Lexicon
+                                    ws.writeByte(FFALAYER_LEXICAL)  // [1] : Layer TypeId
+                                    ws.writeInt(context.nodeMap[layer.groupLink] ?: -1) // [4] NodeIf of GroupNode
+                                    ws.writeStringUft8Nt(layer.lexicon)   // [n] : Lexicon
 
                                     if( writtenExplicits.contains(layer.groupLink)) {
-                                        ra.writeByte(0) // [1] : No Explicits to write
+                                        ws.writeByte(0) // [1] : No Explicits to write
                                     }
                                     else {
-                                        ra.writeByte(min(255, layer.sharedExplicitMap.size))   // [1] : Num Explicits
+                                        ws.writeByte(min(255, layer.sharedExplicitMap.size))   // [1] : Num Explicits
                                         for( explicit in layer.sharedExplicitMap.asSequence().take(255)) {
-                                            ra.writeByte(explicit.key.toByte().toInt()) // [1] : Char mapping
-                                            ra.writeInt(context.nodeMap[explicit.value] ?: -1) // [4] : NodeId
+                                            ws.writeByte(explicit.key.toByte().toInt()) // [1] : Char mapping
+                                            ws.writeInt(context.nodeMap[explicit.value] ?: -1) // [4] : NodeId
                                         }
                                     }
                                 }
                                 is FfaLayerCascading -> {
-                                    ra.writeByte(FFALAYER_CASCADING)    // [1] : Layer TypeId
-                                    ra.writeInt(context.nodeMap[layer.groupLink] ?: -1) // [4] NodeId of GroupNode
-                                    ra.writeUFT8NT(layer.lexicon ?: "") // [n] : Lexicon
+                                    ws.writeByte(FFALAYER_CASCADING)    // [1] : Layer TypeId
+                                    ws.writeInt(context.nodeMap[layer.groupLink] ?: -1) // [4] NodeId of GroupNode
+                                    ws.writeStringUft8Nt(layer.lexicon ?: "") // [n] : Lexicon
 
                                     val subinfos = layer.sublayerInfo.values.toList()
-                                    ra.writeByte(min(255, subinfos.size)) // [1] : Group Subinfos
+                                    ws.writeByte(min(255, subinfos.size)) // [1] : Group Subinfos
                                     subinfos.forEach {
-                                        ra.writeInt(context.nodeMap[it.group] ?: -1)    // [4] NodeId
-                                        ra.writeShort(it.primaryLen)                        // [2] PrimaryLen
-                                        ra.writeByte(it.lexicalKey.toByte().toInt())        // [1] Lexical Key
-                                        ra.writeUFT8NT(it.lexicon ?: "")
+                                        ws.writeInt(context.nodeMap[it.group] ?: -1)    // [4] NodeId
+                                        ws.writeShort(it.primaryLen)                        // [2] PrimaryLen
+                                        ws.writeByte(it.lexicalKey.toByte().toInt())        // [1] Lexical Key
+                                        ws.writeStringUft8Nt(it.lexicon ?: "")
                                     }
                                 }
                             }

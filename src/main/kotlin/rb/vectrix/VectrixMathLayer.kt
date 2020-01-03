@@ -6,6 +6,7 @@ import kotlin.math.sin
 object VectrixMathLayer {
     var mathLayer : IMathLayer = BaseMathLayer
 
+    inline fun arraycopy(src: ByteArray, srcPos: Int, dest:ByteArray, destPos: Int, len: Int) = mathLayer.arraycopy(src, srcPos, dest, destPos, len)
     inline fun arraycopy(src: IntArray, srcPos: Int, dest:IntArray, destPos: Int, len: Int) = mathLayer.arraycopy(src, srcPos, dest, destPos, len)
     inline fun arraycopy(src: FloatArray, srcPos: Int, dest:FloatArray, destPos: Int, len: Int) = mathLayer.arraycopy(src, srcPos, dest, destPos, len)
     inline fun fastSin(theta: Double) = mathLayer.fastSin(theta)
@@ -14,6 +15,7 @@ object VectrixMathLayer {
 }
 
 interface IMathLayer {
+    fun arraycopy(src: ByteArray, srcPos: Int, dest:ByteArray, destPos: Int, len: Int)
     fun arraycopy(src: FloatArray, srcPos: Int, dest:FloatArray, destPos: Int, len: Int)
     fun arraycopy(src: IntArray, srcPos: Int, dest:IntArray, destPos: Int, len: Int)
 
@@ -22,6 +24,9 @@ interface IMathLayer {
 }
 
 object BaseMathLayer : IMathLayer {
+    override fun arraycopy(src: ByteArray, srcPos: Int, dest: ByteArray, destPos: Int, len: Int) {
+        (0 until len).forEach { dest[destPos + it] = src[srcPos + len] }
+    }
 
     override fun arraycopy(src: IntArray, srcPos: Int, dest: IntArray, destPos: Int, len: Int) {
         (0 until len).forEach { dest[destPos + it] = src[srcPos + len] }

@@ -21,7 +21,7 @@ object PaletteMapSaver {
             spriteMappings.forEach { (pair, colors) ->
                 val (node, spritePartName) = pair
                 ra.writeInt(context.nodeMap[node] ?: -1)    // [4]: Node Id
-                ra.writeUFT8NT(spritePartName)                  // [n] : Sprite Part Name
+                ra.writeStringUft8Nt(spritePartName)           // [n] : Sprite Part Name
                 ra.writeByte(min(colors.size, 255))         // [1] : Size of Belt
                 colors.take(255).forEach { ra.writeInt(it.argb32) } // [4] : Color ARGB
             }
