@@ -1,6 +1,5 @@
 package rb.alexandria.io
 
-import rb.glow.using
 import rb.vectrix.VectrixMathLayer
 
 class BufferedWriteStream(
@@ -14,49 +13,49 @@ class BufferedWriteStream(
 
     override fun goto(pointer: Long) {
         writeInBuff()
+        underlying.goto(pointer)
         this.pointer = pointer
         buff = null
         buffMet = 0
     }
 
     override fun write(byteArray: ByteArray) {
-        tailrec fun sub(byteArray: ByteArray, startPos: Int){
-            val oBuff = buff
-            val numBytesToWrite = byteArray.size - startPos
+        writeSub(byteArray, 0)
+        pointer += byteArray.size
+    }
+    tailrec fun writeSub(byteArray: ByteArray, startPos: Int){
+        val oBuff = buff
+        val numBytesToWrite = byteArray.size - startPos
 
-            if( oBuff == null) {
-                if( numBytesToWrite >= buffSize){
-                    val toWrite = ByteArray(numBytesToWrite)
-                    VectrixMathLayer.arraycopy(byteArray,startPos,toWrite,0,numBytesToWrite)
-                    underlying.write(toWrite)
-                }
-                else {
-                    val nBuff = ByteArray(buffSize)
-                    VectrixMathLayer.arraycopy(byteArray,startPos,nBuff,0,numBytesToWrite)
-                    buff = nBuff
-                    buffMet = numBytesToWrite
-                }
+        if( oBuff == null) {
+            if( numBytesToWrite >= buffSize){
+                val toWrite = ByteArray(numBytesToWrite)
+                VectrixMathLayer.arraycopy(byteArray,startPos,toWrite,0,numBytesToWrite)
+                underlying.write(toWrite)
             }
             else {
-                if( numBytesToWrite + buffMet >= buffSize) {
-                    val numBytesWriting = numBytesToWrite % (buffSize - buffMet)
-                    val fullWrite = numBytesToWrite + buffMet == buffSize
-                    VectrixMathLayer.arraycopy(byteArray,startPos,oBuff,buffMet,numBytesWriting)
-                    underlying.write(oBuff)
-                    buff = null
-                    buffMet = 0
-                    if( !fullWrite)
-                    sub(byteArray, numBytesWriting)
-                }
-                else {
-                    VectrixMathLayer.arraycopy(byteArray,startPos,oBuff,buffMet,numBytesToWrite)
-                    buffMet += numBytesToWrite
-                }
+                val nBuff = ByteArray(buffSize)
+                VectrixMathLayer.arraycopy(byteArray,startPos,nBuff,0,numBytesToWrite)
+                buff = nBuff
+                buffMet = numBytesToWrite
             }
         }
-
-        sub(byteArray, 0)
-        pointer += byteArray.size
+        else {
+            if( numBytesToWrite + buffMet >= buffSize) {
+                val numBytesWriting = buffSize - buffMet
+                val fullWrite = numBytesToWrite + buffMet == buffSize
+                VectrixMathLayer.arraycopy(byteArray,startPos,oBuff,buffMet,numBytesWriting)
+                underlying.write(oBuff)
+                buff = null
+                buffMet = 0
+                if( !fullWrite)
+                    writeSub(byteArray, numBytesWriting)
+            }
+            else {
+                VectrixMathLayer.arraycopy(byteArray,startPos,oBuff,buffMet,numBytesToWrite)
+                buffMet += numBytesToWrite
+            }
+        }
     }
 
     fun writeInBuff() {
