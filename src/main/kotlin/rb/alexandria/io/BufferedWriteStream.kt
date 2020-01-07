@@ -19,11 +19,11 @@ class BufferedWriteStream(
         buffMet = 0
     }
 
-    override fun write(byteArray: ByteArray) {
+    override fun write(byteArray: ByteArray, start: Int, len: Int) {
         writeSub(byteArray, 0)
         pointer += byteArray.size
     }
-    tailrec fun writeSub(byteArray: ByteArray, startPos: Int){
+    private tailrec fun writeSub(byteArray: ByteArray, startPos: Int){
         val oBuff = buff
         val numBytesToWrite = byteArray.size - startPos
 
@@ -58,7 +58,7 @@ class BufferedWriteStream(
         }
     }
 
-    fun writeInBuff() {
+    private fun writeInBuff() {
         val oBuff = buff
         if( oBuff != null && buffMet != 0) {
             val toWrite = ByteArray(buffMet)
