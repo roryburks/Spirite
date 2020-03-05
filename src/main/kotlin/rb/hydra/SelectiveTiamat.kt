@@ -15,7 +15,7 @@ fun <T> List<T>.selectiveTiamatGrindSync( headCount: Int = 4, filter: (T)->Boole
 suspend fun <T> List<T>.selectiveTiamatGrind(
         headCount: Int = 4, filter: (T)->Boolean) : List<T>
 {
-    val heads = List(headCount){SelectiveTiamatHead<T>()}
+    val heads = List(headCount){ CoroutineScope(Dispatchers.Default)}
     val channel = Channel<T>()
     val output = mutableListOf<T>()
 
@@ -34,12 +34,4 @@ suspend fun <T> List<T>.selectiveTiamatGrind(
 
     tasks.awaitAll()
     return output
-}
-
-private class SelectiveTiamatHead<T> : CoroutineScope {
-    var t: T? = null
-    var size: Double = Double.MAX_VALUE
-
-    val job = Job()
-    override val coroutineContext: CoroutineContext get() = newSingleThreadContext("test") + job
 }
