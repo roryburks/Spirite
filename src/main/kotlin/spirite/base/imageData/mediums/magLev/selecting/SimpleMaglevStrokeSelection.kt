@@ -4,6 +4,8 @@ import rb.extendo.extensions.stride
 import rb.extendo.extensions.toLookup
 import rb.glow.GraphicsContext
 import rb.glow.color.Colors
+import rb.hydra.selectiveTiamatGrind
+import rb.hydra.selectiveTiamatGrindSync
 import rb.vectrix.linear.*
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
@@ -86,7 +88,7 @@ class SimpleMaglevStrokeSelection(
 
                 val passingStrokes = maglev.things
                         .filterIsInstance<MaglevStroke>()
-                        .filter { stroke ->
+                        .selectiveTiamatGrindSync { stroke ->
                             val dp = stroke.drawPoints
                             val pts = (0 until dp.length)
                                     .map { tMediumToSelection.apply(Vec2f(dp.x[it], dp.y[it])) }
