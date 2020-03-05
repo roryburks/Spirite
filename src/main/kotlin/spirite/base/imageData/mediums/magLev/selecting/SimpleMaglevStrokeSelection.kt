@@ -6,9 +6,7 @@ import rb.glow.GraphicsContext
 import rb.glow.color.Colors
 import rb.vectrix.linear.*
 import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
-import rb.vectrix.shapes.RectI
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.mediums.magLev.MaglevStroke
@@ -48,7 +46,7 @@ class SimpleMaglevStrokeSelection(
         private val deepThreshAlpha = 0.9f
         private val deepStride = 10
 
-        fun liftFromArranged( arranged: ArrangedMediumData) : SimpleMaglevStrokeSelection
+        fun FromArranged( arranged: ArrangedMediumData) : SimpleMaglevStrokeSelection
         {
             val medium = arranged.handle.medium
             val maglev = medium as? MaglevMedium ?: throw SpiriteException("Tried to lift a non-maglev medium into a Maglev Selection")
@@ -77,6 +75,13 @@ class SimpleMaglevStrokeSelection(
                 fun passesDeepThreshold(pts: List<Vec2f>) : Boolean {
                     val ptsToCheck = pts.stride(deepStride)
 
+                    val passCt = ptsToCheck
+                            .count {
+                                val color = arranged.selection.mask.getColor(it.xf.round, it.yf.round)
+                                return color.alpha > deepThreshAlpha
+                            }
+
+                    return (passCt.f / ptsToCheck.count().f) > deepThresh
                 }
 
                 val passingStrokes = maglev.things
@@ -88,6 +93,11 @@ class SimpleMaglevStrokeSelection(
 
                             passesShallowThreshold(pts) && passesDeepThreshold(pts)
                         }
+
+                return SimpleMaglevStrokeSelection(
+                        maglev,
+                        passingStrokes,
+                        arranged.tMediumToWorkspace)
             }
         }
     }
