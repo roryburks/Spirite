@@ -36,9 +36,9 @@ class SimpleMaglevStrokeSelectionTests {
             // Here's the case.  Workspace is 100x100
             // Selection is a 50x100 square: the right half of the workspace
             // image has three strokes:
-            //   one going from (25,0) to (25,100), well outside of the selection
-            //   one going from (75,0) to (75,100), inside the selection
-            //   one goes from (0,50) to (100,50), half inside the selection
+            //   one going from (25,0) to (25,100), well outside of the selection, not counted
+            //   one going from (75,0) to (75,100), inside the selection, counted
+            //   one goes from (0,50) to (100,50), half inside the selection, not counted (below 70% threshold)
             val workspace = makeWorkspaceWithMockedExternals(100,100)
             val lines= listOf(
                     makeMaglevLine(25f,0f,25f,100f),

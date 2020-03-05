@@ -2,6 +2,7 @@ package spirite.base.imageData.mediums.magLev.selecting
 
 import rb.glow.GraphicsContext
 import rb.glow.IImage
+import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 
 interface IMaglevLiftedData {
@@ -11,6 +12,6 @@ interface IMaglevLiftedData {
 
 interface IMaglevSelection {
     fun draw( gc: GraphicsContext)
-    fun lift() : IMaglevLiftedData
+    fun lift(arranged: ArrangedMediumData) : IMaglevLiftedData?
 }
 

@@ -3,27 +3,70 @@ package spirite.base.imageData.mediums.magLev.selecting
 import rb.extendo.extensions.stride
 import rb.extendo.extensions.toLookup
 import rb.glow.GraphicsContext
+import rb.glow.IImage
 import rb.glow.color.Colors
 import rb.hydra.selectiveTiamatGrind
 import rb.hydra.selectiveTiamatGrindSync
 import rb.vectrix.linear.*
+import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
 import spirite.base.imageData.mediums.ArrangedMediumData
-import spirite.base.imageData.mediums.magLev.MaglevMedium
-import spirite.base.imageData.mediums.magLev.MaglevStroke
+import spirite.base.imageData.mediums.BuiltMediumData
+import spirite.base.imageData.mediums.magLev.*
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.debug.SpiriteException
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
+import spirite.hybrid.Hybrid
 import kotlin.math.min
 
+class SimpleStrokeMaglevLiftedData(
+        val lines: List<MaglevStroke>,
+        val tInternalToContext: ITransformF)
+    : IMaglevLiftedData
+{
+    override val image: IImage by lazy {
+        var x1 :Float? = null
+        var y1: Float? = null
+        var x2: Float? = null
+        var y2: Float? = null
+        lines.forEach { line ->
+            val s = line.params.width
+            val dp = line.drawPoints
+            (0 until line.drawPoints.length).forEach {
+                val x = dp.x[it]
+                val y = dp.y[it]
+                x1 = MathUtil.minOrNull(x1, x - s)
+                y1 = MathUtil.minOrNull(y1, y - s)
+                x2 = MathUtil.maxOrNull(x2, x + s)
+                y2 = MathUtil.maxOrNull(y2, y + s)
+            }
+        }
+        val dy = y1?.floor ?: 0
+        val dx = x1?.floor ?: 0
+        val dw = (x2?.floor?:0) - dx
+        val dh = (y2?.floor?:0) - dy
+
+        val img = Hybrid.imageCreator.createImage(dw, dh)
+        val gc = img.graphics
+
+
+        img
+    }
+
+    override fun anchorOnto(other: MaglevMedium) {
+        TODO("Not yet implemented")
+    }
+}
 
 class SimpleMaglevStrokeSelection(
         val context: MaglevMedium,
         val lines: List<MaglevStroke>,
-        val tLinesToScreen: ITransformF
-) : IMaglevSelection {
+        val tInternalToContext: ITransformF)
+    : IMaglevSelection
+{
     override fun draw(gc: GraphicsContext) {
         gc.color = Colors.WHITE
         lines.forEach { stroke ->
@@ -38,8 +81,10 @@ class SimpleMaglevStrokeSelection(
         }
     }
 
-    override fun lift(): IMaglevLiftedData {
-        TODO("Not yet implemented")
+    override fun lift(arranged: ArrangedMediumData): IMaglevLiftedData? {
+        if( !lines.any()) return null
+        context.removeThings(lines, arranged, "Lifted Selection out of Maglev")
+        return  SimpleStrokeMaglevLiftedData(lines, tInternalToContext)
     }
 
     companion object {
