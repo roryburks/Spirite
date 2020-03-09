@@ -74,6 +74,7 @@ class SelectionEngine(
         set(value) {
             field = value
             selectionDerived.reset()
+            selectionExtraDerived.reset()
         }
 
     override fun setSelection(newSelection: Selection?) {

@@ -52,6 +52,7 @@ abstract class WorkArea(
                 selection.transform?.let { gc.transform(it) }
 
                 drawer.drawBounds(selection.mask, ++i)
+                workspace.selectionEngine.selectionExtra?.draw(gc)
 
                 gc.popTransform()
             }

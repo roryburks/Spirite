@@ -20,6 +20,7 @@ import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.debug.SpiriteException
 import spirite.base.util.linear.Rect
 import spirite.hybrid.Hybrid
+import java.io.File
 import kotlin.math.min
 
 class SimpleStrokeMaglevLiftedData(
@@ -54,10 +55,10 @@ class SimpleStrokeMaglevLiftedData(
         val dw = (x2?.floor?:0) - dx
         val dh = (y2?.floor?:0) - dy
 
-        val img = Hybrid.imageCreator.createImage(dw, dh)
+        val img = Hybrid.imageCreator.createImage(1000, 1000)
         val gc = img.graphics
 
-        gc.translate(-dx.f, dy.f)
+        gc.translate(-dx.f, -dy.f)
         lines.forEach { line ->
             line.draw(gc, strokeProvider, dw, dh)
         }
@@ -68,12 +69,14 @@ class SimpleStrokeMaglevLiftedData(
     override fun anchorOnto(other: MaglevMedium, arranged: ArrangedMediumData, tThisToOther: ITransformF) {
         if(!lines.any()) return
 
+        val tLineToInternal = ImmutableTransformF.Translation(-dx.f,-dy.f)
+        val tLineToOther = tLineToInternal * tThisToOther
         val transformedLines = lines.map { line ->
             val dp = line.drawPoints
             val tx = FloatArray(dp.length)
             val ty = FloatArray(dp.length)
             (0 until dp.length).forEach {
-                val new = tThisToOther.apply(Vec2f(dp.x[it],dp.y[it]))
+                val new = tLineToOther.apply(Vec2f(dp.x[it],dp.y[it]))
                 tx[it] = new.xf
                 ty[it] = new.yf
             }
@@ -84,7 +87,7 @@ class SimpleStrokeMaglevLiftedData(
 
     override fun draw(gc: GraphicsContext) {
         gc.pushTransform()
-        gc.preTransform(tInternalToContext)
+        gc.transform = ITransformF.Identity
         gc.renderImage(image,dx, dy)
         gc.popTransform()
     }
@@ -108,7 +111,10 @@ class SimpleMaglevStrokeSelectionExtra(
     : IMaglevSelectionExtra
 {
     override fun draw(gc: GraphicsContext) {
+        gc.pushTransform()
+        gc.preTransform(tInternalToContext)
         gc.color = Colors.WHITE
+        gc.alpha = 1f
         lines.forEach { stroke ->
             val dp = stroke.drawPoints
             val xs = (0 until stroke.drawPoints.length).step(10)
@@ -119,6 +125,7 @@ class SimpleMaglevStrokeSelectionExtra(
                     .toFloatArray()
             gc.drawPolyLine(xs, ys, min(xs.size, ys.size))
         }
+        gc.popTransform()
     }
 
     override fun lift(arranged: ArrangedMediumData): IMaglevLiftedData? {
@@ -173,7 +180,7 @@ class SimpleMaglevStrokeSelectionExtra(
 
                 val passingStrokes = maglev.things
                         .filterIsInstance<MaglevStroke>()
-                        .selectiveTiamatGrindSync { stroke ->
+                        .filter { stroke ->
                             val dp = stroke.drawPoints
                             val pts = (0 until dp.length)
                                     .map { tMediumToSelection.apply(Vec2f(dp.x[it], dp.y[it])) }
@@ -184,7 +191,7 @@ class SimpleMaglevStrokeSelectionExtra(
                 return SimpleMaglevStrokeSelectionExtra(
                         maglev,
                         passingStrokes,
-                        arranged.tMediumToWorkspace)
+                        tMediumToSelection)
             }
         }
     }
