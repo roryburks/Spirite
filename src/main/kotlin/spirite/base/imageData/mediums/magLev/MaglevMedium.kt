@@ -38,11 +38,13 @@ constructor(
     // Note: since ImageActions are inherently designed to be destructive, i.e. not-undoable, we
     //  do not need to worry about removing Things from the Medium, instead the duplication of medium snapshots
     //  handles the thing lifecycle w.r.t. the undo engine
-    internal fun addThing(thing : IMaglevThing, arranged: ArrangedMediumData, description: String) {
+    internal fun addThing(thing : IMaglevThing, arranged: ArrangedMediumData, description: String)
+        =   addThings(SinglyList(thing), arranged, description)
+    internal fun addThings(things : List<IMaglevThing>, arranged: ArrangedMediumData, description: String) {
         arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged){
             override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
-                maglev.things.add(thing)
-                thing.draw(built)
+                maglev.things.addAll(things)
+                things.forEach { it.draw(built) }
             }
             override val description: String get() = description
         })

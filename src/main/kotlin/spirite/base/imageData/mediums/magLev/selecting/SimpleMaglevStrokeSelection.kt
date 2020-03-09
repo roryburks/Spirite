@@ -18,6 +18,7 @@ import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.magLev.*
 import spirite.base.imageData.selection.ILiftedData
 import spirite.base.imageData.selection.Selection
+import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.debug.SpiriteException
 import spirite.base.util.linear.Rect
@@ -31,7 +32,6 @@ class SimpleStrokeMaglevLiftedData(
         val strokeProvider: IStrokeDrawerProvider)
     : IMaglevLiftedData
 {
-
     override val image: IImage
     val dx: Int
     val dy: Int
@@ -67,11 +67,23 @@ class SimpleStrokeMaglevLiftedData(
         }
 
         image = img
-        //image = DynamicImage(img, dx, dy)
     }
 
-    override fun anchorOnto(other: MaglevMedium, tThisToOther: ITransformF) {
-        TODO("Not yet implemented")
+    override fun anchorOnto(other: MaglevMedium, arranged: ArrangedMediumData, tThisToOther: ITransformF) {
+        if(!lines.any()) return
+
+        val transformedLines = lines.map { line ->
+            val dp = line.drawPoints
+            val tx = FloatArray(dp.length)
+            val ty = FloatArray(dp.length)
+            (0 until dp.length).forEach {
+                val new = tThisToOther.apply(Vec2f(dp.x[it],dp.y[it]))
+                tx[it] = new.xf
+                ty[it] = new.yf
+            }
+            MaglevStroke(line.params, DrawPoints(tx, ty, dp.w)) // Nothing could possibly go wrong by just passing the width array...  right?
+        }
+        other.addThings(transformedLines,arranged, "Anchoring Lifted SimpleMaglevStroke to Maglev")
     }
 
     override fun draw(gc: GraphicsContext) {

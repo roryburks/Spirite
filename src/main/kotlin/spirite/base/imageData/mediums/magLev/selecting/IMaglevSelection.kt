@@ -9,7 +9,7 @@ import spirite.base.imageData.selection.ILiftedData
 
 interface IMaglevLiftedData : ILiftedData {
     val image: IImage
-    fun anchorOnto( other: MaglevMedium, tThisToOther: ITransformF)
+    fun anchorOnto( other: MaglevMedium, arranged: ArrangedMediumData, tThisToOther: ITransformF)
 }
 
 interface IMaglevSelection {
