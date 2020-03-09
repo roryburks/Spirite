@@ -7,6 +7,7 @@ import rb.owl.Observable
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f
+import rbJvm.owl.addWeakObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.IAnchorLiftModule
@@ -24,6 +25,7 @@ interface ISelectionEngine {
     val selectionChangeObserver: IObservable<(SelectionChangeEvent)->Any?>
     val selection : Selection?
     val selectionTransform: ITransformF?
+    val selectionExtra: ISelectionExtra?
     fun setSelection(newSelection: Selection?)
     fun mergeSelection(newSelection: Selection, mode: BuildMode)
     fun transformSelection(transform: ITransformF, liftIfEmpty: Boolean = false)
@@ -33,7 +35,7 @@ interface ISelectionEngine {
     fun anchorLifted()
     fun clearLifted()
     fun attemptLiftData( drawer: IImageDrawer)
-    fun setSelectionWithLifted(newSelection: Selection, lifted: ILiftedData)
+    fun setSelectionWithLifted(newSelection: Selection, lifted: ILiftedData?)
     fun imageToSelection(image: IImage, transform: ITransformF?)
 
     var proposingTransform: ITransformF?
@@ -56,6 +58,12 @@ class SelectionEngine(
     private val selectionDerived = DerivedLazy { selectionMask?.let { Selection(it, selectionTransform) } }
     override val selection by selectionDerived
 
+    private val selectionExtraDerived = DerivedLazy<ISelectionExtra?> {
+        val selection = selection ?: return@DerivedLazy null
+        (workspace.activeDrawer as? ILiftSelectionModule)?.getSelectionExtra(selection)
+    }
+    override val selectionExtra: ISelectionExtra? by selectionExtraDerived
+
     // region Base Selection Stuff
     override var selectionTransform : ITransformF? = null
         private set(value) {
@@ -77,8 +85,7 @@ class SelectionEngine(
         else {
             val drawer = workspace.anchorDrawer
             workspace.undoEngine.doAsAggregateAction("Change Selection") {
-                val proposingTransform = proposingTransform
-                val anchorTransform = when( proposingTransform ) {
+                val anchorTransform = when(val proposingTransform = proposingTransform) {
                     null -> selectionTransform
                     else -> proposingTransform * (selectionTransform ?: ImmutableTransformF.Identity)
                 }
@@ -95,10 +102,10 @@ class SelectionEngine(
         }
     }
 
-    inner class ChangeSelectionAction(val newSelection: Selection?)
+    inner class ChangeSelectionAction(private val newSelection: Selection?)
         : NullAction()
     {
-        val oldSelection: Selection? = selection
+        private val oldSelection: Selection? = selection
         override val description: String get() = "Change Selection"
 
         override fun performAction() {
@@ -117,10 +124,10 @@ class SelectionEngine(
     override fun mergeSelection(newSelection: Selection, mode: BuildMode) {
         if( newSelection.empty) return
         when( mode) {
-            ISelectionEngine.BuildMode.DEFAULT -> setSelection(newSelection)
-            ISelectionEngine.BuildMode.ADD -> setSelection(selection?.let { it + newSelection} ?: newSelection)
-            ISelectionEngine.BuildMode.SUBTRACT -> selection?.let { setSelection(it - newSelection) }
-            ISelectionEngine.BuildMode.INTERSECTION -> selection?.let { setSelection(it intersection newSelection) }
+            BuildMode.DEFAULT -> setSelection(newSelection)
+            BuildMode.ADD -> setSelection(selection?.let { it + newSelection} ?: newSelection)
+            BuildMode.SUBTRACT -> selection?.let { setSelection(it - newSelection) }
+            BuildMode.INTERSECTION -> selection?.let { setSelection(it intersection newSelection) }
         }
     }
 
@@ -142,7 +149,7 @@ class SelectionEngine(
     inner class TransformSelectionAction(
             var transform: ITransformF) : NullAction(), StackableAction
     {
-        val originalTransform = selectionTransform
+        private val originalTransform = selectionTransform
 
         override val description: String get() = "Moved Selection"
 
@@ -197,7 +204,7 @@ class SelectionEngine(
             drawer.anchorLifted(liftedData, selectionTransform)
     }
 
-    override fun setSelectionWithLifted(newSelection: Selection, lifted: ILiftedData) {
+    override fun setSelectionWithLifted(newSelection: Selection, lifted: ILiftedData?) {
         workspace.undoEngine.doAsAggregateAction("Set Lifted Selection"){
             setSelection(newSelection)
             workspace.undoEngine.performAndStore(ChangeLiftedDataAction(lifted))
@@ -262,4 +269,7 @@ class SelectionEngine(
     }
 
     override val selectionChangeObserver = Observable<(SelectionChangeEvent)->Any?>()
+
+    // For Selection Extra trigger-on-change
+    private val _workspaceDrawerK = workspace.activeDrawerObs.addWeakObserver { selectionExtraDerived.reset() }
 }

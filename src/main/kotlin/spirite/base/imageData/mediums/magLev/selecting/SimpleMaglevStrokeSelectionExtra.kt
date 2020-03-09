@@ -10,19 +10,15 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
-import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.magLev.*
 import spirite.base.imageData.selection.ILiftedData
-import spirite.base.imageData.selection.Selection
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.debug.SpiriteException
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.RectangleUtil
 import spirite.hybrid.Hybrid
 import kotlin.math.min
 
@@ -105,11 +101,11 @@ class SimpleStrokeMaglevLiftedData(
     override val height: Int get() = image.height
 }
 
-class SimpleMaglevStrokeSelection(
+class SimpleMaglevStrokeSelectionExtra(
         val context: MaglevMedium,
         val lines: List<MaglevStroke>,
         val tInternalToContext: ITransformF)
-    : IMaglevSelection
+    : IMaglevSelectionExtra
 {
     override fun draw(gc: GraphicsContext) {
         gc.color = Colors.WHITE
@@ -137,12 +133,12 @@ class SimpleMaglevStrokeSelection(
         private val deepThreshAlpha = 0.9f
         private val deepStride = 10
 
-        fun FromArranged( arranged: ArrangedMediumData) : SimpleMaglevStrokeSelection
+        fun FromArranged( arranged: ArrangedMediumData) : SimpleMaglevStrokeSelectionExtra
         {
             val medium = arranged.handle.medium
             val maglev = medium as? MaglevMedium ?: throw SpiriteException("Tried to lift a non-maglev medium into a Maglev Selection")
             if( arranged.selection == null){
-                return SimpleMaglevStrokeSelection(
+                return SimpleMaglevStrokeSelectionExtra(
                         maglev,
                         maglev.things.filterIsInstance<MaglevStroke>(),
                         arranged.tMediumToWorkspace)
@@ -185,7 +181,7 @@ class SimpleMaglevStrokeSelection(
                             passesShallowThreshold(pts) && passesDeepThreshold(pts)
                         }
 
-                return SimpleMaglevStrokeSelection(
+                return SimpleMaglevStrokeSelectionExtra(
                         maglev,
                         passingStrokes,
                         arranged.tMediumToWorkspace)

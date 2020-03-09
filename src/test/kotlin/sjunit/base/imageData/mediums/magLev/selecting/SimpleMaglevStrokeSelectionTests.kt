@@ -10,7 +10,7 @@ import sjunit.testHelpers.makeWorkspaceWithMockedExternals
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.mediums.magLev.MaglevStroke
-import spirite.base.imageData.mediums.magLev.selecting.SimpleMaglevStrokeSelection
+import spirite.base.imageData.mediums.magLev.selecting.SimpleMaglevStrokeSelectionExtra
 import spirite.base.imageData.selection.Selection
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
@@ -51,7 +51,7 @@ class SimpleMaglevStrokeSelectionTests {
             val arranged = ArrangedMediumData(handle, selection = selection)
 
             // Act
-            val magSel = SimpleMaglevStrokeSelection.FromArranged(arranged)
+            val magSel = SimpleMaglevStrokeSelectionExtra.FromArranged(arranged)
 
             // Assert
             assertEquals(lines[1], magSel.lines.single())

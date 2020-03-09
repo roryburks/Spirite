@@ -107,11 +107,11 @@ class DefaultImageDrawer(
 
     override fun acceptsLifted(lifted: ILiftedData) = true
 
-    override fun anchorLifted(lifted: ILiftedData, trans: ITransformF?) {
+    override fun anchorLifted(lifted: ILiftedData, tLiftedToMedium: ITransformF?) {
         workspace.undoEngine.performMaskedImageAction("Anchor Lifted", arranged, null) { built, mask ->
             built.drawOnComposite { gc->
-                if(trans != null)
-                    gc.preTransform(trans)
+                if(tLiftedToMedium != null)
+                    gc.preTransform(tLiftedToMedium)
                 lifted.draw(gc)
             }
         }

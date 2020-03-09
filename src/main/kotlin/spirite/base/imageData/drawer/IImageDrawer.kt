@@ -10,6 +10,7 @@ import spirite.base.imageData.deformation.IDeformation
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.selection.ILiftedData
+import spirite.base.imageData.selection.ISelectionExtra
 import spirite.base.imageData.selection.Selection
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.ImageAction
@@ -98,12 +99,13 @@ interface IImageDrawer {
     }
 
     interface ILiftSelectionModule {
-        fun liftSelection(selection: Selection, clearLifted: Boolean = true): ILiftedData
+        fun liftSelection(selection: Selection, clearLifted: Boolean = true): ILiftedData?
+        fun getSelectionExtra(selection: Selection) : ISelectionExtra? = null
     }
 
     interface IAnchorLiftModule {
         fun acceptsLifted(lifted: ILiftedData): Boolean
-        fun anchorLifted(lifted: ILiftedData, trans: ITransformF?)
+        fun anchorLifted(lifted: ILiftedData, tLiftedToMedium: ITransformF?)
     }
 
     interface IDeformDrawer {
