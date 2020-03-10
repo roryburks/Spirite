@@ -6,6 +6,7 @@ import rb.glow.gle.GLParameters
 import rb.glow.gle.GLPrimitive
 import rb.glow.gle.IGLEngine
 import rb.glow.gle.PolyRenderCall
+import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.floor
@@ -23,17 +24,27 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
     }
 
     override fun doStep(context: DrawerContext) {
-
-        drawStroke(gle, context.image, context.builder.currentPoints, context.glParams)
-        (0..context.builder.currentPoints.length-1).forEach {
+        drawStroke(gle, context.image, context.builder.currentPoints, context.glParams, null)
+        (0 until context.builder.currentPoints.length).forEach {
             drawPoint(gle, context.image, context.builder.currentPoints.x[it].floor, context.builder.currentPoints.y[it].floor, context.glParams)
         }
     }
 
-    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters) {
-        drawStroke(gle, image, drawPoints, glParams)
-        (0..drawPoints.length-1).forEach {
-            drawPoint(gle, image, drawPoints.x[it].floor, drawPoints.y[it].floor, glParams)
+    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters, transform: ITransformF?) {
+        drawStroke(gle, image, drawPoints, glParams, transform)
+        (0 until drawPoints.length).forEach {
+            val px: Int
+            val py: Int
+            if( transform == null) {
+                px = drawPoints.x[it].floor
+                py = drawPoints.y[it].floor
+            }
+            else {
+                val point = transform.apply(Vec2f(drawPoints.x[it], drawPoints.y[it]))
+                px = point.xf.floor
+                py = point.yf.floor
+            }
+            drawPoint(gle, image, px, py, glParams)
         }
     }
 
@@ -52,7 +63,7 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
                     prim, params, null)
         }
 
-        fun drawStroke(gle: IGLEngine, image: GLImage, points: DrawPoints, params: GLParameters) {
+        fun drawStroke(gle: IGLEngine, image: GLImage, points: DrawPoints, params: GLParameters, transform: ITransformF?) {
             val vb = composeVBuffer(points)
 
             image.graphics.clear()
@@ -60,7 +71,7 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
 
             val prim = GLPrimitive(vb, intArrayOf(2), intArrayOf(GLC.LINE_STRIP), intArrayOf(points.length + 1))
             gle.applyPrimitiveProgram(StrokePixelCall(Vec3f(1f, 1f, 1f)),
-                    prim, params, null)
+                    prim, params, transform)
         }
 
         private fun composeVBuffer( states: DrawPoints) : FloatArray {

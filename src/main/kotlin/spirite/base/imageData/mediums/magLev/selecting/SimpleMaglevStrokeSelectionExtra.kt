@@ -54,14 +54,18 @@ class SimpleStrokeMaglevLiftedData(
         dy = y1?.floor ?: 0
         val dw = (x2?.floor?:0) - dx
         val dh = (y2?.floor?:0) - dy
+//        val dw = 1000
+//        val dh = 1000
 
-        val img = Hybrid.imageCreator.createImage(1000, 1000)
+        val img = Hybrid.imageCreator.createImage(dw, dh)
         val gc = img.graphics
 
         gc.translate(-dx.f, -dy.f)
         lines.forEach { line ->
             line.draw(gc, strokeProvider, dw, dh)
         }
+
+//        Hybrid.imageIO.saveImage(img, File("C:/Bucket/ex.png"))
 
         image = img
     }
@@ -87,7 +91,7 @@ class SimpleStrokeMaglevLiftedData(
 
     override fun draw(gc: GraphicsContext) {
         gc.pushTransform()
-        gc.transform = ITransformF.Identity
+        gc.preTransform(tInternalToContext)
         gc.renderImage(image,dx, dy)
         gc.popTransform()
     }
