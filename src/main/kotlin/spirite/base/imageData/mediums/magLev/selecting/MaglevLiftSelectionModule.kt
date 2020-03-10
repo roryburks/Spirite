@@ -1,6 +1,5 @@
 package spirite.base.imageData.mediums.magLev.selecting
 
-import rb.glow.IImage
 import rb.vectrix.linear.ITransformF
 import spirite.base.exceptions.CannotDoException
 import spirite.base.imageData.drawer.IImageDrawer
@@ -36,9 +35,8 @@ class MaglevAnchorLiftModule(
     : IImageDrawer.IAnchorLiftModule
 {
     override fun acceptsLifted(lifted: ILiftedData): Boolean = lifted is IMaglevLiftedData
-    override fun anchorLifted(lifted: ILiftedData, tLiftedToMedium: ITransformF?) {
+    override fun anchorLifted(lifted: ILiftedData, tMediumToLifted: ITransformF?) {
         val maglevLifted = lifted as? IMaglevLiftedData ?: throw CannotDoException("Attempt to Anchor non-Maglev data onto Maglev")
-        val tLiftedToMedium = tLiftedToMedium ?: ITransformF.Identity
-        maglevLifted.anchorOnto(maglev, arranged, tLiftedToMedium)
+        maglevLifted.anchorOnto(maglev, arranged, tMediumToLifted ?: ITransformF.Identity)
     }
 }

@@ -105,7 +105,7 @@ interface IImageDrawer {
 
     interface IAnchorLiftModule {
         fun acceptsLifted(lifted: ILiftedData): Boolean
-        fun anchorLifted(lifted: ILiftedData, tLiftedToMedium: ITransformF?)
+        fun anchorLifted(lifted: ILiftedData, tMediumToLifted: ITransformF?)
     }
 
     interface IDeformDrawer {

@@ -4,7 +4,6 @@ import rb.extendo.extensions.stride
 import rb.glow.GraphicsContext
 import rb.glow.IImage
 import rb.glow.color.Colors
-import rb.hydra.selectiveTiamatGrindSync
 import rb.vectrix.linear.*
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
@@ -20,7 +19,6 @@ import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.debug.SpiriteException
 import spirite.base.util.linear.Rect
 import spirite.hybrid.Hybrid
-import java.io.File
 import kotlin.math.min
 
 class SimpleStrokeMaglevLiftedData(
@@ -70,11 +68,14 @@ class SimpleStrokeMaglevLiftedData(
         image = img
     }
 
-    override fun anchorOnto(other: MaglevMedium, arranged: ArrangedMediumData, tThisToOther: ITransformF) {
+    override fun anchorOnto(other: MaglevMedium, arranged: ArrangedMediumData, tMediumToLifted: ITransformF) {
         if(!lines.any()) return
 
-        val tLineToInternal = ImmutableTransformF.Translation(-dx.f,-dy.f)
-        val tLineToOther = tLineToInternal * tThisToOther
+        // Short justification for this transform:
+        // tInternalToContext stores the inverse of the initial transform of the selection
+        // tMediumToLifted stores the new selection transform
+        // so invert old then apply new = transformed the difference
+        val tLineToOther = tInternalToContext * tMediumToLifted
         val transformedLines = lines.map { line ->
             val dp = line.drawPoints
             val tx = FloatArray(dp.length)
