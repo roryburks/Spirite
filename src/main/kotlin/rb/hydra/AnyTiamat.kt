@@ -4,7 +4,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.ClosedSendChannelException
-import kotlin.coroutines.CoroutineContext
 
 
 fun <T> Sequence<T>.anyTiamatGrindSync(headCount: Int = 4, lambda: (T) -> Boolean)

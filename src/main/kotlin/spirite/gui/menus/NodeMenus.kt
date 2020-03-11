@@ -6,7 +6,6 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import spirite.base.imageData.mediums.MediumType
 
 object NodeMenus {
     fun schemeForNode(workspace: IImageWorkspace, node: Node?) : List<MenuItem>{

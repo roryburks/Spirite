@@ -1,16 +1,16 @@
 package old.spirite.base.graphics.fill
 
+import old.TestConfig
+import org.junit.jupiter.api.Test
 import rb.glow.color.Colors
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
-import old.TestConfig
 import spirite.hybrid.EngineLaunchpoint
 import spirite.specialRendering.fill.GLFill
 import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.system.measureTimeMillis
-import org.junit.jupiter.api.Test
 
 class GLFillTests {
     @Test fun TestFill400() {

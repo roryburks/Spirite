@@ -1,6 +1,5 @@
 package sjunit.testHelpers
 
-import rb.owl.IObservable
 import rb.owl.Observable
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.IUndoEngine

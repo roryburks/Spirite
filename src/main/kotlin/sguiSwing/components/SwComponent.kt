@@ -22,7 +22,6 @@ import javax.swing.BorderFactory
 import javax.swing.JComponent
 import javax.swing.KeyStroke
 import javax.swing.border.BevelBorder
-import java.awt.event.MouseEvent as JMouseEvent
 
 interface ISwComponent : IComponent {
     override val component : Component

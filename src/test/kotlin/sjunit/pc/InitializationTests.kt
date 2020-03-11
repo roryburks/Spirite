@@ -1,12 +1,10 @@
 package sjunit.pc
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Test
 import spirite.base.brains.MasterControl
 import spirite.pc.Spirite
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 class InitializationTests {
     fun doInitTest(lambda : (MasterControl)->Unit) {

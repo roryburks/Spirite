@@ -1,8 +1,8 @@
 package sjunit.rb.owl
 
+import org.junit.jupiter.api.Test
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class BindableTests{

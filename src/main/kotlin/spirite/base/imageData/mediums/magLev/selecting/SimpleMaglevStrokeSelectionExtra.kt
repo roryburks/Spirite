@@ -4,7 +4,9 @@ import rb.extendo.extensions.stride
 import rb.glow.GraphicsContext
 import rb.glow.IImage
 import rb.glow.color.Colors
-import rb.vectrix.linear.*
+import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
@@ -12,7 +14,8 @@ import rb.vectrix.mathUtil.round
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.mediums.ArrangedMediumData
-import spirite.base.imageData.mediums.magLev.*
+import spirite.base.imageData.mediums.magLev.MaglevMedium
+import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.base.imageData.selection.ILiftedData
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawerProvider

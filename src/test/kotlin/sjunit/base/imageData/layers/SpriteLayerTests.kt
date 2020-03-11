@@ -2,6 +2,7 @@ package sjunit.base.imageData.layers
 
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.jupiter.api.Test
 import sgui.components.IButton
 import sjunit.testHelpers.MockedWorkspaceSet
 import sjunit.testHelpers.PassthroughUndoEngine
@@ -9,7 +10,6 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.views.layerProperties.SpriteLayerPanel
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 class SpriteLayerTests{
     class MockUndo {

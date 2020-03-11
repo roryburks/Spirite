@@ -1,20 +1,20 @@
 package old.spirite.base.graphics.gl
 
 
+import old.TestConfig
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Tags
+import org.junit.jupiter.api.Test
 import rb.glow.color.ColorARGB32Normal
 import rb.glow.color.Colors
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
-import old.TestConfig
-import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.Tags
 import spirite.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 @Tags(Tag("Old"), Tag(("GPU")))
 class GLImageTests {

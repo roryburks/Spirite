@@ -21,7 +21,6 @@ import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.HandleCompositeSource
 import spirite.base.imageData.mediums.magLev.MaglevFill.StrokeSegment
-import spirite.base.imageData.mediums.magLev.selecting.IMaglevLiftedData
 import spirite.base.imageData.mediums.magLev.selecting.MaglevAnchorLiftModule
 import spirite.base.imageData.mediums.magLev.selecting.MaglevLiftSelectionModule
 import spirite.base.pen.PenState

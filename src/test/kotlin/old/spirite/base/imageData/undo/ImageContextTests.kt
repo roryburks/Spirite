@@ -1,6 +1,7 @@
 package old.spirite.base.imageData.undo
 
 import io.mockk.mockk
+import org.junit.jupiter.api.Test
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
@@ -9,7 +10,6 @@ import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.undo.ImageAction
 import spirite.base.imageData.undo.ImageContext
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 class ImageContextTests {
     val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)

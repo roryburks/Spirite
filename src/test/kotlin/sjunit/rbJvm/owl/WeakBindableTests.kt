@@ -1,11 +1,10 @@
 package sjunit.rbJvm.owl
 
-import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 import rb.owl.bindable.Bindable
 import rbJvm.owl.bindWeaklyTo
 import sjunit.rb.owl.BindableTests
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 class WeakBindableTests {
     data class DummyInfoClass(val a: Int = 999)

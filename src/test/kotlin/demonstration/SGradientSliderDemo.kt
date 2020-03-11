@@ -7,7 +7,6 @@ import sgui.components.IButton
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
 import spirite.hybrid.Hybrid
-import java.awt.Color
 import java.awt.GridLayout
 import javax.swing.JFrame
 

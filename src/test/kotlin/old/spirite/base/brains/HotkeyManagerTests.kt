@@ -1,13 +1,13 @@
 package old.spirite.base.brains
 
 import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 import spirite.base.brains.Hotkey
 import spirite.base.brains.HotkeyManager
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.settings.JPreferences
 import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 @Tag("Old")
 class HotkeyManagerTests {

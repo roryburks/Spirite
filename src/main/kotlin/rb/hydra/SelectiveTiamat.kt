@@ -3,7 +3,6 @@ package rb.hydra
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import kotlin.coroutines.CoroutineContext
 
 /**
  * SelectiveTiamat is a coroutine version of filter (only use if your filter criteria are heavy and parallelable)

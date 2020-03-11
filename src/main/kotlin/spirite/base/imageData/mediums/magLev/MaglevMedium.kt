@@ -12,8 +12,6 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.*
 import spirite.base.imageData.mediums.MediumType.MAGLEV
-import spirite.base.imageData.undo.IUndoEngine
-import spirite.base.imageData.undo.UndoEngine
 
 
 class MaglevMedium
@@ -34,6 +32,7 @@ constructor(
 
     internal val thingsMap = things?.toMutableMap() ?: mutableMapOf()
     fun getThingsMap() : Map<Int,IMaglevThing> = thingsMap
+    val things get() = thingsMap.values
     private var met = thingsMap.keys.max()?.apply { this + 1 } ?: 0
 
     fun build(handle: MediumHandle)

@@ -1,7 +1,6 @@
 package spirite.base.pen.stroke
 
 import rb.glow.GraphicsContext
-import rb.vectrix.linear.ITransformF
 
 interface IStrokeDrawer {
     fun start( builder: StrokeBuilder, width: Int, height:Int) : Boolean

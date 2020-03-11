@@ -1,6 +1,8 @@
 package old.spirite.base.graphics.gl
 
 
+import old.TestConfig
+import org.junit.jupiter.api.Test
 import rb.glow.CapMethod.NONE
 import rb.glow.JoinMethod.MITER
 import rb.glow.color.Colors
@@ -14,7 +16,6 @@ import rb.glow.gle.RenderCall.RenderAlgorithm.*
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
 import rbJvm.glow.awt.toBufferedImage
-import old.TestConfig
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.pen.stroke.DrawPoints
 import spirite.hybrid.Hybrid
@@ -24,7 +25,6 @@ import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 class GLEngineTests {
     val gle = Hybrid.gle

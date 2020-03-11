@@ -7,7 +7,6 @@ import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.brains.toolset.Toolset
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.ImageWorkspace
-import spirite.base.imageData.MImageWorkspace
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 
 fun  makeWorkspaceWithMockedExternals(width: Int = 100, height: Int = 100) =  ImageWorkspace(

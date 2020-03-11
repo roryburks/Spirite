@@ -1,6 +1,5 @@
 package spirite.base.brains.commands
 
-import rb.extendo.extensions.toHashMap
 import spirite.base.brains.KeyCommand
 import spirite.base.exceptions.CommandNotValidException
 

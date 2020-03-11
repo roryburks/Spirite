@@ -2,19 +2,13 @@ package sjunit.base.imageData.mediums.maglev.selecting
 
 import org.junit.jupiter.api.Test
 import rb.glow.color.Colors
-import rb.vectrix.mathUtil.MathUtil
-import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.floor
 import sjunit.base.imageData.mediums.maglev.MaglevTestHelper
 import sjunit.testHelpers.images.TRectIImage
 import sjunit.testHelpers.makeWorkspaceWithMockedExternals
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.magLev.MaglevMedium
-import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.base.imageData.mediums.magLev.selecting.SimpleMaglevStrokeSelectionExtra
 import spirite.base.imageData.selection.Selection
-import spirite.base.pen.stroke.DrawPoints
-import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.linear.Rect
 import kotlin.test.assertEquals
 

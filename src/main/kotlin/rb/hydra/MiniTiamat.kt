@@ -3,7 +3,6 @@ package rb.hydra
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import kotlin.coroutines.CoroutineContext
 
 fun <T> Sequence<T>.miniTiamatGrindSync(headCount: Int = 4, minimizer: (T)->Double)
         = runBlocking { miniTiamatGrind(headCount, minimizer) }

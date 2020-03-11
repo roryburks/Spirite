@@ -1,6 +1,5 @@
 package spirite.base.imageData.mediums.magLev.selecting
 
-import rb.glow.GraphicsContext
 import rb.glow.IImage
 import rb.vectrix.linear.ITransformF
 import spirite.base.imageData.mediums.ArrangedMediumData
