@@ -41,11 +41,7 @@ suspend fun <T> Sequence<T>.miniTiamatGrind(
     return if( min?.t == null) null else Pair(min.size, min.t!!)
 }
 
-private class MiniTiamatHead<T> : CoroutineScope{
+private class MiniTiamatHead<T> : CoroutineScope by CoroutineScope(Dispatchers.Default){
     var t: T? = null
     var size: Double = Double.MAX_VALUE
-
-    val job = Job()
-    override val coroutineContext: CoroutineContext get() = newSingleThreadContext("test") + job
-
 }

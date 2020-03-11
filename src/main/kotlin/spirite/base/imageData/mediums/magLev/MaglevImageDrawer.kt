@@ -21,6 +21,9 @@ import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.HandleCompositeSource
 import spirite.base.imageData.mediums.magLev.MaglevFill.StrokeSegment
+import spirite.base.imageData.mediums.magLev.selecting.IMaglevLiftedData
+import spirite.base.imageData.mediums.magLev.selecting.MaglevAnchorLiftModule
+import spirite.base.imageData.mediums.magLev.selecting.MaglevLiftSelectionModule
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeBuilder
@@ -40,7 +43,9 @@ class MaglevImageDrawer(
         IColorChangeModule by MaglevColorChangeModule(arranged),
         IMagneticFillModule by MaglevMagneticFillModule(arranged, maglev),
         IDeformDrawer by MaglevDeformationModule(arranged, maglev),
-        IMagneticEraseModule by MaglevMagneticEraseModule(arranged, maglev)
+        IMagneticEraseModule by MaglevMagneticEraseModule(arranged, maglev),
+        ILiftSelectionModule by MaglevLiftSelectionModule(arranged),
+        IAnchorLiftModule by MaglevAnchorLiftModule(arranged, maglev)
 
 class MaglevClearModule( val arranged: ArrangedMediumData) : IClearModule {
     override fun clear() {

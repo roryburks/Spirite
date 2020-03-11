@@ -29,8 +29,8 @@ class GLStrokeDrawerV2(
         drawStroke(context.image, context.builder.currentPoints, context.builder.params.width, context.glParams, context.builder.params)
     }
 
-    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters) {
-        drawStroke( image, drawPoints, params.width, glParams, params)
+    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters, transform: ITransformF?) {
+        drawStroke( image, drawPoints, params.width, glParams, params, transform)
     }
 
     override fun getIntensifyMethod(params: StrokeParams): IntensifyMethod = when {
