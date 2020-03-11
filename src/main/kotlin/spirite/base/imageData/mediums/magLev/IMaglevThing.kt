@@ -7,7 +7,8 @@ import spirite.base.imageData.mediums.BuiltMediumData
 
 interface IMaglevThing {
     fun dupe() : IMaglevThing
-    fun draw(built: BuiltMediumData)}
+    fun draw(built: BuiltMediumData)
+}
 
 interface IMaglevPointwiseThing {
     fun transformPoints( lambda: (Vec3f)->(Vec3f))
