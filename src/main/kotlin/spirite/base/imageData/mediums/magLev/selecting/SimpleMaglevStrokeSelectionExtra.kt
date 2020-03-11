@@ -152,7 +152,7 @@ class SimpleMaglevStrokeSelectionExtra(
             if( arranged.selection == null){
                 return SimpleMaglevStrokeSelectionExtra(
                         maglev,
-                        maglev.things.filterIsInstance<MaglevStroke>(),
+                        maglev.thingsMap.values.filterIsInstance<MaglevStroke>(),
                         arranged.tMediumToWorkspace)
             }
             else {
@@ -183,7 +183,7 @@ class SimpleMaglevStrokeSelectionExtra(
                     return (passCt.f / ptsToCheck.count().f) > deepThresh
                 }
 
-                val passingStrokes = maglev.things
+                val passingStrokes = maglev.thingsMap.values
                         .filterIsInstance<MaglevStroke>()
                         .filter { stroke ->
                             val dp = stroke.drawPoints

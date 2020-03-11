@@ -29,7 +29,7 @@ data class MaglevFill(
         var i = 0
         val maglev = built.arranged.handle.medium as MaglevMedium
         for( segment in segments) {
-            val stroke = maglev.things[segment.strokeId] as MaglevStroke
+            val stroke = maglev.thingsMap[segment.strokeId] as MaglevStroke
 
             val stepping =
                     if(segment.end >= segment.start) segment.start..segment.end

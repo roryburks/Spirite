@@ -49,17 +49,11 @@ class MaglevImageDrawer(
 
 class MaglevClearModule( val arranged: ArrangedMediumData) : IClearModule {
     override fun clear() {
-        arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged) {
-            override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
-                maglev.things.clear()
-                built.rawAccessComposite { it.graphics.clear() }
-            }
-
-            override val description: String get() = "Clear Maglev Layer"
-
-        })
+        arranged.handle.workspace.undoEngine.performAndStoreMaglevImageAction(arranged, "Clear Maglev Layer"){ built, maglev->
+            maglev.thingsMap.clear()
+            built.rawAccessComposite { it.graphics.clear() }
+        }
     }
-
 }
 
 class MaglevStrokeModule(val arranged: ArrangedMediumData) : IStrokeModule {
@@ -126,13 +120,14 @@ class MaglevTransformModule(val arranged: ArrangedMediumData)
             override val isHeavy: Boolean get() = true
 
             override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
-                val things = maglev.things
+                val things = maglev.thingsMap.values
                 things.asSequence()
                         .filterIsInstance<IMaglevPointwiseThing>()
-                        .forEach { it.transformPoints{
-                            val vec2 = effectiveTrans.apply(Vec2f(it.xf, it.yf))
-                            Vec3f(vec2.xf, vec2.yf, it.zf * det)
-                        } }
+                        .forEach { thing -> thing.transformPoints {
+                                val vec2 = effectiveTrans.apply(Vec2f(it.xf, it.yf))
+                                Vec3f(vec2.xf, vec2.yf, it.zf * det)
+                            }
+                        }
                 built.rawAccessComposite {it.graphics.clear()}
                 things.forEach { it.draw(built) }
             }
@@ -174,7 +169,7 @@ class MaglevColorChangeModule(val arranged: ArrangedMediumData) : IColorChangeMo
             override val description: String get() = "Color Change Maglev Layer"
             override val isHeavy: Boolean get() = true
             override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
-                val things = maglev.things
+                val things = maglev.thingsMap.values
                 things.asSequence()
                         .filterIsInstance<IMaglevColorwiseThing>()
                         .forEach { it.transformColor { color ->
@@ -213,7 +208,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
         val outY = FloatArray(totalLen)
         var i = 0
         segments.forEach { seg ->
-            val stroke = maglev.things[seg.strokeId] as MaglevStroke
+            val stroke = maglev.thingsMap[seg.strokeId] as MaglevStroke
             val sign = if(seg.travel < 0) -1 else 1
             (0..abs(seg.travel)).forEach { c ->
                 outX[i] = stroke.drawPoints.x[seg.pivotPoint + c * sign]
@@ -245,7 +240,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
         if( closestDist > r) return
 
         if( closest.strokeId == ss?.strokeId) {
-            val stroke = maglev.things[closest.strokeId] as MaglevStroke
+            val stroke = maglev.thingsMap[closest.strokeId] as MaglevStroke
             val sx = stroke.drawPoints.x[closest.pivotPoint]
             val sy = stroke.drawPoints.y[closest.pivotPoint]
 
@@ -275,7 +270,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
     private data class StrokePointContext(val strokeIndex: Int, val index: Int, val drawPoints: DrawPoints)
     fun findClosestStroke( x: Float, y: Float) : Pair<Double,BuildingStrokeSegment>?
     {
-        val (dist, closest) = maglev.things.asSequence()
+        val (dist, closest) = maglev.thingsMap.values.asSequence()
                 .mapIndexedNotNull { index, iMaglevThing ->
                     if( iMaglevThing is MaglevStroke) Pair(index, iMaglevThing.drawPoints)
                     else null }
@@ -296,7 +291,7 @@ class MaglevDeformationModule(val arranged: ArrangedMediumData, val maglev: Magl
             override val isHeavy: Boolean get() = true
 
             override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
-                val things = maglev.things
+                val things = maglev.thingsMap.values
                 things.asSequence()
                         .filterIsInstance<IMaglevPointwiseThing>()
                         .forEach { it.transformPoints{
@@ -315,10 +310,10 @@ class MaglevDeformationModule(val arranged: ArrangedMediumData, val maglev: Magl
 class MaglevMagneticEraseModule( val arranged: ArrangedMediumData, val maglev: MaglevMedium) : IMagneticEraseModule
 {
     override fun erase(x: Float, y: Float) {
-        val things = maglev.things
+        val things = maglev.thingsMap
         val removedThings = HashSet<IMaglevThing>()
 
-        val strokesToRemove = things
+        val strokesToRemove = things.values
                 .filterIsInstance<MaglevStroke>()
                 .filter {stroke ->
                     val strokeWidth = stroke.params.width
@@ -333,7 +328,7 @@ class MaglevMagneticEraseModule( val arranged: ArrangedMediumData, val maglev: M
                 .toSet()
 
 
-        val fillsToRemove = maglev.things
+        val fillsToRemove = maglev.thingsMap.values
                 .filterIsInstance<MaglevFill>()
                 .filter { fill -> fill.segments.any{removedIds.contains(it.strokeId)} }
 

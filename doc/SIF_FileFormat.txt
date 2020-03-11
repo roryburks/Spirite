@@ -94,7 +94,7 @@ Header
 				[1, byte] : Fill Method
 				[2, ushort] : number of stroke segments
 				Per reference:
-					[4, Int] : reference to stroke
+					[4, Int] : reference to stroke // Note: really should be 2, ushort
 					[4, Int] : start point of stroke
 					[4, Int] : end point of stroke
 		[4, int] : Size of Image Data

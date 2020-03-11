@@ -12,27 +12,35 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.*
 import spirite.base.imageData.mediums.MediumType.MAGLEV
+import spirite.base.imageData.undo.IUndoEngine
+import spirite.base.imageData.undo.UndoEngine
 
 
 class MaglevMedium
 constructor(
         private val workspace: MImageWorkspace,
-        internal val things: MutableList<IMaglevThing>,
+        things: Map<Int,IMaglevThing>?,
         val builtImage : DynamicImage)
     :IMedium, IImageMedium
 {
     constructor(
             workspace: MImageWorkspace,
-            things: List<IMaglevThing>? = null)
-            : this(workspace, things?.toMutableList() ?: mutableListOf(), DynamicImage())
+            things: Map<Int,IMaglevThing>? = null)
+            : this(workspace, things, DynamicImage())
+    constructor(
+            workspace: MImageWorkspace,
+            things: List<IMaglevThing>)
+            : this(workspace, things.mapIndexed { i, thing -> Pair(i,thing) }.toMap(), DynamicImage())
 
-    fun getThings() = things.toList()
+    internal val thingsMap = things?.toMutableMap() ?: mutableMapOf()
+    fun getThingsMap() : Map<Int,IMaglevThing> = thingsMap
+    private var met = thingsMap.keys.max()?.apply { this + 1 } ?: 0
 
     fun build(handle: MediumHandle)
     {
         val arranged = ArrangedMediumData(handle, 0f, 0f)
         val built = build(arranged)
-        things.forEach { it.draw(built) }
+        thingsMap.values.forEach { it.draw(built) }
     }
 
     // Note: since ImageActions are inherently designed to be destructive, i.e. not-undoable, we
@@ -41,25 +49,21 @@ constructor(
     internal fun addThing(thing : IMaglevThing, arranged: ArrangedMediumData, description: String)
         =   addThings(SinglyList(thing), arranged, description)
     internal fun addThings(things : List<IMaglevThing>, arranged: ArrangedMediumData, description: String) {
-        arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged){
-            override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
-                maglev.things.addAll(things)
-                things.forEach { it.draw(built) }
+        arranged.handle.workspace.undoEngine.performAndStoreMaglevImageAction(arranged, description) {built, maglev ->
+            things.forEach {
+                maglev.thingsMap[maglev.met++] = it
+                it.draw(built)
             }
-            override val description: String get() = description
-        })
+        }
     }
 
     internal fun removeThings( things: Collection<IMaglevThing>, arranged: ArrangedMediumData, description: String) {
-        val toRemoveSet= things.toSet()
-        arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged){
-            override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
-                maglev.things.replaceAll { if( toRemoveSet.contains(it)) DeadMaglevThing else it }
-                builtImage.flush() // BAD: using things after flush is intended to be undefined behavior, I'm using internal knowledge.  bad
-                maglev.things.forEach { it.draw(built) }
-            }
-            override val description: String get() = description
-        })
+        //val toRemoveSet= things.toSet()
+        arranged.handle.workspace.undoEngine.performAndStoreMaglevImageAction(arranged, description) {built, maglev ->
+            maglev.thingsMap.values.removeAll(things)
+            maglev.builtImage.flush()
+            maglev.thingsMap.values.forEach {it.draw(built)  }
+        }
     }
 
     // region IMedium
@@ -87,7 +91,9 @@ constructor(
 
     override fun dupe(workspace: MImageWorkspace) = MaglevMedium(
             workspace,
-            things.map { it.dupe() }.toMutableList(),
+            thingsMap
+                    .map { Pair(it.key, it.value.dupe()) }
+                    .toMap(),
             this.builtImage.deepCopy())
     override fun flush() { builtImage.flush() }
     // endregion
