@@ -2,10 +2,10 @@ package old.hydra
 
 
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Test
 import rb.hydra.miniTiamatGrind
 import rb.vectrix.mathUtil.d
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 class MiniTiamatTests {
     @Test fun Minimizes_Basic(){

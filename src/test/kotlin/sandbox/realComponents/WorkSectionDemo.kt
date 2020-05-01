@@ -1,10 +1,10 @@
-package sandbox.realComponents
+package demonstration.realComponents
 
-import sandbox.DemoLauncher
+import demonstration.DemoLauncher
+import old.TestHelper
 import sgui.Orientation.HORIZONTAL
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
-import old.TestHelper
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.gui.views.work.WorkTabPane

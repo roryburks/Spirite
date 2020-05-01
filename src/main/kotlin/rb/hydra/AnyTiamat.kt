@@ -4,7 +4,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.ClosedSendChannelException
-import kotlin.coroutines.CoroutineContext
 
 
 fun <T> Sequence<T>.anyTiamatGrindSync(headCount: Int = 4, lambda: (T) -> Boolean)
@@ -13,7 +12,7 @@ fun <T> Sequence<T>.anyTiamatGrindSync(headCount: Int = 4, lambda: (T) -> Boolea
 suspend fun <T> Sequence<T>.anyTiamatGrind(
         headCount: Int = 4, lambda: (T) -> Boolean) : Boolean
 {
-    val heads = List(headCount) { AnyTiamatHead<T>() }
+    val heads = List(headCount) { AnyTiamatHead() }
     val channel = Channel<T>()
 
     val tasks = heads
@@ -39,8 +38,6 @@ suspend fun <T> Sequence<T>.anyTiamatGrind(
     return heads.any { it.found }
 }
 
-private class AnyTiamatHead<T>() : CoroutineScope {
+private class AnyTiamatHead : CoroutineScope by CoroutineScope(Dispatchers.Default) {
     var found: Boolean = false
-    val job = Job()
-    override val coroutineContext: CoroutineContext get() = newSingleThreadContext("test") + job
 }

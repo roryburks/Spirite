@@ -42,7 +42,7 @@ object MagneticMediumLoader : IMediumLoader
                 when (thingType.i) {
                     SaveLoadUtil.MAGLEV_THING_STROKE -> {
                         val color = ra.readInt().toColor()
-                        val strokeMethod = StrokeParams.Method.fromFileId(ra.readByte().i) ?: BASIC
+                        val strokeMethod = Method.fromFileId(ra.readByte().i) ?: BASIC
                         val strokeWidth = ra.readFloat()
                         val mode = PenDrawMode.fromFileId(ra.readUnsignedByte())
 
@@ -89,7 +89,8 @@ object MagneticMediumLoader : IMediumLoader
             }
         }
 
-        return MaglevMedium(context.workspace, things.toMutableList(), DynamicImage(img, xoffset, yoffset))
+        val thingMap = things.mapIndexed { i, thing -> Pair(i,thing) }.toMap()
+        return MaglevMedium(context.workspace, thingMap, DynamicImage(img, xoffset, yoffset))
     }
 }
 
@@ -105,7 +106,7 @@ object Legacy_1_0006_MagneticMediumPartialLoader : IMediumLoader
             when( thingType.i) {
                 SaveLoadUtil.MAGLEV_THING_STROKE -> {
                     val color = ra.readInt().toColor()
-                    val strokeMethod = StrokeParams.Method.fromFileId(ra.readByte().i) ?: BASIC
+                    val strokeMethod = Method.fromFileId(ra.readByte().i) ?: BASIC
                     val strokeWidth = ra.readFloat()
                     val mode =
                             if( context.version < 0x1_0006) PenDrawMode.NORMAL
@@ -147,7 +148,8 @@ object Legacy_1_0006_MagneticMediumPartialLoader : IMediumLoader
             }
         }.filterNotNull()
 
-        return MaglevMedium(context.workspace, things)
+        val thingMap = things.mapIndexed { i, thing -> Pair(i,thing) }.toMap()
+        return MaglevMedium(context.workspace, thingMap)
     }
 }
 
@@ -202,7 +204,8 @@ object Legacy_pre_1_0000_MaglevMediumLoader : IMediumLoader {
             strokeLengths.add( (thing as? MaglevStroke)?.drawPoints?.length)
             thing
         }
-        return MaglevMedium(context.workspace, things)
+        val thingMap = things.mapIndexed { i, thing -> Pair(i,thing) }.toMap()
+        return MaglevMedium(context.workspace, thingMap)
     }
 }
 

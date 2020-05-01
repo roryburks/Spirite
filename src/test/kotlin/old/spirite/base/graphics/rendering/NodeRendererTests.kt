@@ -1,13 +1,14 @@
 package old.spirite.base.graphics.rendering
 
+import old.TestConfig
+import old.TestHelper
+import org.junit.jupiter.api.Test
 import rb.glow.RawImage
 import rb.glow.color.Colors
 import rb.glow.gle.RenderMethod
 import rb.glow.gle.RenderMethodType.MULTIPLY
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.awt.ImageBI
-import old.TestConfig
-import old.TestHelper
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
@@ -16,7 +17,6 @@ import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
-import org.junit.jupiter.api.Test
 
 class NodeRendererTests {
     val gle = Hybrid.gle

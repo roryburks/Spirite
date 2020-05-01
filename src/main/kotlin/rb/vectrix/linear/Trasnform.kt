@@ -296,6 +296,10 @@ interface ITransformF : ITransform
 
     override fun toImmutable() : ImmutableTransformF
     override fun toMutable(): MutableTransformF
+
+    companion object{
+        val Identity get() = ImmutableTransformF.Identity
+    }
 }
 
 data class ImmutableTransformF(

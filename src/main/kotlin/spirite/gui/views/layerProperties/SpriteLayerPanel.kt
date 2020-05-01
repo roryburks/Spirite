@@ -6,7 +6,6 @@ import rb.owl.Observer
 import rb.owl.bindable.Bindable
 import rbJvm.glow.awt.NativeImage
 import rbJvm.owl.addWeakObserver
-import rbJvm.owl.bindWeaklyTo
 import sgui.components.IBoxList.IBoxComponent
 import sgui.components.IBoxList.IMovementContract
 import sgui.components.IComponent
@@ -16,7 +15,6 @@ import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet
-import spirite.base.graphics.rendering.DerivedNativeThumbnailStore
 import spirite.base.graphics.rendering.IThumbnailStore
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart

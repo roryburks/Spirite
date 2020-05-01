@@ -2,13 +2,13 @@ package sjunit.base.brains
 
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.jupiter.api.Test
 import rb.owl.observer
 import spirite.base.brains.CentralObservatory
 import spirite.base.brains.WorkspaceSet
 import spirite.base.imageData.IImageObservatory
 import spirite.base.imageData.ImageObservatory
 import spirite.base.imageData.MImageWorkspace
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 open class CentralObservatoryTests {

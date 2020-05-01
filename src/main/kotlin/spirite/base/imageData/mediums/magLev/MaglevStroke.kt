@@ -1,9 +1,11 @@
 package spirite.base.imageData.mediums.magLev
 
+import rb.glow.GraphicsContext
 import rb.glow.color.SColor
 import rb.vectrix.linear.Vec3f
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.pen.stroke.DrawPoints
+import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams
 
 class MaglevStroke(
@@ -30,10 +32,13 @@ class MaglevStroke(
     }
 
     override fun draw(built: BuiltMediumData) {
-        val drawer = built.arranged.handle.workspace.strokeProvider.getStrokeDrawer(params)
         built.rawAccessComposite {
-            drawer.batchDraw(it.graphics, drawPoints, params, built.width, built.height)
+            draw(it.graphics, built.arranged.handle.workspace.strokeProvider, built.width, built.height)
         }
+    }
+
+    fun draw(gc: GraphicsContext, strokeProvider: IStrokeDrawerProvider, width: Int, height:Int) {
+        strokeProvider.getStrokeDrawer(params).batchDraw(gc, drawPoints, params,width, height)
     }
 
     override fun dupe() = MaglevStroke(params, drawPoints.dupe())

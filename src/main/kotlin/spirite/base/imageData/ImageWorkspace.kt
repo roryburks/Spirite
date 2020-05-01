@@ -1,5 +1,6 @@
 package spirite.base.imageData
 
+import rb.IContract
 import rb.extendo.dataStructures.SinglyList
 import rb.owl.GuardedObservable
 import rb.owl.IObservable
@@ -119,7 +120,7 @@ class ImageWorkspace(
     override val viewSystem: IViewSystem = ViewSystem(undoEngine)
     override val groupTree = PrimaryGroupTree(this) // Needs to be after ViewSystem, UndoEngine
     override val animationManager: IAnimationManager = AnimationManager(this)
-    override val selectionEngine: ISelectionEngine = SelectionEngine(this)
+    override val selectionEngine: ISelectionEngine
     override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet = paletteManager.makePaletteSet()
     override val isolationManager: IIsolationManager = IsolationManager(this)
@@ -186,7 +187,7 @@ class ImageWorkspace(
     }
 
     // region ActiveDrawer Tracking
-    override val activeDrawerObs = GuardedObservable<()->Unit>()
+    override val activeDrawerObs : GuardedObservable<()->Unit> = GuardedObservable()
     private val _amK = activeMediumBind.addObserver { _, _ -> triggerActiveDrawerChange()}
     private val _aDrawTreeK = groupTree.treeObservable.addObserver(Observer(object : TreeObserver {
         override fun treeStructureChanged(evt: TreeChangeEvent) {}
@@ -275,12 +276,15 @@ class ImageWorkspace(
         }.observer()
     )
 
-    private val _selectionK = selectionEngine.selectionChangeObserver.addObserver({ it: SelectionChangeEvent ->
-        imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), emptySet(), this@ImageWorkspace, liftedChange = it.isLiftedChange))
-    }.observer())
     // endregion
 
     init {
+        // The pit of order-dependency shame
         paletteMediumMap = PaletteMediumMap(this)
+        selectionEngine = SelectionEngine(this)
     }
+
+    private val _selectionK : IContract = selectionEngine.selectionChangeObserver.addObserver({ it: SelectionChangeEvent ->
+        imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), emptySet(), this@ImageWorkspace, liftedChange = it.isLiftedChange))
+    }.observer())
 }

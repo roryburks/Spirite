@@ -41,7 +41,7 @@ interface IImage {
      *  * bits 8-15: Green
      *  * bits 0-7: Blue
      */
-    fun getARGB(x: Int, y: Int): Int
+    fun getARGB(x: Int, y: Int): Int = getColor(x,y).argb32
     fun getColor(x: Int, y: Int): Color
 
 

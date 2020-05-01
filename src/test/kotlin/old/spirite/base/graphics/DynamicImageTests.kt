@@ -1,18 +1,18 @@
 package old.spirite.base.graphics
 
 
-import rbJvm.glow.awt.AwtImageConverter
-import rbJvm.glow.awt.ImageBI
 import old.TestConfig
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Tags
+import org.junit.jupiter.api.Test
+import rbJvm.glow.awt.AwtImageConverter
+import rbJvm.glow.awt.ImageBI
 import spirite.base.graphics.DynamicImage
 import spirite.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import org.junit.jupiter.api.Test
 
 @Tags(Tag("Old"),Tag("GPU"))
 class DynamicImageTests {

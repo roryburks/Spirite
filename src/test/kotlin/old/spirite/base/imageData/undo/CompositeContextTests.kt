@@ -3,6 +3,7 @@ package old.spirite.base.imageData.undo
 
 import io.mockk.mockk
 import old.spirite.base.imageData.undo.NullContextTests.TestNullAction
+import org.junit.jupiter.api.Test
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
@@ -11,7 +12,6 @@ import spirite.base.imageData.undo.CompositeContext
 import spirite.base.imageData.undo.ImageContext
 import spirite.base.imageData.undo.NullContext
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 class CompositeContextTests {
     val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)

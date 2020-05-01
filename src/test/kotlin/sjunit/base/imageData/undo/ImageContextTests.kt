@@ -4,15 +4,11 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Tags
-import rb.glow.color.Colors
+import org.junit.jupiter.api.Test
 import rb.glow.gl.GLImage
 import rbJvm.vectrix.SetupVectrixForJvm
 import sjunit.testHelpers.runTest
 import spirite.base.brains.MasterControl
-import spirite.base.brains.toolset.Toolset
-import spirite.base.graphics.rendering.IRenderEngine
-import spirite.base.graphics.rendering.RenderEngine
-import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumRepository
 import spirite.base.imageData.layers.SimpleLayer
@@ -27,9 +23,7 @@ import spirite.hybrid.Hybrid
 import spirite.pc.setupSwGuiStuff
 import javax.swing.SwingUtilities
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 @Tags(Tag("Integration"))
 class ImageContextTests {

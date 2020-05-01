@@ -2,11 +2,11 @@ package old
 
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Tags
+import org.junit.jupiter.api.Test
 import rbJvm.glow.jogl.JOGL
 import spirite.hybrid.Hybrid
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
-import org.junit.jupiter.api.Test
 
 class JOGLTests {
     @Tags(Tag("Old"), Tag("GPU"))

@@ -8,5 +8,10 @@ interface IStrokeDrawer {
     fun draw( gc: GraphicsContext)
     fun end()
 
-    fun batchDraw(gc: GraphicsContext, drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int)
+    fun batchDraw(
+            gc: GraphicsContext,
+            drawPoints: DrawPoints,
+            params: StrokeParams,
+            width: Int,
+            height: Int)
 }

@@ -32,7 +32,7 @@ class Toolset( internal val manager: IToolsetManager) {
             Pen, Eraser, Fill, ShapeSelection, FreeSelection, Rigger, Move, Pixel, Crop, Flip, Reshape,
             ColorChanger, ColorPicker, Stencil, MagneticFill)
     private val maglevTools = listOf(
-            Pen, Eraser, Pixel, Flip, Reshape, ColorChanger, MagneticFill, Deformer, MagEraser)
+            Pen, Eraser, Pixel, Flip, Reshape, ColorChanger, MagneticFill, Deformer, MagEraser, ShapeSelection, FreeSelection)
     private val multiTools = listOf(Flip, Reshape)
     fun toolsForDrawer(drawer: IImageDrawer) : List<Tool> {
         return when( drawer) {

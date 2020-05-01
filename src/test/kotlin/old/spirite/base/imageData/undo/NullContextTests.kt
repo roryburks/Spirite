@@ -2,13 +2,13 @@ package old.spirite.base.imageData.undo
 
 
 import io.mockk.mockk
+import org.junit.jupiter.api.Test
 import rb.extendo.dataStructures.SinglyList
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.NullContext
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 class NullContextTests {
     val underTest = NullContext()
