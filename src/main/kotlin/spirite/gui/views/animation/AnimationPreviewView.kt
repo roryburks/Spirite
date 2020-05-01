@@ -27,6 +27,11 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.round
 
+object AnimationPreviewViewSettings {
+    val ViewWidth = 600f
+    val ViewHeight = 600f
+}
+
 class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
     override val icon: SwIcon? get() = SpiriteIcons.BigIcons.Frame_AnimationScheme
@@ -55,8 +60,8 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
     private val imp = Hybrid.ui.CrossPanel {
         rows += {
-            add( viewPanel, flex = 300f)
-            flex = 300f
+            add( viewPanel, flex = AnimationPreviewViewSettings.ViewWidth)
+            flex = AnimationPreviewViewSettings.ViewHeight
         }
         rows.addGap(3)
         rows += {
