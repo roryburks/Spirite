@@ -13,11 +13,15 @@ buildscript {
 
 
 group 'Spirite'
-version '0.2.0'
+version '0.2.1'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'kotlinx-serialization'
+
+implementation(kotlin("reflect"))
+testImplementation(kotlin("test"))
+testImplementation(kotlin("test-junit"))
 
 //compileJava {
 //    options.compilerArgs << '--add-exports java.desktop/sun.awt.image=ALL-UNNAMED'
