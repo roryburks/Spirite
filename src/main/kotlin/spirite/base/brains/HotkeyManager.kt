@@ -49,7 +49,8 @@ private const val SHIFT = InputEvent.SHIFT_DOWN_MASK
 
 private val defaultHotkeys = mapOf(
         WorkViewCommand.ZOOM_IN.keyCommand to (Hotkey( KeyEvent.VK_ADD, 0)),
-        WorkViewCommand.ZOOM_OUT.keyCommand to (Hotkey( KeyEvent.VK_SUBTRACT, 0)),
+        //WorkViewCommand.ZOOM_OUT.keyCommand to (Hotkey( KeyEvent.VK_SUBTRACT, 0)),
+        WorkViewCommand.ZOOM_OUT.keyCommand to (Hotkey( KeyEvent.VK_ADD, CTRL or SHIFT)),
         WorkViewCommand.ZOOM_IN_SLOW.keyCommand to (Hotkey( KeyEvent.VK_ADD, CTRL)),
         WorkViewCommand.ZOOM_OUT_SLOW.keyCommand to (Hotkey( KeyEvent.VK_SUBTRACT, CTRL)),
         WorkViewCommand.ZOOM_0.keyCommand to (Hotkey( KeyEvent.VK_NUMPAD0, CTRL)),
@@ -70,7 +71,7 @@ private val defaultHotkeys = mapOf(
         ToolCommand.SetMode_4.keyCommand to (Hotkey(KeyEvent.VK_4, SHIFT)),
 
         ToolCommand.DecreasePenSize.keyCommand to (Hotkey( KeyEvent.VK_OPEN_BRACKET, 0)),
-        ToolCommand.IncreasePenSize.keyCommand to (Hotkey( KeyEvent.VK_CLOSE_BRACKET, 0)),
+        ToolCommand.IncreasePenSize.keyCommand to (Hotkey( KeyEvent.VK_OPEN_BRACKET, CTRL or SHIFT)),
 
         PaletteCommands.Swap.keyCommand to (Hotkey( KeyEvent.VK_X, 0)),
         PaletteCommands.SwapBack.keyCommand to (Hotkey( KeyEvent.VK_Z, 0)),
