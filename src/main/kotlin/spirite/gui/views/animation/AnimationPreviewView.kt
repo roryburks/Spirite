@@ -55,8 +55,8 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
     private val imp = Hybrid.ui.CrossPanel {
         rows += {
-            add( viewPanel, flex = 300f)
-            flex = 300f
+            add( viewPanel, flex = 800f)
+            flex = 800f
         }
         rows.addGap(3)
         rows += {

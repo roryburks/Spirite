@@ -94,6 +94,18 @@ object SpriteCommands {
                 toLayer.insertPart(it.handle, it.structure.copy(partName = nonduplicateName))
             }
         }
+    }
 
+    val CopyAcrossMirrored = SpriteCommand("copyMirrored"){ sprite, part, master ->
+        part ?: throw CommandNotValidException
+        val ws = sprite.workspace
+        val handlesToReplace = sprite.getAllLinkedLayers()
+                .mapNotNull { it.parts.firstOrNull { it.partName == part?.partName } }
+                .map { it.handle }
+                .filter { it != part.handle }
+
+        handlesToReplace.forEach {
+            ws.mediumRepository.replaceMediumDirect( it, part.handle.medium.dupe(ws))
+        }
     }
 }
