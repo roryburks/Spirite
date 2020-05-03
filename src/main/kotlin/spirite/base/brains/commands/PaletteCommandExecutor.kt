@@ -1,13 +1,16 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.ITopLevelFeedbackSystem
+import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.exceptions.CommandNotValidException
+import spirite.base.imageData.IImageWorkspace
 
 class PaletteCommandExecutor(
         val paletteManager: IPaletteManager,
-        val topLevelFeedbackSystem: ITopLevelFeedbackSystem)
+        val topLevelFeedbackSystem: ITopLevelFeedbackSystem,
+        val workspaceSet: IWorkspaceSet)
     : ICommandExecutor
 {
 
@@ -17,7 +20,7 @@ class PaletteCommandExecutor(
     override fun executeCommand(string: String, extra: Any?): Boolean {
         try
         {
-            commands[string]?.action?.invoke(PaletteCommandContext(paletteManager, topLevelFeedbackSystem)) ?: return false
+            commands[string]?.action?.invoke(PaletteCommandContext(paletteManager, topLevelFeedbackSystem, workspaceSet.currentWorkspace)) ?: return false
             return true
         }catch (e: CommandNotValidException)
         {
@@ -42,7 +45,8 @@ constructor(
 
 private class PaletteCommandContext(
         val paletteManager: IPaletteManager,
-        val topLevelFeedbackSystem: ITopLevelFeedbackSystem)
+        val topLevelFeedbackSystem: ITopLevelFeedbackSystem,
+        val currentWorkspace: IImageWorkspace?)
 // endregion
 
 object PaletteCommands
@@ -61,5 +65,13 @@ object PaletteCommands
                 it.paletteManager.drivePalette = true
             }
         }
+    }
+
+    val CyclePalettes: ICommand = PaletteCommand("cyclePalette"){
+        val ws = it.currentWorkspace ?: throw CommandNotValidException
+        val currentPalette = it.paletteManager.currentPalette
+        val currentPaletteId = ws.paletteSet.palettes.indexOf(currentPalette)
+        val newPaletteId = (currentPaletteId + 1) % ws.paletteSet.palettes.size
+        it.paletteManager.currentPalette = ws.paletteSet.palettes.getOrNull( newPaletteId) ?: it.paletteManager.globalPalette
     }
 }

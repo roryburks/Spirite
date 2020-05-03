@@ -75,6 +75,7 @@ private val defaultHotkeys = mapOf(
         PaletteCommands.Swap.keyCommand to (Hotkey( KeyEvent.VK_X, 0)),
         PaletteCommands.SwapBack.keyCommand to (Hotkey( KeyEvent.VK_Z, 0)),
         PaletteCommands.SwitchModes.keyCommand to (Hotkey(KeyEvent.VK_P, SHIFT or CTRL)),
+        PaletteCommands.CyclePalettes.keyCommand to (Hotkey(KeyEvent.VK_P, CTRL)),
 
         NodeCommands.QuickNewLayer.keyCommand to (Hotkey( KeyEvent.VK_INSERT, 0)),
         NodeCommands.NewSpriteLayer.keyCommand to Hotkey( KeyEvent.VK_INSERT, SHIFT),

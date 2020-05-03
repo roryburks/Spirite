@@ -16,7 +16,7 @@ interface IPaletteManager {
     val activeBelt : PaletteBelt
 
     val currentPaletteBind : IBindable<Palette>
-    val currentPalette: Palette
+    var currentPalette: Palette
     val globalPalette: Palette
 
     var drivePalette : Boolean
@@ -51,7 +51,7 @@ class PaletteManager(
     }
 
     override val currentPaletteBind = Bindable(globalPalette)
-    override val currentPalette: Palette by currentPaletteBind
+    override var currentPalette: Palette by currentPaletteBind
 
     override var drivePalette: Boolean = true
 
