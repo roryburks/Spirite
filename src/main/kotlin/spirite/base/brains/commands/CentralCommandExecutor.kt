@@ -30,7 +30,7 @@ class CentralCommandExecutor(
             GlobalCommandExecutor(master, workspaceSet),
             WorkViewCommandExecutor(master),
             ToolsetCommandExecutor(master.toolsetManager),
-            PaletteCommandExecutor(master.paletteManager, master.topLevelFeedbackSystem),
+            PaletteCommandExecutor(master.paletteManager, master.topLevelFeedbackSystem, master.workspaceSet),
             SelectionCommandExecutor(workspaceSet),
             FrameCommandExecutor(master.frameManager),
             IsolationCommandExecutor(workspaceSet),

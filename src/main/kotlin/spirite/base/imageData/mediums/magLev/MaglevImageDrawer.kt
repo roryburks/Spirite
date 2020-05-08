@@ -229,6 +229,9 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
     override fun startMagneticFill() {}
 
     override fun endMagneticFill(color: SColor, mode: MagneticFillMode) {
+        if( segments.filter{maglev.thingsMap[it.strokeId] !is MaglevStroke}.any()){
+            println("brk")
+        }
         val fill = MaglevFill(segments.map {StrokeSegment(it.strokeId, it.pivotPoint, it.pivotPoint + it.travel)}, mode, color)
         maglev.addThing(fill,  arranged, "Magnetic Fill")
     }
@@ -269,9 +272,10 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
     private data class StrokePointContext(val strokeIndex: Int, val index: Int, val drawPoints: DrawPoints)
     fun findClosestStroke( x: Float, y: Float) : Pair<Double,BuildingStrokeSegment>?
     {
-        val (dist, closest) = maglev.thingsMap.values.asSequence()
-                .mapIndexedNotNull { index, iMaglevThing ->
-                    if( iMaglevThing is MaglevStroke) Pair(index, iMaglevThing.drawPoints)
+        val (dist, closest) = maglev.thingsMap.asSequence()
+                .mapNotNull { entry ->
+                    val iMaglevThing = entry.value
+                    if( iMaglevThing is MaglevStroke) Pair(entry.key, iMaglevThing.drawPoints)
                     else null }
                 .flatMap { (index, drawPoints) ->
                     (0 until drawPoints.length).asSequence().map { StrokePointContext(index, it, drawPoints) } }
