@@ -90,7 +90,7 @@ object MagneticMediumLoader : IMediumLoader
         }
 
         val thingMap = things.mapIndexed { i, thing -> Pair(i,thing) }.toMap()
-        return MaglevMedium(context.workspace, thingMap, DynamicImage(img, xoffset, yoffset))
+        return MaglevMedium(context.workspace, thingMap, DynamicImage(img, xoffset, yoffset), (thingMap.keys.max() ?: 0)+1)
     }
 }
 

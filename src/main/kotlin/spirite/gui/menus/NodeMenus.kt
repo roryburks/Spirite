@@ -6,6 +6,7 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.mediums.magLev.MaglevMedium
 
 object NodeMenus {
     fun schemeForNode(workspace: IImageWorkspace, node: Node?) : List<MenuItem>{
@@ -42,6 +43,8 @@ object NodeMenus {
                         scheme.add(MenuItem("Add Group To Animation As New &Cascading Layer", NodeCommands.InsertCascadingLayer))
                     }
                     scheme.add(MenuItem("Write Group To GIF Animation", NodeCommands.GifFromGroup))
+                    if( node.children.any { it is LayerNode && it.layer is SpriteLayer && it.layer.parts.any{ it.handle.medium is MaglevMedium} })
+                        scheme.add(MenuItem("`Flatten All Magleve", NodeCommands.FlattenAllSprites))
 
                     scheme.add(MenuItem(if(node.flatenned)"Unflatten Group Node" else "Flatten Group Node", NodeCommands.ToggleFlatness))
                 }
@@ -55,6 +58,8 @@ object NodeMenus {
                             scheme.add(MenuItem("&Sprite Layer Commands"))
                             scheme.add(MenuItem(".Diffuse Sprite Layer", NodeCommands.DiffuseSpriteLayer))
                             scheme.add(MenuItem(".Shift Sprite Layer Depth", NodeCommands.ShiftSpriteLayerDepth))
+                            if( layer.parts.any { it.handle.medium is MaglevMedium })
+                                scheme.add(MenuItem(".Flatten All Magleve", NodeCommands.FlattenAllSprites))
                             scheme.add(MenuItem("Construct &Rig Animation From Sprite", NodeCommands.NewRigAnimation))
                         }
                         //is PuppetLayer -> scheme.add(MenuItem("Add &Derived Puppet Layer", customAction = {TODO()}))

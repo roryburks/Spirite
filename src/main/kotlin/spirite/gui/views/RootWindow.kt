@@ -98,7 +98,8 @@ class RootWindow( val master: IMasterControl) : JFrame() {
 
                 MenuItem("&Debug"),
                 MenuItem(".Commands To Clipboard", DebugCommands.CommandHistoryToClipboard),
-                MenuItem(".Brk", DebugCommands.Breakpoint)
+                MenuItem(".Brk", DebugCommands.Breakpoint),
+                MenuItem(".Cycle Sprite", DebugCommands.CycleSpriteParts)
 
         )
 

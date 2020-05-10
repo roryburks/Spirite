@@ -18,22 +18,22 @@ class MaglevMedium
 constructor(
         private val workspace: MImageWorkspace,
         things: Map<Int,IMaglevThing>?,
-        val builtImage : DynamicImage)
+        val builtImage : DynamicImage,
+        private var met: Int)
     :IMedium, IImageMedium
 {
     constructor(
             workspace: MImageWorkspace,
             things: Map<Int,IMaglevThing>? = null)
-            : this(workspace, things, DynamicImage())
+            : this(workspace, things, DynamicImage(), things?.keys?.max()?.apply { this + 1 } ?: 0)
     constructor(
             workspace: MImageWorkspace,
             things: List<IMaglevThing>)
-            : this(workspace, things.mapIndexed { i, thing -> Pair(i,thing) }.toMap(), DynamicImage())
+            : this(workspace, things.mapIndexed { i, thing -> Pair(i,thing) }.toMap(), DynamicImage(),  things.count())
 
     internal val thingsMap = things?.toMutableMap() ?: mutableMapOf()
+
     fun getThingsMap() : Map<Int,IMaglevThing> = thingsMap
-    val things get() = thingsMap.values
-    private var met = thingsMap.keys.max()?.apply { this + 1 } ?: 0
 
     fun build(handle: MediumHandle)
     {
@@ -46,7 +46,7 @@ constructor(
     //  do not need to worry about removing Things from the Medium, instead the duplication of medium snapshots
     //  handles the thing lifecycle w.r.t. the undo engine
     internal fun addThing(thing : IMaglevThing, arranged: ArrangedMediumData, description: String)
-        =   addThings(SinglyList(thing), arranged, description)
+            =   addThings(SinglyList(thing), arranged, description)
     internal fun addThings(things : List<IMaglevThing>, arranged: ArrangedMediumData, description: String) {
         arranged.handle.workspace.undoEngine.performAndStoreMaglevImageAction(arranged, description) {built, maglev ->
             things.forEach {
@@ -93,7 +93,8 @@ constructor(
             thingsMap
                     .map { Pair(it.key, it.value.dupe()) }
                     .toMap(),
-            this.builtImage.deepCopy())
+            this.builtImage.deepCopy(),
+            met)
     override fun flush() { builtImage.flush() }
     // endregion
 
@@ -118,7 +119,7 @@ constructor(
 
         override fun _rawAccessComposite(doer: (RawImage) -> Unit) {
             builtImage.drawToImage(workspace.width, workspace.height, arranged.tMediumToWorkspace)
-                { raw -> doer.invoke(raw)}
+            { raw -> doer.invoke(raw)}
         }
 
     }

@@ -3,12 +3,14 @@ package spirite.base.brains.commands
 import rb.glow.gle.RenderMethod
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
+import spirite.base.brains.commands.specific.SpriteLayerFixes
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.MovableGroupTree
 import spirite.base.imageData.groupTree.duplicateInto
+import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
@@ -214,6 +216,19 @@ object NodeCommands {
         val shiftFactor = dialogs.promptForString("Enter diffuse factor", "10")?.toIntOrNull() ?: throw CommandNotValidException
         if( shiftFactor != 0) {
             spriteLayer.remapDepth(spriteLayer.parts.map { Pair(it, it.depth + shiftFactor) }.toMap())
+        }
+    }
+    val FlattenAllSprites = NodeCommand("flattenAllSprites"){ workspace, node, dialogs ->
+        if( node is GroupNode){
+            node.children
+                    .filterIsInstance<LayerNode>()
+                    .map { it.layer }
+                    .filterIsInstance<SpriteLayer>()
+                    .forEach { SpriteLayerFixes.SpriteMaglevToDynamic(it) }
+        }
+        if( node is LayerNode){
+            if( node.layer is SpriteLayer)
+                SpriteLayerFixes.SpriteMaglevToDynamic(node.layer)
         }
     }
     //endregion

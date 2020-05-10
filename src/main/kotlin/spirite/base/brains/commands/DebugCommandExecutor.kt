@@ -2,7 +2,10 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
+import spirite.base.brains.commands.specific.SpriteLayerFixes
 import spirite.base.exceptions.CommandNotValidException
+import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.hybrid.Hybrid
 
 class DebugCommandExecutor(
@@ -47,5 +50,15 @@ object DebugCommands
     }
     val Breakpoint = DebugCmd("brk"){
         println("brk")
+    }
+
+    val CycleSpriteParts = DebugCmd("cycle-sprite-parts") {master ->
+        val ws = master.workspaceSet.currentMWorkspace ?: return@DebugCmd
+        val selectedNode = ws.groupTree.selectedNode as? GroupTree.LayerNode ?: return@DebugCmd
+        val groupNode = selectedNode.parent ?: return@DebugCmd
+        val sprite = selectedNode.layer as? SpriteLayer ?: return@DebugCmd
+        val selected = sprite.multiSelect ?: return@DebugCmd
+        val partNames = selected.map { it.partName }
+        SpriteLayerFixes.CycleParts(groupNode, partNames, 1, ws )
     }
 }

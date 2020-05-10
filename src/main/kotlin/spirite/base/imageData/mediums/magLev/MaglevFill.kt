@@ -23,6 +23,7 @@ data class MaglevFill(
     override fun dupe() = this.copy(color = color) // note: segments are currently immutable so no need to deep-copy
 
     override fun draw(built: BuiltMediumData) {
+        //val segments = segments.filter{ it.start != it.end} // Hack
         val len = segments.sumBy { abs(it.end - it.start) + 1 }
         val outX = FloatArray(len)
         val outY = FloatArray(len)
@@ -41,9 +42,17 @@ data class MaglevFill(
                     else segment.start downTo segment.end
 
             stepping.forEach { c ->
-                outX[i] = stroke.drawPoints.x[c]
-                outY[i] = stroke.drawPoints.y[c]
-                ++i
+                val nx = stroke.drawPoints.x.getOrNull(c)
+                val ny = stroke.drawPoints.y.getOrNull(c)
+                if( nx != null && ny != null){
+                    outX[i] = stroke.drawPoints.x.getOrNull(c) ?: stroke.drawPoints.x[c-1]
+                    outY[i] = stroke.drawPoints.y.getOrNull(c) ?: stroke.drawPoints.y[c-1]
+                    ++i
+                }
+                else {
+                    println("brk")
+                }
+
             }
         }
 
@@ -54,7 +63,7 @@ data class MaglevFill(
                 BEHIND -> DST_OVER
             }
             gc.color = color
-            gc.fillPolygon(outX.asList(), outY.asList(), len)
+            gc.fillPolygon(outX.asList(), outY.asList(), i)
         }
     }
 
