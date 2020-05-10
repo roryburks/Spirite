@@ -23,7 +23,7 @@ fun main( args: Array<String>) {
         val mockWs = TestHelper.makeShellWorkspace(200,200, renderEngine = master.renderEngine, strokeProvider = master.strokeDrawerProvider)
         master.workspaceSet.addWorkspace(mockWs)
         val wsd = PrimaryGroupViewDemo()
-        DemoLauncher.launch(wsd, 800, 600)
+        DemoLauncher.launch(wsd, 1400, 800)
     }
 }
 

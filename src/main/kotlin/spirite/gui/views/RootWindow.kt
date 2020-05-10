@@ -133,9 +133,9 @@ class RootWindow( val master: IMasterControl) : JFrame() {
 
             center = OmniSegment( paletteSection , 100)
         }
-        right += SubContainer(100,120) {
+        right += SubContainer(100,200) {
             center = OmniTab(listOf(refView, animListView), 100)
-            bottom += OmniSegment( layerPropertiesView, 200)
+            bottom += OmniSegment( layerPropertiesView, 200, 400)
         }
     }
 
@@ -157,7 +157,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
         }
         this.add( multiLevel.jcomponent)
 
-        SwingUtilities.invokeLater {this.size = Dimension(800,600) }
+        SwingUtilities.invokeLater {this.size = Dimension(1400,800) }
         SwingUtilities.invokeLater {groupView.component.jcomponent.requestFocus() }
     }
 
