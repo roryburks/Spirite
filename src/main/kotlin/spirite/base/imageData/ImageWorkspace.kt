@@ -30,6 +30,8 @@ import spirite.base.imageData.drawer.MultiMediumDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree
+import spirite.base.imageData.mediumGroups.IMediumGroupRepository
+import spirite.base.imageData.mediumGroups.MediumGroupRepository
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.Compositor
 import spirite.base.imageData.mediums.magLev.MaglevMedium
@@ -74,6 +76,7 @@ interface IImageWorkspace {
     val paletteMediumMap: IPaletteMediumMap
     val imageObservatory: IImageObservatory
     val compositor : Compositor
+    val mediumGroupRepository: IMediumGroupRepository
 //	public StagingManager getStageManager() {return stagingManager;}
 
     // Super-Components
@@ -128,6 +131,7 @@ class ImageWorkspace(
     override val filterManager: IFilterManager = FilterManager()
     override val paletteMediumMap: IPaletteMediumMap
     override val compositor = Compositor()
+    override val mediumGroupRepository = MediumGroupRepository(this)
 
     override var width: Int by UndoableDelegate(width, undoEngine, "Changed Workspace Width")
     override var height: Int by UndoableDelegate(height, undoEngine, "Changed Workspace Height")
