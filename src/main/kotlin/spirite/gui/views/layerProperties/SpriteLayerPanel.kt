@@ -43,6 +43,9 @@ class SpriteLayerPanel(
     private var _tfScaleYK : IContract? = null
     private var _tfRotK : IContract? = null
 
+    private var _boxWidth: Int = 48
+    private var _boxHeight: Int = 48
+
     var linkedSprite : SpriteLayer? = null
         set(value) {
             val old = field
@@ -101,7 +104,7 @@ class SpriteLayerPanel(
     private val activePartBind = Bindable<SpritePart?>(null)
     private var activePart: SpritePart? by activePartBind
 
-    val boxList = Hybrid.ui.BoxList<SpritePart>(32, 32)
+    val boxList = Hybrid.ui.BoxList<SpritePart>(_boxWidth, _boxHeight)
     private val tfTransX = Hybrid.ui.FloatField()
     private val tfTransY = Hybrid.ui.FloatField()
     private val tfScaleX =  Hybrid.ui.FloatField()
@@ -145,8 +148,8 @@ class SpriteLayerPanel(
             object : IBoxComponent {
                 override val component: IComponent = Hybrid.ui.CrossPanel {
                         cols += {
-                            width = 32
-                            addFlatGroup(22) {
+                            width = _boxWidth
+                            addFlatGroup(_boxHeight-8) {
                                 add(Hybrid.ui.Label(part.partName).also {it.textSize = 10;it.textColor= Colors.BLACK}, height = 8)
                             }
                             this += {
@@ -158,7 +161,7 @@ class SpriteLayerPanel(
                                     }
                                 }
                                 add( thumbnail)
-                                height = 32
+                                height = _boxHeight
                             }
                         }
                     }.apply {

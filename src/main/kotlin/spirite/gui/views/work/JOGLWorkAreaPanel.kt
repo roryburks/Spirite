@@ -104,7 +104,7 @@ private constructor(
             fun update(e: java.awt.event.MouseEvent) {
                 penner.holdingAlt = e.isAltDown
                 penner.holdingCtrl = e.isControlDown
-                penner.holdingShift = Hybrid.keypressSystem.holdingSpace
+                penner.holdingShift = e.isShiftDown
 
             }
 

@@ -63,6 +63,7 @@ private val defaultHotkeys = mapOf(
         ToolCommand.Pixel.keyCommand to (Hotkey( KeyEvent.VK_A, 0)),
         ToolCommand.Rigger.keyCommand to (Hotkey( KeyEvent.VK_R, SHIFT)),
         ToolCommand.MagneticFill.keyCommand to (Hotkey(KeyEvent.VK_F, 0)),
+        ToolCommand.FreeSelection.keyCommand to (Hotkey(KeyEvent.VK_F, SHIFT)),
 
         ToolCommand.SetMode_1.keyCommand to (Hotkey(KeyEvent.VK_1, SHIFT)),
         ToolCommand.SetMode_2.keyCommand to (Hotkey(KeyEvent.VK_2, SHIFT)),

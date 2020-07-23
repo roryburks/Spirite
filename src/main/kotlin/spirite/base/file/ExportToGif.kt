@@ -65,6 +65,7 @@ object ExportToGif {
 
                     frame
                             .map { it.stack(trans) }
+                            .sortedWith(compareBy {it.drawDepth})
                             .forEach { it.draw(gc) }
 
                     gl

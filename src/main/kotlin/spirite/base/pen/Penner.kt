@@ -131,7 +131,11 @@ class Penner(
                     holdingSpace -> context.currentView?.also { behavior =  MovingViewBehavior(this,it )}
                     tool is Pen -> when {
                         holdingCtrl -> behavior = PickBehavior( this, button == LEFT)
-                        drawer is IStrokeModule -> behavior = PenBehavior.Stroke(this, drawer, color)
+                        drawer is IStrokeModule ->{
+                            println("$holdingShift")
+                            if( holdingShift) behavior = StraightLinePenBehavior.FromSettings(this, drawer, toolsetManager, color)
+                            else behavior = PenBehavior.Stroke(this, drawer, color)
+                        }
                         else -> Hybrid.beep()
                     }
                     tool is Pixel -> when {

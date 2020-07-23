@@ -16,12 +16,14 @@ import spirite.base.imageData.mediums.MediumType.MAGLEV
 
 class MaglevMedium
 constructor(
-        private val workspace: MImageWorkspace,
+        val workspace: MImageWorkspace,
         things: Map<Int,IMaglevThing>?,
         val builtImage : DynamicImage,
         private var met: Int)
     :IMedium, IImageMedium
 {
+    internal val thingsMap = things?.toMutableMap() ?: mutableMapOf()
+
     constructor(
             workspace: MImageWorkspace,
             things: Map<Int,IMaglevThing>? = null)
@@ -30,8 +32,6 @@ constructor(
             workspace: MImageWorkspace,
             things: List<IMaglevThing>)
             : this(workspace, things.mapIndexed { i, thing -> Pair(i,thing) }.toMap(), DynamicImage(),  things.count())
-
-    internal val thingsMap = things?.toMutableMap() ?: mutableMapOf()
 
     fun getThingsMap() : Map<Int,IMaglevThing> = thingsMap
 
