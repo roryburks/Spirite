@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.util.*
 import javax.imageio.stream.FileImageOutputStream
+import javax.imageio.stream.ImageOutputStream
 
 
 fun exportGroupGif(group: GroupNode, file: File, fps: Float) {
@@ -35,7 +36,7 @@ fun exportGroupGif(group: GroupNode, file: File, fps: Float) {
     val ios = FileImageOutputStream(file)
 
     val gsw = GifSequenceWriter(
-            ios,
+            ios as ImageOutputStream,
             biList[0].type,
             (1000 / fps).toInt(),
             true)
@@ -57,11 +58,14 @@ object ExportToGif {
 
         val biList = drawFrames
                 .map { frame ->
-                    val gl = GLImage(drawRect.wi, drawRect.hi, Hybrid.gle)
+                    val gl = GLImage(drawRect.wi*2, drawRect.hi*2, Hybrid.gle)
                     val gc = gl.graphics
-                    gc.color = Colors.LIGHT_GRAY
-                    gc.fillRect(0,0,drawRect.wi, drawRect.hi)
-                    val trans = ImmutableTransformF.Translation(-drawRect.x1i.f, -drawRect.y1i.f)
+                    gc.color = Colors.DARK_GRAY
+                    gc.fillRect(0,0,drawRect.wi*2, drawRect.hi*2)
+                    val trans =
+                            ImmutableTransformF.Scale(2f,2f) *
+                            ImmutableTransformF.Translation(-drawRect.x1i.f, -drawRect.y1i.f)
+
 
                     frame
                             .map { it.stack(trans) }
