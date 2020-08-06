@@ -23,7 +23,7 @@ import spirite.gui.implementations.topLevelFeedback.SwTopLevelFeedbackSystem
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.dialogs.IDialog
 import spirite.gui.menus.dialogs.JDialog
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import spirite.pc.menus.SwContextMenus
 import spirite.specialRendering.stroke.GLStrokeDrawerProvider
 

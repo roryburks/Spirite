@@ -21,9 +21,9 @@ import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.MenuItem
 import spirite.gui.menus.dialogs.IDialog
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
-import spirite.hybrid.Hybrid
-import spirite.hybrid.customGui.ArrowPanel
-import spirite.hybrid.customGui.DashedOutPanel
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.customGui.ArrowPanel
+import sguiSwing.hybrid.customGui.DashedOutPanel
 import java.awt.image.BufferedImage
 import java.io.InvalidClassException
 

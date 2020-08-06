@@ -5,8 +5,8 @@ import rb.glow.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.imageData.MMediumRepository
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
 
 abstract class BuiltMediumData(
         val arranged: ArrangedMediumData,

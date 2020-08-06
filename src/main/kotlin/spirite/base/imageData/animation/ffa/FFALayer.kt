@@ -5,8 +5,8 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContrac
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.UndoableChangeDelegate
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
 
 
 interface IFFALayerLinked {

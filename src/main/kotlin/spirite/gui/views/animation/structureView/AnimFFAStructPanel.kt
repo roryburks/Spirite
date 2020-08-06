@@ -26,7 +26,7 @@ import spirite.base.util.linear.Rect
 import spirite.gui.views.animation.structureView.ffa.FfaStructBuilderFactory
 import spirite.gui.views.animation.structureView.ffa.IAnimDragBehavior
 import spirite.gui.views.animation.structureView.ffa.IFFAStructView
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.lang.ref.WeakReference

@@ -19,7 +19,7 @@ import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.menus.MenuItem
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.awt.Point
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DragGestureEvent

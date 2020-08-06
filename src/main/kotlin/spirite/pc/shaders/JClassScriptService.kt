@@ -1,8 +1,8 @@
 package spirite.pc.shaders
 
 import spirite.base.resources.IScriptService
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.RESOURCE
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.RESOURCE
 import java.io.IOException
 import java.util.*
 

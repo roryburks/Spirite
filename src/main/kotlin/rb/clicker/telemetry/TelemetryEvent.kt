@@ -1,7 +1,7 @@
 package rb.clicker.telemetry
 
 import rb.extendo.dataStructures.Deque
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 
 class TelemetryEvent {

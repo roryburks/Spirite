@@ -11,7 +11,7 @@ import spirite.base.graphics.rendering.sources.RenderSource
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 /**
  * The Render Engine has two primary jobs:

@@ -26,7 +26,7 @@ import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.menus.NodeMenus
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class PrimaryGroupView
 private constructor(

@@ -19,9 +19,9 @@ import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSp
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
-import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetDragEvent

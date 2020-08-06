@@ -6,7 +6,7 @@ import spirite.base.brains.commands.specific.SpriteLayerFixes
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class DebugCommandExecutor(
         val master: IMasterControl)

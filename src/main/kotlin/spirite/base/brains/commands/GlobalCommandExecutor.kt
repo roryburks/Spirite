@@ -33,10 +33,10 @@ import spirite.base.util.linear.Rect
 import spirite.gui.menus.dialogs.IDialog.FilePickType
 import spirite.gui.menus.dialogs.IDialog.FilePickType.AAF
 import spirite.gui.menus.dialogs.IDialog.FilePickType.SAVE_SIF
-import spirite.hybrid.Hybrid
-import spirite.hybrid.Transferables.IClipboard.ClipboardThings.Image
-import spirite.hybrid.Transferables.ILayerBuilder
-import spirite.hybrid.Transferables.INodeBuilder
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.Transferables.IClipboard.ClipboardThings.Image
+import sguiSwing.hybrid.Transferables.ILayerBuilder
+import sguiSwing.hybrid.Transferables.INodeBuilder
 
 class GlobalCommandExecutor(
         val master: IMasterControl,

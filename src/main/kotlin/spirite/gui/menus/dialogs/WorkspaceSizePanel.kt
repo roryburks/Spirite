@@ -3,7 +3,7 @@ package spirite.gui.menus.dialogs
 import cwShared.dialogSystem.IDialogPanel
 import sgui.components.crossContainer.ICrossPanel
 import spirite.base.brains.IMasterControl
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 data class WorkspaceSizeReturn(
         val width: Int,

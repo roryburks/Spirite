@@ -14,9 +14,9 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.mediums.IImageMedium
 import spirite.base.util.linear.Rect
-import spirite.hybrid.Hybrid
-import spirite.hybrid.IImageCreator
-import spirite.hybrid.IImageIO
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.IImageCreator
+import sguiSwing.hybrid.IImageIO
 import java.io.File
 import java.io.RandomAccessFile
 

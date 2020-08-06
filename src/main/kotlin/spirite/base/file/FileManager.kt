@@ -10,9 +10,9 @@ import spirite.base.file.save.SaveEngine
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
-import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.FILE
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.FILE
 import java.io.File
 import java.io.IOException
 

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import rb.glow.color.Colors
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
-import spirite.hybrid.EngineLaunchpoint
+import sguiSwing.hybrid.EngineLaunchpoint
 import spirite.specialRendering.fill.GLFill
 import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import java.io.File

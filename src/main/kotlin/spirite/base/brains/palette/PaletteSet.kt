@@ -4,8 +4,8 @@ import rb.owl.bindable.Bindable
 import spirite.base.brains.palette.IPaletteManager.PaletteChangeEvent
 import spirite.base.brains.palette.IPaletteManager.PaletteSetChangeEvent
 import spirite.base.util.StringUtil
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
 
 abstract class PaletteSet {
     abstract val onPaletteSetChangeTrigger: (PaletteSetChangeEvent) -> Unit

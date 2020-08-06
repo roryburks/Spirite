@@ -9,7 +9,7 @@ import sguiSwing.jcolor
 import sguiSwing.skin.Skin.Global.Bg
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.awt.Graphics
 import javax.swing.JPanel
 import kotlin.math.floor

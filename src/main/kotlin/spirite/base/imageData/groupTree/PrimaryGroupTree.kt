@@ -13,7 +13,7 @@ import spirite.base.imageData.mediums.MediumType.*
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
 import spirite.base.util.debug.SpiriteException
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class PrimaryGroupTree(workspace: MImageWorkspace) : MovableGroupTree( workspace) {
     enum class InsertBehavior {

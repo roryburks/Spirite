@@ -19,7 +19,7 @@ import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
 import spirite.gui.views.work.WorkSection
 import spirite.gui.views.work.WorkSectionView
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 interface IPenner {
 //    val holdingShift : Boolean

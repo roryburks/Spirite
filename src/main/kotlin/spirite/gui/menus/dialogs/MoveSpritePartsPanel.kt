@@ -6,7 +6,7 @@ import sgui.components.crossContainer.ICrossPanel
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class MoveSpritePartsPanel(
         val parts: List<SpritePart>) :ICrossPanel by Hybrid.ui.CrossPanel(), IDialogPanel<SpriteLayer?>

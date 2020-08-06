@@ -12,8 +12,8 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import spirite.hybrid.ContentBoundsFinder
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.ContentBoundsFinder
+import sguiSwing.hybrid.Hybrid
 import kotlin.math.max
 
 /**

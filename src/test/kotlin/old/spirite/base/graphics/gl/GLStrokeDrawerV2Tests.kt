@@ -10,7 +10,7 @@ import rbJvm.glow.awt.toBufferedImage
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import spirite.specialRendering.stroke.GLStrokeDrawerV2
 import java.io.File
 import javax.imageio.ImageIO

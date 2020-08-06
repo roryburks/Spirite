@@ -9,7 +9,7 @@ import sgui.components.crossContainer.ICrossPanel
 import sguiSwing.SwIcon
 import spirite.base.brains.IMasterControl
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class GroupView
 private constructor(

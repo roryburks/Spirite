@@ -16,7 +16,7 @@ import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.gui.resources.SpiriteIcons.SmallIcons.*
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class SpriteLayerNodePanel
 private constructor(

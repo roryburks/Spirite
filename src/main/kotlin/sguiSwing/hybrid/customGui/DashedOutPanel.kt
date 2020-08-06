@@ -1,4 +1,4 @@
-package spirite.hybrid.customGui
+package sguiSwing.hybrid.customGui
 
 import sguiSwing.JColor
 import java.awt.Graphics

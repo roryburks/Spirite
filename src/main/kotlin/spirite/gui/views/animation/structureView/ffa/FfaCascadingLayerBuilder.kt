@@ -12,7 +12,7 @@ import spirite.base.imageData.animation.ffa.FfaLayerCascading.CascadingFrame
 import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.gui.resources.SpiriteIcons
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.io.InvalidClassException
 
 private object SettingStore {

@@ -2,8 +2,8 @@ package spirite.base.imageData.undo
 
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
 
 /**
  * The CompositeContext is a special Context which can store multiple actions

@@ -18,7 +18,7 @@ import rb.vectrix.linear.Vec4f
 import rbJvm.glow.awt.toBufferedImage
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.pen.stroke.DrawPoints
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import spirite.specialRendering.*
 import spirite.specialRendering.SquareGradientCall.GradientType.V
 import java.io.File

@@ -19,9 +19,9 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
 import java.lang.ref.WeakReference
 
 interface IThumbnailStore<T>

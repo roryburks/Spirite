@@ -1,4 +1,4 @@
-package spirite.hybrid
+package sguiSwing.hybrid
 
 import rb.glow.gl.IGL
 import rb.glow.gle.IGLEngine
@@ -12,8 +12,8 @@ import sgui.systems.KeypressSystem
 import sgui.systems.MKeypressSystem
 import sguiSwing.SwingComponentProvider
 import sguiSwing.mouseSystem.SwMouseSystem
-import spirite.hybrid.Transferables.IClipboard
-import spirite.hybrid.Transferables.SwClipboard
+import sguiSwing.hybrid.Transferables.IClipboard
+import sguiSwing.hybrid.Transferables.SwClipboard
 
 /** Hybrid is a collection of components and interfaces that are platform-specific (things like Timers, GUI libraries,
  * OpenGL implementations, etc).  It wraps them such that they can code can be as portable as possible.

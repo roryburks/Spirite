@@ -15,9 +15,9 @@ import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.UndoableDelegate
 import spirite.base.imageData.view.IViewSystem
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType
-import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType
+import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
 import kotlin.reflect.KProperty
 
 /**

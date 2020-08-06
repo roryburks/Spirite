@@ -6,7 +6,7 @@
 //import spirite.specialRendering.GL330ShaderLoader
 //import rb.glow.gl.GLC
 //import spirite.base.util.linear.MatrixBuilder
-//import spirite.hybrid.Hybrid
+//import sguiSwing.hybrid.Hybrid
 //import spirite.pc.JOGL.JOGL.JOGLUniformLocation
 //import spirite.pc.resources.JClassScriptService
 //import kotlin.test.assertNotEquals

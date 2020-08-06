@@ -21,7 +21,7 @@ import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.SpriteLayerContextMenus
 import spirite.gui.resources.SpiriteIcons
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class SpriteLayerPanel(
         workspaceSet: IWorkspaceSet,

@@ -8,7 +8,7 @@ import sguiSwing.components.jcomponent
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.gui.views.work.WorkTabPane
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.awt.GridLayout
 import javax.swing.JFrame
 import javax.swing.SwingUtilities

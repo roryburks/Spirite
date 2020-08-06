@@ -6,7 +6,7 @@ import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import kotlin.math.min
 
 class FfaLayerCascading(

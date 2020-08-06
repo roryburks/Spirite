@@ -4,7 +4,7 @@ import cwShared.dialogSystem.IDialogPanel
 import sgui.components.crossContainer.ICrossPanel
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.base.imageData.animation.ffa.FfaLayerCascading
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 
 data class FfaCascadingJsonContract(

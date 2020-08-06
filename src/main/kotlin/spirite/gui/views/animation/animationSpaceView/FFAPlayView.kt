@@ -13,7 +13,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.views.animation.AnimationPlayView
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class  FFAPlayView(
         val master: IMasterControl,

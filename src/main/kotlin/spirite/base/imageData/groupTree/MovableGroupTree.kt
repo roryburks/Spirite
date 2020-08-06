@@ -3,8 +3,8 @@ package spirite.base.imageData.groupTree
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior
 import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.*
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
 
 open class MovableGroupTree(
         val workspace: MImageWorkspace) : GroupTree(workspace.undoEngine, workspace.viewSystem) {

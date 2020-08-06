@@ -15,7 +15,7 @@ import spirite.base.brains.toolset.Tool
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.ToolIcons
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.awt.Color
 import java.awt.GradientPaint
 import java.awt.Graphics

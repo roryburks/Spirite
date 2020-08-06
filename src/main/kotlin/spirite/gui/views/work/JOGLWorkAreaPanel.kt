@@ -16,7 +16,7 @@ import sgui.components.events.MouseEvent.MouseButton
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent
 import spirite.base.pen.Penner
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.awt.event.MouseAdapter
 import javax.swing.SwingUtilities
 

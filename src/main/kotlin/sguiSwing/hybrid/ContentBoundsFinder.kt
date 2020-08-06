@@ -1,4 +1,4 @@
-package spirite.hybrid
+package sguiSwing.hybrid
 
 import com.jogamp.opengl.GL2
 import rb.glow.IImage

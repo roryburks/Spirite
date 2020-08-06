@@ -9,7 +9,7 @@ import rb.glow.color.ColorARGB32Normal
 import rb.glow.color.Colors
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs

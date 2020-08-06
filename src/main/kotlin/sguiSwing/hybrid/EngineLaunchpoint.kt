@@ -1,4 +1,4 @@
-package spirite.hybrid
+package sguiSwing.hybrid
 
 import rb.glow.gle.GLEngine
 import rb.glow.gle.IGLEngine

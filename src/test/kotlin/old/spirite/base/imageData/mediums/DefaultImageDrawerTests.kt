@@ -16,7 +16,7 @@ import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import spirite.specialRendering.stroke.GLStrokeDrawerV2
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

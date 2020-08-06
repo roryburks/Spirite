@@ -7,8 +7,8 @@ import rb.owl.bindable.IBindable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSpaceObserver
 import spirite.base.imageData.undo.NullAction
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 
 interface  IAnimationSpaceManager
 {

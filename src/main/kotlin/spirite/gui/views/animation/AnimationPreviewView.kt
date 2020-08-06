@@ -20,8 +20,8 @@ import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChan
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
-import spirite.hybrid.Hybrid
-import spirite.hybrid.ITimer
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.ITimer
 import java.awt.Graphics
 import kotlin.math.floor
 import kotlin.math.max

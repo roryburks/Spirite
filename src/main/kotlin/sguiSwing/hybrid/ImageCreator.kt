@@ -1,4 +1,4 @@
-package spirite.hybrid
+package sguiSwing.hybrid
 
 import rb.glow.RawImage
 import rb.glow.gl.GLImage

@@ -21,7 +21,7 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.debug.SpiriteException
 import spirite.base.util.linear.Rect
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import kotlin.math.min
 
 class SimpleStrokeMaglevLiftedData(

@@ -10,7 +10,6 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.MovableGroupTree
 import spirite.base.imageData.groupTree.duplicateInto
-import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
@@ -20,7 +19,7 @@ import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
 import spirite.gui.menus.dialogs.IDialog
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class NodeContextCommand(
         val workspaceSet: MWorkspaceSet,

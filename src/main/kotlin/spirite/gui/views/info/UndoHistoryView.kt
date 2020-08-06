@@ -10,7 +10,7 @@ import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import spirite.base.imageData.undo.UndoIndex
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
     override val component: IComponent

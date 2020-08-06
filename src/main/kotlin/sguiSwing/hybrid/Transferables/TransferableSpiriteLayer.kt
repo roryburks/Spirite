@@ -1,4 +1,4 @@
-package spirite.hybrid.Transferables
+package sguiSwing.hybrid.Transferables
 
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.Layer

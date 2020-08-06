@@ -9,8 +9,8 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import spirite.hybrid.ContentBoundsFinder
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.ContentBoundsFinder
+import sguiSwing.hybrid.Hybrid
 
 
 /**

@@ -1,4 +1,4 @@
-package spirite.hybrid.customGui
+package sguiSwing.hybrid.customGui
 
 import rb.vectrix.mathUtil.round
 import sgui.Direction.*

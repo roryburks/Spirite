@@ -10,9 +10,9 @@ import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked.UnlinkedFrameClu
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.groupTree.GroupTree.*
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.STRUCTURAL
-import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
+import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 
 
 object FfaLoader : IAnimationLoader {

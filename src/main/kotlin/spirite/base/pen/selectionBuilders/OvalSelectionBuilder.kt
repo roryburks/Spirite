@@ -3,7 +3,7 @@ package spirite.base.pen.selectionBuilders
 import rb.glow.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 
 class OvalSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( workspace) {

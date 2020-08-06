@@ -19,7 +19,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 
 fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {

@@ -11,7 +11,7 @@ import sgui.components.events.MouseEvent
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent
 import spirite.base.pen.Penner
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class JOGLWorkArea
 private constructor(

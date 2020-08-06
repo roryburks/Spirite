@@ -24,10 +24,10 @@ import spirite.base.pen.stroke.DrawPointsBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC
-import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.FILE
-import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.FILE
+import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 
 
 object MagneticMediumLoader : IMediumLoader

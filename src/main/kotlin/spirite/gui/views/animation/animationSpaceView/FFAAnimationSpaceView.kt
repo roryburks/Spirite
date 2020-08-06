@@ -21,7 +21,7 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.Spacial
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationPlayObserver
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
 import spirite.base.util.linear.Rect
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics

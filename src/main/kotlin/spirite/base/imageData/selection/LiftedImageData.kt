@@ -9,7 +9,7 @@ import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.LiftedImageDrawer
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class LiftedImageData(val image: IImage): ILiftedData {
     override fun draw(gc: GraphicsContext) {

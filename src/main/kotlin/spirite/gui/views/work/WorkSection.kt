@@ -17,7 +17,7 @@ import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.pen.Penner
 import spirite.base.util.linear.Rect
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.awt.Font
 import javax.swing.SwingUtilities
 

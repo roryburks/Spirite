@@ -18,8 +18,8 @@ import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.undo.ImageContext
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
-import spirite.hybrid.EngineLaunchpoint
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.EngineLaunchpoint
+import sguiSwing.hybrid.Hybrid
 import spirite.pc.setupSwGuiStuff
 import javax.swing.SwingUtilities
 import kotlin.test.assertEquals

@@ -11,7 +11,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.MediumType
 import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.gui.menus.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class NewSimpleLayerPanel(
         private val master: IMasterControl,

@@ -4,7 +4,7 @@ import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.ToolsetCommandExecutor.ToolCommand.*
 import spirite.base.brains.toolset.DropDownProperty
 import spirite.base.brains.toolset.IToolsetManager
-import spirite.hybrid.MDebug
+import sguiSwing.hybrid.MDebug
 import kotlin.math.ceil
 import kotlin.math.floor
 

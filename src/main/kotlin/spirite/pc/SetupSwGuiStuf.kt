@@ -4,7 +4,7 @@ import sguiSwing.PrimaryIcon.*
 import sguiSwing.SwPrimaryIconSet
 import sguiSwing.SwProvider
 import spirite.gui.resources.SpiriteIcons
-import spirite.hybrid.EngineLaunchpoint
+import sguiSwing.hybrid.EngineLaunchpoint
 
 fun setupSwGuiStuff() {
     SwProvider.converter = EngineLaunchpoint.converter

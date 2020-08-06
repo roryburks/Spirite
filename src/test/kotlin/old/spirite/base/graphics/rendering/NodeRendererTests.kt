@@ -14,7 +14,7 @@ import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 

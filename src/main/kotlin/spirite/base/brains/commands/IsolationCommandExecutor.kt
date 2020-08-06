@@ -3,7 +3,7 @@ package spirite.base.brains.commands
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.IsolationCommandExecutor.IsolationCommand.*
-import spirite.hybrid.MDebug
+import sguiSwing.hybrid.MDebug
 
 class IsolationCommandExecutor(private val workspaceSet: IWorkspaceSet) : ICommandExecutor
 {

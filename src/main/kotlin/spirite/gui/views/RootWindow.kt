@@ -28,8 +28,8 @@ import spirite.gui.views.tool.PaletteSection
 import spirite.gui.views.tool.ToolSection
 import spirite.gui.views.tool.ToolSettingsSection
 import spirite.gui.views.work.WorkTabPane
-import spirite.hybrid.Hybrid
-import spirite.hybrid.SwHybrid
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.SwHybrid
 import spirite.pc.menus.SwContextMenus
 import java.awt.Dimension
 import java.awt.GridLayout

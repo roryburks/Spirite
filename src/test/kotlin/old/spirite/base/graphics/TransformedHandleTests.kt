@@ -10,7 +10,7 @@
 //import spirite.base.graphics.rendering.TransformedHandle
 //import spirite.base.imageData.MediumHandle
 //import rb.glow.color.Colors
-//import spirite.hybrid.Hybrid
+//import sguiSwing.hybrid.Hybrid
 //import rbJvm.glow.awt.AwtImageConverter
 //import rbJvm.glow.awt.ImageBI
 //import java.io.File

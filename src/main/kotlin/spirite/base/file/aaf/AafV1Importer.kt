@@ -10,7 +10,7 @@ import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.InsertTo
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.DynamicMedium
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 
 class AafV1Anim(
         val name: String,
