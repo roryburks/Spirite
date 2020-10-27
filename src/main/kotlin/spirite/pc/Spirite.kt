@@ -28,8 +28,8 @@ class Spirite {
             SwingUtilities.invokeAndWait {
                 EngineLaunchpoint.gle
                 master = MasterControl()
-                master.frameManager.initUi()
-            }
+
+                master.frameManager.initUi()}
 
             SwingUtilities.invokeLater {
                 val ws1 = master.createWorkspace(640,480)
