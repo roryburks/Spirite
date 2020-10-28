@@ -7,14 +7,15 @@ import rb.glow.CapMethod.NONE
 import rb.glow.JoinMethod.MITER
 import rb.glow.Colors
 import rb.glow.gl.GLImage
-import rb.glow.gle.BasicCall
+import rb.glow.gl.shader.programs.BasicCall
 import rb.glow.gle.GLParameters
-import rb.glow.gle.PolyRenderCall
+import rb.glow.gl.shader.programs.PolyRenderCall
 import rb.glow.gle.PolyType.STRIP
-import rb.glow.gle.RenderCall
-import rb.glow.gle.RenderCall.RenderAlgorithm.*
+import rb.glow.gl.shader.programs.RenderCall
+import rb.glow.gl.shader.programs.RenderCall.RenderAlgorithm.*
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
+import rb.vectrix.mathUtil.f
 import rbJvm.glow.awt.toBufferedImage
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.pen.stroke.DrawPoints
@@ -146,10 +147,12 @@ class GLEngineTests {
 
         gle.setTarget(image)
         val drawPoints = DrawPoints(
-                FloatArray(100, { it.toFloat() }),
-                FloatArray(100, { it.toFloat() }),
-                FloatArray(100, { 1f - abs(50 - it) / 50f })
+                FloatArray(100) { it.f },
+                FloatArray(100) { it.f },
+                FloatArray(100) { 1f - abs(50 - it) / 50f }
         )
+
+        println(drawPoints)
 
         // TODO
 

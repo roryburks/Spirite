@@ -5,6 +5,10 @@ import rb.glow.gl.GLC
 import rb.glow.gl.IGL
 import rb.glow.gl.IGLProgram
 import rb.glow.gl.IGLShader
+import rb.glow.gl.shader.programs.BasicCall
+import rb.glow.gl.shader.programs.LineRenderCall
+import rb.glow.gl.shader.programs.PolyRenderCall
+import rb.glow.gl.shader.programs.RenderCall
 import rb.glow.gle.*
 import rb.glow.resources.IScriptService
 

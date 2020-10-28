@@ -4,7 +4,7 @@ import rb.glow.gl.*
 import rb.glow.gle.IGLEngine.BlendMethod
 import rb.glow.gle.IGLEngine.BlendMethod.DEST_OVER
 import rb.glow.gle.IGLEngine.BlendMethod.MAX
-import rb.glow.gle.IGlProgramCall
+import rb.glow.gl.shader.programs.IGlProgramCall
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
 import rb.vectrix.mathUtil.f

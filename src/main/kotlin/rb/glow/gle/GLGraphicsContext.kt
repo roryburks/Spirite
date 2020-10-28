@@ -1,18 +1,14 @@
 package rb.glow.gle
 
-import rb.glow.CapMethod.NONE
-import rb.glow.Composite
-import rb.glow.Composite.SRC_OVER
-import rb.glow.GraphicsContext
+import rb.glow.*
 import rb.glow.img.IImage
-import rb.glow.JoinMethod.ROUNDED
-import rb.glow.LineAttributes
-import rb.glow.Color
-import rb.glow.Colors
 import rb.glow.gl.GLC
 import rb.glow.gl.GLImage
-import rb.glow.gle.RenderCall.RenderAlgorithm
-import rb.glow.gle.RenderCall.RenderAlgorithm.*
+import rb.glow.gl.shader.programs.IGlProgramCall
+import rb.glow.gl.shader.programs.PolyRenderCall
+import rb.glow.gl.shader.programs.RenderCall
+import rb.glow.gl.shader.programs.RenderCall.RenderAlgorithm
+import rb.glow.gl.shader.programs.RenderCall.RenderAlgorithm.*
 import rb.glow.gle.RenderMethodType.*
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.MutableTransformF
@@ -81,14 +77,14 @@ class GLGraphicsContext : GraphicsContext {
         set(value) {_trans = value.toMutable()}
     private var _trans : MutableTransformF = MutableTransformF.Identity
 
-    override fun preTranslate(offsetX: Float, offsetY: Float) = _trans.preTranslate(offsetX.toFloat(), offsetY.toFloat())
-    override fun translate(offsetX: Float, offsetY: Float) = _trans.translate(offsetX.toFloat(), offsetY.toFloat())
+    override fun preTranslate(offsetX: Float, offsetY: Float) = _trans.preTranslate(offsetX, offsetY)
+    override fun translate(offsetX: Float, offsetY: Float) = _trans.translate(offsetX, offsetY)
 
     override fun preTransform(trans: ITransformF) = _trans .preConcatenate(trans)
     override fun transform(trans: ITransformF) = _trans.concatenate(trans)
 
-    override fun preScale(sx: Float, sy: Float) = _trans.preScale(sx.toFloat(), sy.toFloat())
-    override fun scale(sx: Float, sy: Float) = _trans.scale(sx.toFloat(), sy.toFloat())
+    override fun preScale(sx: Float, sy: Float) = _trans.preScale(sx, sy)
+    override fun scale(sx: Float, sy: Float) = _trans.scale(sx, sy)
     // endregion
 
     // region Other Settings
@@ -96,7 +92,7 @@ class GLGraphicsContext : GraphicsContext {
     override var color : Color = Colors.BLACK
 
     override var alpha = 1f
-    override var composite = SRC_OVER
+    override var composite = Composite.SRC_OVER
         set(value) {
             setCompositeBlend(cachedParams, value)
             field = value
@@ -120,7 +116,7 @@ class GLGraphicsContext : GraphicsContext {
         }
     }
 
-    private val defaultLA = LineAttributes(1f, NONE, ROUNDED, null)
+    private val defaultLA = LineAttributes(1f, CapMethod.NONE, JoinMethod.ROUNDED, null)
     override var lineAttributes: LineAttributes = defaultLA
 
     override fun setClip(i: Int, j: Int, width: Int, height: Int) {
@@ -151,7 +147,7 @@ class GLGraphicsContext : GraphicsContext {
     override fun drawPolyLine(x: IntArray, y: IntArray, count: Int) {
         reset()
         gle.applyComplexLineProgram(
-                x.map { it.toFloat() }, y.map { it.toFloat() }, count, lineAttributes.cap, lineAttributes.join,
+                x.map { it.f }, y.map { it.f }, count, lineAttributes.cap, lineAttributes.join,
                 false, lineAttributes.width, color.rgbComponent, alpha, cachedParams, _trans)
     }
 
@@ -161,7 +157,7 @@ class GLGraphicsContext : GraphicsContext {
                 false, lineAttributes.width, color.rgbComponent, alpha, cachedParams, _trans)
     }
 
-    override fun drawLine(x1: Int, y1: Int, x2: Int, y2: Int) = drawLine(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat())
+    override fun drawLine(x1: Int, y1: Int, x2: Int, y2: Int) = drawLine(x1.f, y1.f, x2.f, y2.f)
 
     override fun draw(shape: IShape) {
         reset()

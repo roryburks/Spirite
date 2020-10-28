@@ -5,6 +5,8 @@ import rb.glow.IImageConverter
 import rb.glow.JoinMethod
 import rb.glow.exceptions.GLEException
 import rb.glow.gl.*
+import rb.glow.gl.shader.programs.IGlProgramCall
+import rb.glow.gl.shader.programs.LineRenderCall
 import rb.glow.glu.IPolygonTesselator
 import rb.glow.glu.MatrixBuilder.F.orthagonalProjectionMatrix
 import rb.glow.glu.MatrixBuilder.F.wrapTransform
@@ -228,6 +230,7 @@ class GLEngine(
 
             prim.flush()
         }else {
+            println("todo")
 
         }
     }

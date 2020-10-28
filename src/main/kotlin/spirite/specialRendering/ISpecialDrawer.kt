@@ -5,7 +5,7 @@ import rb.glow.img.IImage
 import rb.glow.Color
 import rb.glow.Colors
 import rb.glow.gl.GLImage
-import rb.glow.gle.BasicCall
+import rb.glow.gl.shader.programs.BasicCall
 import rb.glow.gle.GLGraphicsContext
 import rb.glow.using
 import rb.vectrix.mathUtil.f

@@ -5,7 +5,7 @@ import rb.glow.gl.GLImage
 import rb.glow.gle.GLParameters
 import rb.glow.gle.GLPrimitive
 import rb.glow.gle.IGLEngine
-import rb.glow.gle.PolyRenderCall
+import rb.glow.gl.shader.programs.PolyRenderCall
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
