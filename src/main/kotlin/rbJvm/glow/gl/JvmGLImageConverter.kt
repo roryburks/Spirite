@@ -7,6 +7,7 @@ import rb.glow.gl.IGL
 import rb.glow.gl.IGLImageConverter
 import rb.glow.gle.IGLEngine
 import rb.glow.img.IImage
+import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.awt.ImageBI
 import rbJvm.glow.awt.RasterHelper
 import rbJvm.glow.jogl.JOGL
@@ -15,16 +16,17 @@ import java.nio.IntBuffer
 
 object JvmGLImageConverter : IGLImageConverter {
     override fun convertToGL(image: IImage, gle: IGLEngine): GLImage {
-        val gl = gle.gl
-        val tex = gl.createTexture() ?: throw GLException("Failed to create texture.")
-        gl.bindTexture(GLC.TEXTURE_2D, tex)
-        gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_MIN_FILTER, GLC.NEAREST)
-        gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_MAG_FILTER, GLC.NEAREST)
-        gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_S, GLC.CLAMP_TO_EDGE)
-        gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_T, GLC.CLAMP_TO_EDGE)
-
-        loadImageIntoGL(image, gl)
-        return GLImage(tex, image.width, image.height, gle, false)
+        return AwtImageConverter({gle}).convertToInternal(image) as GLImage
+//        val gl = gle.gl
+//        val tex = gl.createTexture() ?: throw GLException("Failed to create texture.")
+//        gl.bindTexture(GLC.TEXTURE_2D, tex)
+//        gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_MIN_FILTER, GLC.NEAREST)
+//        gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_MAG_FILTER, GLC.NEAREST)
+//        gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_S, GLC.CLAMP_TO_EDGE)
+//        gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_T, GLC.CLAMP_TO_EDGE)
+//
+//        loadImageIntoGL(image, gl)
+//        return GLImage(tex, image.width, image.height, gle, false)
     }
 
     fun loadImageIntoGL(image: IImage, gl: IGL) {

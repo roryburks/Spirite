@@ -21,7 +21,7 @@ class GlBindFramebufferException(msg: String) : GLEException(msg)
 interface IGLEngine
 {
     val tesselator : IPolygonTesselator
-    val converter: IImageConverter
+    val converter: IGLImageConverter
 
     val width : Int
     val height : Int
@@ -77,7 +77,7 @@ interface IGLEngine
 class GLEngine(
         override val tesselator: IPolygonTesselator,
         shaderLoader: IGLShaderLoader,
-        override val converter: IImageConverter,
+        override val converter: IGLImageConverter,
         private val _context: IGLContext)
     : IGLEngine
 {

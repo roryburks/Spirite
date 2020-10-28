@@ -85,7 +85,7 @@ class GLSpecialDrawer(private val _gc: GLGraphicsContext) : ISpecialDrawer{
                 val gc = buffer.graphics
                 gc.clear()
 
-                val texture = gle.converter.convert(image, GLImage::class) as GLImage
+                val texture = gle.converter.convertToGL(image, gle)
                 val bufferParams = cachedParams.copy(texture1 = texture)
                 gc.applyPassProgram(BasicCall(),
                         bufferParams, transform, 0f, 0f, image.width + 0f, image.height + 0f)
