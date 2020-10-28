@@ -1,4 +1,4 @@
-package rb.glow.color
+package rb.glow
 
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
@@ -38,13 +38,13 @@ class ColorARGB32Normal(argb: Int)
     override val alpha: Float get() = (a / 255.0f)
 
     companion object {
-        fun FromComponents( alpha: Float, red: Float, green: Float, blue: Float) : ColorARGB32Normal{
+        fun FromComponents( alpha: Float, red: Float, green: Float, blue: Float) : ColorARGB32Normal {
             val a = MathUtil.clip(0, (alpha*255).round, 255)
             val r = MathUtil.clip(0, (red*255).round, 255)
             val g = MathUtil.clip(0, (green*255).round, 255)
             val b = MathUtil.clip(0, (blue*255).round, 255)
 
-            return ColorARGB32Normal( (a shl 24) or (r shl 16) or (g shl 8) or (b shl 0))
+            return ColorARGB32Normal((a shl 24) or (r shl 16) or (g shl 8) or (b shl 0))
         }
     }
 }
@@ -126,7 +126,7 @@ object Colors {
 }
 
 object ColorUtil {
-    fun colorDistance( c1: Color, c2: Color) : Double {
+    fun colorDistance(c1: Color, c2: Color) : Double {
         // I don't have to explain.  sqrt(2)^2 + 1^2 = c^2, c = sqrt(3), d = sqrt(4) = 2
         val dr = (c1.red - c2.red) * 255.0/2
         val dg = (c1.green - c2.green) * 255.0/2

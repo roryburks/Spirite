@@ -1,7 +1,7 @@
 package spirite.base.graphics.rendering
 
 import rb.glow.GraphicsContext
-import rb.glow.RawImage
+import rb.glow.img.RawImage
 import rb.glow.gle.RenderRubric
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF

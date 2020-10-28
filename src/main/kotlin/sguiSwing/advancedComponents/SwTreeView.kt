@@ -2,7 +2,7 @@ package sguiSwing.advancedComponents
 
 import rb.IContract
 import rb.extendo.delegates.OnChangeDelegate
-import rb.glow.color.SColor
+import rbJvm.glow.SColor
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil

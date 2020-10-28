@@ -1,7 +1,7 @@
 package spirite.base.imageData.mediums.magLev
 
 import rb.glow.GraphicsContext
-import rb.glow.color.SColor
+import rbJvm.glow.SColor
 import rb.vectrix.linear.Vec3f
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.pen.stroke.DrawPoints

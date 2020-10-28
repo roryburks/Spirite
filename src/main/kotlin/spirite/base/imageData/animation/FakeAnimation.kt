@@ -2,7 +2,7 @@ package spirite.base.imageData.animation
 
 import rb.glow.GraphicsContext
 import rb.glow.LineAttributes
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.IImageWorkspace
 

@@ -1,6 +1,6 @@
 package sguiSwing.hybrid.Transferables
 
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.layers.Layer

@@ -3,7 +3,7 @@ package spirite.base.graphics.filter
 import rb.glow.Composite.CLEAR
 import rb.glow.Composite.DST_IN
 import rb.glow.GraphicsContext
-import rb.glow.IImage
+import rb.glow.img.IImage
 import kotlin.math.min
 
 interface IFilter {

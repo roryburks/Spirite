@@ -1,7 +1,7 @@
 package spirite.base.file
 
-import rb.glow.color.ColorARGB32Normal
-import rb.glow.color.Colors
+import rb.glow.ColorARGB32Normal
+import rb.glow.Colors
 import rb.glow.gl.GLImage
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f

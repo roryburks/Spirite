@@ -1,7 +1,7 @@
 package sjunit.base.imageData.mediums.maglev.selecting
 
 import org.junit.jupiter.api.Test
-import rb.glow.color.Colors
+import rb.glow.Colors
 import sjunit.base.imageData.mediums.maglev.MaglevTestHelper
 import sjunit.testHelpers.images.TRectIImage
 import sjunit.testHelpers.makeWorkspaceWithMockedExternals

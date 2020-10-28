@@ -1,6 +1,6 @@
 package spirite.gui.views.tool
 
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.owl.Observer
 import rb.owl.bindable.addObserver
 import sgui.components.IBoxList

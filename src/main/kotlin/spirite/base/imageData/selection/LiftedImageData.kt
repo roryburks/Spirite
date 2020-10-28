@@ -1,7 +1,7 @@
 package spirite.base.imageData.selection
 
 import rb.glow.GraphicsContext
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.mathUtil.f
 import spirite.base.imageData.IImageWorkspace

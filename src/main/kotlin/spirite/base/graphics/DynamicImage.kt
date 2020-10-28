@@ -2,7 +2,7 @@ package spirite.base.graphics
 
 import rb.glow.Composite.SRC
 import rb.glow.IFlushable
-import rb.glow.RawImage
+import rb.glow.img.RawImage
 import rb.glow.using
 import rb.glow.with
 import rb.vectrix.linear.ITransformF

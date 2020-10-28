@@ -1,6 +1,6 @@
 package spirite.gui.views.groupView
 
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.owl.bindable.addObserver
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BASIC

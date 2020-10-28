@@ -1,6 +1,6 @@
 package spirite.specialRendering.fill
 
-import rb.glow.color.SColor
+import rbJvm.glow.SColor
 import rb.glow.gl.GLC
 import rb.glow.gl.GLImage
 import rb.glow.gle.GLGraphicsContext

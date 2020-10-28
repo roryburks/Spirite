@@ -1,6 +1,7 @@
 package rb.glow.gle
 
 import rb.glow.CapMethod
+import rb.glow.IImageConverter
 import rb.glow.JoinMethod
 import rb.glow.exceptions.GLEException
 import rb.glow.gl.*

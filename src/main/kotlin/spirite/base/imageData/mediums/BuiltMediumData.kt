@@ -1,7 +1,7 @@
 package spirite.base.imageData.mediums
 
 import rb.glow.GraphicsContext
-import rb.glow.RawImage
+import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.imageData.MMediumRepository

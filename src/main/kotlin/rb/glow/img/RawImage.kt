@@ -1,6 +1,8 @@
-package rb.glow
+package rb.glow.img
 
-import rb.glow.color.Colors
+import rb.glow.Colors
+import rb.glow.GraphicsContext
+import rb.glow.IFlushable
 
 
 /**

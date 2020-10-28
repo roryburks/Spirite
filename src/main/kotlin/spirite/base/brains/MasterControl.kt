@@ -1,6 +1,6 @@
 package spirite.base.brains
 
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rbJvm.glow.awt.NativeImage
 import spirite.base.brains.commands.CentralCommandExecutor
 import spirite.base.brains.commands.ICentralCommandExecutor

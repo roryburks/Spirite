@@ -3,8 +3,8 @@ package rb.glow
 import rb.extendo.dataStructures.Deque
 import rb.glow.CapMethod.NONE
 import rb.glow.JoinMethod.MITER
-import rb.glow.color.Color
 import rb.glow.gle.RenderRubric
+import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.shapes.IShape
 

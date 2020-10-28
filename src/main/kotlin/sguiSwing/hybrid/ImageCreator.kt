@@ -1,6 +1,6 @@
 package sguiSwing.hybrid
 
-import rb.glow.RawImage
+import rb.glow.img.RawImage
 import rb.glow.gl.GLImage
 
 interface IImageCreator {

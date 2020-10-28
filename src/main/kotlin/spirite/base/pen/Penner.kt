@@ -1,7 +1,7 @@
 package spirite.base.pen
 
 import rb.glow.GraphicsContext
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.owl.bindable.addObserver
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f

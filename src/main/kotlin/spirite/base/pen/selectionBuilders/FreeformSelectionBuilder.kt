@@ -1,7 +1,7 @@
 package spirite.base.pen.selectionBuilders
 
 import rb.glow.GraphicsContext
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.vectrix.compaction.IntCompactor
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.f

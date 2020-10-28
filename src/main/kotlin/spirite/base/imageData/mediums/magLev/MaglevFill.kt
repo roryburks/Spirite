@@ -2,7 +2,7 @@ package spirite.base.imageData.mediums.magLev
 
 import rb.glow.Composite.DST_OVER
 import rb.glow.Composite.SRC_OVER
-import rb.glow.color.SColor
+import rbJvm.glow.SColor
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.MagneticFillMode.BEHIND
 import spirite.base.brains.toolset.MagneticFillMode.NORMAL

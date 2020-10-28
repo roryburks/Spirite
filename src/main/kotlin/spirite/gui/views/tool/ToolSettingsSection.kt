@@ -1,7 +1,7 @@
 package spirite.gui.views.tool
 
 import rb.IContract
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.interprettedBindings.bindToX

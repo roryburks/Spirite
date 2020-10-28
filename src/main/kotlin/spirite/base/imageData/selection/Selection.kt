@@ -1,10 +1,10 @@
 package spirite.base.imageData.selection
 
 import rb.glow.Composite.*
-import rb.glow.IImage
-import rb.glow.RawImage
-import rb.glow.color.Color
-import rb.glow.color.Colors
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
+import rb.glow.Color
+import rb.glow.Colors
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f

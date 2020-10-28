@@ -2,9 +2,9 @@ package spirite.base.brains.commands
 
 import rb.extendo.dataStructures.SinglySet
 import rb.glow.Composite.SRC_IN
-import rb.glow.IImage
-import rb.glow.RawImage
-import rb.glow.color.Colors
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
+import rb.glow.Colors
 import rb.glow.using
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f

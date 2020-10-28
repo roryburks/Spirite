@@ -1,9 +1,9 @@
 package rb.glow.gl
 
-import rb.glow.RawImage
-import rb.glow.RawImage.InvalidImageDimensionsExeption
-import rb.glow.color.toColor
-import rb.glow.color.toColorPremultiplied
+import rb.glow.img.RawImage
+import rb.glow.img.RawImage.InvalidImageDimensionsExeption
+import rb.glow.toColor
+import rb.glow.toColorPremultiplied
 import rb.glow.gle.GLGraphicsContext
 import rb.glow.gle.GLParameters
 import rb.glow.gle.IGLEngine
@@ -95,7 +95,6 @@ class GLImage : RawImage {
             engine.runOnGLThread {
                 gl.tracker.markGLImageUnloaded(this)
 
-                //engine.glImageUnloaded(this)  // TODO
                 if( engine.target == _tex)
                     engine.target = null
                 engine.gl.deleteTexture(_tex)

@@ -2,8 +2,8 @@ package spirite.base.imageData.mediums.magLev.selecting
 
 import rb.extendo.extensions.stride
 import rb.glow.GraphicsContext
-import rb.glow.IImage
-import rb.glow.color.Colors
+import rb.glow.img.IImage
+import rb.glow.Colors
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f

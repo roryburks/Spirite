@@ -1,7 +1,5 @@
 package rb.glow
 
-import rb.glow.color.Color
-import rb.glow.color.Colors
 import rb.vectrix.linear.MutableTransformD
 
 interface IGraphicsContext {

@@ -1,10 +1,10 @@
 package spirite.base.imageData.drawer
 
 import rb.glow.Composite.*
-import rb.glow.RawImage
-import rb.glow.color.Color
-import rb.glow.color.ColorUtil
-import rb.glow.color.SColor
+import rb.glow.img.RawImage
+import rb.glow.Color
+import rb.glow.ColorUtil
+import rbJvm.glow.SColor
 import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF

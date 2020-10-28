@@ -5,7 +5,7 @@ import io.mockk.mockk
 import old.TestConfig
 import old.TestHelper
 import org.junit.jupiter.api.Test
-import rb.glow.color.Colors
+import rb.glow.Colors
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.imageData.layers.SimpleLayer

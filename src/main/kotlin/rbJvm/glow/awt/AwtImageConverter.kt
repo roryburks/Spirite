@@ -1,12 +1,12 @@
 package rbJvm.glow.awt
 
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rb.glow.exceptions.GLEException
 import rb.glow.gl.GLC
 import rb.glow.gl.GLImage
 import rb.glow.gl.IGL
 import rb.glow.gle.IGLEngine
-import rb.glow.gle.IImageConverter
+import rb.glow.IImageConverter
 import rbJvm.glow.jogl.JOGL.JOGLTextureSource
 import java.nio.ByteBuffer
 import java.nio.IntBuffer

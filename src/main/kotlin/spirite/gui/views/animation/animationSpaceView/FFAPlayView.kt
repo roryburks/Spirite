@@ -1,6 +1,6 @@
 package spirite.gui.views.animation.animationSpaceView
 
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
 import sgui.Orientation.VERTICAL

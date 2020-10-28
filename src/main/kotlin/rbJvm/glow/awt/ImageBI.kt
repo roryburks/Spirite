@@ -1,10 +1,10 @@
 package rbJvm.glow.awt
 
 import rb.glow.GraphicsContext
-import rb.glow.RawImage
-import rb.glow.color.Color
-import rb.glow.color.ColorARGB32Normal
-import rb.glow.color.ColorARGB32Premultiplied
+import rb.glow.img.RawImage
+import rb.glow.Color
+import rb.glow.ColorARGB32Normal
+import rb.glow.ColorARGB32Premultiplied
 import java.awt.image.BufferedImage
 
 class ImageBI(

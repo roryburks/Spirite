@@ -3,7 +3,7 @@ package sjunit.base.imageData.mediums.maglev.actions
 import org.junit.jupiter.api.Test
 import rb.extendo.dataStructures.SinglyCollection
 import rb.extendo.dataStructures.SinglyList
-import rb.glow.color.Colors
+import rb.glow.Colors
 import sjunit.base.imageData.mediums.maglev.MaglevTestHelper
 import sjunit.testHelpers.makeWorkspaceWithMockedExternals
 import spirite.base.brains.toolset.MagneticFillMode

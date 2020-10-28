@@ -1,7 +1,7 @@
 package spirite.base.imageData.drawer
 
-import rb.glow.color.Color
-import rb.glow.color.SColor
+import rb.glow.Color
+import rbJvm.glow.SColor
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import spirite.base.brains.toolset.ColorChangeMode

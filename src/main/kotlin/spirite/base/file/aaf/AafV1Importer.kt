@@ -1,7 +1,7 @@
 package spirite.base.file.aaf
 
-import rb.glow.IImage
-import rb.glow.RawImage
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
 import rb.vectrix.shapes.RectI
 import spirite.base.file.readUTF8NT
 import spirite.base.graphics.DynamicImage
@@ -79,7 +79,7 @@ object AafV1Importer : IAafImporter {
                 }
     }
 
-    fun imageFromFrame( frame: RectI, image: IImage) : RawImage{
+    fun imageFromFrame( frame: RectI, image: IImage) : RawImage {
         val output = Hybrid.imageCreator.createImage(frame.wi,frame.hi)
         output.graphics.renderImage(image, -frame.x1i, -frame.y1i)
         return output

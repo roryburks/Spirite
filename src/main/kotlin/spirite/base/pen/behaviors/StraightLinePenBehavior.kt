@@ -1,6 +1,6 @@
 package spirite.base.pen.behaviors
 
-import rb.glow.color.SColor
+import rbJvm.glow.SColor
 import rb.vectrix.mathUtil.f
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.imageData.drawer.IImageDrawer

@@ -2,7 +2,7 @@ package spirite.base.pen.behaviors
 
 import com.hackoeur.jglm.support.FastMath.max
 import rb.glow.GraphicsContext
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer

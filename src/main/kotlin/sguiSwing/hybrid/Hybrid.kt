@@ -2,7 +2,7 @@ package sguiSwing.hybrid
 
 import rb.glow.gl.IGL
 import rb.glow.gle.IGLEngine
-import rb.glow.gle.IImageConverter
+import rb.glow.IImageConverter
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.jogl.JOGLProvider
 import sgui.components.IComponentProvider

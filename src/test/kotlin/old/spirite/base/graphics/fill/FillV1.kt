@@ -1,7 +1,7 @@
 package old.spirite.base.graphics.fill
 
 import org.junit.jupiter.api.Test
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.glow.gl.GLImage
 import sguiSwing.hybrid.EngineLaunchpoint
 import spirite.specialRendering.fill.V0FillArrayAlgorithm

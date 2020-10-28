@@ -1,7 +1,7 @@
 package spirite.base.graphics.rendering
 
-import rb.glow.IImage
-import rb.glow.RawImage
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
 import rb.owl.observer
 import rbJvm.glow.awt.NativeImage
 import spirite.base.brains.ICentralObservatory

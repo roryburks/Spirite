@@ -4,7 +4,7 @@ import old.TestConfig
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.Test
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
 import spirite.base.pen.stroke.DrawPoints

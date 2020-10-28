@@ -1,8 +1,8 @@
 package sgui.components
 
-import rb.glow.IImage
-import rb.glow.NillImage
-import rb.glow.color.SColor
+import rb.glow.img.IImage
+import rb.glow.img.NillImage
+import rbJvm.glow.SColor
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import sgui.components.ITreeViewNonUI.ITreeNode

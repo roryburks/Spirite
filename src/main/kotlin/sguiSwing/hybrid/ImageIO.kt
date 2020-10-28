@@ -1,7 +1,7 @@
 package sguiSwing.hybrid
 
-import rb.glow.IImage
-import rb.glow.RawImage
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
 import rbJvm.glow.awt.ImageBI
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

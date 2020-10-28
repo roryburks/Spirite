@@ -1,6 +1,6 @@
 package old
 
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
 import sguiSwing.hybrid.Hybrid
 import java.io.File

@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
 import rb.glow.GraphicsContext
-import rb.glow.color.Colors
+import rb.glow.Colors
 import spirite.base.brains.toolset.BoxSelectionShape
 import spirite.base.brains.toolset.BoxSelectionShape.OVAL
 import spirite.base.brains.toolset.BoxSelectionShape.RECTANGLE

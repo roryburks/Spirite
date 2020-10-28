@@ -1,8 +1,8 @@
 package spirite.base.graphics.rendering
 
 import rb.glow.IFlushable
-import rb.glow.IImage
-import rb.glow.RawImage
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
 import rb.owl.observer
 import spirite.base.brains.ICentralObservatory
 import spirite.base.graphics.IResourceUseTracker

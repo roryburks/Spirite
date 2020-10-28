@@ -3,8 +3,8 @@ package old.spirite.base.graphics.rendering
 import old.TestConfig
 import old.TestHelper
 import org.junit.jupiter.api.Test
-import rb.glow.RawImage
-import rb.glow.color.Colors
+import rb.glow.img.RawImage
+import rb.glow.Colors
 import rb.glow.gle.RenderMethod
 import rb.glow.gle.RenderMethodType.MULTIPLY
 import rbJvm.glow.awt.AwtImageConverter

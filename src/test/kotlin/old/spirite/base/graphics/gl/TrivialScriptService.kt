@@ -1,6 +1,6 @@
 package old.spirite.base.graphics.gl
 
-import spirite.base.resources.IScriptService
+import rb.glow.resources.IScriptService
 
 class TrivialScriptService : IScriptService {
     override fun loadScript(scriptName: String): String {

@@ -1,8 +1,8 @@
 package spirite.base.pen.behaviors
 
 import rb.glow.GraphicsContext
-import rb.glow.color.ColorARGB32Normal
-import rb.glow.color.SColor
+import rb.glow.ColorARGB32Normal
+import rbJvm.glow.SColor
 import rb.vectrix.mathUtil.f
 import spirite.base.imageData.drawer.IImageDrawer.IMagneticFillModule
 import spirite.base.pen.Penner

@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
 import rb.glow.GraphicsContext
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import sgui.components.events.MouseEvent.MouseButton

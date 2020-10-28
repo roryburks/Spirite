@@ -5,7 +5,7 @@ import old.TestConfig
 import org.junit.jupiter.api.Test
 import rb.glow.CapMethod.NONE
 import rb.glow.JoinMethod.MITER
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.glow.gl.GLImage
 import rb.glow.gle.BasicCall
 import rb.glow.gle.GLParameters

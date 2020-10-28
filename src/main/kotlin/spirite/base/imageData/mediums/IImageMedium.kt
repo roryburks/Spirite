@@ -1,7 +1,7 @@
 package spirite.base.imageData.mediums
 
 import rb.glow.GraphicsContext
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rb.glow.gle.RenderRubric
 
 interface IImageMedium : IMedium{

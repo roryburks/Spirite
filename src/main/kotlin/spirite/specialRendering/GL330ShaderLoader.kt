@@ -6,7 +6,7 @@ import rb.glow.gl.IGL
 import rb.glow.gl.IGLProgram
 import rb.glow.gl.IGLShader
 import rb.glow.gle.*
-import spirite.base.resources.IScriptService
+import rb.glow.resources.IScriptService
 
 class GlCreateProgramException( msg: String) : GLEException(msg)
 class GlLinkShaderException( msg: String) : GLEException(msg)

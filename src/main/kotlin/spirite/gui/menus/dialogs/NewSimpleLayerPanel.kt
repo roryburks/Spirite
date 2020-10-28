@@ -1,8 +1,8 @@
 package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
-import rb.glow.color.Color
-import rb.glow.color.Colors
+import rb.glow.Color
+import rb.glow.Colors
 import sgui.Orientation.HORIZONTAL
 import sgui.Orientation.VERTICAL
 import sgui.components.crossContainer.ICrossPanel

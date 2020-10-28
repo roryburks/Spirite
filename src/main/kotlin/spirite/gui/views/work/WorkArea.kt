@@ -1,7 +1,7 @@
 package spirite.gui.views.work
 
 import rb.glow.GraphicsContext
-import rb.glow.color.Colors
+import rb.glow.Colors
 import sguiSwing.components.ISwComponent
 import sguiSwing.skin.Skin
 import spirite.specialRendering.SpecialDrawerFactory

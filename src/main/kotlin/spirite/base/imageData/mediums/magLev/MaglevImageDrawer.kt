@@ -1,7 +1,7 @@
 package spirite.base.imageData.mediums.magLev
 
-import rb.glow.color.Color
-import rb.glow.color.SColor
+import rb.glow.Color
+import rbJvm.glow.SColor
 import rb.hydra.anyTiamatGrindSync
 import rb.hydra.miniTiamatGrindSync
 import rb.vectrix.linear.ITransformF

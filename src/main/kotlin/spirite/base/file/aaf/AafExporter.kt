@@ -2,8 +2,8 @@ package spirite.base.file.aaf
 
 import rb.extendo.extensions.pop
 import rb.extendo.extensions.toLookup
-import rb.glow.IImage
-import rb.glow.RawImage
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher

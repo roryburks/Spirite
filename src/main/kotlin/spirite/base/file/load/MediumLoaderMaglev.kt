@@ -1,7 +1,7 @@
 package spirite.base.file.load
 
-import rb.glow.color.ColorARGB32Normal
-import rb.glow.color.toColor
+import rb.glow.ColorARGB32Normal
+import rb.glow.toColor
 import rb.vectrix.interpolation.CubicSplineInterpolator2D
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.i

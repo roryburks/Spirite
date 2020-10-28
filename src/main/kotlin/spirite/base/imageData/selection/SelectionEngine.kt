@@ -1,7 +1,7 @@
 package spirite.base.imageData.selection
 
 import rb.extendo.delegates.DerivedLazy
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.vectrix.linear.ITransformF

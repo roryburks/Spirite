@@ -1,7 +1,7 @@
 package spirite.gui.views.layerProperties
 
 import rb.IContract
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.owl.Observer
 import rb.owl.bindable.Bindable
 import rbJvm.glow.awt.NativeImage

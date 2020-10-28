@@ -1,7 +1,7 @@
 package sguiSwing.hybrid
 
 import com.jogamp.opengl.GL2
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.ImageBI
 import spirite.base.util.linear.Rect

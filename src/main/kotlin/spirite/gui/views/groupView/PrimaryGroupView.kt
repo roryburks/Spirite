@@ -1,7 +1,7 @@
 package spirite.gui.views.groupView
 
 import rb.IContract
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent

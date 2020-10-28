@@ -1,7 +1,7 @@
 package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
-import rb.glow.color.SColor
+import rbJvm.glow.SColor
 import sguiSwing.components.jcomponent
 import sguiSwing.jcolor
 import sguiSwing.scolor
