@@ -15,7 +15,7 @@ import java.io.File
 import javax.imageio.ImageIO
 import kotlin.test.assertEquals
 
-class GLGraphicsContextTests {
+class GLGraphicsContextOldTests {
     val gle = Hybrid.gle
 
     @Test fun drawBounds() {

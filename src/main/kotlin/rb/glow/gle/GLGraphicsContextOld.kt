@@ -23,7 +23,7 @@ import rb.vectrix.shapes.RectI
 //import spirite.specialRendering.GridCall
 
 
-class GLGraphicsContext : GraphicsContext {
+class GLGraphicsContextOld : GraphicsContext_old {
 
     val image : GLImage?
     val premultiplied : Boolean

@@ -9,7 +9,7 @@ import jpen.*
 import jpen.PButton.Type.*
 import jpen.event.PenListener
 import jpen.owner.multiAwt.AwtPenToolkit
-import rb.glow.gle.GLGraphicsContext
+import rb.glow.gle.GLGraphicsContextOld
 import rb.vectrix.mathUtil.round
 import rbJvm.glow.jogl.JOGLProvider
 import sgui.components.events.MouseEvent.MouseButton
@@ -130,7 +130,7 @@ private constructor(
                 val h = drawable.surfaceHeight
 
                 val gle = Hybrid.gle
-                val glgc = GLGraphicsContext(w, h, false, gle, true)
+                val glgc = GLGraphicsContextOld(w, h, false, gle, true)
 
                 JOGLProvider.gl2 = drawable.gl.gL2
                 gle.setTarget(null)

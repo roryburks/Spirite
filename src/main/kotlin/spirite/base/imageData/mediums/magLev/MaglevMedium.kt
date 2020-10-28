@@ -1,7 +1,7 @@
 package spirite.base.imageData.mediums.magLev
 
 import rb.extendo.dataStructures.SinglyList
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.img.RawImage
 import rb.glow.Colors
 import rbJvm.glow.SColor
@@ -112,7 +112,7 @@ constructor(
         override val tMediumToComposite: ITransformF get() = arranged.tMediumToWorkspace
         override val tWorkspaceToComposite: ITransformF get() = ImmutableTransformF.Identity
 
-        override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {
+        override fun _drawOnComposite(doer: (GraphicsContext_old) -> Unit) {
             builtImage.drawToImage(workspace.width,workspace.height, arranged.tMediumToWorkspace)
             { raw -> doer.invoke(raw.graphics)}
         }

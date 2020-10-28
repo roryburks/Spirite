@@ -1,6 +1,6 @@
 package spirite.base.pen.behaviors
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import sgui.components.events.MouseEvent.MouseButton
 import spirite.base.pen.Penner
 import spirite.gui.views.work.WorkSectionView
@@ -33,5 +33,5 @@ abstract class DrawnPennerBehavior(penner: Penner) : PennerBehavior(penner) {
         this.penner.context.redraw()
     }
 
-    abstract fun paintOverlay(gc: GraphicsContext, view: WorkSectionView)
+    abstract fun paintOverlay(gc: GraphicsContext_old, view: WorkSectionView)
 }

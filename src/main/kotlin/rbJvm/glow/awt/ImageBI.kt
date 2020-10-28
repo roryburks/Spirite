@@ -1,6 +1,6 @@
 package rbJvm.glow.awt
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.img.RawImage
 import rb.glow.Color
 import rb.glow.ColorARGB32Normal
@@ -19,7 +19,7 @@ class ImageBI(
         }
     }
 
-    override val graphics: GraphicsContext
+    override val graphics: GraphicsContext_old
         get() = TODO("not implemented")
 
     override val width: Int get() = bi.width

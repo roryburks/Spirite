@@ -1,7 +1,7 @@
 package spirite.base.imageData.mediums.magLev.selecting
 
 import rb.extendo.extensions.stride
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.img.IImage
 import rb.glow.Colors
 import rb.vectrix.linear.ITransformF
@@ -93,7 +93,7 @@ class SimpleStrokeMaglevLiftedData(
         other.addThings(transformedLines,arranged, "Anchoring Lifted SimpleMaglevStroke to Maglev")
     }
 
-    override fun draw(gc: GraphicsContext) {
+    override fun draw(gc: GraphicsContext_old) {
         gc.pushTransform()
         gc.preTransform(tInternalToContext)
         gc.renderImage(image,dx, dy)
@@ -118,7 +118,7 @@ class SimpleMaglevStrokeSelectionExtra(
         val tInternalToContext: ITransformF)
     : IMaglevSelectionExtra
 {
-    override fun draw(gc: GraphicsContext) {
+    override fun draw(gc: GraphicsContext_old) {
         gc.pushTransform()
         gc.preTransform(tInternalToContext)
         gc.color = Colors.WHITE

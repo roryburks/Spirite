@@ -6,6 +6,8 @@ import rb.glow.JoinMethod.MITER
 import rb.glow.gle.RenderRubric
 import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.mathUtil.f
 import rb.vectrix.shapes.IShape
 
 /**
@@ -15,7 +17,7 @@ import rb.vectrix.shapes.IShape
  *
  * @author Rory Burks
  */
-abstract class GraphicsContext {
+abstract class GraphicsContext_old {
     abstract val width: Int
     abstract val height: Int
 
@@ -78,32 +80,12 @@ abstract class GraphicsContext {
     fun pushState() { stateStack.addBack(GraphicalState(transform.toMutable(), composite, alpha, color))}
     fun popState() {
         val state = stateStack.popBack() ?: return
-        transform = state.trans
+        transform = ImmutableTransformF(
+                state.trans.m00.f,state.trans.m01.f, state.trans.m02.f,
+                state.trans.m10.f, state.trans.m11.f, state.trans.m12.f)
         composite = state.composite
         alpha = state.alpha
         color = state.color
     }
 }
 
-
-enum class Composite {
-    SRC, SRC_IN, SRC_OVER, SRC_OUT, SRC_ATOP,
-    DST, DST_IN, DST_OVER, DST_OUT, DST_ATOP,
-    CLEAR, XOR
-}
-
-enum class JoinMethod {MITER, ROUNDED, BEVEL}
-
-enum class CapMethod {NONE, ROUND, SQUARE}
-
-class LineAttributes (
-        val width: Float,
-        val cap: CapMethod = NONE,
-        val join: JoinMethod = MITER,
-        val dashes: FloatArray? = null)
-
-data class GraphicalState(
-        val trans: ITransformF,
-        val composite: Composite,
-        val alpha: Float,
-        val color: Color)

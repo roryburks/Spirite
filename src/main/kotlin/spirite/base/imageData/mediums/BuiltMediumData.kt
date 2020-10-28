@@ -1,6 +1,6 @@
 package spirite.base.imageData.mediums
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
@@ -29,7 +29,7 @@ abstract class BuiltMediumData(
     // Note: Can be changed to return Boolean if we want to be able to differentiate between image-changing calls and
     //  non-image-changing calls (assuming there's ever a need for such a thing)
     private var doing = false
-    fun drawOnComposite(drawer: (GraphicsContext) -> Unit) {
+    fun drawOnComposite(drawer: (GraphicsContext_old) -> Unit) {
         if( doing) {
             MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
             return
@@ -55,7 +55,7 @@ abstract class BuiltMediumData(
         arranged.handle.refresh()
     }
 
-    protected abstract fun _drawOnComposite(doer: (GraphicsContext) -> Unit)
+    protected abstract fun _drawOnComposite(doer: (GraphicsContext_old) -> Unit)
     protected abstract fun _rawAccessComposite(doer: (RawImage) -> Unit)
 
 }

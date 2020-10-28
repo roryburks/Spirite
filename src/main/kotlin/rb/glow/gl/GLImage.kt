@@ -4,7 +4,7 @@ import rb.glow.img.RawImage
 import rb.glow.img.RawImage.InvalidImageDimensionsExeption
 import rb.glow.toColor
 import rb.glow.toColorPremultiplied
-import rb.glow.gle.GLGraphicsContext
+import rb.glow.gle.GLGraphicsContextOld
 import rb.glow.gle.GLParameters
 import rb.glow.gle.IGLEngine
 
@@ -81,7 +81,7 @@ class GLImage : RawImage {
 
     // endregion
 
-    override val graphics: GLGraphicsContext get() = GLGraphicsContext(this)
+    override val graphics: GLGraphicsContextOld get() = GLGraphicsContextOld(this)
     override val byteSize: Int get() = width*height*4
 
     val glParams : GLParameters get() = GLParameters(width, height, premultiplied = premultiplied)

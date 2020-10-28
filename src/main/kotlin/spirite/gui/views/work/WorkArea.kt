@@ -1,6 +1,6 @@
 package spirite.gui.views.work
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.Colors
 import sguiSwing.components.ISwComponent
 import sguiSwing.skin.Skin
@@ -12,7 +12,7 @@ abstract class WorkArea(
 
     var i = 0
 
-    fun drawWork( gc: GraphicsContext) {
+    fun drawWork( gc: GraphicsContext_old) {
         gc.clear( Skin.Global.Bg.scolor)
         gc.color = Colors.RED
 

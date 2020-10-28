@@ -35,6 +35,13 @@ interface ITransform
 
     fun toImmutable() : ImmutableTrasform
     fun toMutable() : MutableTransform
+
+    companion object {
+        fun Translate(x: Double, y: Double) = ImmutableTransformD.Translation(x,y)
+        fun Scale(x: Double, y: Double) = ImmutableTransformD.Scale(x,y)
+        fun Rotate(theta: Double) = ImmutableTransformD.Rotation(theta)
+        val Identity get() = ImmutableTransformD.Identity
+    }
 }
 
 fun ITransformF.invertN() : ImmutableTransformF = invert() ?: ImmutableTransformF.Identity
@@ -206,15 +213,6 @@ data class MutableTransformD(
         m12 = n12
     }
 
-    fun set(other: ITransform) {
-        m00 = other.m00
-        m01 = other.m01
-        m02 = other.m02
-        m10 = other.m10
-        m11 = other.m11
-        m12 = other.m12
-    }
-
     fun reset() {
         m00 = 1.0
         m01 = 0.0
@@ -297,8 +295,8 @@ interface ITransformF : ITransform
     override fun toImmutable() : ImmutableTransformF
     override fun toMutable(): MutableTransformF
 
-    companion object{
-        val Identity get() = ImmutableTransformF.Identity
+    companion object {
+        val Identity = ImmutableTransformF( 1f, 0f, 0f, 0f, 1f, 0f)
     }
 }
 

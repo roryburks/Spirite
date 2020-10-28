@@ -1,6 +1,6 @@
 package spirite.base.pen.selectionBuilders
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
 import sguiSwing.hybrid.Hybrid
@@ -33,7 +33,7 @@ class OvalSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( work
         return Selection(img, null, true)
     }
 
-    override fun drawBuilding(gc: GraphicsContext) {
+    override fun drawBuilding(gc: GraphicsContext_old) {
         gc.drawOval(
                 Math.min(startX, currentX), Math.min(startY, currentY),
                 Math.abs(startX - currentX), Math.abs(startY - currentY))

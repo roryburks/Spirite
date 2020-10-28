@@ -1,6 +1,6 @@
 package spirite.base.graphics.rendering.sources
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.vectrix.mathUtil.f
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
@@ -15,7 +15,7 @@ data class LayerSource(val layer: Layer, override val workspace: IImageWorkspace
     override val nodeDependencies: Collection<Node> get() = emptySet()
     override val rendersLifted: Boolean get() = false
 
-    override fun render(settings: RenderSettings, gc: GraphicsContext) {
+    override fun render(settings: RenderSettings, gc: GraphicsContext_old) {
         gc.pushState()
         gc.preTranslate( -layer.x.f, -layer.y.f)
         gc.preScale(settings.width.f / layer.width.f, settings.height.f/layer.height.f)

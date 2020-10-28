@@ -1,6 +1,6 @@
 package spirite.base.pen.behaviors
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.ColorARGB32Normal
 import rb.glow.Colors
 import rb.vectrix.compaction.FloatCompactor
@@ -108,7 +108,7 @@ class StrokeDeformComposingBehavior(
 
 
 
-    override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {
+    override fun paintOverlay(gc: GraphicsContext_old, view: WorkSectionView) {
         fromStrokes.forEachIndexed { index, (x_, y_) ->
             gc.color = ColorARGB32Normal(DefaultStrokeColors[index])
             gc.drawPolyLine(x_, y_, x_.size)

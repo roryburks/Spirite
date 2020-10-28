@@ -1,6 +1,6 @@
 package spirite.base.graphics.rendering
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.img.RawImage
 import rb.glow.gle.RenderRubric
 import rb.vectrix.linear.ITransformF
@@ -37,7 +37,7 @@ class NodeRenderer(
     private val ratioH get() = settings.height.toFloat() / workspace.height.toFloat()
 
 
-    fun render( gc: GraphicsContext) {
+    fun render( gc: GraphicsContext_old) {
         try {
             buildCompositeLayer()
 
@@ -183,7 +183,7 @@ class NodeRenderer(
     private abstract inner class DrawThing {
         val subDepth: Int = tick++
         abstract val depth: Int
-        abstract fun draw( gc: GraphicsContext)
+        abstract fun draw( gc: GraphicsContext_old)
     }
 
     private inner class GroupDrawThing(
@@ -193,7 +193,7 @@ class NodeRenderer(
             override val depth: Int = 0)
         : DrawThing()
     {
-        override fun draw(gc: GraphicsContext) {
+        override fun draw(gc: GraphicsContext_old) {
             buffer[n+1].graphics.clear()
 
             _renderRec(node, n+1, isolator)
@@ -211,7 +211,7 @@ class NodeRenderer(
     {
         override val depth: Int get() = th.drawDepth
 
-        override fun draw(gc: GraphicsContext) {
+        override fun draw(gc: GraphicsContext_old) {
             gc.pushTransform()
             gc.scale(ratioW, ratioH)
 

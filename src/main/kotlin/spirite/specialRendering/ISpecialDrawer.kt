@@ -1,12 +1,12 @@
 package spirite.specialRendering
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.img.IImage
 import rb.glow.Color
 import rb.glow.Colors
 import rb.glow.gl.GLImage
 import rb.glow.gl.shader.programs.BasicCall
-import rb.glow.gle.GLGraphicsContext
+import rb.glow.gle.GLGraphicsContextOld
 import rb.glow.using
 import rb.vectrix.mathUtil.f
 import spirite.base.brains.toolset.ColorChangeMode
@@ -22,13 +22,13 @@ interface ISpecialDrawer {
 }
 
 object SpecialDrawerFactory {
-    fun makeSpecialDrawer( gc: GraphicsContext) = when( gc) {
-        is GLGraphicsContext -> GLSpecialDrawer(gc)
+    fun makeSpecialDrawer( gc: GraphicsContext_old) = when( gc) {
+        is GLGraphicsContextOld -> GLSpecialDrawer(gc)
         else -> TODO()
     }
 }
 
-class GLSpecialDrawer(private val _gc: GLGraphicsContext) : ISpecialDrawer{
+class GLSpecialDrawer(private val _gc: GLGraphicsContextOld) : ISpecialDrawer{
     override fun fill(x: Int, y: Int, color: Color) {
         GLFill(V0FillArrayAlgorithm).fill(_gc, x, y, color)
     }

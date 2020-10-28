@@ -1,6 +1,6 @@
 package spirite.base.pen.selectionBuilders
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.Colors
 import rb.vectrix.compaction.IntCompactor
 import rb.vectrix.linear.Vec2i
@@ -35,7 +35,7 @@ class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(w
         return Selection(img, null, true)
     }
 
-    override fun drawBuilding(gc: GraphicsContext) {
+    override fun drawBuilding(gc: GraphicsContext_old) {
         for( i in 0 until xCompactor.chunkCount) {
             gc.drawPolyLine( xCompactor.getChunk(i), yCompactor.getChunk(i), xCompactor.getChunkSize(i))
         }

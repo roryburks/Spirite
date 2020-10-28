@@ -1,6 +1,6 @@
 package spirite.base.imageData.mediums
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.IFlushable
 import rb.glow.img.RawImage
 import rb.glow.Colors
@@ -40,7 +40,7 @@ interface IMedium : IFlushable {
     fun build(arranged: ArrangedMediumData): BuiltMediumData
     fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer
 
-    fun render(gc: GraphicsContext, render: RenderRubric? = null)
+    fun render(gc: GraphicsContext_old, render: RenderRubric? = null)
 
     fun dupe(workspace: MImageWorkspace): IMedium
     override fun flush()
@@ -48,13 +48,13 @@ interface IMedium : IFlushable {
 }
 
 abstract class IComplexMedium : IMedium {
-    override fun render(gc: GraphicsContext, render: RenderRubric?) {
+    override fun render(gc: GraphicsContext_old, render: RenderRubric?) {
         drawBehindComposite(gc,render)
         drawOverComposite(gc, render)
     }
 
-    abstract fun drawBehindComposite(gc: GraphicsContext, render: RenderRubric? = null)
-    abstract fun drawOverComposite(gc: GraphicsContext, render: RenderRubric? = null)
+    abstract fun drawBehindComposite(gc: GraphicsContext_old, render: RenderRubric? = null)
+    abstract fun drawOverComposite(gc: GraphicsContext_old, render: RenderRubric? = null)
 }
 
 object NilMedium : IMedium {
@@ -70,14 +70,14 @@ object NilMedium : IMedium {
     override fun dupe(workspace: MImageWorkspace) = this
     override fun flush() {}
     override fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer  = throw Exception("Tried to Get Drawer for NilMedium")
-    override fun render(gc: GraphicsContext, render: RenderRubric?) {}
+    override fun render(gc: GraphicsContext_old, render: RenderRubric?) {}
 
     class NilBuiltMedium(arranged: ArrangedMediumData) : BuiltMediumData(arranged, NilMMediumRepo) {
         override val tWorkspaceToComposite: ITransformF get() = ImmutableTransformF.Identity
         override val tMediumToComposite: ITransformF get() = ImmutableTransformF.Identity
         override val width: Int get() = 1
         override val height: Int get() = 1
-        override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {}
+        override fun _drawOnComposite(doer: (GraphicsContext_old) -> Unit) {}
         override fun _rawAccessComposite(doer: (RawImage) -> Unit) {}
     }
 }

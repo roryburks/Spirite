@@ -1,9 +1,9 @@
 package spirite.specialRendering.stroke
 
 import rb.glow.Composite.*
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.gl.GLImage
-import rb.glow.gle.GLGraphicsContext
+import rb.glow.gle.GLGraphicsContextOld
 import rb.glow.gle.GLParameters
 import rb.glow.gle.IGLEngine
 import rb.glow.using
@@ -57,7 +57,7 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
         }
     }
 
-    override fun draw(gc: GraphicsContext) {
+    override fun draw(gc: GraphicsContext_old) {
         context?.also { ctx -> drawStrokeImageToGc(ctx.image, gc, ctx.builder.params)}
     }
 
@@ -66,7 +66,7 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
         context = null
     }
 
-    override fun batchDraw(gc: GraphicsContext, drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int) {
+    override fun batchDraw(gc: GraphicsContext_old, drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int) {
         using(GLImage(width, height, gle, false)) { batchImage ->
             val glParams = batchImage.glParams
             doBatch(batchImage, drawPoints, params, glParams, gc.transform)
@@ -78,8 +78,8 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
         }
     }
 
-    private fun drawStrokeImageToGc(image: GLImage, gc: GraphicsContext, strokeParams: StrokeParams) {
-        val glgc = gc as? GLGraphicsContext ?: return
+    private fun drawStrokeImageToGc(image: GLImage, gc: GraphicsContext_old, strokeParams: StrokeParams) {
+        val glgc = gc as? GLGraphicsContextOld ?: return
 
         glgc.pushState()
 

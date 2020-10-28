@@ -1,6 +1,6 @@
 package spirite.base.pen.behaviors
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.Colors
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
@@ -40,7 +40,7 @@ class FreeformSelectionBehavior(
             builder.update(penner.x, penner.y)
     }
 
-    override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {
+    override fun paintOverlay(gc: GraphicsContext_old, view: WorkSectionView) {
         gc.pushTransform()
         gc.color = Colors.BLACK
         builder.drawBuilding(gc)

@@ -2,12 +2,12 @@ package spirite.base.graphics.filter
 
 import rb.glow.Composite.CLEAR
 import rb.glow.Composite.DST_IN
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.img.IImage
 import kotlin.math.min
 
 interface IFilter {
-    fun apply(gc: GraphicsContext, w: Int, h: Int)
+    fun apply(gc: GraphicsContext_old, w: Int, h: Int)
 }
 
 class StencilFilter(
@@ -15,7 +15,7 @@ class StencilFilter(
         val ox: Int,
         val oy: Int) : IFilter
 {
-    override fun apply(gc: GraphicsContext, w: Int, h: Int) {
+    override fun apply(gc: GraphicsContext_old, w: Int, h: Int) {
         gc.composite = CLEAR
 
         val x2 = ox + image.width

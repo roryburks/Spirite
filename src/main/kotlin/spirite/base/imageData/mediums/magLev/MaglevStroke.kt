@@ -1,6 +1,6 @@
 package spirite.base.imageData.mediums.magLev
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rbJvm.glow.SColor
 import rb.vectrix.linear.Vec3f
 import spirite.base.imageData.mediums.BuiltMediumData
@@ -37,7 +37,7 @@ class MaglevStroke(
         }
     }
 
-    fun draw(gc: GraphicsContext, strokeProvider: IStrokeDrawerProvider, width: Int, height:Int) {
+    fun draw(gc: GraphicsContext_old, strokeProvider: IStrokeDrawerProvider, width: Int, height:Int) {
         strokeProvider.getStrokeDrawer(params).batchDraw(gc, drawPoints, params,width, height)
     }
 

@@ -1,6 +1,6 @@
 package spirite.base.pen.selectionBuilders
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.RectangleUtil
@@ -27,7 +27,7 @@ class RectSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( work
         return Selection.RectangleSelection(RectangleUtil.rectFromEndpoints(startX, startY, currentX, currentY))
     }
 
-    override fun drawBuilding(gc: GraphicsContext) {
+    override fun drawBuilding(gc: GraphicsContext_old) {
         gc.drawRect(
                 Math.min(startX, currentX), Math.min(startY, currentY),
                 Math.abs(startX - currentX), Math.abs(startY - currentY))

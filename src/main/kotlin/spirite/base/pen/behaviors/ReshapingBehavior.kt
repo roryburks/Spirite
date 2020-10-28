@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
 import com.hackoeur.jglm.support.FastMath.max
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.Colors
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
@@ -111,7 +111,7 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
 
 
 
-    override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {
+    override fun paintOverlay(gc: GraphicsContext_old, view: WorkSectionView) {
         val region = region ?: return
         if( region.isEmpty || state == INACTIVE) return
 

@@ -1,6 +1,6 @@
 package spirite.base.pen.behaviors
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import rb.glow.Colors
 import spirite.base.brains.toolset.BoxSelectionShape
 import spirite.base.brains.toolset.BoxSelectionShape.OVAL
@@ -39,7 +39,7 @@ class FormingSelectionBehavior(
         super.onPenUp()
     }
 
-    override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {
+    override fun paintOverlay(gc: GraphicsContext_old, view: WorkSectionView) {
         gc.pushTransform()
         gc.color = Colors.BLACK
         builder.drawBuilding(gc)

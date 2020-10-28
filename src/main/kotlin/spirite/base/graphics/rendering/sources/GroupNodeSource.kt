@@ -1,7 +1,7 @@
 package spirite.base.graphics.rendering.sources
 
 import rb.extendo.dataStructures.SinglyList
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
@@ -16,7 +16,7 @@ data class GroupNodeSource( val group: GroupNode, override val workspace: IImage
     override val nodeDependencies: Collection<Node> get() = SinglyList(group) + group.getAllAncestors()
     override val rendersLifted: Boolean get() = true
 
-    override fun render(settings: RenderSettings, gc: GraphicsContext) {
+    override fun render(settings: RenderSettings, gc: GraphicsContext_old) {
         NodeRenderer( group, workspace, settings, workspace.isolationManager.currentIsolator).render(gc)
     }
 }

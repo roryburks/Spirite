@@ -1,9 +1,9 @@
 package spirite.base.imageData.selection
 
-import rb.glow.GraphicsContext
+import rb.glow.GraphicsContext_old
 import spirite.base.imageData.IImageWorkspace
 
-fun drawLiftedTransform(gc: GraphicsContext, workspace: IImageWorkspace) {
+fun drawLiftedTransform(gc: GraphicsContext_old, workspace: IImageWorkspace) {
     val lifted = workspace.selectionEngine.liftedData
 
     if( lifted != null) {
