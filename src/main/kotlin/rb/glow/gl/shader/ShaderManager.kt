@@ -14,7 +14,7 @@ interface IShaderManager {
 }
 
 private const val GLOBAL = "#GLOBAL"
-private const val root = "shaders/300es"
+private const val root = "shaders/330"
 
 class ShaderManager(
     val scriptService: IScriptService

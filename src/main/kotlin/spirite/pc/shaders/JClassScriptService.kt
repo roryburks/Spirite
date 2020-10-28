@@ -10,7 +10,12 @@ class JClassScriptService : IScriptService {
     override fun loadScript(scriptName: String): String {
         try {
             var ret = ""
-            JClassScriptService::class.java.classLoader.getResource(scriptName).openStream().use {
+            val resource = JClassScriptService::class.java.classLoader.getResource(scriptName)
+            if( resource == null) {
+                println("breakhere")
+            }
+
+            resource.openStream().use {
                 val scanner = Scanner(it)
                 scanner.useDelimiter("\\A")
                 ret = scanner.next()
