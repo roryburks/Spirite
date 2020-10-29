@@ -44,7 +44,7 @@ class GLStrokeDrawerV3(
 
     private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: ITransformF? = null) {
         if( true /* 330 */ ) {
-            target.graphics.clear()
+            target.graphicsOld.clear()
             gle.setTarget(target)
 
             // DEBUG

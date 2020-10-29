@@ -28,16 +28,16 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
     }
 
     override fun invert() {
-        doToUnderlying { SpecialDrawerFactory.makeSpecialDrawer(it.graphics).invert() }
+        doToUnderlying { SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).invert() }
     }
 
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
-        doToUnderlying { SpecialDrawerFactory.makeSpecialDrawer(it.graphics).changeColor(from, to, mode) }
+        doToUnderlying { SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).changeColor(from, to, mode) }
     }
     override fun fill(x: Int, y: Int, color: Color): Boolean {
         doToUnderlyingWithTrans { rawImage, transform ->
             val p = transform?.invert()?.apply(Vec2f(x.f,y.f)) ?: Vec2f(x.f,y.f)
-            SpecialDrawerFactory.makeSpecialDrawer(rawImage.graphics).fill(p.xf.floor, p.yf.floor, color)
+            SpecialDrawerFactory.makeSpecialDrawer(rawImage.graphicsOld).fill(p.xf.floor, p.yf.floor, color)
         }
 
         return true
@@ -94,7 +94,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         val lifted = workspace.selectionEngine.liftedData as? LiftedImageData ?: return
         val newLifted = LiftedImageData(lifted.image.deepCopy().apply {
             lambda.invoke(this)
-            this.graphics.also { gc ->
+            this.graphicsOld.also { gc ->
                 gc.composite = DST_IN
                 gc.renderImage(selection.mask, 0, 0)
             }
@@ -109,7 +109,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
 
         val newLifted = LiftedImageData(lifted.image.deepCopy().apply {
             lambda.invoke(this, selection.transform)
-            this.graphics.also { gc ->
+            this.graphicsOld.also { gc ->
                 gc.composite = DST_IN
                 gc.renderImage(selection.mask, 0, 0)
             }

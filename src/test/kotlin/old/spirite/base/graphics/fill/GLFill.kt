@@ -26,10 +26,10 @@ class GLFillTests {
         val w = image.width
         val h = image.height
 
-        image.graphics.drawLine( 0, 0, w,h)
+        image.graphicsOld.drawLine( 0, 0, w,h)
 
         println(measureTimeMillis {
-            GLFill(V0FillArrayAlgorithm).fill(image.graphics, 3, 2, Colors.BLUE)
+            GLFill(V0FillArrayAlgorithm).fill(image.graphicsOld, 3, 2, Colors.BLUE)
         })
 
 

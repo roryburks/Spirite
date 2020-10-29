@@ -148,7 +148,7 @@ class AafExporter(
         val chunkMap = packed.packedRects
                 .mapIndexed { index, rect ->
                     val image= imagesByDimension[Vec2i(rect.wi, rect.hi)]!!.pop()
-                    img.graphics.renderImage(image, rect.x1i, rect.y1i)
+                    img.graphics.renderImage(image, rect.x1, rect.y1)
                     Pair(image, index)
                 }.toMap()
 

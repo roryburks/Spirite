@@ -57,9 +57,9 @@ class DefaultImageDrawer(
     override fun invert() {
         workspace.undoEngine.performMaskedImageAction("Invert", arranged, mask) { built, mask ->
             when( mask) {
-                null -> built.rawAccessComposite {  SpecialDrawerFactory.makeSpecialDrawer(it.graphics).invert() }
+                null -> built.rawAccessComposite {  SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).invert() }
                 else -> built.rawAccessComposite { raw ->
-                    mask.doMasked(raw, built.tWorkspaceToComposite) {SpecialDrawerFactory.makeSpecialDrawer(it.graphics).invert()} }
+                    mask.doMasked(raw, built.tWorkspaceToComposite) {SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).invert()} }
             }
         }
     }
@@ -70,8 +70,8 @@ class DefaultImageDrawer(
     override fun clear() {
         workspace.undoEngine.performMaskedImageAction("Clear", arranged, mask) { built, mask ->
             when (mask) {
-                null -> built.rawAccessComposite { it.graphics.clear() }
-                else -> built.rawAccessComposite { raw -> mask.doMasked(raw, built.tWorkspaceToComposite) { it.graphics.clear() } }
+                null -> built.rawAccessComposite { it.graphicsOld.clear() }
+                else -> built.rawAccessComposite { raw -> mask.doMasked(raw, built.tWorkspaceToComposite) { it.graphicsOld.clear() } }
             }
         }
     }
@@ -88,7 +88,7 @@ class DefaultImageDrawer(
         if( clearLifted) {
             workspace.undoEngine.performMaskedImageAction("lift-inner", arranged, null) { built, mask ->
                 built.rawAccessComposite {
-                    it.graphics.apply {
+                    it.graphicsOld.apply {
                         val tSelToImage = (built.tWorkspaceToComposite) * (selection.transform
                                 ?: ImmutableTransformF.Identity)
                         transform = tSelToImage
@@ -124,9 +124,9 @@ class DefaultImageDrawer(
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
         workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask) { built, mask ->
             when (mask) {
-                null -> built.rawAccessComposite { SpecialDrawerFactory.makeSpecialDrawer(it.graphics).changeColor(from, to, mode) }
+                null -> built.rawAccessComposite { SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).changeColor(from, to, mode) }
                 else -> built.rawAccessComposite {raw ->
-                    mask.doMasked(raw, built.tWorkspaceToComposite) { SpecialDrawerFactory.makeSpecialDrawer(it.graphics).changeColor(from, to, mode) }
+                    mask.doMasked(raw, built.tWorkspaceToComposite) { SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).changeColor(from, to, mode) }
                 }
             }
         }
@@ -140,12 +140,12 @@ class DefaultImageDrawer(
             when( mask) {
                 null -> built.rawAccessComposite {
                     val p = built.tWorkspaceToComposite.apply(Vec2f(x.f,y.f))
-                    SpecialDrawerFactory.makeSpecialDrawer(it.graphics).fill(p.xf.floor, p.yf.floor, color)
+                    SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).fill(p.xf.floor, p.yf.floor, color)
                 }
                 else -> built.rawAccessComposite {raw ->
                     mask.doMaskedRequiringTransform(raw, built.tWorkspaceToComposite, color) { maskedRaw, tImageToFloating ->
                         val p =  tImageToFloating.apply(built.tWorkspaceToComposite.apply(Vec2f(x.f,y.f)))
-                        SpecialDrawerFactory.makeSpecialDrawer(maskedRaw.graphics).fill(p.xf.floor,p.yf.floor, color)
+                        SpecialDrawerFactory.makeSpecialDrawer(maskedRaw.graphicsOld).fill(p.xf.floor,p.yf.floor, color)
                     }
                 }
             }
@@ -191,11 +191,11 @@ class DefaultImageDrawer(
                 override fun performImageAction(built: BuiltMediumData) {
                     built.rawAccessComposite {
                         val buffer = Hybrid.imageCreator.createImage(it.width, it.height)
-                        val bgc = buffer.graphics
+                        val bgc = buffer.graphicsOld
                         bgc.transform(effectiveTrans)
                         bgc.renderImage(it,0,0)
 
-                        val igc = it.graphics
+                        val igc = it.graphicsOld
                         igc.composite = SRC
                         igc.renderImage(buffer,0,0)
                         buffer.flush()
@@ -294,7 +294,7 @@ class DefaultStrokeModule(val arranged: ArrangedMediumData) : IStrokeModule {
             override fun performImageAction(built: BuiltMediumData) {
                 val drawer = built.arranged.handle.workspace.strokeProvider.getStrokeDrawer(params)
                 built.rawAccessComposite {
-                    drawer.batchDraw(it.graphics, bakedDrawPoints, params, built.width, built.height)
+                    drawer.batchDraw(it.graphicsOld, bakedDrawPoints, params, built.width, built.height)
                 }
             }
         })
@@ -327,7 +327,7 @@ class DefaultMagFillModule(val arranged: ArrangedMediumData) : IMagneticFillModu
 
             override fun performImageAction(built: BuiltMediumData) {
                 built.rawAccessComposite {
-                    val gc = it.graphics
+                    val gc = it.graphicsOld
                     gc.color = color
                     if( mode == BEHIND)
                         gc.composite = DST_OVER

@@ -50,7 +50,7 @@ class MaglevClearModule( val arranged: ArrangedMediumData) : IClearModule {
     override fun clear() {
         arranged.handle.workspace.undoEngine.performAndStoreMaglevImageAction(arranged, "Clear Maglev Layer"){ built, maglev->
             maglev.thingsMap.clear()
-            built.rawAccessComposite { it.graphics.clear() }
+            built.rawAccessComposite { it.graphicsOld.clear() }
         }
     }
 }
@@ -127,7 +127,7 @@ class MaglevTransformModule(val arranged: ArrangedMediumData)
                                 Vec3f(vec2.xf, vec2.yf, it.zf * det)
                             }
                         }
-                built.rawAccessComposite {it.graphics.clear()}
+                built.rawAccessComposite {it.graphicsOld.clear()}
                 things.forEach { it.draw(built) }
             }
         })
@@ -178,7 +178,7 @@ class MaglevColorChangeModule(val arranged: ArrangedMediumData) : IColorChangeMo
                             else
                                 color
                         } }
-                built.rawAccessComposite {it.graphics.clear()}
+                built.rawAccessComposite {it.graphicsOld.clear()}
                 things.forEach { it.draw(built) }
             }
         })
@@ -301,7 +301,7 @@ class MaglevDeformationModule(val arranged: ArrangedMediumData, val maglev: Magl
                             val vec2 = deformation.transform(it.xf, it.yf)
                             Vec3f(vec2.xf, vec2.yf, it.zf)
                         } }
-                built.rawAccessComposite {it.graphics.clear()}
+                built.rawAccessComposite {it.graphicsOld.clear()}
                 things.forEach { it.draw(built) }
             }
         })

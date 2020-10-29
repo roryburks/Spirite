@@ -33,7 +33,7 @@ class MaglevStroke(
 
     override fun draw(built: BuiltMediumData) {
         built.rawAccessComposite {
-            draw(it.graphics, built.arranged.handle.workspace.strokeProvider, built.width, built.height)
+            draw(it.graphicsOld, built.arranged.handle.workspace.strokeProvider, built.width, built.height)
         }
     }
 

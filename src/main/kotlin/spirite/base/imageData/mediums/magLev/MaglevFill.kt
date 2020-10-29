@@ -57,7 +57,7 @@ data class MaglevFill(
         }
 
         built.rawAccessComposite {raw ->
-            val gc = raw.graphics
+            val gc = raw.graphicsOld
             gc.composite = when( mode) {
                 NORMAL -> SRC_OVER
                 BEHIND -> DST_OVER

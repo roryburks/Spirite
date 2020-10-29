@@ -82,7 +82,7 @@ class GLSpecialDrawer(private val _gc: GLGraphicsContextOld) : ISpecialDrawer{
     override fun drawBounds(image: IImage, c: Int) {
         _gc.run {
             using(GLImage(width, height, gle)) { buffer ->
-                val gc = buffer.graphics
+                val gc = buffer.graphicsOld
                 gc.clear()
 
                 val texture = gle.converter.convertToGL(image, gle)

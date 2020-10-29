@@ -50,7 +50,7 @@ class FlatMedium(
         override val tWorkspaceToComposite: ITransformF by lazy { arranged.tMediumToWorkspace.invert() ?: ImmutableTransformF.Identity }
 
         override fun _drawOnComposite(doer: (GraphicsContext_old) -> Unit) {
-            val gc = image.graphics
+            val gc = image.graphicsOld
             gc.transform = tWorkspaceToComposite
             doer.invoke( gc)
         }

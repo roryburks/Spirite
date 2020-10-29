@@ -23,7 +23,7 @@ class GLImageTests {
     @Test fun BasicGLFunctionality() {
         val glimage = GLImage(10, 10, gle)
 
-        val gc = glimage.graphics
+        val gc = glimage.graphicsOld
         //gc.clear()
         gc.color = Colors.RED
         gc.fillRect(0, 0, 10, 10)
@@ -42,7 +42,7 @@ class GLImageTests {
     @Test fun DeepCopy() {
         val glimage = GLImage(10, 10, gle)
 
-        val gc = glimage.graphics
+        val gc = glimage.graphicsOld
         gc.clear()
         gc.color = Colors.RED
         gc.fillRect(0, 0, 10, 10)
@@ -54,7 +54,7 @@ class GLImageTests {
     }
     @Test fun TestConvertToBi() {
         val glimage = GLImage(10, 12, gle)
-        glimage.graphics.clear()
+        glimage.graphicsOld.clear()
 
         assertEquals( 10, glimage.width)
         assertEquals( 12, glimage.height)
@@ -69,12 +69,12 @@ class GLImageTests {
         val img1 = GLImage(25, 25, gle, false)
         val img2 = GLImage(25, 25, gle, false)
 
-        val gc1 = img1.graphics
+        val gc1 = img1.graphicsOld
         gc1.color = Colors.RED
         gc1.fillRect(0,0,25,25)
 
 
-        val gc2 = img2.graphics
+        val gc2 = img2.graphicsOld
         gc2.color = Colors.BLUE
         gc2.fillRect(0,0,25,25)
 
@@ -93,15 +93,15 @@ class GLImageTests {
         val img2 = GLImage(25, 25, gle, false)
         val img3 = GLImage(25, 25, gle, true)
 
-        img1.graphics.also {
+        img1.graphicsOld.also {
             it.color = ColorARGB32Normal(0x88ff0000.toInt())
             it.alpha = 0.5f
             it.fillRect(5,5, 15, 15)
         }
-        img2.graphics.also {
+        img2.graphicsOld.also {
             it.renderImage(img1, 0, 0)
         }
-        img3.graphics.also {
+        img3.graphicsOld.also {
             it.renderImage(img2, 0, 0)
         }
 

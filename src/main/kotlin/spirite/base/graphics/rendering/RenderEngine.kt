@@ -68,7 +68,7 @@ class RenderEngine(
 
         // Lifecycle passed to whatever called this
         val image = Hybrid.imageCreator.createImage(target.renderSettings.width, target.renderSettings.height)
-        target.renderSource.render( target.renderSettings, image.graphics)
+        target.renderSource.render( target.renderSettings, image.graphicsOld)
 
         return image
     }
@@ -83,7 +83,7 @@ class RenderEngine(
 
         // Lifecycle handled by the RenderEngine
         val image = Hybrid.imageCreator.createImage(target.renderSettings.width, target.renderSettings.height)
-        target.renderSource.render( target.renderSettings, image.graphics)
+        target.renderSource.render( target.renderSettings, image.graphicsOld)
 
         // Save to Cache
         imageCache.put(target, CachedImage(image))

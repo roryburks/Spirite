@@ -16,7 +16,7 @@ class ContentBoundsFinderTest {
     @Tags(Tag("Old"), Tag("GPU"))
     @Test fun testContentBounds() {
         val img = GLImage(20, 20, gle)
-        val gc = img.graphics
+        val gc = img.graphicsOld
         gc.drawLine(5,5,13,17)
         val bounds = ContentBoundsFinder.findContentBounds(img, 0, true)
 

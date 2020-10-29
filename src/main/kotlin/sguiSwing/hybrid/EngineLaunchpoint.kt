@@ -20,7 +20,8 @@ object EngineLaunchpoint {
                 JvmGLImageConverter,
                 JOGLContext(),
                 ShaderManager(JClassScriptService()),
-                ShaderMapping.Map330
+                ShaderMapping.Map330,
+                true
         )
     }
 

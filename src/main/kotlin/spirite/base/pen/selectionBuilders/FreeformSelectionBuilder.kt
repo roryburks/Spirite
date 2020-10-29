@@ -29,7 +29,7 @@ class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(w
     override fun build(): Selection {
         // Lifecycle tied to the selection
         val img = Hybrid.imageCreator.createImage(workspace.width, workspace.height)
-        val gc = img.graphics
+        val gc = img.graphicsOld
         gc.color = Colors.WHITE
         gc.fillPolygon( xCompactor.toArray().map { it.f },  yCompactor.toArray().map { it.f }, xCompactor.size)
         return Selection(img, null, true)

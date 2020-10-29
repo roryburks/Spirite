@@ -45,7 +45,7 @@ private constructor(private val imp: Imp) : IComponent by SwComponent(imp)
 
             Hybrid.gle.runInGLContext {
                 val image = Hybrid.imageCreator.createImage(width, height)
-                val gc = image.graphics
+                val gc = image.graphicsOld
                 gc.preScale(anim.state.zoomF, anim.state.zoomF)
 
                 anim.drawFrame(gc,context.frame)

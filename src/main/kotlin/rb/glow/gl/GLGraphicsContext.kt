@@ -4,6 +4,7 @@ import rb.glow.*
 import rb.glow.Composite.DST_OVER
 import rb.glow.gl.shader.programs.*
 import rb.glow.gle.*
+import rb.glow.img.IImage
 import rb.vectrix.mathUtil.f
 import rb.vectrix.shapes.Rect
 import rb.vectrix.shapes.RectI
@@ -84,31 +85,6 @@ class GLGraphicsContext : AGraphicsContext {
         gl.clearColor(color.red, color.green, color.blue, color.alpha, GLC.COLOR_BUFFER_BIT)
     }
 
-    override fun renderImage(image: GLImage, x: Double, y: Double, imgPart: Rect) {
-        val params = cachedParams.copy()
-
-        params.texture1 = image
-
-        // Default Blend Mode (may be over-written)
-        setCompositeBlend(params, composite)
-        reset()
-        gle.applyPassProgram(
-            SimpleRenderCall(alpha), params, transform,
-                (x + 0).f, (y).f, (x+imgPart.w).f, (y+imgPart.h).f,
-                (imgPart.x1 / image.width).f, (imgPart.y1 / image.height).f, (imgPart.x2 / image.width).f, (imgPart.y2 / image.height).f)
-    }
-
-    override fun renderImage(image: GLImage, x: Double, y: Double) {
-        val params = cachedParams.copy()
-
-        params.texture1 = image
-
-        // Default Blend Mode (may be over-written)
-        setCompositeBlend(params, composite)
-        reset()
-        gle.applyPassProgram(SimpleRenderCall(alpha), params, transform, (x + 0).f, (y+image.height).f, (x+image.width).f, (y+0).f)
-    }
-
     /**
      * The way this constructs its call from the RenderRubric is:
      *  -performs all calls which require sharer algorithms in the order that they're entered
@@ -118,7 +94,8 @@ class GLGraphicsContext : AGraphicsContext {
      * screen", but it doesn't make a lot of sense (or rather the algorithms aren't in place) for it to "multiply and subtract
      * the texture from the screen"
      */
-    override fun renderImage(image: GLImage, x: Double, y: Double, render: RenderRubric?) {
+    override fun renderImage(image: IImage, x: Double, y: Double, render: RenderRubric?, imgPart: Rect? ) {
+        val image = image as? GLImage ?: gle.converter.convertToGL(image, gle)
         val params = this.cachedParams.copy()
 
         val calls = mutableListOf<Pair<RenderCall.RenderAlgorithm,Int>>()
@@ -133,19 +110,19 @@ class GLGraphicsContext : AGraphicsContext {
                 RenderMethodType.COLOR_CHANGE_FULL -> calls.add( Pair(RenderCall.RenderAlgorithm.AS_COLOR_ALL, it.renderValue))
                 RenderMethodType.DISOLVE -> calls.add(Pair(RenderCall.RenderAlgorithm.DISSOLVE, it.renderValue))
                 RenderMethodType.LIGHTEN -> params.setBlendModeExt(
-                    GLC.ONE, GLC.ONE, GLC.FUNC_ADD,
-                    GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+                        GLC.ONE, GLC.ONE, GLC.FUNC_ADD,
+                        GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
                 RenderMethodType.SUBTRACT -> params.setBlendModeExt(
-                    GLC.ZERO, GLC.ONE_MINUS_SRC_COLOR, GLC.FUNC_ADD,
-                    GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+                        GLC.ZERO, GLC.ONE_MINUS_SRC_COLOR, GLC.FUNC_ADD,
+                        GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
                 RenderMethodType.MULTIPLY -> params.setBlendModeExt(
-                    GLC.DST_COLOR, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD,
-                    GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+                        GLC.DST_COLOR, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD,
+                        GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
                 RenderMethodType.SCREEN ->
                     // C = (1 - (1-DestC)*(1-SrcC) = SrcC*(1-DestC) + DestC
                     params.setBlendModeExt(
-                        GLC.ONE_MINUS_DST_COLOR, GLC.ONE, GLC.FUNC_ADD,
-                        GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+                            GLC.ONE_MINUS_DST_COLOR, GLC.ONE, GLC.FUNC_ADD,
+                            GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
                 RenderMethodType.DEFAULT -> {}
             }
         }
@@ -158,33 +135,42 @@ class GLGraphicsContext : AGraphicsContext {
         }
         reset()
 
-        gle.applyPassProgram(
-            RenderCall(alpha * (render?.alpha ?: 1f), calls),
-            params, tDraw, (x + 0).f, (y+image.height).f, (x+image.width).f, (y+0).f
-        )
+        if( imgPart == null) {
+            gle.applyPassProgram(
+                    RenderCall(alpha * (render?.alpha ?: 1f), calls),
+                    params, tDraw, (x + 0).f, (y + image.height).f, (x + image.width).f, (y + 0).f
+            )
+        }
+        else {
+            gle.applyPassProgram(
+                    RenderCall(alpha * (render?.alpha ?: 1f), calls), params, tDraw,
+                    (x + 0).f, (y).f, (x+imgPart.w).f, (y+imgPart.h).f,
+                    (imgPart.x1 / image.width).f, (imgPart.y1 / image.height).f, (imgPart.x2 / image.width).f, (imgPart.y2 / image.height).f
+            )
+        }
     }
 
     override fun drawPolyLine(x: Iterable<Double>, y: Iterable<Double>, count: Int, loop: Boolean) {
         reset()
         gle.applyComplexLineProgram(
-            x.map { it.f }, y.map { it.f }, count,
-            lineAttributes.cap,
-            lineAttributes.join,
-            false,
-            lineAttributes.width,
-            color.rgbComponent,
-            alpha,
-            cachedParams,
-            transform)
+                x.map { it.f }, y.map { it.f }, count,
+                lineAttributes.cap,
+                lineAttributes.join,
+                false,
+                lineAttributes.width,
+                color.rgbComponent,
+                alpha,
+                cachedParams,
+                transform)
     }
 
     override fun fillPolygon(x: Iterable<Double>, y: Iterable<Double>, count: Int) {
         val poly = gle.tesselator.tesselatePolygon(x.asSequence(), y.asSequence(), count)
         gle.applyPrimitiveProgram(
-            PolyRenderCall(
-                color.rgbComponent,
-                alpha
-            ), poly, cachedParams, transform)
+                PolyRenderCall(
+                        color.rgbComponent,
+                        alpha
+                ), poly, cachedParams, transform)
     }
 
     override fun setClip(i: Int, j: Int, width: Int, height: Int) {

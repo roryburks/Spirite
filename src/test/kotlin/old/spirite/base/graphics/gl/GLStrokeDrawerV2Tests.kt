@@ -29,7 +29,7 @@ class GLStrokeDrawerV2Tests {
                 FloatArray(100, { 1f - abs(50 - it) / 50f })
         )
         val image = GLImage(100, 100, gle)
-        drawer.batchDraw(image.graphics, drawPoints, StrokeParams(Colors.GREEN, width = 5f, alpha = 0.5f), 100, 100)
+        drawer.batchDraw(image.graphicsOld, drawPoints, StrokeParams(Colors.GREEN, width = 5f, alpha = 0.5f), 100, 100)
 
         //val image = drawer.batchDraw(drawPoints, StrokeParams(width = 5f), 100, 100)
 
@@ -45,11 +45,11 @@ class GLStrokeDrawerV2Tests {
                 FloatArray(100, { 1f - abs(50 - it) / 50f })
         )
         val image = GLImage(100, 100, gle)
-        val gc = image.graphics
+        val gc = image.graphicsOld
         gc.color = Colors.GRAY
         gc.fillRect(0,0,100,100)
 
-        drawer.batchDraw(image.graphics, drawPoints, StrokeParams(Colors.GREEN, width = 5f, alpha = 0.75f, method = ERASE), 100, 100)
+        drawer.batchDraw(image.graphicsOld, drawPoints, StrokeParams(Colors.GREEN, width = 5f, alpha = 0.75f, method = ERASE), 100, 100)
 
         //val image = drawer.batchDraw(drawPoints, StrokeParams(width = 5f), 100, 100)
 

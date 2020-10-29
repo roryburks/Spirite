@@ -64,7 +64,7 @@ constructor(
 
         override fun _drawOnComposite(doer: (GraphicsContext_old) -> Unit) {
             image.drawToImage(workspace.width,workspace.height, arranged.tMediumToWorkspace)
-                { raw -> doer.invoke(raw.graphics)}
+                { raw -> doer.invoke(raw.graphicsOld)}
         }
 
         override fun _rawAccessComposite(doer: (RawImage) -> Unit) {

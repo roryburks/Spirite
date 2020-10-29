@@ -20,7 +20,7 @@ class LiftedImageData(val image: IImage): ILiftedData {
         // Bakes the rotation and scale, spits out the translation
         val bakedArea = RectangleUtil.circumscribeTrans(Rect(image.width, image.height),transform)
         val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
-        val gc = newImage.graphics
+        val gc = newImage.graphicsOld
         gc.transform = transform
         gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
         gc.renderImage(image, 0, 0)

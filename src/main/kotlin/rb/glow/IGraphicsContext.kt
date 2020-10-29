@@ -3,6 +3,7 @@ package rb.glow
 import rb.extendo.dataStructures.Deque
 import rb.glow.gl.GLImage
 import rb.glow.gle.RenderRubric
+import rb.glow.img.IImage
 import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.MutableTransformD
 import rb.vectrix.shapes.Rect
@@ -32,9 +33,7 @@ interface IGraphicsContext {
     fun fillPolygon(x: Iterable<Double>, y: Iterable<Double>, count: Int)
 
     // Rendering
-    fun renderImage(image: GLImage, x: Double, y: Double, imgPart: Rect)
-    fun renderImage(image: GLImage, x: Double, y: Double)
-    fun renderImage(image: GLImage, x: Double, y: Double, renderRubric: RenderRubric?)
+    fun renderImage(image: IImage, x: Double, y: Double, renderRubric: RenderRubric? = null, imgPart: Rect? = null)
 
     fun setClip( i: Int, j: Int, width: Int, height: Int)
 

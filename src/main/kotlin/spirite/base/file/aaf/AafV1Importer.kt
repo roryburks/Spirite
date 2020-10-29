@@ -81,7 +81,7 @@ object AafV1Importer : IAafImporter {
 
     fun imageFromFrame( frame: RectI, image: IImage) : RawImage {
         val output = Hybrid.imageCreator.createImage(frame.wi,frame.hi)
-        output.graphics.renderImage(image, -frame.x1i, -frame.y1i)
+        output.graphics.renderImage(image, -frame.x1, -frame.y1)
         return output
     }
 }

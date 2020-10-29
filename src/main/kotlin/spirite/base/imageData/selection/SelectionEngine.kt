@@ -180,7 +180,7 @@ class SelectionEngine(
 
         val bakedArea = RectangleUtil.circumscribeTrans(Rect(selectionMask.width, selectionMask.height),transform)
         val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
-        val gc = newImage.graphics
+        val gc = newImage.graphicsOld
         gc.transform = transform
         gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
         gc.renderImage(selectionMask, 0, 0)

@@ -46,7 +46,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
 
             empty = cropped.isEmpty
             val maskBeingBuilt = Hybrid.imageCreator.createImage(max(1,cropped.width), max(1,cropped.height))
-            maskBeingBuilt.graphics.renderImage(mask, -cropped.x, -cropped.y)
+            maskBeingBuilt.graphicsOld.renderImage(mask, -cropped.x, -cropped.y)
 
             this.mask = maskBeingBuilt
             this.transform = transform ?: ImmutableTransformF.Translation(cropped.x.f, cropped.y.f)
@@ -59,7 +59,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
                 (other.transform?.let { RectangleUtil.circumscribeTrans(Rect(other.width, other.height), it)} ?: Rect(other.width, other.height))
 
         val image = Hybrid.imageCreator.createImage(area.width, area.height)
-        val gc = image.graphics
+        val gc = image.graphicsOld
         gc.preTranslate(-area.x.f, -area.y.f)
         gc.pushTransform()
         transform?.apply { gc.preTransform( this)}
@@ -76,7 +76,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
         val area = Rect(width, height)
 
         val image = Hybrid.imageCreator.createImage(area.width, area.height)
-        val gc = image.graphics
+        val gc = image.graphicsOld
         gc.renderImage(mask, 0, 0)
         gc.composite = DST_OUT
         gc.transform = (other.transform ?: ImmutableTransformF.Identity) * (transform?.invert() ?: ImmutableTransformF.Identity)
@@ -92,7 +92,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
         if( area.isEmpty) return null
 
         val image = Hybrid.imageCreator.createImage(area.width, area.height)
-        val gc = image.graphics
+        val gc = image.graphicsOld
         gc.renderImage(mask, 0, 0)
         gc.composite = DST_IN
         gc.transform = tOtherToThis
@@ -117,7 +117,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
 
         val image = Hybrid.imageCreator.createImage(area.width+2, area.height+2)
 
-        val gc = image.graphics
+        val gc = image.graphicsOld
         //gc.jcolor = Colors.WHITE
         gc.fillRect(1,1,width,height)
         gc.composite = DST_OUT
@@ -134,7 +134,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
         val tImageToSel = tSelToImage.invert()
         val lifted = Hybrid.imageCreator.createImage(mask.width, mask.height)
 
-        lifted.graphics.apply {
+        lifted.graphicsOld.apply {
             renderImage(mask, 0, 0)
             transform = tImageToSel ?: ImmutableTransformF.Identity
             composite = SRC_IN
@@ -171,7 +171,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
 
             // Step 1: Lift the Selection Mask out of the image (two different ways depending on if you want the out-of
             //  bounds area to have a certain jcolor, such as when filling)
-            val gc = floatingImage.graphics
+            val gc = floatingImage.graphicsOld
 
             if( backgroundColor != null) {
                 gc.transform = ImmutableTransformF.Identity
@@ -196,14 +196,14 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
             lambda(floatingImage, tImageToFloating)
 
             // Step 3: Lift the Selection Mask out of the drawn image (since the draw action might have gone out of the lines)
-            val cgc = compositingImage.graphics
+            val cgc = compositingImage.graphicsOld
             cgc.transform = tSelToFloating
             cgc.renderImage(mask,0,0)
             cgc.composite = SRC_IN
             cgc.renderImage(floatingImage, 0, 0)
 
             // Step 4: Stencil the selection mask out of the image
-            val igc = image.graphics
+            val igc = image.graphicsOld
             igc.transform = tSelToImage
             igc.composite = DST_OUT
             igc.renderImage(mask, 0, 0)
@@ -238,7 +238,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
         fun RectangleSelection( rect: Rect) : Selection {
             // Mind the 1-pixel buffer (for drawing the border)
             val img = Hybrid.imageCreator.createImage(rect.width + 2, rect.height + 2)
-            val gc = img.graphics
+            val gc = img.graphicsOld
             gc.color = Colors.WHITE
             gc.fillRect(1,1,rect.width,rect.height)
 

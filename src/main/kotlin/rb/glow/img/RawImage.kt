@@ -3,6 +3,7 @@ package rb.glow.img
 import rb.glow.Colors
 import rb.glow.GraphicsContext_old
 import rb.glow.IFlushable
+import rb.glow.IGraphicsContext
 
 
 /**
@@ -11,7 +12,8 @@ import rb.glow.IFlushable
 
 interface RawImage : IImage, IFlushable {
     /** Gets the GraphicsContext for writing to the image.  */
-    val graphics: GraphicsContext_old
+    val graphics: IGraphicsContext
+    val graphicsOld: GraphicsContext_old
 
     /** Flushes the image, marking it as no longer being used, allowing it to
      * free up underlying resources.
@@ -26,7 +28,8 @@ interface RawImage : IImage, IFlushable {
 }
 
 object NillImage: RawImage {
-    override val graphics: GraphicsContext_old get() = throw Exception("Can't draw to Nill Image")
+    override val graphics: IGraphicsContext get() = throw Exception("Can't draw on Nill Image")
+    override val graphicsOld: GraphicsContext_old get() = throw Exception("Can't draw to Nill Image")
     override val width: Int get() = 1
     override val height: Int get() = 1
     override val byteSize: Int get() = 1

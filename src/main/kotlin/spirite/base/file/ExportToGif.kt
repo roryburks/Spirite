@@ -59,7 +59,7 @@ object ExportToGif {
         val biList = drawFrames
                 .map { frame ->
                     val gl = GLImage(drawRect.wi*2, drawRect.hi*2, Hybrid.gle)
-                    val gc = gl.graphics
+                    val gc = gl.graphicsOld
                     gc.color = Colors.DARK_GRAY
                     gc.fillRect(0,0,drawRect.wi*2, drawRect.hi*2)
                     val trans =

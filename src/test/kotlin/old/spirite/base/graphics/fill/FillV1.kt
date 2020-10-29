@@ -27,7 +27,7 @@ class FillV1Tests {
         val w = image.width
         val h = image.height
 
-        image.graphics.drawLine( 0, 0, w,h)
+        image.graphicsOld.drawLine( 0, 0, w,h)
 
         lateinit var iii: IntArray
 //        println(measureTimeMillis {
@@ -41,7 +41,7 @@ class FillV1Tests {
         println(measureTimeMillis {
             iii = //GLFillV1.fill(image, 3, 2, Colors.BLACK) ?: throw Exception("bad")
                     V0FillArrayAlgorithm.fill(
-                            image.graphics.toIntArray() ?: throw Exception(),
+                            image.graphicsOld.toIntArray() ?: throw Exception(),
                             image.width, image.height, 3, 2, Colors.BLACK.argb32) ?: throw Exception("bad")
         })
 

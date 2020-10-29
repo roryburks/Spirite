@@ -67,7 +67,7 @@ class NodeRenderer(
             return
         }
 
-        val gc = buffer[depth].graphics
+        val gc = buffer[depth].graphicsOld
 
         _getDrawListUnsorted(node, depth, isolator)
                 .sortedWith(compareBy({it.depth}, {it.subDepth}))
@@ -128,7 +128,7 @@ class NodeRenderer(
             val compositeImage = Hybrid.imageCreator.createImage(
                     (built.width*ratioW).ceil,
                     (built.height*ratioH).ceil)
-            val gc = compositeImage.graphics
+            val gc = compositeImage.graphicsOld
             val baseTransform = ImmutableTransformF.Scale(ratioW, ratioH)
             gc.transform = baseTransform
 

@@ -35,7 +35,7 @@ class GLEngineTests {
 
     @Test fun TestBasicRendering() {
         val img = GLImage(50, 50, gle)
-        val gc = img.graphics
+        val gc = img.graphicsOld
         gc.clear()
 
         gle.setTarget(img)
@@ -64,7 +64,7 @@ class GLEngineTests {
 
     @Test fun TestComplexLineProgram() {
         val img = GLImage(50, 50, gle)
-        val gc = img.graphics
+        val gc = img.graphicsOld
         gc.clear()
 
         val xs = listOf(0, 10, 50, 50)
@@ -97,7 +97,7 @@ class GLEngineTests {
     @Test fun writeOutPassShaders() {
         // Draw the base star
         val star = GLImage(50, 50, gle)
-        val gc = star.graphics
+        val gc = star.graphicsOld
 
         val xs = listOf(0f, 50f, 0f, 50f, 25f)
         val ys = listOf(0f, 40f, 40f, 0f, 50f)
@@ -105,7 +105,7 @@ class GLEngineTests {
         gc.fillPolygon(xs, ys, 5)
 
         val image = GLImage(500, 500, gle)
-        image.graphics.clear()
+        image.graphicsOld.clear()
         gle.setTarget(image)
 
         val params = GLParameters(500, 500, texture1 = star)

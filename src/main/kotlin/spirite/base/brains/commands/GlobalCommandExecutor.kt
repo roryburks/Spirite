@@ -234,7 +234,7 @@ object GlobalCommands
                                             ?: ImmutableTransformF.Identity)
 
                                     val img2 = Hybrid.imageCreator.createImage(selection.mask.width, selection.mask.height)
-                                    val gc = img2.graphics
+                                    val gc = img2.graphicsOld
                                     gc.color = Colors.WHITE
                                     gc.transform = transform
                                     gc.fillRect(0, 0, img.width, img.height)
@@ -256,7 +256,7 @@ object GlobalCommands
                             else -> {
                                 // Flushed by the end of the function
                                 val img = Hybrid.imageCreator.createImage(liftedData.width, liftedData.height)
-                                        .also { liftedData.draw(it.graphics) }
+                                        .also { liftedData.draw(it.graphicsOld) }
 
                                 if (cut)
                                     selectionEngine.clearLifted()

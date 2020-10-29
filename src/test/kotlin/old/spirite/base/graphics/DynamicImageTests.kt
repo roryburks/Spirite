@@ -22,7 +22,7 @@ class DynamicImageTests {
     @Test fun testWorks() {
         val dynamicImage = DynamicImage()
         dynamicImage.drawToImage(100, 100, drawer = { raw ->
-            raw.graphics.drawLine(20,20,50,30)
+            raw.graphicsOld.drawLine(20,20,50,30)
         })
 
         assertEquals(20, dynamicImage.xOffset)
@@ -46,10 +46,10 @@ class DynamicImageTests {
     @Test fun testMultipleDraws() {
         val dynamicImage = DynamicImage()
         dynamicImage.drawToImage(100, 100, drawer = { raw ->
-            raw.graphics.drawLine(20,20,50,30)
+            raw.graphicsOld.drawLine(20,20,50,30)
         })
         dynamicImage.drawToImage(100, 100, drawer = { raw ->
-            raw.graphics.drawLine(10,80,10,90)
+            raw.graphicsOld.drawLine(10,80,10,90)
         })
 
         assertEquals(9, dynamicImage.xOffset)   // should really be 10

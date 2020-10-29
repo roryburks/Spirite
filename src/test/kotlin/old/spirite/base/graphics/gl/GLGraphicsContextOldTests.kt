@@ -21,12 +21,12 @@ class GLGraphicsContextOldTests {
     @Test fun drawBounds() {
         val img = GLImage(30, 30, gle)
 
-        val gc = img.graphics
+        val gc = img.graphicsOld
         gc.color = Colors.RED
         gc.fillRect( 5, 5, 10, 10)
 
         val toImage = GLImage(30, 30, gle)
-        SpecialDrawerFactory.makeSpecialDrawer(toImage.graphics).drawBounds( img, 101101)
+        SpecialDrawerFactory.makeSpecialDrawer(toImage.graphicsOld).drawBounds( img, 101101)
 
         if( TestConfig.save)
             ImageIO.write(toImage.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_drawBounds.png"))
@@ -34,12 +34,12 @@ class GLGraphicsContextOldTests {
     @Test fun drawImage() {
         val subImg = GLImage(30, 30, gle)
 
-        val gc = subImg.graphics
+        val gc = subImg.graphicsOld
         gc.color = Colors.RED
         gc.fillRect( 5, 5, 10, 10)
 
         val toImage = GLImage(30, 30, gle)
-        val togc = toImage.graphics
+        val togc = toImage.graphicsOld
         togc.alpha = 0.5f
         togc.renderImage( subImg, 5, 5)
 
@@ -52,7 +52,7 @@ class GLGraphicsContextOldTests {
 
     @Test fun drawRect(){
         val img = GLImage(30, 30, gle)
-        val gc = img.graphics
+        val gc = img.graphicsOld
 
         //gc.setComposite(gc.composite, 0.5f)
         gc.color = Colors.RED
@@ -85,7 +85,7 @@ class GLGraphicsContextOldTests {
 
     @Test fun fillRect(){
         val img = GLImage(30, 30, gle)
-        val gc = img.graphics
+        val gc = img.graphicsOld
 
         gc.color = Colors.RED
         gc.fillRect( 5, 5, 20, 20)
@@ -106,7 +106,7 @@ class GLGraphicsContextOldTests {
 
     @Test fun fillPoly() {
         val img = GLImage(50, 50, gle)
-        val gc = img.graphics
+        val gc = img.graphicsOld
 
         val xs = listOf(0f, 50f, 0f, 50f, 25f)
         val ys = listOf(0f, 40f, 40f, 0f, 50f)

@@ -21,6 +21,7 @@ interface IGLEngine
 {
     val tesselator : IPolygonTesselator
     val converter : IGLImageConverter
+    val imgsYFlipped: Boolean // Feels like the wrong place for this, but for now.
 
     val width : Int
     val height : Int
@@ -98,7 +99,8 @@ class GLEngine(
         override val converter: IGLImageConverter,
         private val _context: IGLContext,
         private val _shaderManager: IShaderManager,
-        shaderMap: Map<String, GlShaderLoadContract>
+        shaderMap: Map<String, GlShaderLoadContract>,
+        override val imgsYFlipped: Boolean
 ) : IGLEngine
 {
     override val gl: IGL get() = _context.glGetter.invoke()
