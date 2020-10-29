@@ -2,6 +2,7 @@ package spirite.specialRendering.fill
 
 import rbJvm.glow.SColor
 import rb.glow.gl.GLC
+import rb.glow.gl.GLGraphicsContext
 import rb.glow.gl.GLImage
 import rb.glow.gle.GLGraphicsContextOld
 import rb.glow.gle.GLParameters
@@ -62,6 +63,21 @@ class GLFill(val filler: IFillArrayAlgorithm)  {
 
 
 fun GLGraphicsContextOld.toIntArray(rect: RectI? = null) : IntArray{
+    val rect2 = rect ?: RectI(0,0,width, height)
+    gle.setTarget(image)
+
+    if( rect2.wi <= 0 || rect2.hi <= 0)
+        return IntArray(0)
+
+    val gl = gle.gl
+    val data = IntArray(rect2.wi * rect2.hi)
+    val read = gl.makeInt32Source(data)
+    gl.readnPixels(rect2.x1i, rect2.y1i, rect2.wi, rect2.hi, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4*data.size, read )
+
+    return data
+}
+
+fun GLGraphicsContext.toIntArray(rect: RectI? = null) : IntArray{
     val rect2 = rect ?: RectI(0,0,width, height)
     gle.setTarget(image)
 

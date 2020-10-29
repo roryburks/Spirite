@@ -2,7 +2,9 @@ package old.spirite.base.graphics.fill
 
 import org.junit.jupiter.api.Test
 import rb.glow.Colors
+import rb.glow.drawer
 import rb.glow.gl.GLImage
+import rb.vectrix.mathUtil.d
 import sguiSwing.hybrid.EngineLaunchpoint
 import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import spirite.specialRendering.fill.toIntArray
@@ -27,7 +29,7 @@ class FillV1Tests {
         val w = image.width
         val h = image.height
 
-        image.graphicsOld.drawLine( 0, 0, w,h)
+        image.graphics.drawer.drawLine( 0.0, 0.0, w.d,h.d)
 
         lateinit var iii: IntArray
 //        println(measureTimeMillis {
@@ -41,7 +43,7 @@ class FillV1Tests {
         println(measureTimeMillis {
             iii = //GLFillV1.fill(image, 3, 2, Colors.BLACK) ?: throw Exception("bad")
                     V0FillArrayAlgorithm.fill(
-                            image.graphicsOld.toIntArray() ?: throw Exception(),
+                            image.graphics.toIntArray() ?: throw Exception(),
                             image.width, image.height, 3, 2, Colors.BLACK.argb32) ?: throw Exception("bad")
         })
 

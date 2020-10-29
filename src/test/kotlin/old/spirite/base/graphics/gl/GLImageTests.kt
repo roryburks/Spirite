@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.Test
 import rb.glow.ColorARGB32Normal
 import rb.glow.Colors
+import rb.glow.drawer
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
 import sguiSwing.hybrid.Hybrid
@@ -54,7 +55,7 @@ class GLImageTests {
     }
     @Test fun TestConvertToBi() {
         val glimage = GLImage(10, 12, gle)
-        glimage.graphicsOld.clear()
+        glimage.graphics.clear()
 
         assertEquals( 10, glimage.width)
         assertEquals( 12, glimage.height)
@@ -93,16 +94,16 @@ class GLImageTests {
         val img2 = GLImage(25, 25, gle, false)
         val img3 = GLImage(25, 25, gle, true)
 
-        img1.graphicsOld.also {
+        img1.graphics.also {
             it.color = ColorARGB32Normal(0x88ff0000.toInt())
             it.alpha = 0.5f
-            it.fillRect(5,5, 15, 15)
+            it.drawer.fillRect(5.0,5.0, 15.0, 15.0)
         }
-        img2.graphicsOld.also {
-            it.renderImage(img1, 0, 0)
+        img2.graphics.also {
+            it.renderImage(img1, 0.0, 0.0)
         }
-        img3.graphicsOld.also {
-            it.renderImage(img2, 0, 0)
+        img3.graphics.also {
+            it.renderImage(img2, 0.0, 0.0)
         }
 
         assertEquals(img1.getColor(10,10).red, 1f)

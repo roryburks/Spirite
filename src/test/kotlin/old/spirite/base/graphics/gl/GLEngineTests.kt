@@ -105,7 +105,7 @@ class GLEngineTests {
         gc.fillPolygon(xs, ys, 5)
 
         val image = GLImage(500, 500, gle)
-        image.graphicsOld.clear()
+        image.graphics.clear()
         gle.setTarget(image)
 
         val params = GLParameters(500, 500, texture1 = star)

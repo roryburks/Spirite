@@ -66,7 +66,7 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
         fun drawStroke(gle: IGLEngine, image: GLImage, points: DrawPoints, params: GLParameters, transform: ITransformF?) {
             val vb = composeVBuffer(points)
 
-            image.graphicsOld.clear()
+            image.graphics.clear()
             gle.setTarget(image)
 
             val prim = GLPrimitive(vb, intArrayOf(2), intArrayOf(GLC.LINE_STRIP), intArrayOf(points.length + 1))

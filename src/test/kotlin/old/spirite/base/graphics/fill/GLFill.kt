@@ -3,7 +3,9 @@ package old.spirite.base.graphics.fill
 import old.TestConfig
 import org.junit.jupiter.api.Test
 import rb.glow.Colors
+import rb.glow.drawer
 import rb.glow.gl.GLImage
+import rb.vectrix.mathUtil.d
 import rbJvm.glow.awt.toBufferedImage
 import sguiSwing.hybrid.EngineLaunchpoint
 import spirite.specialRendering.fill.GLFill
@@ -26,7 +28,7 @@ class GLFillTests {
         val w = image.width
         val h = image.height
 
-        image.graphicsOld.drawLine( 0, 0, w,h)
+        image.graphics.drawer.drawLine( 0.0, 0.0, w.d,h.d)
 
         println(measureTimeMillis {
             GLFill(V0FillArrayAlgorithm).fill(image.graphicsOld, 3, 2, Colors.BLUE)
