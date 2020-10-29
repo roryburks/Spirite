@@ -9,6 +9,7 @@ import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
@@ -193,13 +194,13 @@ class DefaultImageDrawer(
                 override fun performImageAction(built: BuiltMediumData) {
                     built.rawAccessComposite {
                         val buffer = Hybrid.imageCreator.createImage(it.width, it.height)
-                        val bgc = buffer.graphicsOld
+                        val bgc = buffer.graphics
                         bgc.transform(effectiveTrans)
-                        bgc.renderImage(it,0,0)
+                        bgc.renderImage(it,0.0,0.0)
 
-                        val igc = it.graphicsOld
+                        val igc = it.graphics
                         igc.composite = SRC
-                        igc.renderImage(buffer,0,0)
+                        igc.renderImage(buffer,0.0,0.0)
                         buffer.flush()
                     }
                 }
@@ -329,11 +330,11 @@ class DefaultMagFillModule(val arranged: ArrangedMediumData) : IMagneticFillModu
 
             override fun performImageAction(built: BuiltMediumData) {
                 built.rawAccessComposite {
-                    val gc = it.graphicsOld
+                    val gc = it.graphics
                     gc.color = color
                     if( mode == BEHIND)
                         gc.composite = DST_OVER
-                    gc.fillPolygon(fillX.asList(), fillY.asList(), size)
+                    gc.fillPolygon(fillX.map { it.d }, fillY.map { it.d }, size)
                 }
             }
         })

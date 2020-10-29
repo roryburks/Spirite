@@ -2,6 +2,7 @@ package spirite.base.imageData.mediums.magLev
 
 import rb.glow.Composite.DST_OVER
 import rb.glow.Composite.SRC_OVER
+import rb.vectrix.mathUtil.d
 import rbJvm.glow.SColor
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.MagneticFillMode.BEHIND
@@ -57,13 +58,13 @@ data class MaglevFill(
         }
 
         built.rawAccessComposite {raw ->
-            val gc = raw.graphicsOld
+            val gc = raw.graphics
             gc.composite = when( mode) {
                 NORMAL -> SRC_OVER
                 BEHIND -> DST_OVER
             }
             gc.color = color
-            gc.fillPolygon(outX.asList(), outY.asList(), i)
+            gc.fillPolygon(outX.map { it.d }, outY.map { it.d }, i)
         }
     }
 
