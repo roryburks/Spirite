@@ -28,16 +28,16 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
     }
 
     override fun invert() {
-        doToUnderlying { SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).invert() }
+        doToUnderlying { SpecialDrawerFactory.makeSpecialDrawer(it.graphics).invert() }
     }
 
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
-        doToUnderlying { SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).changeColor(from, to, mode) }
+        doToUnderlying { SpecialDrawerFactory.makeSpecialDrawer(it.graphics).changeColor(from, to, mode) }
     }
     override fun fill(x: Int, y: Int, color: Color): Boolean {
         doToUnderlyingWithTrans { rawImage, transform ->
             val p = transform?.invert()?.apply(Vec2f(x.f,y.f)) ?: Vec2f(x.f,y.f)
-            SpecialDrawerFactory.makeSpecialDrawer(rawImage.graphicsOld).fill(p.xf.floor, p.yf.floor, color)
+            SpecialDrawerFactory.makeSpecialDrawer(rawImage.graphics).fill(p.xf.floor, p.yf.floor, color)
         }
 
         return true

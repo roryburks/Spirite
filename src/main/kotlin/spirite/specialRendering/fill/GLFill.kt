@@ -15,7 +15,7 @@ import java.nio.IntBuffer
 
 
 class GLFill(val filler: IFillArrayAlgorithm)  {
-    fun fill(gc: GLGraphicsContextOld, x: Int, y: Int, color: SColor) {
+    fun fill(gc: GLGraphicsContext, x: Int, y: Int, color: SColor) {
         val gle = gc.gle
         val gl = gle.gl
         val w = gc.width

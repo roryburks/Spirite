@@ -26,7 +26,7 @@ class GLGraphicsContextOldTests {
         gc.fillRect( 5, 5, 10, 10)
 
         val toImage = GLImage(30, 30, gle)
-        SpecialDrawerFactory.makeSpecialDrawer(toImage.graphicsOld).drawBounds( img, 101101)
+        SpecialDrawerFactory.makeSpecialDrawer(toImage.graphics).drawBounds( img, 101101)
 
         if( TestConfig.save)
             ImageIO.write(toImage.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_drawBounds.png"))

@@ -2,9 +2,11 @@ package rb.glow.gl
 
 import rb.glow.*
 import rb.glow.Composite.DST_OVER
+import rb.glow.Composite.SRC_OVER
 import rb.glow.gl.shader.programs.*
 import rb.glow.gle.*
 import rb.glow.img.IImage
+import rb.vectrix.linear.ITransform
 import rb.vectrix.mathUtil.f
 import rb.vectrix.shapes.Rect
 import rb.vectrix.shapes.RectI
@@ -54,7 +56,7 @@ class GLGraphicsContext : AGraphicsContext {
 
     override var color: Color = Colors.BLACK
     override var alpha = 1f
-    override var composite: Composite = DST_OVER
+    override var composite: Composite = SRC_OVER
     override var lineAttributes: LineAttributes = LineAttributes(1f)
 
     private fun setCompositeBlend(params: GLParameters, composite: Composite) {
@@ -81,7 +83,8 @@ class GLGraphicsContext : AGraphicsContext {
     override fun clear(color: Color) {
         val gl = gle.gl
         reset()
-        gl.clearColor(color.red, color.green, color.blue, color.alpha, GLC.COLOR_BUFFER_BIT)
+        //gl.clearColor(color.red, color.green, color.blue, color.alpha, GLC.COLOR_BUFFER_BIT)
+        gl.clearColor(color.red, color.green, color.blue, color.alpha, GLC.COLOR)
     }
 
     /**
@@ -177,4 +180,17 @@ class GLGraphicsContext : AGraphicsContext {
         cachedParams.clipRect = RectI( i, j, width, height)
     }
 
+    fun applyPassProgram(
+            call: IGlProgramCall,
+            params: GLParameters,
+            trans: ITransform?,
+            x: Float = 0f,
+            y: Float = 0f,
+            w: Float = width.f,
+            h: Float = height.f)
+    {
+        reset()
+        gle.applyPassProgram(call, params, trans, x, y, x + w, y + h)
+
+    }
 }

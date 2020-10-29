@@ -58,9 +58,9 @@ class DefaultImageDrawer(
     override fun invert() {
         workspace.undoEngine.performMaskedImageAction("Invert", arranged, mask) { built, mask ->
             when( mask) {
-                null -> built.rawAccessComposite {  SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).invert() }
+                null -> built.rawAccessComposite {  SpecialDrawerFactory.makeSpecialDrawer(it.graphics).invert() }
                 else -> built.rawAccessComposite { raw ->
-                    mask.doMasked(raw, built.tWorkspaceToComposite) {SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).invert()} }
+                    mask.doMasked(raw, built.tWorkspaceToComposite) {SpecialDrawerFactory.makeSpecialDrawer(it.graphics).invert()} }
             }
         }
     }
@@ -126,9 +126,9 @@ class DefaultImageDrawer(
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
         workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask) { built, mask ->
             when (mask) {
-                null -> built.rawAccessComposite { SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).changeColor(from, to, mode) }
+                null -> built.rawAccessComposite { SpecialDrawerFactory.makeSpecialDrawer(it.graphics).changeColor(from, to, mode) }
                 else -> built.rawAccessComposite {raw ->
-                    mask.doMasked(raw, built.tWorkspaceToComposite) { SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).changeColor(from, to, mode) }
+                    mask.doMasked(raw, built.tWorkspaceToComposite) { SpecialDrawerFactory.makeSpecialDrawer(it.graphics).changeColor(from, to, mode) }
                 }
             }
         }
@@ -142,12 +142,12 @@ class DefaultImageDrawer(
             when( mask) {
                 null -> built.rawAccessComposite {
                     val p = built.tWorkspaceToComposite.apply(Vec2f(x.f,y.f))
-                    SpecialDrawerFactory.makeSpecialDrawer(it.graphicsOld).fill(p.xf.floor, p.yf.floor, color)
+                    SpecialDrawerFactory.makeSpecialDrawer(it.graphics).fill(p.xf.floor, p.yf.floor, color)
                 }
                 else -> built.rawAccessComposite {raw ->
                     mask.doMaskedRequiringTransform(raw, built.tWorkspaceToComposite, color) { maskedRaw, tImageToFloating ->
                         val p =  tImageToFloating.apply(built.tWorkspaceToComposite.apply(Vec2f(x.f,y.f)))
-                        SpecialDrawerFactory.makeSpecialDrawer(maskedRaw.graphicsOld).fill(p.xf.floor,p.yf.floor, color)
+                        SpecialDrawerFactory.makeSpecialDrawer(maskedRaw.graphics).fill(p.xf.floor,p.yf.floor, color)
                     }
                 }
             }

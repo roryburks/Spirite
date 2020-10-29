@@ -5,6 +5,7 @@ import com.jogamp.opengl.GLCapabilities
 import com.jogamp.opengl.GLEventListener
 import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLCanvas
+import rb.glow.gl.GLGraphicsContext
 import rb.glow.gle.GLGraphicsContextOld
 import rbJvm.glow.jogl.JOGLProvider
 import sgui.components.events.MouseEvent
@@ -61,7 +62,7 @@ private constructor(
                 val h = drawable.surfaceHeight
 
                 val gle = Hybrid.gle
-                val glgc = GLGraphicsContextOld(w, h, true, gle, false)
+                val glgc = GLGraphicsContext(w, h, true, gle, false)
 
                 JOGLProvider.gl2 = drawable.gl.gL2
                 gle.setTarget(null)
