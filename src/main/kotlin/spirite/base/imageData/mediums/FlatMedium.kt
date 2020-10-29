@@ -4,6 +4,7 @@ import rb.extendo.dataStructures.SinglyList
 import rb.glow.GraphicsContext_old
 import rb.glow.img.RawImage
 import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import rbJvm.glow.SColor
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
@@ -49,8 +50,8 @@ class FlatMedium(
         override val tMediumToComposite: ITransformF get() = ImmutableTransformF.Identity
         override val tWorkspaceToComposite: ITransformF by lazy { arranged.tMediumToWorkspace.invert() ?: ImmutableTransformF.Identity }
 
-        override fun _drawOnComposite(doer: (GraphicsContext_old) -> Unit) {
-            val gc = image.graphicsOld
+        override fun _drawOnComposite(doer: (IGraphicsContext) -> Unit) {
+            val gc = image.graphics
             gc.transform = tWorkspaceToComposite
             doer.invoke( gc)
         }

@@ -4,6 +4,7 @@ import rb.extendo.dataStructures.SinglyList
 import rb.glow.GraphicsContext_old
 import rb.glow.img.RawImage
 import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import rbJvm.glow.SColor
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
@@ -112,9 +113,9 @@ constructor(
         override val tMediumToComposite: ITransformF get() = arranged.tMediumToWorkspace
         override val tWorkspaceToComposite: ITransformF get() = ImmutableTransformF.Identity
 
-        override fun _drawOnComposite(doer: (GraphicsContext_old) -> Unit) {
+        override fun _drawOnComposite(doer: (IGraphicsContext) -> Unit) {
             builtImage.drawToImage(workspace.width,workspace.height, arranged.tMediumToWorkspace)
-            { raw -> doer.invoke(raw.graphicsOld)}
+            { raw -> doer.invoke(raw.graphics)}
         }
 
         override fun _rawAccessComposite(doer: (RawImage) -> Unit) {

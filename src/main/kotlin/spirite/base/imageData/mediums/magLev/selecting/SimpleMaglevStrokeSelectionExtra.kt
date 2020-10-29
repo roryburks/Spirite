@@ -91,10 +91,10 @@ class SimpleStrokeMaglevLiftedData(
         other.addThings(transformedLines,arranged, "Anchoring Lifted SimpleMaglevStroke to Maglev")
     }
 
-    override fun draw(gc: GraphicsContext_old) {
+    override fun draw(gc: IGraphicsContext) {
         gc.pushTransform()
         gc.preTransform(tInternalToContext)
-        gc.renderImage(image,dx, dy)
+        gc.renderImage(image,dx.d, dy.d)
         gc.popTransform()
     }
 

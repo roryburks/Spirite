@@ -159,7 +159,8 @@ class NodeRenderer(
                     else -> selectionTransform * proposingTransform
                 }
                 toTrans?.also { gc.preTransform(it) }
-                lifted.draw(gc)
+                // TODO
+                //lifted.draw(gc)
             }
 
             // Draw the composite

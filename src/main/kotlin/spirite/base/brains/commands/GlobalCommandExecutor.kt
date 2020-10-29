@@ -258,7 +258,7 @@ object GlobalCommands
                             else -> {
                                 // Flushed by the end of the function
                                 val img = Hybrid.imageCreator.createImage(liftedData.width, liftedData.height)
-                                        .also { liftedData.draw(it.graphicsOld) }
+                                        .also { liftedData.draw(it.graphics) }
 
                                 if (cut)
                                     selectionEngine.clearLifted()

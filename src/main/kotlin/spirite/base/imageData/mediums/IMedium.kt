@@ -4,6 +4,7 @@ import rb.glow.GraphicsContext_old
 import rb.glow.IFlushable
 import rb.glow.img.RawImage
 import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import rbJvm.glow.SColor
 import rb.glow.gle.RenderRubric
 import rb.vectrix.linear.ITransformF
@@ -77,7 +78,7 @@ object NilMedium : IMedium {
         override val tMediumToComposite: ITransformF get() = ImmutableTransformF.Identity
         override val width: Int get() = 1
         override val height: Int get() = 1
-        override fun _drawOnComposite(doer: (GraphicsContext_old) -> Unit) {}
+        override fun _drawOnComposite(doer: (IGraphicsContext) -> Unit) {}
         override fun _rawAccessComposite(doer: (RawImage) -> Unit) {}
     }
 }
