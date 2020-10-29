@@ -1,6 +1,7 @@
 package spirite.base.graphics.rendering.sources
 
 import rb.glow.GraphicsContext_old
+import rb.glow.IGraphicsContext
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -23,7 +24,7 @@ interface RenderSource {
     val nodeDependencies: Collection<Node>
     val rendersLifted: Boolean
 
-    fun render( settings: RenderSettings, gc: GraphicsContext_old)
+    fun render( settings: RenderSettings, gc: IGraphicsContext)
 }
 
 fun getRenderSourceForNode( node: Node, workspace: IImageWorkspace) : RenderSource {
