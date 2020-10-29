@@ -17,7 +17,7 @@ data class GroupNodeSource( val group: GroupNode, override val workspace: IImage
     override val nodeDependencies: Collection<Node> get() = SinglyList(group) + group.getAllAncestors()
     override val rendersLifted: Boolean get() = true
 
-    override fun render(settings: RenderSettings, gc: IGraphicsContext) {
+    override fun render(settings: RenderSettings, gc: GraphicsContext_old) {
         NodeRenderer( group, workspace, settings, workspace.isolationManager.currentIsolator).render(gc)
     }
 }

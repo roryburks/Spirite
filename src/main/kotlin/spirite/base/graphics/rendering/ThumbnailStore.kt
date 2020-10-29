@@ -272,7 +272,7 @@ class ThumbnailStore(
             else -> existing.also { it.made = Hybrid.timing.currentMilli; it.changed = false }
         }
 
-        val gc= thumbnail.image.graphics
+        val gc= thumbnail.image.graphicsOld
         gc.clear()
         source.render(RenderSettings(32, 32, false), gc)
 

@@ -10,10 +10,6 @@ import rb.vectrix.shapes.Rect
 import rb.vectrix.shapes.RectI
 
 class GLGraphicsContext : AGraphicsContext {
-    override val old: GraphicsContext_old get() =
-        if( image == null) GLGraphicsContextOld(width, height, false, gle, premultiplied)
-        else GLGraphicsContextOld(image)
-
     val image : GLImage?
     val premultiplied : Boolean
     val cachedParams = GLParameters(1, 1)

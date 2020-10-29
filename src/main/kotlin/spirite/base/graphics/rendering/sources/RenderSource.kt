@@ -24,7 +24,7 @@ interface RenderSource {
     val nodeDependencies: Collection<Node>
     val rendersLifted: Boolean
 
-    fun render( settings: RenderSettings, gc: IGraphicsContext)
+    fun render( settings: RenderSettings, gc: GraphicsContext_old)
 }
 
 fun getRenderSourceForNode( node: Node, workspace: IImageWorkspace) : RenderSource {

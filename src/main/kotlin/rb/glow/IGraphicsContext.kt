@@ -9,7 +9,6 @@ import rb.vectrix.linear.MutableTransformD
 import rb.vectrix.shapes.Rect
 
 interface IGraphicsContext {
-    val old: GraphicsContext_old // todo :kill before refactor is done
 
     val width: Int
     val height: Int
