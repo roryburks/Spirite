@@ -70,8 +70,8 @@ class DefaultImageDrawer(
     override fun clear() {
         workspace.undoEngine.performMaskedImageAction("Clear", arranged, mask) { built, mask ->
             when (mask) {
-                null -> built.rawAccessComposite { it.graphicsOld.clear() }
-                else -> built.rawAccessComposite { raw -> mask.doMasked(raw, built.tWorkspaceToComposite) { it.graphicsOld.clear() } }
+                null -> built.rawAccessComposite { it.graphics.clear() }
+                else -> built.rawAccessComposite { raw -> mask.doMasked(raw, built.tWorkspaceToComposite) { it.graphics.clear() } }
             }
         }
     }
