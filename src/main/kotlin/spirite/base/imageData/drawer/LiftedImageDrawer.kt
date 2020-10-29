@@ -94,9 +94,9 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         val lifted = workspace.selectionEngine.liftedData as? LiftedImageData ?: return
         val newLifted = LiftedImageData(lifted.image.deepCopy().apply {
             lambda.invoke(this)
-            this.graphicsOld.also { gc ->
+            this.graphics.also { gc ->
                 gc.composite = DST_IN
-                gc.renderImage(selection.mask, 0, 0)
+                gc.renderImage(selection.mask, 0.0, 0.0)
             }
         })
         workspace.selectionEngine.setSelectionWithLifted(selection,newLifted)
@@ -109,9 +109,9 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
 
         val newLifted = LiftedImageData(lifted.image.deepCopy().apply {
             lambda.invoke(this, selection.transform)
-            this.graphicsOld.also { gc ->
+            this.graphics.also { gc ->
                 gc.composite = DST_IN
-                gc.renderImage(selection.mask, 0, 0)
+                gc.renderImage(selection.mask, 0.0, 0.0)
             }
         })
         workspace.selectionEngine.setSelectionWithLifted(selection,newLifted)

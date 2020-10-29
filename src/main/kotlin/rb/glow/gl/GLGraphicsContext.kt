@@ -165,6 +165,7 @@ class GLGraphicsContext : AGraphicsContext {
 
     override fun fillPolygon(x: Iterable<Double>, y: Iterable<Double>, count: Int) {
         val poly = gle.tesselator.tesselatePolygon(x.asSequence(), y.asSequence(), count)
+        reset()
         gle.applyPrimitiveProgram(
                 PolyRenderCall(
                         color.rgbComponent,

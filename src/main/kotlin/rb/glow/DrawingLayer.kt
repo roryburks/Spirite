@@ -16,6 +16,8 @@ interface IDrawingLayer {
     // Fill
     fun fillRect(x: Double, y: Double, w: Double, h: Double)
     fun fillRect(rect: Rect) = fillRect(rect.x1, rect.y1, rect.w, rect.h)
+    fun fillOval(x: Double, y: Double, w: Double, h: Double) = fill(
+            OvalShape(x.f + w.f / 2.0f, y.f + h.f / 2.0f, w.f / 2.0f, h.f / 2.0f))
     fun fill( shape: IShape)
     fun fillPolygon( polygon: IPolygon)
 }

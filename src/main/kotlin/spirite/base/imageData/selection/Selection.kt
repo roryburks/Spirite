@@ -8,6 +8,7 @@ import rb.glow.Colors
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
 import spirite.base.util.linear.Rect
@@ -46,7 +47,7 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
 
             empty = cropped.isEmpty
             val maskBeingBuilt = Hybrid.imageCreator.createImage(max(1,cropped.width), max(1,cropped.height))
-            maskBeingBuilt.graphicsOld.renderImage(mask, -cropped.x, -cropped.y)
+            maskBeingBuilt.graphics.renderImage(mask, -cropped.x.d, -cropped.y.d)
 
             this.mask = maskBeingBuilt
             this.transform = transform ?: ImmutableTransformF.Translation(cropped.x.f, cropped.y.f)
@@ -134,11 +135,11 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
         val tImageToSel = tSelToImage.invert()
         val lifted = Hybrid.imageCreator.createImage(mask.width, mask.height)
 
-        lifted.graphicsOld.apply {
-            renderImage(mask, 0, 0)
+        lifted.graphics.apply {
+            renderImage(mask, 0.0, 0.0)
             transform = tImageToSel ?: ImmutableTransformF.Identity
             composite = SRC_IN
-            renderImage( image, 0, 0)
+            renderImage( image, 0.0, 0.0)
         }
 
         return lifted
