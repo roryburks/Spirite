@@ -44,7 +44,7 @@ abstract class WorkArea(
                 gc.alpha = 0.3f
                 gc.color = Skin.DrawPanel.LayerBorder.scolor
                 gc.transform( active.tMediumToWorkspace)
-                //gc.drawRect(active.handle.x, active.handle.y, active.handle.width, active.handle.height)
+                //gc.drawer.drawRect(active.handle.x.d, active.handle.y.d, active.handle.width.d, active.handle.height.d)
 
                 gc.popTransform()
             }
@@ -56,8 +56,8 @@ abstract class WorkArea(
                 // Why is this transform instead of preTransform?  Doesn't quite seem right.
                 selection.transform?.let { gc.transform(it) }
 
-//                drawer.drawBounds(selection.mask, ++i)
-//                workspace.selectionEngine.selectionExtra?.draw(gc)
+                drawer.drawBounds(selection.mask, ++i)
+                workspace.selectionEngine.selectionExtra?.draw(gc)
 
                 gc.popTransform()
             }

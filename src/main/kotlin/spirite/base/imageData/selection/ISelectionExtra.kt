@@ -1,7 +1,7 @@
 package spirite.base.imageData.selection
 
-import rb.glow.GraphicsContext_old
+import rb.glow.IGraphicsContext
 
 interface ISelectionExtra {
-    fun draw( gc: GraphicsContext_old)
+    fun draw( gc: IGraphicsContext)
 }

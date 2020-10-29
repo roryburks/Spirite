@@ -4,13 +4,11 @@ import rb.extendo.extensions.stride
 import rb.glow.GraphicsContext_old
 import rb.glow.img.IImage
 import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
-import rb.vectrix.mathUtil.MathUtil
-import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.floor
-import rb.vectrix.mathUtil.round
+import rb.vectrix.mathUtil.*
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -118,7 +116,7 @@ class SimpleMaglevStrokeSelectionExtra(
         val tInternalToContext: ITransformF)
     : IMaglevSelectionExtra
 {
-    override fun draw(gc: GraphicsContext_old) {
+    override fun draw(gc: IGraphicsContext) {
         gc.pushTransform()
         gc.preTransform(tInternalToContext)
         gc.color = Colors.WHITE
@@ -126,11 +124,9 @@ class SimpleMaglevStrokeSelectionExtra(
         lines.forEach { stroke ->
             val dp = stroke.drawPoints
             val xs = (0 until stroke.drawPoints.length).step(10)
-                    .map { dp.x[it] }
-                    .toFloatArray()
+                    .map { dp.x[it].d }
             val ys = (0 until stroke.drawPoints.length).step(10)
-                    .map{ dp.y[it]}
-                    .toFloatArray()
+                    .map{ dp.y[it].d}
             gc.drawPolyLine(xs, ys, min(xs.size, ys.size))
         }
         gc.popTransform()
