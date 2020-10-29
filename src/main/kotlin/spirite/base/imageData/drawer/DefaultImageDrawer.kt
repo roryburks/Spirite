@@ -33,6 +33,7 @@ import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import sguiSwing.hybrid.Hybrid
 import spirite.specialRendering.SpecialDrawerFactory
+import java.io.File
 import kotlin.math.min
 
 
@@ -88,12 +89,13 @@ class DefaultImageDrawer(
         if( clearLifted) {
             workspace.undoEngine.performMaskedImageAction("lift-inner", arranged, null) { built, mask ->
                 built.rawAccessComposite {
-                    it.graphicsOld.apply {
+                    Hybrid.imageIO.saveImage(it, File( "C:\\Bucket\\1.png"))
+                    it.graphics.apply {
                         val tSelToImage = (built.tWorkspaceToComposite) * (selection.transform
                                 ?: ImmutableTransformF.Identity)
                         transform = tSelToImage
                         composite = DST_OUT
-                        renderImage(selection.mask, 0, 0)
+                        renderImage(selection.mask, 0.0, 0.0)
                     }
                 }
             }

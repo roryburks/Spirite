@@ -74,7 +74,7 @@ abstract class AGraphicsContext : IGraphicsContext {
 
     private val stateStack = Deque<GcState>()
 
-    override fun pushState() { stateStack.addBack(GcState(transform, composite, alpha, color)) }
+    override fun pushState() { stateStack.addBack(GcState(transform.toMutable(), composite, alpha, color)) }
     override fun popState() {
         val state = stateStack.popBack() ?: return
         transform = state.trans

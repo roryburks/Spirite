@@ -21,7 +21,7 @@ object EngineLaunchpoint {
                 JOGLContext(),
                 ShaderManager(JClassScriptService()),
                 ShaderMapping.Map330,
-                true
+                false
         )
     }
 

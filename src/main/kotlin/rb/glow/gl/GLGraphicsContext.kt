@@ -137,7 +137,7 @@ class GLGraphicsContext : AGraphicsContext {
         if( imgPart == null) {
             gle.applyPassProgram(
                     RenderCall(alpha * (render?.alpha ?: 1f), calls),
-                    params, tDraw, (x + 0).f, (y + image.height).f, (x + image.width).f, (y + 0).f
+                    params, tDraw, (x + 0).f, (y + 0).f, (x + image.width).f, (y + image.height).f
             )
         }
         else {

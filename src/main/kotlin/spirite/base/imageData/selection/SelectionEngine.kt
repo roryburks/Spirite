@@ -6,6 +6,7 @@ import rb.owl.IObservable
 import rb.owl.Observable
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rbJvm.owl.addWeakObserver
 import spirite.base.imageData.IImageWorkspace
@@ -180,10 +181,10 @@ class SelectionEngine(
 
         val bakedArea = RectangleUtil.circumscribeTrans(Rect(selectionMask.width, selectionMask.height),transform)
         val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
-        val gc = newImage.graphicsOld
+        val gc = newImage.graphics
         gc.transform = transform
-        gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
-        gc.renderImage(selectionMask, 0, 0)
+        gc.preTranslate(-bakedArea.x.d, -bakedArea.y.d)
+        gc.renderImage(selectionMask, 0.0, 0.0)
         val newSelection = Selection(newImage, ImmutableTransformF.Translation(bakedArea.x.f, bakedArea.y.f) , false)
 
         workspace.undoEngine.doAsAggregateAction("Bake Lifted") {
