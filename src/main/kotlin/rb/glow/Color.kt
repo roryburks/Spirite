@@ -6,8 +6,6 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.round
 import kotlin.math.sqrt
 
-
-// TODO: Eventually I will need a more robust color space... space.
 sealed class Color {
     val rgbComponent : Vec3f by lazy { Vec3f(red, green, blue) }
     val rgbaComponent : Vec4f by lazy { Vec4f(red, green, blue, alpha) }
@@ -16,6 +14,18 @@ sealed class Color {
     abstract val green: Float
     abstract val blue: Float
     abstract val alpha: Float
+
+    companion object {
+        fun FromArgb(argb: Int) = ColorARGB32Normal(argb)
+        fun Make(r: Int, g: Int, b: Int) : ColorARGB32Normal {
+            val argb =
+                    (255 shl 24) or
+                            ((r % 256) shl 16) or
+                            ((g % 256) shl 8) or
+                            ((b % 256))
+            return ColorARGB32Normal(argb)
+        }
+    }
 }
 
 abstract class ColorARGB32(val argb: Int)
@@ -48,15 +58,15 @@ class ColorARGB32Normal(argb: Int)
         }
     }
 }
-fun Int.toColor() = ColorARGB32Normal(this)
+fun Int.toColor() = if(this shr 24 == 0) ColorARGB32Normal(this or (0xff shl 24)) else ColorARGB32Normal(this)
 fun Int.toColorPremultiplied() = ColorARGB32Premultiplied(this)
 
 class ColorARGB32Premultiplied(argb: Int)
     : ColorARGB32(argb)
 {
-    override val red: Float get() = if( alpha == 0f) 0f else (r/255.0f) / alpha
-    override val green: Float get() = if( alpha == 0f) 0f else (g/255.0f) / alpha
-    override val blue: Float get() = if( alpha == 0f) 0f else (b/255.0f) / alpha
+    override val red: Float get() = (r/255.0f) / alpha
+    override val green: Float get() = (g/255.0f) / alpha
+    override val blue: Float get() = (b/255.0f) / alpha
     override val alpha: Float get() = (a/255.0f)
 }
 
@@ -124,6 +134,7 @@ object Colors {
 //        return Math.sqrt((dr * dr + dg * dg + db * db + da * da).toDouble())
 //    }
 }
+
 
 object ColorUtil {
     fun colorDistance(c1: Color, c2: Color) : Double {

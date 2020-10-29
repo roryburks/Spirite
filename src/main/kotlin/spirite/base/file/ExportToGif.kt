@@ -7,7 +7,7 @@ import rb.glow.gl.GLImage
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f
 import rbJvm.glow.awt.ImageBI
-import rbJvm.util.GifSequenceWriter
+import rbJvm.file.util.GifSequenceWriter
 import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.animation.AnimationUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation

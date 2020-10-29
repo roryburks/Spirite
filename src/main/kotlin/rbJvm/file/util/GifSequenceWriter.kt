@@ -1,4 +1,4 @@
-package rbJvm.util
+package rbJvm.file.util
 
 import java.awt.image.RenderedImage
 import java.io.IOException
