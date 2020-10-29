@@ -297,7 +297,7 @@ class DefaultStrokeModule(val arranged: ArrangedMediumData) : IStrokeModule {
             override fun performImageAction(built: BuiltMediumData) {
                 val drawer = built.arranged.handle.workspace.strokeProvider.getStrokeDrawer(params)
                 built.rawAccessComposite {
-                    drawer.batchDraw(it.graphicsOld, bakedDrawPoints, params, built.width, built.height)
+                    drawer.batchDraw(it.graphics, bakedDrawPoints, params, built.width, built.height)
                 }
             }
         })

@@ -2,6 +2,7 @@ package spirite.base.file
 
 import rb.glow.ColorARGB32Normal
 import rb.glow.Colors
+import rb.glow.drawer
 import rb.glow.gl.GLImage
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f
@@ -59,9 +60,9 @@ object ExportToGif {
         val biList = drawFrames
                 .map { frame ->
                     val gl = GLImage(drawRect.wi*2, drawRect.hi*2, Hybrid.gle)
-                    val gc = gl.graphicsOld
+                    val gc = gl.graphics
                     gc.color = Colors.DARK_GRAY
-                    gc.fillRect(0,0,drawRect.wi*2, drawRect.hi*2)
+                    gc.drawer.fillRect(0.0,0.0,drawRect.wi*2.0, drawRect.hi*2.0)
                     val trans =
                             ImmutableTransformF.Scale(2f,2f) *
                             ImmutableTransformF.Translation(-drawRect.x1i.f, -drawRect.y1i.f)

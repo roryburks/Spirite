@@ -57,9 +57,9 @@ class SimpleStrokeMaglevLiftedData(
 //        val dh = 1000
 
         val img = Hybrid.imageCreator.createImage(dw, dh)
-        val gc = img.graphicsOld
+        val gc = img.graphics
 
-        gc.translate(-dx.f, -dy.f)
+        gc.translate(-dx.d, -dy.d)
         lines.forEach { line ->
             line.draw(gc, strokeProvider, dw, dh)
         }

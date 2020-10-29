@@ -246,9 +246,9 @@ private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationView
 
             Hybrid.gle.runInGLContext {
                 val image = Hybrid.imageCreator.createImage(width, height)
-                val gc = image.graphicsOld
-                gc.preScale(anim.state.zoomF, anim.state.zoomF)
-                gc.preTranslate(anim.state.offsetX.f, anim.state.offsetY.f)
+                val gc = image.graphics
+                gc.preScale(anim.state.zoomF.d, anim.state.zoomF.d)
+                gc.preTranslate(anim.state.offsetX.d, anim.state.offsetY.d)
 
                 anim.drawFrame(gc,anim.state.met)
 

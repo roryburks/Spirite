@@ -1,6 +1,7 @@
 package spirite.base.imageData.animation
 
 import rb.glow.GraphicsContext_old
+import rb.glow.IGraphicsContext
 import rb.owl.bindable.Bindable
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
@@ -15,7 +16,7 @@ abstract class Animation(
     abstract val startFrame : Float
     abstract val endFrame : Float
 
-    abstract fun drawFrame(gc: GraphicsContext_old, t: Float)
+    abstract fun drawFrame(gc: IGraphicsContext, t: Float)
 
     protected fun triggerStructureChange() {
         workspace.animationManager.triggerStructureChange(this)
@@ -30,7 +31,7 @@ abstract class MediumBasedAnimation(name : String,workspace : IImageWorkspace, s
 
     abstract fun getDrawList( t: Float) : List<TransformedHandle>
 
-    override fun drawFrame(gc: GraphicsContext_old, t: Float) {
+    override fun drawFrame(gc: IGraphicsContext, t: Float) {
         getDrawList(t)
                 .sortedBy {  it.drawDepth }
                 .forEach {it.draw(gc)}

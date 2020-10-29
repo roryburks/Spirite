@@ -1,12 +1,13 @@
 package spirite.specialRendering.stroke
 
 import rb.glow.Composite.*
-import rb.glow.GraphicsContext_old
+import rb.glow.IGraphicsContext
+import rb.glow.gl.GLGraphicsContext
 import rb.glow.gl.GLImage
-import rb.glow.gle.GLGraphicsContextOld
 import rb.glow.gle.GLParameters
 import rb.glow.gle.IGLEngine
 import rb.glow.using
+import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.ITransformF
 import spirite.base.brains.toolset.PenDrawMode.BEHIND
 import spirite.base.brains.toolset.PenDrawMode.KEEP_ALPHA
@@ -33,7 +34,7 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
 
     protected abstract fun doStart(context: DrawerContext)
     protected abstract fun doStep(context: DrawerContext)
-    protected abstract fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters, transform: ITransformF?)
+    protected abstract fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters, transform: ITransform?)
     protected abstract fun getIntensifyMethod(params: StrokeParams) : IntensifyMethod
 
     override fun start(builder: StrokeBuilder, width: Int, height: Int): Boolean {
@@ -57,7 +58,7 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
         }
     }
 
-    override fun draw(gc: GraphicsContext_old) {
+    override fun draw(gc: IGraphicsContext) {
         context?.also { ctx -> drawStrokeImageToGc(ctx.image, gc, ctx.builder.params)}
     }
 
@@ -66,7 +67,7 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
         context = null
     }
 
-    override fun batchDraw(gc: GraphicsContext_old, drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int) {
+    override fun batchDraw(gc: IGraphicsContext, drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int) {
         using(GLImage(width, height, gle, false)) { batchImage ->
             val glParams = batchImage.glParams
             doBatch(batchImage, drawPoints, params, glParams, gc.transform)
@@ -78,8 +79,8 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
         }
     }
 
-    private fun drawStrokeImageToGc(image: GLImage, gc: GraphicsContext_old, strokeParams: StrokeParams) {
-        val glgc = gc as? GLGraphicsContextOld ?: return
+    private fun drawStrokeImageToGc(image: GLImage, gc: IGraphicsContext, strokeParams: StrokeParams) {
+        val glgc = gc as? GLGraphicsContext ?: return
 
         glgc.pushState()
 

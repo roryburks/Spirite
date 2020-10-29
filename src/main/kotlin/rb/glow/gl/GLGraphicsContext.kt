@@ -184,13 +184,19 @@ class GLGraphicsContext : AGraphicsContext {
             call: IGlProgramCall,
             params: GLParameters,
             trans: ITransform?,
-            x: Float = 0f,
-            y: Float = 0f,
-            w: Float = width.f,
-            h: Float = height.f)
+            x: Float = 0f, y: Float = 0f, w: Float = width.f, h: Float = height.f)
     {
         reset()
         gle.applyPassProgram(call, params, trans, x, y, x + w, y + h)
+    }
+
+    fun applyPassProgram(
+            programCall: IGlProgramCall,
+            image: GLImage,
+            x1 :Float= 0f, y1 :Float= 0f, x2 : Float = image.width.f, y2 : Float = image.height.f)
+    {
+        reset()
+        gle.applyPassProgram( programCall, cachedParams.copy(texture1 = image), transform, x1, y1, x2, y2)
 
     }
 }

@@ -6,6 +6,7 @@ import rb.glow.gle.GLParameters
 import rb.glow.gle.GLPrimitive
 import rb.glow.gle.IGLEngine
 import rb.glow.gl.shader.programs.PolyRenderCall
+import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
@@ -30,7 +31,7 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
         }
     }
 
-    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters, transform: ITransformF?) {
+    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters, transform: ITransform?) {
         drawStroke(gle, image, drawPoints, glParams, transform)
         (0 until drawPoints.length).forEach {
             val px: Int
@@ -41,8 +42,8 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
             }
             else {
                 val point = transform.apply(Vec2f(drawPoints.x[it], drawPoints.y[it]))
-                px = point.xf.floor
-                py = point.yf.floor
+                px = point.x.floor
+                py = point.y.floor
             }
             drawPoint(gle, image, px, py, glParams)
         }
@@ -63,7 +64,7 @@ class GLStrikeDrawerPixel(gle: IGLEngine)
                     prim, params, null)
         }
 
-        fun drawStroke(gle: IGLEngine, image: GLImage, points: DrawPoints, params: GLParameters, transform: ITransformF?) {
+        fun drawStroke(gle: IGLEngine, image: GLImage, points: DrawPoints, params: GLParameters, transform: ITransform?) {
             val vb = composeVBuffer(points)
 
             image.graphics.clear()

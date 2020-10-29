@@ -39,7 +39,7 @@ class NodeRenderer(
     private val ratioH get() = settings.height.toFloat() / workspace.height.toFloat()
 
 
-    fun render( gc: GraphicsContext_old) {
+    fun render( gc: IGraphicsContext) {
         try {
             buildCompositeLayer()
 
@@ -52,7 +52,7 @@ class NodeRenderer(
 
                 // Step 2: Recursively Draw the image
                 _renderRec(root, 0, rootIsolator)
-                gc.renderImage(buffer[0], 0, 0)
+                gc.renderImage(buffer[0], 0.0, 0.0)
             }finally {
                 buffer.forEach { it.flush() }
             }
@@ -69,7 +69,7 @@ class NodeRenderer(
             return
         }
 
-        val gc = buffer[depth].graphicsOld
+        val gc = buffer[depth].graphics
 
         _getDrawListUnsorted(node, depth, isolator)
                 .sortedWith(compareBy({it.depth}, {it.subDepth}))
@@ -130,7 +130,7 @@ class NodeRenderer(
             val compositeImage = Hybrid.imageCreator.createImage(
                     (built.width*ratioW).ceil,
                     (built.height*ratioH).ceil)
-            val gc = compositeImage.graphicsOld
+            val gc = compositeImage.graphics
             val baseTransform = ImmutableTransformF.Scale(ratioW, ratioH)
             gc.transform = baseTransform
 
@@ -159,8 +159,7 @@ class NodeRenderer(
                     else -> selectionTransform * proposingTransform
                 }
                 toTrans?.also { gc.preTransform(it) }
-                // TODO
-                //lifted.draw(gc)
+                lifted.draw(gc)
             }
 
             // Draw the composite
@@ -186,7 +185,7 @@ class NodeRenderer(
     private abstract inner class DrawThing {
         val subDepth: Int = tick++
         abstract val depth: Int
-        abstract fun draw( gc: GraphicsContext_old)
+        abstract fun draw( gc: IGraphicsContext)
     }
 
     private inner class GroupDrawThing(
@@ -196,13 +195,13 @@ class NodeRenderer(
             override val depth: Int = 0)
         : DrawThing()
     {
-        override fun draw(gc: GraphicsContext_old) {
+        override fun draw(gc: IGraphicsContext) {
             buffer[n+1].graphics.clear()
 
             _renderRec(node, n+1, isolator)
 
             val rubric = RenderRubric(node.tNodeToContext, node.alpha, node.method)
-            gc.renderImage( buffer[n+1], 0, 0, rubric)
+            gc.renderImage( buffer[n+1], 0.0, 0.0, rubric)
         }
     }
 
@@ -214,9 +213,9 @@ class NodeRenderer(
     {
         override val depth: Int get() = th.drawDepth
 
-        override fun draw(gc: GraphicsContext_old) {
+        override fun draw(gc: IGraphicsContext) {
             gc.pushTransform()
-            gc.scale(ratioW, ratioH)
+            gc.scale(ratioW.d, ratioH.d)
 
             val nodeTransformedRubric = th.renderRubric.stack(RenderRubric(node.tNodeToContext, node.alpha, node.method))
             val isolatorRubric = isolator?.rubric
@@ -226,7 +225,7 @@ class NodeRenderer(
             when(th.handle) {
                 builtComposite?.handle -> {
                     val compositeRubric = baseRubric.stack(RenderRubric(transform = builtComposite.tCompositeToMedium))
-                    gc.renderImage( builtComposite.compositeImage, 0, 0, compositeRubric)
+                    gc.renderImage( builtComposite.compositeImage, 0.0, 0.0, compositeRubric)
 
                 }
                 else -> {

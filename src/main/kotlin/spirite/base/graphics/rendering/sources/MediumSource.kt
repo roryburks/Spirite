@@ -17,10 +17,10 @@ data class MediumSource(val medium: MediumHandle, override val workspace: IImage
     override val nodeDependencies: Collection<Node> get() = emptySet()
     override val rendersLifted: Boolean get() = false
 
-    override fun render(settings: RenderSettings, gc: GraphicsContext_old) {
+    override fun render(settings: RenderSettings, gc: IGraphicsContext) {
         gc.pushState()
-        gc.preTranslate( -medium.x.f, -medium.y.f)
-        gc.preScale(settings.width / medium.width.f, settings.height/medium.height.f)
+        gc.preTranslate( -medium.x.d, -medium.y.d)
+        gc.preScale(settings.width / medium.width.d, settings.height/medium.height.d)
         medium.medium.render(gc)
     }
 }

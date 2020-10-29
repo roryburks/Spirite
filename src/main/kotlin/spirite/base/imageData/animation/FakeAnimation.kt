@@ -1,9 +1,8 @@
 package spirite.base.imageData.animation
 
-import rb.glow.GraphicsContext_old
-import rb.glow.LineAttributes
-import rb.glow.Colors
+import rb.glow.*
 import rb.vectrix.mathUtil.MathUtil
+import rb.vectrix.mathUtil.d
 import spirite.base.imageData.IImageWorkspace
 
 class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace,
@@ -15,12 +14,12 @@ class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace,
     override val endFrame: Float
         get() = 100f
 
-    override fun drawFrame(gc: GraphicsContext_old, t: Float) {
+    override fun drawFrame(gc: IGraphicsContext, t: Float) {
         val t = MathUtil.cycle(0f, 100f, t)
 
         gc.lineAttributes = LineAttributes(3f)
         gc.color = Colors.RED
-        gc.drawLine(100f - t, 0f, t, 100f)
+        gc.drawer.drawLine(100.0 - t, 0.0, t.d, 100.0)
     }
 
     override fun dupe()= FakeAnimation(workspace)

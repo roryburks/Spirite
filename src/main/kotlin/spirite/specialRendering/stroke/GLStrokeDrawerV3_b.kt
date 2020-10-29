@@ -8,7 +8,7 @@ import rb.glow.gle.GLPrimitive
 import rb.glow.gle.IGLEngine
 import rb.glow.gl.shader.programs.PolyRenderCall
 import rb.glow.glu.PrimitiveBuilder
-import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.d
@@ -32,7 +32,7 @@ class GLStrokeDrawerV3_b(
         drawStroke(context.image, context.builder.currentPoints, context.builder.params.width, context.glParams, context.builder.params)
     }
 
-    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters, transform: ITransformF?) {
+    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters, transform: ITransform?) {
         drawStroke( image, drawPoints, params.width, glParams, params, transform)
     }
 
@@ -41,7 +41,7 @@ class GLStrokeDrawerV3_b(
         else -> StrokeV2ApplyCall.IntensifyMethod.DEFAULT
     }
 
-    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: ITransformF? = null) {
+    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: ITransform? = null) {
         if( true /* 330 */ ) {
             target.graphics.clear()
             gle.setTarget(target)

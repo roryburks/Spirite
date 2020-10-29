@@ -1,6 +1,7 @@
 package spirite.gui.views.animation
 
 import rb.extendo.delegates.OnChangeDelegate
+import rb.vectrix.mathUtil.d
 import rbJvm.glow.SColor
 import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
@@ -45,8 +46,8 @@ private constructor(private val imp: Imp) : IComponent by SwComponent(imp)
 
             Hybrid.gle.runInGLContext {
                 val image = Hybrid.imageCreator.createImage(width, height)
-                val gc = image.graphicsOld
-                gc.preScale(anim.state.zoomF, anim.state.zoomF)
+                val gc = image.graphics
+                gc.preScale(anim.state.zoomF.d, anim.state.zoomF.d)
 
                 anim.drawFrame(gc,context.frame)
 
