@@ -3,6 +3,8 @@ package spirite.base.pen.behaviors
 import com.hackoeur.jglm.support.FastMath.max
 import rb.glow.GraphicsContext_old
 import rb.glow.Colors
+import rb.glow.IGraphicsContext
+import rb.glow.drawer
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer
@@ -10,6 +12,7 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.shapes.IShape
 import rb.vectrix.shapes.OvalShape
@@ -111,7 +114,7 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
 
 
 
-    override fun paintOverlay(gc: GraphicsContext_old, view: WorkSectionView) {
+    override fun paintOverlay(gc: IGraphicsContext, view: WorkSectionView) {
         val region = region ?: return
         if( region.isEmpty || state == INACTIVE) return
 
@@ -125,7 +128,7 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         val w = region.width
         val h = region.height
         gc.color = Colors.BLACK
-        gc.drawRect(0, 0, w, h)
+        gc.drawer.drawRect(0.0, 0.0, w.d, h.d)
 
 //			Stroke defStroke = new BasicStroke( 2/zoom);
         gc.color = Colors.GRAY
@@ -169,11 +172,11 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
                 gc.color = Colors.YELLOW
 //					gc.setStroke(new BasicStroke( 4/zoom));
 
-                gc.draw(shape)
+                gc.drawer.draw(shape)
                 gc.color = Colors.GRAY
                 overlap = i
             }
-            else gc.draw(shape)
+            else gc.drawer.draw(shape)
         }
         gc.alpha = 1f
 

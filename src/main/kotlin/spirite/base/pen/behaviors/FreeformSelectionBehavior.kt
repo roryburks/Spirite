@@ -2,6 +2,7 @@ package spirite.base.pen.behaviors
 
 import rb.glow.GraphicsContext_old
 import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import sgui.components.events.MouseEvent.MouseButton
@@ -40,7 +41,7 @@ class FreeformSelectionBehavior(
             builder.update(penner.x, penner.y)
     }
 
-    override fun paintOverlay(gc: GraphicsContext_old, view: WorkSectionView) {
+    override fun paintOverlay(gc: IGraphicsContext, view: WorkSectionView) {
         gc.pushTransform()
         gc.color = Colors.BLACK
         builder.drawBuilding(gc)

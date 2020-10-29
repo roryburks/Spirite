@@ -2,6 +2,7 @@ package spirite.base.pen
 
 import rb.glow.GraphicsContext_old
 import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import rb.owl.bindable.addObserver
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
@@ -36,7 +37,7 @@ interface IPenner {
     fun rawUpdatePressure(rawPressure: Float)
 
     val drawsOverlay : Boolean
-    fun drawOverlay(gc: GraphicsContext_old, view: WorkSectionView)
+    fun drawOverlay(gc: IGraphicsContext, view: WorkSectionView)
 
 }
 
@@ -243,7 +244,7 @@ class Penner(
     override fun rawUpdatePressure(rawPressure: Float) { pressure = rawPressure }
 
     override val drawsOverlay: Boolean get() = behavior is DrawnPennerBehavior
-    override fun drawOverlay(gc: GraphicsContext_old, view: WorkSectionView) {
+    override fun drawOverlay(gc: IGraphicsContext, view: WorkSectionView) {
         (behavior as? DrawnPennerBehavior)?.paintOverlay(gc,view)
     }
 

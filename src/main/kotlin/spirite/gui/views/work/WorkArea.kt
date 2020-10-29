@@ -62,8 +62,8 @@ abstract class WorkArea(
                 gc.popTransform()
             }
 
-//            if( context.penner.drawsOverlay)
-//                context.penner.drawOverlay(gc, view)
+            if( context.penner.drawsOverlay)
+                context.penner.drawOverlay(gc, view)
         }
     }
 

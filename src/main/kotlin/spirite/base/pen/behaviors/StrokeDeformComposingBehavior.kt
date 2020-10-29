@@ -3,8 +3,10 @@ package spirite.base.pen.behaviors
 import rb.glow.GraphicsContext_old
 import rb.glow.ColorARGB32Normal
 import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.interpolation.CubicSplineInterpolator2D
+import rb.vectrix.mathUtil.d
 import sgui.components.events.MouseEvent.MouseButton
 import sgui.components.events.MouseEvent.MouseButton.*
 import spirite.base.imageData.deformation.StrokeDeformationPiece
@@ -108,21 +110,21 @@ class StrokeDeformComposingBehavior(
 
 
 
-    override fun paintOverlay(gc: GraphicsContext_old, view: WorkSectionView) {
+    override fun paintOverlay(gc: IGraphicsContext, view: WorkSectionView) {
         fromStrokes.forEachIndexed { index, (x_, y_) ->
             gc.color = ColorARGB32Normal(DefaultStrokeColors[index])
-            gc.drawPolyLine(x_, y_, x_.size)
+            gc.drawPolyLine(x_.map { it.d }, y_.map { it.d }, x_.size)
         }
         toStrokes.forEachIndexed { index, (x_, y_) ->
             gc.color = ColorARGB32Normal(DefaultStrokeColors[index])
-            gc.drawPolyLine(x_, y_, x_.size)
+            gc.drawPolyLine(x_.map { it.d }, y_.map { it.d }, x_.size)
         }
         val xCompact = xCompact
         val yCompact = yCompact
         if( xCompact != null && yCompact != null) {
             gc.color = Colors.MAGENTA
-            val xs = xCompact.toArray()
-            val ys = yCompact.toArray()
+            val xs = xCompact.toArray().map { it.d }
+            val ys = yCompact.toArray().map { it.d }
 
             gc.drawPolyLine(xs, ys, xs.size)
         }

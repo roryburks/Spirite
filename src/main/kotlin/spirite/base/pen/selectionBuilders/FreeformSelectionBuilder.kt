@@ -2,8 +2,10 @@ package spirite.base.pen.selectionBuilders
 
 import rb.glow.GraphicsContext_old
 import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import rb.vectrix.compaction.IntCompactor
 import rb.vectrix.linear.Vec2i
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
@@ -35,9 +37,9 @@ class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(w
         return Selection(img, null, true)
     }
 
-    override fun drawBuilding(gc: GraphicsContext_old) {
+    override fun drawBuilding(gc: IGraphicsContext) {
         for( i in 0 until xCompactor.chunkCount) {
-            gc.drawPolyLine( xCompactor.getChunk(i), yCompactor.getChunk(i), xCompactor.getChunkSize(i))
+            gc.drawPolyLine( xCompactor.getChunk(i).map { it.d }, yCompactor.getChunk(i).map { it.d }, xCompactor.getChunkSize(i))
         }
     }
 }

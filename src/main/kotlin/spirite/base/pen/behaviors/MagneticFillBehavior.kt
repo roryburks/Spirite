@@ -2,6 +2,8 @@ package spirite.base.pen.behaviors
 
 import rb.glow.GraphicsContext_old
 import rb.glow.ColorARGB32Normal
+import rb.glow.IGraphicsContext
+import rb.vectrix.mathUtil.d
 import rbJvm.glow.SColor
 import rb.vectrix.mathUtil.f
 import spirite.base.imageData.drawer.IImageDrawer.IMagneticFillModule
@@ -25,11 +27,11 @@ class MagneticFillBehavior(penner: Penner, val drawer: IMagneticFillModule, val 
         }
     }
 
-    override fun paintOverlay(gc: GraphicsContext_old, view: WorkSectionView) {
+    override fun paintOverlay(gc: IGraphicsContext, view: WorkSectionView) {
         gc.transform  = view.tWorkspaceToScreen
         gc.color = ColorARGB32Normal(0xFFFFFF xor color.argb32)
-        val fx = drawer.magFillXs
-        val fy = drawer.magFillYs
+        val fx = drawer.magFillXs.map { it.d }
+        val fy = drawer.magFillYs.map { it.d }
         gc.drawPolyLine(fx, fy, min(fx.size, fy.size))
     }
 }
