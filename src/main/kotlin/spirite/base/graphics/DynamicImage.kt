@@ -7,6 +7,7 @@ import rb.glow.using
 import rb.glow.with
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.mathUtil.d
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import sguiSwing.hybrid.ContentBoundsFinder
@@ -58,10 +59,10 @@ class DynamicImage(
     private fun checkoutRaw(compositionWidth: Int, compositionHeight: Int, tImageToComposition: ITransformF) : CompositionContext {
         val newContext = CompositionContext(tImageToComposition, compositionWidth, compositionHeight)
 
-        val gc = newContext.buffer.graphicsOld
+        val gc = newContext.buffer.graphics
         gc.transform(tImageToComposition)
         val b = base
-        if( b != null ) gc.renderImage(b, xOffset, yOffset)
+        if( b != null ) gc.renderImage(b, xOffset.d, yOffset.d)
 
         return newContext
     }
@@ -75,17 +76,17 @@ class DynamicImage(
                 .union( Rect(xOffset, yOffset, base?.width ?: 0, base?.height ?: 0))
 
         using(Hybrid.imageCreator.createImage(combiningBounds.width, combiningBounds.height)) { combiningImage ->
-            val gc = combiningImage.graphicsOld
+            val gc = combiningImage.graphics
 
             base?.with {
-                gc.renderImage(it, xOffset - combiningBounds.x, yOffset - combiningBounds.y)
+                gc.renderImage(it, xOffset - combiningBounds.x.d, yOffset - combiningBounds.y.d)
             }
 
             using(context.buffer) { buffer ->
                 gc.transform =tCompositeToImage
-                gc.preTranslate(-combiningBounds.x + 0f, -combiningBounds.y + 0f)
+                gc.preTranslate(-combiningBounds.x.d, -combiningBounds.y.d)
                 gc.composite = SRC
-                gc.renderImage(buffer, 0, 0)
+                gc.renderImage(buffer, 0.0, 0.0)
 
                 // Step 2: Crop the Combining Bounds
                 val contentBounds = ContentBoundsFinder.findContentBounds(combiningImage, 0, true)
@@ -93,7 +94,8 @@ class DynamicImage(
                     contentBounds.isEmpty -> null
                     else -> Hybrid.imageCreator.createImage(contentBounds.width, contentBounds.height)
                 }
-                newBase?.graphicsOld?.renderImage(combiningImage, -contentBounds.x, -contentBounds.y)
+                //println("${contentBounds.width} , ${contentBounds.height}")
+                newBase?.graphics?.renderImage(combiningImage, -contentBounds.x.d, -contentBounds.y.d)
 
                 xOffset = contentBounds.x + combiningBounds.x
                 yOffset = contentBounds.y + combiningBounds.y

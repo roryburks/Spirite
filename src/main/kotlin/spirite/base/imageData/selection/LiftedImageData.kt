@@ -3,6 +3,7 @@ package spirite.base.imageData.selection
 import rb.glow.GraphicsContext_old
 import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
@@ -20,10 +21,10 @@ class LiftedImageData(val image: IImage): ILiftedData {
         // Bakes the rotation and scale, spits out the translation
         val bakedArea = RectangleUtil.circumscribeTrans(Rect(image.width, image.height),transform)
         val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
-        val gc = newImage.graphicsOld
+        val gc = newImage.graphics
         gc.transform = transform
-        gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
-        gc.renderImage(image, 0, 0)
+        gc.preTranslate(-bakedArea.x.d, -bakedArea.y.d)
+        gc.renderImage(image, 0.0, 0.0)
         return LiftedImageData(newImage)
     }
 

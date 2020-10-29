@@ -74,11 +74,11 @@ class FileManager( val master: IMasterControl)  : IFileManager{
                 // Remove Alpha Layer of JPG so that it works correctly with encoding
                 val wsImage = master.renderEngine.renderWorkspace(workspace)
                 using(Hybrid.imageCreator.createImage(wsImage.width, wsImage.height)) { img ->
-                    val gc = img.graphicsOld
+                    val gc = img.graphics
                     gc.clear(Colors.WHITE)
-                    gc.renderImage(wsImage, 0, 0)
+                    gc.renderImage(wsImage, 0.0, 0.0)
 
-                    Hybrid.imageIO.saveImage(img, file)
+                    Hybrid.imageIO.saveImage(wsImage, file) // intentionally changed from img.  seems SLIGHTLY less completely broken
                 }
             }
             else -> Hybrid.imageIO.saveImage( master.renderEngine.renderWorkspace(workspace), file)
