@@ -15,6 +15,7 @@ import rb.glow.gl.shader.programs.RenderCall
 import rb.glow.gl.shader.programs.RenderCall.RenderAlgorithm.*
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rbJvm.glow.awt.toBufferedImage
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
@@ -35,7 +36,7 @@ class GLEngineTests {
 
     @Test fun TestBasicRendering() {
         val img = GLImage(50, 50, gle)
-        val gc = img.graphicsOld
+        val gc = img.graphics
         gc.clear()
 
         gle.setTarget(img)
@@ -64,7 +65,7 @@ class GLEngineTests {
 
     @Test fun TestComplexLineProgram() {
         val img = GLImage(50, 50, gle)
-        val gc = img.graphicsOld
+        val gc = img.graphics
         gc.clear()
 
         val xs = listOf(0, 10, 50, 50)
@@ -97,10 +98,10 @@ class GLEngineTests {
     @Test fun writeOutPassShaders() {
         // Draw the base star
         val star = GLImage(50, 50, gle)
-        val gc = star.graphicsOld
+        val gc = star.graphics
 
-        val xs = listOf(0f, 50f, 0f, 50f, 25f)
-        val ys = listOf(0f, 40f, 40f, 0f, 50f)
+        val xs = listOf(0f, 50f, 0f, 50f, 25f).map { it.d }
+        val ys = listOf(0f, 40f, 40f, 0f, 50f).map { it.d }
         gc.color = Colors.RED
         gc.fillPolygon(xs, ys, 5)
 

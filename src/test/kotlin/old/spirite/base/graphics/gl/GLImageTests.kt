@@ -24,10 +24,10 @@ class GLImageTests {
     @Test fun BasicGLFunctionality() {
         val glimage = GLImage(10, 10, gle)
 
-        val gc = glimage.graphicsOld
+        val gc = glimage.graphics
         //gc.clear()
         gc.color = Colors.RED
-        gc.fillRect(0, 0, 10, 10)
+        gc.drawer.fillRect(0.0, 0.0, 10.0, 10.0)
 
         val color = glimage.getARGB(2,2)
 
@@ -43,10 +43,10 @@ class GLImageTests {
     @Test fun DeepCopy() {
         val glimage = GLImage(10, 10, gle)
 
-        val gc = glimage.graphicsOld
+        val gc = glimage.graphics
         gc.clear()
         gc.color = Colors.RED
-        gc.fillRect(0, 0, 10, 10)
+        gc.drawer.fillRect(0.0, 0.0, 10.0, 10.0)
 
         val gli2 = glimage.deepCopy()
         val color = gli2.getARGB(2,2)
@@ -70,14 +70,14 @@ class GLImageTests {
         val img1 = GLImage(25, 25, gle, false)
         val img2 = GLImage(25, 25, gle, false)
 
-        val gc1 = img1.graphicsOld
+        val gc1 = img1.graphics
         gc1.color = Colors.RED
-        gc1.fillRect(0,0,25,25)
+        gc1.drawer.fillRect(0.0,0.0,25.0,25.0)
 
 
-        val gc2 = img2.graphicsOld
+        val gc2 = img2.graphics
         gc2.color = Colors.BLUE
-        gc2.fillRect(0,0,25,25)
+        gc2.drawer.fillRect(0.0,0.0,25.0,25.0)
 
         val img3 = img2.deepCopy() as GLImage
 
