@@ -1,7 +1,6 @@
 package rb.glow
 
 import rb.extendo.dataStructures.Deque
-import rb.glow.gl.GLImage
 import rb.glow.gle.RenderRubric
 import rb.glow.img.IImage
 import rb.vectrix.linear.ITransform

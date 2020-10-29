@@ -1,8 +1,11 @@
 package spirite.base.file
 
-import rb.glow.img.IImage
 import rb.glow.Colors
+import rb.glow.img.IImage
 import rb.glow.using
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.FILE
 import spirite.base.brains.IMasterControl
 import spirite.base.file.load.BadSifFileException
 import spirite.base.file.load.LoadEngine
@@ -10,9 +13,6 @@ import spirite.base.file.save.SaveEngine
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.ErrorType.FILE
 import java.io.File
 import java.io.IOException
 

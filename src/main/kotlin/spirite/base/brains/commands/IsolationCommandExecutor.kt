@@ -1,9 +1,9 @@
 package spirite.base.brains.commands
 
+import sguiSwing.hybrid.MDebug
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.IsolationCommandExecutor.IsolationCommand.*
-import sguiSwing.hybrid.MDebug
 
 class IsolationCommandExecutor(private val workspaceSet: IWorkspaceSet) : ICommandExecutor
 {

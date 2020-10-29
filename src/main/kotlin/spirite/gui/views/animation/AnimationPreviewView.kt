@@ -11,6 +11,8 @@ import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sguiSwing.SwIcon
 import sguiSwing.components.SJPanel
 import sguiSwing.components.SwComponent
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.ITimer
 import sguiSwing.jcolor
 import sguiSwing.skin.Skin
 import spirite.base.brains.IMasterControl
@@ -20,8 +22,6 @@ import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChan
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.ITimer
 import java.awt.Graphics
 import kotlin.math.floor
 import kotlin.math.max

@@ -1,13 +1,12 @@
 package rb.glow.gl
 
-import rb.glow.IGraphicsContext
+import rb.glow.gle.GLGraphicsContextOld
+import rb.glow.gle.GLParameters
+import rb.glow.gle.IGLEngine
 import rb.glow.img.RawImage
 import rb.glow.img.RawImage.InvalidImageDimensionsExeption
 import rb.glow.toColor
 import rb.glow.toColorPremultiplied
-import rb.glow.gle.GLGraphicsContextOld
-import rb.glow.gle.GLParameters
-import rb.glow.gle.IGLEngine
 
 class GLImage : RawImage {
     override val width : Int

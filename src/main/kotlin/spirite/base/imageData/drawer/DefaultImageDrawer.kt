@@ -1,10 +1,9 @@
 package spirite.base.imageData.drawer
 
-import rb.glow.Composite.*
-import rb.glow.img.RawImage
 import rb.glow.Color
 import rb.glow.ColorUtil
-import rbJvm.glow.SColor
+import rb.glow.Composite.*
+import rb.glow.img.RawImage
 import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
@@ -13,6 +12,8 @@ import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
+import rbJvm.glow.SColor
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.MagneticFillMode.BEHIND
@@ -32,7 +33,6 @@ import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import sguiSwing.hybrid.Hybrid
 import spirite.specialRendering.SpecialDrawerFactory
 import java.io.File
 import kotlin.math.min

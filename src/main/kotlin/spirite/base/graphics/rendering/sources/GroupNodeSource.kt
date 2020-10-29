@@ -1,7 +1,6 @@
 package spirite.base.graphics.rendering.sources
 
 import rb.extendo.dataStructures.SinglyList
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings

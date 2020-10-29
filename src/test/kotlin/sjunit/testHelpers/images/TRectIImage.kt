@@ -1,9 +1,9 @@
 package sjunit.testHelpers.images
 
-import rb.glow.img.IImage
-import rb.glow.img.RawImage
 import rb.glow.Color
 import rb.glow.Colors
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
 import spirite.base.util.linear.Rect
 import kotlin.math.max
 

@@ -1,21 +1,20 @@
 package spirite.base.graphics.rendering
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
-import rb.glow.img.RawImage
 import rb.glow.gle.RenderRubric
+import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.d
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.mediums.IComplexMedium
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
 
 class NodeRenderer(
         val root: GroupNode,

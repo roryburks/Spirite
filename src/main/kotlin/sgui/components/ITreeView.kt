@@ -2,9 +2,9 @@ package sgui.components
 
 import rb.glow.img.IImage
 import rb.glow.img.NillImage
-import rbJvm.glow.SColor
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
+import rbJvm.glow.SColor
 import sgui.components.ITreeViewNonUI.ITreeNode
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
 import sgui.transfer.ITransferObject

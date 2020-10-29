@@ -1,8 +1,8 @@
 package spirite.base.imageData.drawer
 
+import rb.glow.Color
 import rb.glow.Composite.DST_IN
 import rb.glow.img.RawImage
-import rb.glow.Color
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f

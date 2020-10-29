@@ -1,21 +1,21 @@
 package spirite.base.imageData.selection
 
-import rb.glow.Composite.*
-import rb.glow.img.IImage
-import rb.glow.img.RawImage
 import rb.glow.Color
 import rb.glow.Colors
+import rb.glow.Composite.*
 import rb.glow.drawer
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
-import spirite.base.util.linear.Rect
-import spirite.base.util.linear.RectangleUtil
 import sguiSwing.hybrid.ContentBoundsFinder
 import sguiSwing.hybrid.Hybrid
+import spirite.base.util.linear.Rect
+import spirite.base.util.linear.RectangleUtil
 import kotlin.math.max
 
 /**

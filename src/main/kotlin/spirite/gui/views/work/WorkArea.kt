@@ -1,12 +1,10 @@
 package spirite.gui.views.work
 
-import rb.glow.*
-import rb.vectrix.mathUtil.d
+import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import sguiSwing.components.ISwComponent
-import sguiSwing.hybrid.Hybrid
 import sguiSwing.skin.Skin
 import spirite.specialRendering.SpecialDrawerFactory
-import java.io.File
 
 abstract class WorkArea(
         val context: WorkSection) {

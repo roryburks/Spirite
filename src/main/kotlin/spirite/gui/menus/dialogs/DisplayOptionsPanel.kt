@@ -2,9 +2,9 @@ package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
 import sgui.components.crossContainer.ICrossPanel
+import sguiSwing.hybrid.Hybrid
 import spirite.gui.menus.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.resources.SpiriteIcons
-import sguiSwing.hybrid.Hybrid
 
 class DisplayOptionsPanel(
         val defaultOptions : DisplayOptions? = null

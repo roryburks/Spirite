@@ -1,17 +1,15 @@
 package spirite.base.imageData.selection
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.mathUtil.d
-import rb.vectrix.mathUtil.f
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.LiftedImageDrawer
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import sguiSwing.hybrid.Hybrid
 
 class LiftedImageData(val image: IImage): ILiftedData {
     override fun draw(gc: IGraphicsContext) {

@@ -1,6 +1,5 @@
 package spirite.base.imageData.mediums
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.Node

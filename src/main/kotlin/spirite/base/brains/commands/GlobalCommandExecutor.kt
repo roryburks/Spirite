@@ -1,11 +1,11 @@
 package spirite.base.brains.commands
 
 import rb.extendo.dataStructures.SinglySet
+import rb.glow.Colors
 import rb.glow.Composite.SRC_IN
+import rb.glow.drawer
 import rb.glow.img.IImage
 import rb.glow.img.RawImage
-import rb.glow.Colors
-import rb.glow.drawer
 import rb.glow.using
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
@@ -13,6 +13,10 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.Transferables.IClipboard.ClipboardThings.Image
+import sguiSwing.hybrid.Transferables.ILayerBuilder
+import sguiSwing.hybrid.Transferables.INodeBuilder
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
@@ -35,10 +39,6 @@ import spirite.base.util.linear.Rect
 import spirite.gui.menus.dialogs.IDialog.FilePickType
 import spirite.gui.menus.dialogs.IDialog.FilePickType.AAF
 import spirite.gui.menus.dialogs.IDialog.FilePickType.SAVE_SIF
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.Transferables.IClipboard.ClipboardThings.Image
-import sguiSwing.hybrid.Transferables.ILayerBuilder
-import sguiSwing.hybrid.Transferables.INodeBuilder
 
 class GlobalCommandExecutor(
         val master: IMasterControl,

@@ -1,14 +1,14 @@
 package spirite.base.imageData.mediums.magLev.selecting
 
 import rb.extendo.extensions.stride
-import rb.glow.GraphicsContext_old
-import rb.glow.img.IImage
 import rb.glow.Colors
 import rb.glow.IGraphicsContext
+import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.*
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -19,7 +19,6 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.debug.SpiriteException
 import spirite.base.util.linear.Rect
-import sguiSwing.hybrid.Hybrid
 import kotlin.math.min
 
 class SimpleStrokeMaglevLiftedData(

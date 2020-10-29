@@ -9,7 +9,7 @@ import rb.glow.gl.shader.programs.BasicCall
 import rb.glow.gl.shader.programs.LineRenderCall
 import rb.glow.gl.shader.programs.PolyRenderCall
 import rb.glow.gl.shader.programs.RenderCall
-import rb.glow.gle.*
+import rb.glow.gle.IGLShaderLoader
 import rb.glow.resources.IScriptService
 
 class GlCreateProgramException( msg: String) : GLEException(msg)

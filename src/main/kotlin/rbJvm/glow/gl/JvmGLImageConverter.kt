@@ -1,6 +1,5 @@
 package rbJvm.glow.gl
 
-import com.jogamp.opengl.GLException
 import rb.glow.gl.GLC
 import rb.glow.gl.GLImage
 import rb.glow.gl.IGL

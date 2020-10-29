@@ -2,14 +2,13 @@ package spirite.specialRendering.stroke
 
 import rb.glow.gl.GLC
 import rb.glow.gl.GLImage
+import rb.glow.gl.shader.programs.PolyRenderCall
 import rb.glow.gle.GLParameters
 import rb.glow.gle.GLPrimitive
 import rb.glow.gle.IGLEngine
-import rb.glow.gl.shader.programs.PolyRenderCall
 import rb.glow.glu.DoubleEndedSinglePrimitiveBuilder
 import rb.glow.glu.PrimitiveBuilder
 import rb.vectrix.linear.ITransform
-import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import spirite.base.pen.stroke.DrawPoints

@@ -3,6 +3,7 @@ package spirite.base.file.aaf
 import rb.glow.img.IImage
 import rb.glow.img.RawImage
 import rb.vectrix.shapes.RectI
+import sguiSwing.hybrid.Hybrid
 import spirite.base.file.readUTF8NT
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
@@ -10,7 +11,6 @@ import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.InsertTo
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.DynamicMedium
-import sguiSwing.hybrid.Hybrid
 
 class AafV1Anim(
         val name: String,

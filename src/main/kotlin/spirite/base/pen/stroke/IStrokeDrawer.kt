@@ -1,6 +1,5 @@
 package spirite.base.pen.stroke
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 
 interface IStrokeDrawer {

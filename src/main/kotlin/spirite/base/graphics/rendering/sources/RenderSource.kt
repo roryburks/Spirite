@@ -1,6 +1,5 @@
 package spirite.base.graphics.rendering.sources
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace

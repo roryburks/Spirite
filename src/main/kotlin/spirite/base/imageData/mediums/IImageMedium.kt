@@ -1,9 +1,8 @@
 package spirite.base.imageData.mediums
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
-import rb.glow.img.IImage
 import rb.glow.gle.RenderRubric
+import rb.glow.img.IImage
 import rb.vectrix.mathUtil.d
 
 interface IImageMedium : IMedium{

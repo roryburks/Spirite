@@ -8,10 +8,10 @@ import rb.glow.with
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.d
-import spirite.base.util.linear.Rect
-import spirite.base.util.linear.RectangleUtil
 import sguiSwing.hybrid.ContentBoundsFinder
 import sguiSwing.hybrid.Hybrid
+import spirite.base.util.linear.Rect
+import spirite.base.util.linear.RectangleUtil
 
 
 /**

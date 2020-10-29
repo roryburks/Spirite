@@ -8,12 +8,12 @@ import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.components.crossContainer.ICrossPanel
 import sguiSwing.components.ResizeContainerPanel
+import sguiSwing.hybrid.Hybrid
 import sguiSwing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.views.animation.AnimationPlayView
-import sguiSwing.hybrid.Hybrid
 
 class  FFAPlayView(
         val master: IMasterControl,

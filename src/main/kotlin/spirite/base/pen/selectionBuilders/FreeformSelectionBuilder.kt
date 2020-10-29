@@ -1,15 +1,13 @@
 package spirite.base.pen.selectionBuilders
 
-import rb.glow.GraphicsContext_old
 import rb.glow.Colors
 import rb.glow.IGraphicsContext
 import rb.vectrix.compaction.IntCompactor
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
-import rb.vectrix.mathUtil.f
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
-import sguiSwing.hybrid.Hybrid
 
 class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(workspace) {
     private val xCompactor = IntCompactor()

@@ -3,12 +3,12 @@ package spirite.gui.views.layerProperties
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
 import sguiSwing.SwIcon
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import sguiSwing.hybrid.Hybrid
 
 class LayerPropertiesPanel( val master: IMasterControl) : IOmniComponent
 {

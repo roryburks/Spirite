@@ -1,6 +1,5 @@
 package spirite.base.pen
 
-import rb.glow.GraphicsContext_old
 import rb.glow.Colors
 import rb.glow.IGraphicsContext
 import rb.owl.bindable.addObserver
@@ -9,6 +8,7 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import sgui.components.events.MouseEvent.MouseButton
 import sgui.components.events.MouseEvent.MouseButton.LEFT
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
@@ -20,7 +20,6 @@ import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
 import spirite.gui.views.work.WorkSection
 import spirite.gui.views.work.WorkSectionView
-import sguiSwing.hybrid.Hybrid
 
 interface IPenner {
 //    val holdingShift : Boolean

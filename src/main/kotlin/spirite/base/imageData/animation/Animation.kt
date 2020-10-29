@@ -1,6 +1,5 @@
 package spirite.base.imageData.animation
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 import rb.owl.bindable.Bindable
 import spirite.base.graphics.rendering.TransformedHandle

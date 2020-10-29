@@ -1,6 +1,9 @@
 package spirite.base.imageData.animation
 
-import rb.glow.*
+import rb.glow.Colors
+import rb.glow.IGraphicsContext
+import rb.glow.LineAttributes
+import rb.glow.drawer
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
 import spirite.base.imageData.IImageWorkspace

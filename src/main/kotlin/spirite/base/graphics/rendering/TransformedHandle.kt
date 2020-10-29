@@ -1,6 +1,5 @@
 package spirite.base.graphics.rendering
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 import rb.glow.gle.RenderMethod
 import rb.glow.gle.RenderRubric

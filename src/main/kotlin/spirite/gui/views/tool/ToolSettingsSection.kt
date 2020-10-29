@@ -14,12 +14,12 @@ import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.components.crossContainer.ICrossPanel
 import sguiSwing.SwIcon
+import sguiSwing.hybrid.Hybrid
 import sguiSwing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import sguiSwing.hybrid.Hybrid
 
 
 fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {

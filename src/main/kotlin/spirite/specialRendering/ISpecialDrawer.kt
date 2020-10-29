@@ -1,11 +1,13 @@
 package spirite.specialRendering
 
-import rb.glow.*
+import rb.glow.Color
+import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import rb.glow.gl.GLGraphicsContext
-import rb.glow.img.IImage
 import rb.glow.gl.GLImage
 import rb.glow.gl.shader.programs.BasicCall
-import rb.glow.gle.GLGraphicsContextOld
+import rb.glow.img.IImage
+import rb.glow.using
 import rb.vectrix.mathUtil.f
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.specialRendering.fill.GLFill

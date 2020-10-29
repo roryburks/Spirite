@@ -1,7 +1,7 @@
 package sgui.components
 
-import rbJvm.glow.SColor
 import rb.vectrix.shapes.RectI
+import rbJvm.glow.SColor
 import sgui.UIPoint
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseWheelEvent

@@ -3,9 +3,9 @@ package old.spirite.base.graphics.gl
 import old.TestConfig
 import org.junit.jupiter.api.Test
 import rb.glow.CapMethod.NONE
+import rb.glow.Colors
 import rb.glow.JoinMethod.MITER
 import rb.glow.LineAttributes
-import rb.glow.Colors
 import rb.glow.drawer
 import rb.glow.gl.GLImage
 import rb.vectrix.linear.Vec2i

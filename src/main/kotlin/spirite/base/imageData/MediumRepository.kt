@@ -1,9 +1,9 @@
 package spirite.base.imageData
 
-import spirite.base.imageData.mediums.IMedium
 import sguiSwing.hybrid.Hybrid
 import sguiSwing.hybrid.MDebug
 import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
+import spirite.base.imageData.mediums.IMedium
 
 /**
  *  The MediumRepository is responsible for storing the direct medium data.

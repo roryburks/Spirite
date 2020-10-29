@@ -9,6 +9,7 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rbJvm.owl.addWeakObserver
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.IAnchorLiftModule
@@ -20,7 +21,6 @@ import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import sguiSwing.hybrid.Hybrid
 
 interface ISelectionEngine {
     val selectionChangeObserver: IObservable<(SelectionChangeEvent)->Any?>

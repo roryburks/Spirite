@@ -1,7 +1,7 @@
 package sguiSwing.components
 
-import rbJvm.glow.SColor
 import rb.owl.bindable.addObserver
+import rbJvm.glow.SColor
 import sgui.components.ColorSquareNonUI
 import sgui.components.IColorSquare
 import sgui.components.IColorSquareNonUI

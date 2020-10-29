@@ -1,7 +1,6 @@
 package spirite.base.pen.behaviors
 
 import com.hackoeur.jglm.support.FastMath.max
-import rb.glow.GraphicsContext_old
 import rb.glow.Colors
 import rb.glow.IGraphicsContext
 import rb.glow.drawer

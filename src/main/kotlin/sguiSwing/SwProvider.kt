@@ -1,8 +1,8 @@
 package sguiSwing
 
-import rb.glow.img.IImage
 import rb.glow.DummyConverter
 import rb.glow.IImageConverter
+import rb.glow.img.IImage
 
 object SwProvider {
     var converter: IImageConverter = DummyConverter

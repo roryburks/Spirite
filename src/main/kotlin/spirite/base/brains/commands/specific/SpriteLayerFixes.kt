@@ -2,7 +2,6 @@ package spirite.base.brains.commands.specific
 
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.magLev.MaglevMedium

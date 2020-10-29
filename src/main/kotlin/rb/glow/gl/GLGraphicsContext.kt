@@ -1,10 +1,14 @@
 package rb.glow.gl
 
 import rb.glow.*
-import rb.glow.Composite.DST_OVER
 import rb.glow.Composite.SRC_OVER
-import rb.glow.gl.shader.programs.*
-import rb.glow.gle.*
+import rb.glow.gl.shader.programs.IGlProgramCall
+import rb.glow.gl.shader.programs.PolyRenderCall
+import rb.glow.gl.shader.programs.RenderCall
+import rb.glow.gle.GLParameters
+import rb.glow.gle.IGLEngine
+import rb.glow.gle.RenderMethodType
+import rb.glow.gle.RenderRubric
 import rb.glow.img.IImage
 import rb.vectrix.linear.ITransform
 import rb.vectrix.mathUtil.f

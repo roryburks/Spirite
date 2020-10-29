@@ -1,12 +1,11 @@
 package spirite.base.pen.selectionBuilders
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 import rb.glow.drawer
 import rb.vectrix.mathUtil.d
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
-import sguiSwing.hybrid.Hybrid
 
 
 class OvalSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( workspace) {

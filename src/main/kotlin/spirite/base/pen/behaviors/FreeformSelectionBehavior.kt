@@ -1,6 +1,5 @@
 package spirite.base.pen.behaviors
 
-import rb.glow.GraphicsContext_old
 import rb.glow.Colors
 import rb.glow.IGraphicsContext
 import rb.vectrix.mathUtil.MathUtil

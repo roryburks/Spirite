@@ -1,10 +1,10 @@
 package spirite.base.brains.commands
 
+import sguiSwing.hybrid.MDebug
 import spirite.base.brains.IFrameManager
 import spirite.base.brains.IFrameManager.Views.*
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.FrameCommandExecutor.FrameCommand.*
-import sguiSwing.hybrid.MDebug
 
 
 class FrameCommandExecutor(val frameManager: IFrameManager) : ICommandExecutor

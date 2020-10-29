@@ -1,7 +1,6 @@
 package rb.glow.gle
 
 import rb.glow.*
-import rb.glow.img.IImage
 import rb.glow.gl.GLC
 import rb.glow.gl.GLImage
 import rb.glow.gl.shader.programs.IGlProgramCall
@@ -10,6 +9,7 @@ import rb.glow.gl.shader.programs.RenderCall
 import rb.glow.gl.shader.programs.RenderCall.RenderAlgorithm
 import rb.glow.gl.shader.programs.RenderCall.RenderAlgorithm.*
 import rb.glow.gle.RenderMethodType.*
+import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.mathUtil.d

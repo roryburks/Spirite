@@ -8,12 +8,12 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f
 import rbJvm.glow.awt.ImageBI
 import rbJvm.util.GifSequenceWriter
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.animation.AnimationUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.SimpleLayer
-import sguiSwing.hybrid.Hybrid
 import java.awt.image.BufferedImage
 import java.io.File
 import java.util.*

@@ -7,9 +7,7 @@ import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.gl.JvmGLImageConverter
 import rbJvm.glow.jogl.GluPolygonTesselater
 import rbJvm.glow.jogl.JOGLContext
-import rbJvm.glow.jogl.JOGLProvider
 import spirite.pc.shaders.JClassScriptService
-import spirite.specialRendering.GL330ShaderLoader
 import spirite.specialRendering.ShaderMapping
 
 /** This serves little purpose other than being the single place that everything else gets its GLEngine singleton */

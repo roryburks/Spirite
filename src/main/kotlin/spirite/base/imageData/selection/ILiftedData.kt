@@ -1,6 +1,5 @@
 package spirite.base.imageData.selection
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 import rb.vectrix.linear.ITransformF
 import spirite.base.imageData.IImageWorkspace

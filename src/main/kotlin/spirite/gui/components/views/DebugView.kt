@@ -4,8 +4,8 @@ import sgui.components.IComponent
 import sgui.components.ITextArea
 import sgui.components.crossContainer.ICrossPanel
 import sguiSwing.SwIcon
-import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import sguiSwing.hybrid.Hybrid
+import spirite.gui.components.advanced.omniContainer.IOmniComponent
 
 class DebugView
 private constructor( val imp : ICrossPanel)

@@ -1,6 +1,5 @@
 package spirite.base.pen.selectionBuilders
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 import rb.glow.drawer
 import rb.vectrix.mathUtil.d

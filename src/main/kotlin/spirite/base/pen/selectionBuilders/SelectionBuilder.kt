@@ -1,6 +1,5 @@
 package spirite.base.pen.selectionBuilders
 
-import rb.glow.GraphicsContext_old
 import rb.glow.IGraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection

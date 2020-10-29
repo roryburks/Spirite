@@ -3,18 +3,18 @@ package old.spirite.base.graphics.rendering
 import old.TestConfig
 import old.TestHelper
 import org.junit.jupiter.api.Test
-import rb.glow.img.RawImage
 import rb.glow.Colors
 import rb.glow.gle.RenderMethod
 import rb.glow.gle.RenderMethodType.MULTIPLY
+import rb.glow.img.RawImage
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.awt.ImageBI
+import sguiSwing.hybrid.Hybrid
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
-import sguiSwing.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 

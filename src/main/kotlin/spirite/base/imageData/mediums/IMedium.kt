@@ -1,14 +1,13 @@
 package spirite.base.imageData.mediums
 
-import rb.glow.GraphicsContext_old
-import rb.glow.IFlushable
-import rb.glow.img.RawImage
 import rb.glow.Colors
+import rb.glow.IFlushable
 import rb.glow.IGraphicsContext
-import rbJvm.glow.SColor
 import rb.glow.gle.RenderRubric
+import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import rbJvm.glow.SColor
 import spirite.base.imageData.IFloatingMedium
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository

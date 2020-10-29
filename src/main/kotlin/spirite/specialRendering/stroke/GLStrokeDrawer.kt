@@ -9,6 +9,8 @@ import rb.glow.gle.IGLEngine
 import rb.glow.using
 import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.ITransformF
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.brains.toolset.PenDrawMode.BEHIND
 import spirite.base.brains.toolset.PenDrawMode.KEEP_ALPHA
 import spirite.base.pen.stroke.DrawPoints
@@ -16,8 +18,6 @@ import spirite.base.pen.stroke.IStrokeDrawer
 import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.specialRendering.StrokeApplyCall
 import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod
 
