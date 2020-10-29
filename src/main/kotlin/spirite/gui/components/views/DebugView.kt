@@ -34,8 +34,8 @@ private constructor( val imp : ICrossPanel)
         Hybrid.timing.createTimer(100, true){
             val sb = StringBuilder()
 
-            sb.appendln("${Hybrid.gl.tracker.images.size} : ${Hybrid.gl.tracker.bytesUsed}")
-            Hybrid.gl.tracker.images.forEach {
+            sb.appendln("${Hybrid.gl.tracker?.images?.size} : ${Hybrid.gl.tracker?.bytesUsed}")
+            Hybrid.gl.tracker?.images?.forEach {
                 sb.appendln("  [${it.width} xi ${it.height}]")
             }
 

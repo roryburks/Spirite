@@ -18,7 +18,7 @@ interface IDetailedResourceUseTracker : IResourceUseTracker{
 
 }
 class DetailedResourceUseTracker : IDetailedResourceUseTracker {
-    override val bytesUsed: Long get() = Hybrid.gl.tracker.bytesUsed
+    override val bytesUsed: Long get() = Hybrid.gl.tracker?.bytesUsed ?: 0
 
-    override val glImages: Collection<GLImage> get() = Hybrid.gl.tracker.images
+    override val glImages: Collection<GLImage> get() = Hybrid.gl.tracker?.images ?: emptySet()
 }

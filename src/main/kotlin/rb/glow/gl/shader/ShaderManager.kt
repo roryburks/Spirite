@@ -14,13 +14,13 @@ interface IShaderManager {
 }
 
 private const val GLOBAL = "#GLOBAL"
-private const val root = "shaders/330"
 
 class ShaderManager(
-    val scriptService: IScriptService
+    val scriptService: IScriptService,
+    val globalFragScript: String
 ) : IShaderManager
 {
-    private val globalFrag : String by lazy { scriptService.loadScript("$root/global.frag") }
+    private val globalFrag : String by lazy { scriptService.loadScript(globalFragScript) }
     private val _shaderMap = mutableMapOf<String,IGLProgram>()
 
     override fun loadShaders(gl: IGL, map: Map<String, GlShaderLoadContract>) {

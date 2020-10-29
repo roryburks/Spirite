@@ -17,7 +17,7 @@ object EngineLaunchpoint {
                 GluPolygonTesselater,
                 JvmGLImageConverter,
                 JOGLContext(),
-                ShaderManager(JClassScriptService()),
+                ShaderManager(JClassScriptService(), "shaders/330/global.frag"),
                 ShaderMapping.Map330,
                 false
         )
