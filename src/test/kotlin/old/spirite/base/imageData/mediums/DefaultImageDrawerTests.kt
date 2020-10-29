@@ -42,7 +42,7 @@ class DefaultImageDrawerTests {
         drawer.stepStroke(PenState(20f, 45f, 0.25f))
 
         val wsImage = Hybrid.imageCreator.createImage(100,100)
-        NodeRenderer(workspace.groupTree.root, workspace).render(wsImage.graphicsOld)
+        NodeRenderer(workspace.groupTree.root, workspace).render(wsImage.graphics)
 
         // Save
         TestConfig.trySave(wsImage,"defaultImageDrawer_compositeStroke")
@@ -165,7 +165,7 @@ class DefaultImageDrawerTests {
 
         // Save
         val wsImage = Hybrid.imageCreator.createImage(workspace.width,workspace.height)
-        NodeRenderer(workspace.groupTree.root, workspace).render(wsImage.graphicsOld)
+        NodeRenderer(workspace.groupTree.root, workspace).render(wsImage.graphics)
         TestConfig.trySave(wsImage, "defaultImageDrawer_dynamicComposite")
     }
 }

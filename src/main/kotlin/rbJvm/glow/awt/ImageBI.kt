@@ -17,7 +17,6 @@ class ImageBI(
     }
 
     override val graphics: IGraphicsContext get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    override val graphicsOld: GraphicsContext_old get() = TODO("not implemented")
 
     override val width: Int get() = bi.width
     override val height: Int get() = bi.height

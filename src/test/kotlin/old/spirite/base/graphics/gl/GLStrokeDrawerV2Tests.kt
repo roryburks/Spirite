@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.Test
 import rb.glow.Colors
+import rb.glow.drawer
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
 import sguiSwing.hybrid.Hybrid
@@ -45,9 +46,9 @@ class GLStrokeDrawerV2Tests {
                 FloatArray(100, { 1f - abs(50 - it) / 50f })
         )
         val image = GLImage(100, 100, gle)
-        val gc = image.graphicsOld
+        val gc = image.graphics
         gc.color = Colors.GRAY
-        gc.fillRect(0,0,100,100)
+        gc.drawer.fillRect(0.0,0.0,100.0,100.0)
 
         drawer.batchDraw(image.graphics, drawPoints, StrokeParams(Colors.GREEN, width = 5f, alpha = 0.75f, method = ERASE), 100, 100)
 

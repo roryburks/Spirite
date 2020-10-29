@@ -4,6 +4,7 @@ import old.TestConfig
 import old.TestHelper
 import org.junit.jupiter.api.Test
 import rb.glow.Colors
+import rb.glow.drawer
 import rb.glow.gle.RenderMethod
 import rb.glow.gle.RenderMethodType.MULTIPLY
 import rb.glow.img.RawImage
@@ -36,18 +37,18 @@ class NodeRendererTests {
         simpleLayer3.x = 40
         simpleLayer3.y = 25
 
-        var gc = (((simpleLayer1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        var gc = (((simpleLayer1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.RED
-        gc.fillRect( 0, 0, 50, 50)
-        gc = (((simpleLayer2.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
+        gc = (((simpleLayer2.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.BLUE
-        gc.fillRect( 0, 0, 50, 50)
-        gc = (((simpleLayer3.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
+        gc = (((simpleLayer3.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.GREEN
-        gc.fillRect( 0, 0, 50, 50)
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
 
         val renderLayer = Hybrid.imageCreator.createImage(100,100)
-        NodeRenderer(group, workspace).render(renderLayer.graphicsOld)
+        NodeRenderer(group, workspace).render(renderLayer.graphics)
 
         if( TestConfig.save) {
             val imageBI = imageConverter.convert<ImageBI>(renderLayer)
@@ -75,24 +76,24 @@ class NodeRendererTests {
 
         groupInner.method = RenderMethod(MULTIPLY)
 
-        var gc = (((simpleLayer1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        var gc = (((simpleLayer1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.DARK_GRAY
-        gc.fillRect( 0, 0, 50, 50)
-        gc = (((simpleLayer2.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
+        gc = (((simpleLayer2.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.LIGHT_GRAY
-        gc.fillRect( 0, 0, 50, 50)
-        gc = (((simpleLayerS1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
+        gc = (((simpleLayerS1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.RED
-        gc.fillRect( 0, 0, 50, 50)
-        gc = (((simpleLayerS2.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
+        gc = (((simpleLayerS2.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.GREEN
-        gc.fillRect( 0, 0, 50, 50)
-        gc = (((simpleLayerS3.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
+        gc = (((simpleLayerS3.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.BLUE
-        gc.fillRect( 0, 0, 50, 50)
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
 
         val renderLayer = Hybrid.imageCreator.createImage(100,100)
-        NodeRenderer(group, workspace).render(renderLayer.graphicsOld)
+        NodeRenderer(group, workspace).render(renderLayer.graphics)
 
         if( TestConfig.save) {
             val imageBI = imageConverter.convert<ImageBI>(renderLayer)
@@ -120,24 +121,24 @@ class NodeRendererTests {
 
         groupInner.method = RenderMethod(MULTIPLY)
 
-        var gc = (((simpleLayer1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        var gc = (((simpleLayer1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.DARK_GRAY
-        gc.fillRect( 0, 0, 50, 50)
-        gc = (((simpleLayer2.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
+        gc = (((simpleLayer2.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.LIGHT_GRAY
-        gc.fillRect( 0, 0, 50, 50)
-        gc = (((simpleLayerS1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
+        gc = (((simpleLayerS1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.RED
-        gc.fillRect( 0, 0, 50, 50)
-        gc = (((simpleLayerS2.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
+        gc = (((simpleLayerS2.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.GREEN
-        gc.fillRect( 0, 0, 50, 50)
-        gc = (((simpleLayerS3.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphicsOld
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
+        gc = (((simpleLayerS3.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.BLUE
-        gc.fillRect( 0, 0, 50, 50)
+        gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
 
         val renderLayer = Hybrid.imageCreator.createImage(25,25)
-        NodeRenderer(group, workspace, RenderSettings(25, 25)).render(renderLayer.graphicsOld)
+        NodeRenderer(group, workspace, RenderSettings(25, 25)).render(renderLayer.graphics)
 
         if( TestConfig.save) {
             val imageBI = imageConverter.convert<ImageBI>(renderLayer)
