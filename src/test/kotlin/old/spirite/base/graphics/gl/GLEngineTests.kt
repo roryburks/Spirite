@@ -4,21 +4,23 @@ package old.spirite.base.graphics.gl
 import old.TestConfig
 import org.junit.jupiter.api.Test
 import rb.glow.CapMethod.NONE
+import rb.glow.Colors
 import rb.glow.JoinMethod.MITER
-import rb.glow.color.Colors
 import rb.glow.gl.GLImage
-import rb.glow.gle.BasicCall
+import rb.glow.gl.shader.programs.BasicCall
+import rb.glow.gl.shader.programs.PolyRenderCall
+import rb.glow.gl.shader.programs.RenderCall
+import rb.glow.gl.shader.programs.RenderCall.RenderAlgorithm.*
 import rb.glow.gle.GLParameters
-import rb.glow.gle.PolyRenderCall
 import rb.glow.gle.PolyType.STRIP
-import rb.glow.gle.RenderCall
-import rb.glow.gle.RenderCall.RenderAlgorithm.*
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
+import rb.vectrix.mathUtil.d
+import rb.vectrix.mathUtil.f
 import rbJvm.glow.awt.toBufferedImage
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.pen.stroke.DrawPoints
-import spirite.hybrid.Hybrid
 import spirite.specialRendering.*
 import spirite.specialRendering.SquareGradientCall.GradientType.V
 import java.io.File
@@ -98,8 +100,8 @@ class GLEngineTests {
         val star = GLImage(50, 50, gle)
         val gc = star.graphics
 
-        val xs = listOf(0f, 50f, 0f, 50f, 25f)
-        val ys = listOf(0f, 40f, 40f, 0f, 50f)
+        val xs = listOf(0f, 50f, 0f, 50f, 25f).map { it.d }
+        val ys = listOf(0f, 40f, 40f, 0f, 50f).map { it.d }
         gc.color = Colors.RED
         gc.fillPolygon(xs, ys, 5)
 
@@ -146,10 +148,12 @@ class GLEngineTests {
 
         gle.setTarget(image)
         val drawPoints = DrawPoints(
-                FloatArray(100, { it.toFloat() }),
-                FloatArray(100, { it.toFloat() }),
-                FloatArray(100, { 1f - abs(50 - it) / 50f })
+                FloatArray(100) { it.f },
+                FloatArray(100) { it.f },
+                FloatArray(100) { 1f - abs(50 - it) / 50f }
         )
+
+        println(drawPoints)
 
         // TODO
 

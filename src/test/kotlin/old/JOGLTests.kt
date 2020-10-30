@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.Test
 import rbJvm.glow.jogl.JOGL
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 

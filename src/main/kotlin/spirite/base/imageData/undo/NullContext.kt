@@ -1,8 +1,8 @@
 package spirite.base.imageData.undo
 
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
 import spirite.base.imageData.MediumHandle
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
 
 /***
  * NullContext is a special workspace that is not associated with any ImageData

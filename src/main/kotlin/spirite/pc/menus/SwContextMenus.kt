@@ -1,12 +1,12 @@
 package spirite.pc.menus
 
 import sgui.UIPoint
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.MenuItem
-import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType
 import javax.swing.*
 
 class SwContextMenus(private val _commandExecuter: ICentralCommandExecutor) : IContextMenus {

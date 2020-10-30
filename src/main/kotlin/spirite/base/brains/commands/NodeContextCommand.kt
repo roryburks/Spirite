@@ -1,6 +1,7 @@
 package spirite.base.brains.commands
 
 import rb.glow.gle.RenderMethod
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.brains.commands.specific.SpriteLayerFixes
@@ -10,7 +11,6 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.MovableGroupTree
 import spirite.base.imageData.groupTree.duplicateInto
-import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
@@ -20,7 +20,7 @@ import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
 import spirite.gui.menus.dialogs.IDialog
-import spirite.hybrid.Hybrid
+import java.security.acl.Group
 
 class NodeContextCommand(
         val workspaceSet: MWorkspaceSet,
@@ -233,4 +233,7 @@ object NodeCommands {
     }
     //endregion
 
+    val ExportGroupToSMAP0 = NodeCommand("exportGroupToSmap0") { _, node, _ ->
+        val groupLayer = (node as? Group) ?: throw CommandNotValidException
+    }
 }

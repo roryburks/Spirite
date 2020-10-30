@@ -1,12 +1,12 @@
 package spirite.base.imageData.mediums
 
 import rb.extendo.dataStructures.SinglyList
-import rb.glow.GraphicsContext
-import rb.glow.RawImage
-import rb.glow.color.Colors
-import rb.glow.color.SColor
+import rb.glow.Colors
+import rb.glow.IGraphicsContext
+import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import rbJvm.glow.SColor
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.drawer.DefaultImageDrawer
@@ -49,7 +49,7 @@ class FlatMedium(
         override val tMediumToComposite: ITransformF get() = ImmutableTransformF.Identity
         override val tWorkspaceToComposite: ITransformF by lazy { arranged.tMediumToWorkspace.invert() ?: ImmutableTransformF.Identity }
 
-        override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {
+        override fun _drawOnComposite(doer: (IGraphicsContext) -> Unit) {
             val gc = image.graphics
             gc.transform = tWorkspaceToComposite
             doer.invoke( gc)

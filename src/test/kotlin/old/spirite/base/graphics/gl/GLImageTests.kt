@@ -5,11 +5,12 @@ import old.TestConfig
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.Test
-import rb.glow.color.ColorARGB32Normal
-import rb.glow.color.Colors
+import rb.glow.ColorARGB32Normal
+import rb.glow.Colors
+import rb.glow.drawer
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs
@@ -26,7 +27,7 @@ class GLImageTests {
         val gc = glimage.graphics
         //gc.clear()
         gc.color = Colors.RED
-        gc.fillRect(0, 0, 10, 10)
+        gc.drawer.fillRect(0.0, 0.0, 10.0, 10.0)
 
         val color = glimage.getARGB(2,2)
 
@@ -45,7 +46,7 @@ class GLImageTests {
         val gc = glimage.graphics
         gc.clear()
         gc.color = Colors.RED
-        gc.fillRect(0, 0, 10, 10)
+        gc.drawer.fillRect(0.0, 0.0, 10.0, 10.0)
 
         val gli2 = glimage.deepCopy()
         val color = gli2.getARGB(2,2)
@@ -71,12 +72,12 @@ class GLImageTests {
 
         val gc1 = img1.graphics
         gc1.color = Colors.RED
-        gc1.fillRect(0,0,25,25)
+        gc1.drawer.fillRect(0.0,0.0,25.0,25.0)
 
 
         val gc2 = img2.graphics
         gc2.color = Colors.BLUE
-        gc2.fillRect(0,0,25,25)
+        gc2.drawer.fillRect(0.0,0.0,25.0,25.0)
 
         val img3 = img2.deepCopy() as GLImage
 
@@ -96,13 +97,13 @@ class GLImageTests {
         img1.graphics.also {
             it.color = ColorARGB32Normal(0x88ff0000.toInt())
             it.alpha = 0.5f
-            it.fillRect(5,5, 15, 15)
+            it.drawer.fillRect(5.0,5.0, 15.0, 15.0)
         }
         img2.graphics.also {
-            it.renderImage(img1, 0, 0)
+            it.renderImage(img1, 0.0, 0.0)
         }
         img3.graphics.also {
-            it.renderImage(img2, 0, 0)
+            it.renderImage(img2, 0.0, 0.0)
         }
 
         assertEquals(img1.getColor(10,10).red, 1f)

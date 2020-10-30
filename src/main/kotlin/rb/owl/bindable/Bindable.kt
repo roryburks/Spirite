@@ -1,6 +1,6 @@
 package rb.owl.bindable
 
-import rb.IContract
+import rb.global.IContract
 import rb.extendo.extensions.mapRemoveIfNull
 import kotlin.reflect.KProperty
 

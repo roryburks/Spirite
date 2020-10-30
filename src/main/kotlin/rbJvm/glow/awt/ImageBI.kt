@@ -1,10 +1,7 @@
 package rbJvm.glow.awt
 
-import rb.glow.GraphicsContext
-import rb.glow.RawImage
-import rb.glow.color.Color
-import rb.glow.color.ColorARGB32Normal
-import rb.glow.color.ColorARGB32Premultiplied
+import rb.glow.*
+import rb.glow.img.RawImage
 import java.awt.image.BufferedImage
 
 class ImageBI(
@@ -19,8 +16,7 @@ class ImageBI(
         }
     }
 
-    override val graphics: GraphicsContext
-        get() = TODO("not implemented")
+    override val graphics: IGraphicsContext get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override val width: Int get() = bi.width
     override val height: Int get() = bi.height

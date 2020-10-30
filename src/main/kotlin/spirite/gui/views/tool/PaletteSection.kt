@@ -11,6 +11,7 @@ import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import sguiSwing.SwIcon
 import sguiSwing.components.SJPanel
 import sguiSwing.components.SwComponent
+import sguiSwing.hybrid.Hybrid
 import sguiSwing.jcolor
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.palette.IPaletteManager.*
@@ -18,7 +19,6 @@ import spirite.base.brains.palette.Palette
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.menus.MenuItem
 import spirite.gui.resources.SpiriteIcons
-import spirite.hybrid.Hybrid
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics

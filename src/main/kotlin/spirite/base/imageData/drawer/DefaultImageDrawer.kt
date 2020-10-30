@@ -1,17 +1,19 @@
 package spirite.base.imageData.drawer
 
+import rb.glow.Color
+import rb.glow.ColorUtil
 import rb.glow.Composite.*
-import rb.glow.RawImage
-import rb.glow.color.Color
-import rb.glow.color.ColorUtil
-import rb.glow.color.SColor
+import rb.glow.img.RawImage
 import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
+import rbJvm.glow.SColor
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.MagneticFillMode.BEHIND
@@ -31,8 +33,8 @@ import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import spirite.hybrid.Hybrid
 import spirite.specialRendering.SpecialDrawerFactory
+import java.io.File
 import kotlin.math.min
 
 
@@ -88,12 +90,13 @@ class DefaultImageDrawer(
         if( clearLifted) {
             workspace.undoEngine.performMaskedImageAction("lift-inner", arranged, null) { built, mask ->
                 built.rawAccessComposite {
+                    Hybrid.imageIO.saveImage(it, File( "C:\\Bucket\\1.png"))
                     it.graphics.apply {
                         val tSelToImage = (built.tWorkspaceToComposite) * (selection.transform
                                 ?: ImmutableTransformF.Identity)
                         transform = tSelToImage
                         composite = DST_OUT
-                        renderImage(selection.mask, 0, 0)
+                        renderImage(selection.mask, 0.0, 0.0)
                     }
                 }
             }
@@ -193,11 +196,11 @@ class DefaultImageDrawer(
                         val buffer = Hybrid.imageCreator.createImage(it.width, it.height)
                         val bgc = buffer.graphics
                         bgc.transform(effectiveTrans)
-                        bgc.renderImage(it,0,0)
+                        bgc.renderImage(it,0.0,0.0)
 
                         val igc = it.graphics
                         igc.composite = SRC
-                        igc.renderImage(buffer,0,0)
+                        igc.renderImage(buffer,0.0,0.0)
                         buffer.flush()
                     }
                 }
@@ -331,7 +334,7 @@ class DefaultMagFillModule(val arranged: ArrangedMediumData) : IMagneticFillModu
                     gc.color = color
                     if( mode == BEHIND)
                         gc.composite = DST_OVER
-                    gc.fillPolygon(fillX.asList(), fillY.asList(), size)
+                    gc.fillPolygon(fillX.map { it.d }, fillY.map { it.d }, size)
                 }
             }
         })

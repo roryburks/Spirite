@@ -1,6 +1,6 @@
 package sguiSwing.mouseSystem
 
-import rb.IContract
+import rb.global.IContract
 import rb.extendo.extensions.append
 import rb.extendo.extensions.deref
 import rb.extendo.extensions.lookup

@@ -1,15 +1,15 @@
 package spirite.base.pen.stroke
 
-import rb.glow.GraphicsContext
+import rb.glow.IGraphicsContext
 
 interface IStrokeDrawer {
     fun start( builder: StrokeBuilder, width: Int, height:Int) : Boolean
     fun step() : Boolean
-    fun draw( gc: GraphicsContext)
+    fun draw( gc: IGraphicsContext)
     fun end()
 
     fun batchDraw(
-            gc: GraphicsContext,
+            gc: IGraphicsContext,
             drawPoints: DrawPoints,
             params: StrokeParams,
             width: Int,

@@ -6,11 +6,11 @@ import sgui.components.IComponent
 import sgui.components.ITabbedPane
 import sgui.components.crossContainer.ICrossPanel
 import sguiSwing.SwIcon
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.hybrid.Hybrid
 
 
 class WorkTabPane

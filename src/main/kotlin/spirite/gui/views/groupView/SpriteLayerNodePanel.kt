@@ -1,12 +1,13 @@
 package spirite.gui.views.groupView
 
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.owl.bindable.addObserver
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BASIC
 import sgui.components.IToggleButton
 import sgui.components.crossContainer.ICrossPanel
 import sgui.components.events.MouseEvent.MouseButton.RIGHT
+import sguiSwing.hybrid.Hybrid
 import sguiSwing.skin.Skin.AnimSchemePanel.ActiveNodeBg
 import spirite.base.brains.IMasterControl
 import spirite.base.graphics.isolation.IIsolationManager.IsolationState
@@ -16,7 +17,6 @@ import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.gui.resources.SpiriteIcons.SmallIcons.*
-import spirite.hybrid.Hybrid
 
 class SpriteLayerNodePanel
 private constructor(

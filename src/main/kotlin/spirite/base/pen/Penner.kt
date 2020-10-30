@@ -1,13 +1,14 @@
 package spirite.base.pen
 
-import rb.glow.GraphicsContext
-import rb.glow.color.Colors
+import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import rb.owl.bindable.addObserver
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import sgui.components.events.MouseEvent.MouseButton
 import sgui.components.events.MouseEvent.MouseButton.LEFT
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
@@ -19,7 +20,6 @@ import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
 import spirite.gui.views.work.WorkSection
 import spirite.gui.views.work.WorkSectionView
-import spirite.hybrid.Hybrid
 
 interface IPenner {
 //    val holdingShift : Boolean
@@ -36,7 +36,7 @@ interface IPenner {
     fun rawUpdatePressure(rawPressure: Float)
 
     val drawsOverlay : Boolean
-    fun drawOverlay(gc: GraphicsContext, view: WorkSectionView)
+    fun drawOverlay(gc: IGraphicsContext, view: WorkSectionView)
 
 }
 
@@ -131,7 +131,11 @@ class Penner(
                     holdingSpace -> context.currentView?.also { behavior =  MovingViewBehavior(this,it )}
                     tool is Pen -> when {
                         holdingCtrl -> behavior = PickBehavior( this, button == LEFT)
-                        drawer is IStrokeModule -> behavior = PenBehavior.Stroke(this, drawer, color)
+                        drawer is IStrokeModule ->{
+                            println("$holdingShift")
+                            if( holdingShift) behavior = StraightLinePenBehavior.FromSettings(this, drawer, toolsetManager, color)
+                            else behavior = PenBehavior.Stroke(this, drawer, color)
+                        }
                         else -> Hybrid.beep()
                     }
                     tool is Pixel -> when {
@@ -239,7 +243,7 @@ class Penner(
     override fun rawUpdatePressure(rawPressure: Float) { pressure = rawPressure }
 
     override val drawsOverlay: Boolean get() = behavior is DrawnPennerBehavior
-    override fun drawOverlay(gc: GraphicsContext, view: WorkSectionView) {
+    override fun drawOverlay(gc: IGraphicsContext, view: WorkSectionView) {
         (behavior as? DrawnPennerBehavior)?.paintOverlay(gc,view)
     }
 

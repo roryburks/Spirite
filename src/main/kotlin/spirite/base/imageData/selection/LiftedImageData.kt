@@ -1,19 +1,19 @@
 package spirite.base.imageData.selection
 
-import rb.glow.GraphicsContext
-import rb.glow.IImage
+import rb.glow.IGraphicsContext
+import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
-import rb.vectrix.mathUtil.f
+import rb.vectrix.mathUtil.d
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.LiftedImageDrawer
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import spirite.hybrid.Hybrid
 
 class LiftedImageData(val image: IImage): ILiftedData {
-    override fun draw(gc: GraphicsContext) {
-        gc.renderImage(image, 0, 0)
+    override fun draw(gc: IGraphicsContext) {
+        gc.renderImage(image, 0.0, 0.0)
     }
 
     override fun bake(transform: ITransformF): ILiftedData {
@@ -22,8 +22,8 @@ class LiftedImageData(val image: IImage): ILiftedData {
         val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
         val gc = newImage.graphics
         gc.transform = transform
-        gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
-        gc.renderImage(image, 0, 0)
+        gc.preTranslate(-bakedArea.x.d, -bakedArea.y.d)
+        gc.renderImage(image, 0.0, 0.0)
         return LiftedImageData(newImage)
     }
 

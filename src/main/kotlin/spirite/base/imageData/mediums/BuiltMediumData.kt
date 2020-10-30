@@ -1,12 +1,12 @@
 package spirite.base.imageData.mediums
 
-import rb.glow.GraphicsContext
-import rb.glow.RawImage
+import rb.glow.IGraphicsContext
+import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.imageData.MMediumRepository
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
 abstract class BuiltMediumData(
         val arranged: ArrangedMediumData,
@@ -29,7 +29,7 @@ abstract class BuiltMediumData(
     // Note: Can be changed to return Boolean if we want to be able to differentiate between image-changing calls and
     //  non-image-changing calls (assuming there's ever a need for such a thing)
     private var doing = false
-    fun drawOnComposite(drawer: (GraphicsContext) -> Unit) {
+    fun drawOnComposite(drawer: (IGraphicsContext) -> Unit) {
         if( doing) {
             MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
             return
@@ -55,7 +55,7 @@ abstract class BuiltMediumData(
         arranged.handle.refresh()
     }
 
-    protected abstract fun _drawOnComposite(doer: (GraphicsContext) -> Unit)
+    protected abstract fun _drawOnComposite(doer: (IGraphicsContext) -> Unit)
     protected abstract fun _rawAccessComposite(doer: (RawImage) -> Unit)
 
 }

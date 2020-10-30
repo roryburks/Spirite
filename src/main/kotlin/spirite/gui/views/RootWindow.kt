@@ -3,6 +3,8 @@ package spirite.gui.views
 import rbJvm.owl.addWeakObserver
 import sguiSwing.components.SwMenuBar
 import sguiSwing.components.jcomponent
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.SwHybrid
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DebugCommands
@@ -28,8 +30,6 @@ import spirite.gui.views.tool.PaletteSection
 import spirite.gui.views.tool.ToolSection
 import spirite.gui.views.tool.ToolSettingsSection
 import spirite.gui.views.work.WorkTabPane
-import spirite.hybrid.Hybrid
-import spirite.hybrid.SwHybrid
 import spirite.pc.menus.SwContextMenus
 import java.awt.Dimension
 import java.awt.GridLayout
@@ -133,9 +133,9 @@ class RootWindow( val master: IMasterControl) : JFrame() {
 
             center = OmniSegment( paletteSection , 100)
         }
-        right += SubContainer(100,120) {
+        right += SubContainer(100,200) {
             center = OmniTab(listOf(refView, animListView), 100)
-            bottom += OmniSegment( layerPropertiesView, 200)
+            bottom += OmniSegment( layerPropertiesView, 200, 400)
         }
     }
 
@@ -157,7 +157,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
         }
         this.add( multiLevel.jcomponent)
 
-        SwingUtilities.invokeLater {this.size = Dimension(800,600) }
+        SwingUtilities.invokeLater {this.size = Dimension(1400,800) }
         SwingUtilities.invokeLater {groupView.component.jcomponent.requestFocus() }
     }
 

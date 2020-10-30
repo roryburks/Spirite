@@ -1,8 +1,8 @@
 package spirite.base.pen.stroke
 
 import rb.vectrix.calculate.nearestBinarySearch
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
 
 // Made as a class instead of parameters for extendability
 open class DrawPoints(val x: FloatArray, val y: FloatArray, val w: FloatArray) {

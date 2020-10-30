@@ -1,8 +1,8 @@
 package spirite.base.graphics.rendering.sources
 
 import rb.extendo.dataStructures.SinglyList
-import rb.glow.GraphicsContext
-import rb.vectrix.mathUtil.f
+import rb.glow.IGraphicsContext
+import rb.vectrix.mathUtil.d
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -15,10 +15,10 @@ data class MediumSource(val medium: MediumHandle, override val workspace: IImage
     override val nodeDependencies: Collection<Node> get() = emptySet()
     override val rendersLifted: Boolean get() = false
 
-    override fun render(settings: RenderSettings, gc: GraphicsContext) {
+    override fun render(settings: RenderSettings, gc: IGraphicsContext) {
         gc.pushState()
-        gc.preTranslate( -medium.x.f, -medium.y.f)
-        gc.preScale(settings.width.f / medium.width.f, settings.height.f/medium.height.f)
+        gc.preTranslate( -medium.x.d, -medium.y.d)
+        gc.preScale(settings.width / medium.width.d, settings.height/medium.height.d)
         medium.medium.render(gc)
     }
 }

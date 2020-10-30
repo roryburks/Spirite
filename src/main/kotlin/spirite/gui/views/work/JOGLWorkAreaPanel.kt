@@ -9,14 +9,14 @@ import jpen.*
 import jpen.PButton.Type.*
 import jpen.event.PenListener
 import jpen.owner.multiAwt.AwtPenToolkit
-import rb.glow.gle.GLGraphicsContext
+import rb.glow.gl.GLGraphicsContext
 import rb.vectrix.mathUtil.round
 import rbJvm.glow.jogl.JOGLProvider
 import sgui.components.events.MouseEvent.MouseButton
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent
+import sguiSwing.hybrid.Hybrid
 import spirite.base.pen.Penner
-import spirite.hybrid.Hybrid
 import java.awt.event.MouseAdapter
 import javax.swing.SwingUtilities
 
@@ -104,7 +104,7 @@ private constructor(
             fun update(e: java.awt.event.MouseEvent) {
                 penner.holdingAlt = e.isAltDown
                 penner.holdingCtrl = e.isControlDown
-                penner.holdingShift = Hybrid.keypressSystem.holdingSpace
+                penner.holdingShift = e.isShiftDown
 
             }
 

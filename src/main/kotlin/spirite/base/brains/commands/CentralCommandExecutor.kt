@@ -2,11 +2,11 @@ package spirite.base.brains.commands
 
 import rb.extendo.dataStructures.Deque
 import rb.extendo.extensions.toHashMap
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MWorkspaceSet
 import spirite.gui.menus.dialogs.IDialog
-import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
 
 interface ICentralCommandExecutor {
     val commandDomains : List<String>

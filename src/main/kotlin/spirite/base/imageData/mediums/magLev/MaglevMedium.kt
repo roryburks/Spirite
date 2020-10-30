@@ -1,12 +1,12 @@
 package spirite.base.imageData.mediums.magLev
 
 import rb.extendo.dataStructures.SinglyList
-import rb.glow.GraphicsContext
-import rb.glow.RawImage
-import rb.glow.color.Colors
-import rb.glow.color.SColor
+import rb.glow.Colors
+import rb.glow.IGraphicsContext
+import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import rbJvm.glow.SColor
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -16,12 +16,14 @@ import spirite.base.imageData.mediums.MediumType.MAGLEV
 
 class MaglevMedium
 constructor(
-        private val workspace: MImageWorkspace,
+        val workspace: MImageWorkspace,
         things: Map<Int,IMaglevThing>?,
         val builtImage : DynamicImage,
         private var met: Int)
     :IMedium, IImageMedium
 {
+    internal val thingsMap = things?.toMutableMap() ?: mutableMapOf()
+
     constructor(
             workspace: MImageWorkspace,
             things: Map<Int,IMaglevThing>? = null)
@@ -30,8 +32,6 @@ constructor(
             workspace: MImageWorkspace,
             things: List<IMaglevThing>)
             : this(workspace, things.mapIndexed { i, thing -> Pair(i,thing) }.toMap(), DynamicImage(),  things.count())
-
-    internal val thingsMap = things?.toMutableMap() ?: mutableMapOf()
 
     fun getThingsMap() : Map<Int,IMaglevThing> = thingsMap
 
@@ -112,7 +112,7 @@ constructor(
         override val tMediumToComposite: ITransformF get() = arranged.tMediumToWorkspace
         override val tWorkspaceToComposite: ITransformF get() = ImmutableTransformF.Identity
 
-        override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {
+        override fun _drawOnComposite(doer: (IGraphicsContext) -> Unit) {
             builtImage.drawToImage(workspace.width,workspace.height, arranged.tMediumToWorkspace)
             { raw -> doer.invoke(raw.graphics)}
         }

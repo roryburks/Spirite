@@ -5,10 +5,10 @@ import old.TestHelper
 import sgui.Orientation.HORIZONTAL
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.gui.views.groupView.GroupView
-import spirite.hybrid.Hybrid
 import java.awt.GridLayout
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
@@ -23,7 +23,7 @@ fun main( args: Array<String>) {
         val mockWs = TestHelper.makeShellWorkspace(200,200, renderEngine = master.renderEngine, strokeProvider = master.strokeDrawerProvider)
         master.workspaceSet.addWorkspace(mockWs)
         val wsd = PrimaryGroupViewDemo()
-        DemoLauncher.launch(wsd, 800, 600)
+        DemoLauncher.launch(wsd, 1400, 800)
     }
 }
 

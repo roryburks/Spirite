@@ -1,13 +1,13 @@
 package spirite.base.imageData.mediums
 
-import rb.glow.GraphicsContext
+import rb.glow.Colors
 import rb.glow.IFlushable
-import rb.glow.RawImage
-import rb.glow.color.Colors
-import rb.glow.color.SColor
+import rb.glow.IGraphicsContext
 import rb.glow.gle.RenderRubric
+import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import rbJvm.glow.SColor
 import spirite.base.imageData.IFloatingMedium
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
@@ -40,7 +40,7 @@ interface IMedium : IFlushable {
     fun build(arranged: ArrangedMediumData): BuiltMediumData
     fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer
 
-    fun render(gc: GraphicsContext, render: RenderRubric? = null)
+    fun render(gc: IGraphicsContext, render: RenderRubric? = null)
 
     fun dupe(workspace: MImageWorkspace): IMedium
     override fun flush()
@@ -48,13 +48,13 @@ interface IMedium : IFlushable {
 }
 
 abstract class IComplexMedium : IMedium {
-    override fun render(gc: GraphicsContext, render: RenderRubric?) {
+    override fun render(gc: IGraphicsContext, render: RenderRubric?) {
         drawBehindComposite(gc,render)
         drawOverComposite(gc, render)
     }
 
-    abstract fun drawBehindComposite(gc: GraphicsContext, render: RenderRubric? = null)
-    abstract fun drawOverComposite(gc: GraphicsContext, render: RenderRubric? = null)
+    abstract fun drawBehindComposite(gc: IGraphicsContext, render: RenderRubric? = null)
+    abstract fun drawOverComposite(gc: IGraphicsContext, render: RenderRubric? = null)
 }
 
 object NilMedium : IMedium {
@@ -70,14 +70,14 @@ object NilMedium : IMedium {
     override fun dupe(workspace: MImageWorkspace) = this
     override fun flush() {}
     override fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer  = throw Exception("Tried to Get Drawer for NilMedium")
-    override fun render(gc: GraphicsContext, render: RenderRubric?) {}
+    override fun render(gc: IGraphicsContext, render: RenderRubric?) {}
 
     class NilBuiltMedium(arranged: ArrangedMediumData) : BuiltMediumData(arranged, NilMMediumRepo) {
         override val tWorkspaceToComposite: ITransformF get() = ImmutableTransformF.Identity
         override val tMediumToComposite: ITransformF get() = ImmutableTransformF.Identity
         override val width: Int get() = 1
         override val height: Int get() = 1
-        override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {}
+        override fun _drawOnComposite(doer: (IGraphicsContext) -> Unit) {}
         override fun _rawAccessComposite(doer: (RawImage) -> Unit) {}
     }
 }

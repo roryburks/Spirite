@@ -1,7 +1,7 @@
 package spirite.gui.views.groupView
 
-import rb.IContract
-import rb.glow.color.Colors
+import rb.global.IContract
+import rb.glow.Colors
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
@@ -17,6 +17,7 @@ import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.components.events.MouseEvent.MouseEventType.RELEASED
 import sgui.systems.IGlobalMouseHook
 import sgui.transfer.ITransferObject
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
@@ -26,7 +27,6 @@ import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.menus.NodeMenus
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables
-import spirite.hybrid.Hybrid
 
 class PrimaryGroupView
 private constructor(

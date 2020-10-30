@@ -1,16 +1,22 @@
 package spirite.base.brains.commands
 
 import rb.extendo.dataStructures.SinglySet
+import rb.glow.Colors
 import rb.glow.Composite.SRC_IN
-import rb.glow.IImage
-import rb.glow.RawImage
-import rb.glow.color.Colors
+import rb.glow.drawer
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
 import rb.glow.using
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.MathUtil
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.Transferables.IClipboard.ClipboardThings.Image
+import sguiSwing.hybrid.Transferables.ILayerBuilder
+import sguiSwing.hybrid.Transferables.INodeBuilder
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
@@ -33,10 +39,6 @@ import spirite.base.util.linear.Rect
 import spirite.gui.menus.dialogs.IDialog.FilePickType
 import spirite.gui.menus.dialogs.IDialog.FilePickType.AAF
 import spirite.gui.menus.dialogs.IDialog.FilePickType.SAVE_SIF
-import spirite.hybrid.Hybrid
-import spirite.hybrid.Transferables.IClipboard.ClipboardThings.Image
-import spirite.hybrid.Transferables.ILayerBuilder
-import spirite.hybrid.Transferables.INodeBuilder
 
 class GlobalCommandExecutor(
         val master: IMasterControl,
@@ -237,14 +239,14 @@ object GlobalCommands
                                     val gc = img2.graphics
                                     gc.color = Colors.WHITE
                                     gc.transform = transform
-                                    gc.fillRect(0, 0, img.width, img.height)
+                                    gc.drawer.fillRect(0.0, 0.0, img.width.d, img.height.d)
                                     gc.composite = SRC_IN
                                     gc.transform = ImmutableTransformF.Identity
-                                    gc.renderImage(selection.mask, 0, 0)
+                                    gc.renderImage(selection.mask, 0.0, 0.0)
 
                                     gc.transform = transform
                                     gc.composite = SRC_IN
-                                    gc.renderImage(img, 0, 0)
+                                    gc.renderImage(img, 0.0, 0.0)
 
                                     img2
                                 }

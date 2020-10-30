@@ -1,13 +1,13 @@
 package spirite.base.file.save
 
 import rbJvm.glow.awt.ImageBI
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.magLev.IMaglevThing
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.mediums.magLev.actions.MaglevThingFlattener
-import spirite.hybrid.Hybrid
 
 /**
  * In order to save a medium using the ImageIO object, its visual data must be converted to ImageBIs (or other system

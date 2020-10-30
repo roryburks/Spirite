@@ -1,13 +1,13 @@
 package spirite.specialRendering.fill
 
-import rb.glow.color.SColor
 import rb.glow.gl.GLC
+import rb.glow.gl.GLGraphicsContext
 import rb.glow.gl.GLImage
-import rb.glow.gle.GLGraphicsContext
 import rb.glow.gle.GLParameters
 import rb.vectrix.linear.Vec4f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.shapes.RectI
+import rbJvm.glow.SColor
 import rbJvm.glow.jogl.JOGL.JOGLTextureSource
 import spirite.specialRendering.FillAfterpassCall
 import java.nio.IntBuffer
@@ -61,7 +61,7 @@ class GLFill(val filler: IFillArrayAlgorithm)  {
 }
 
 
-fun GLGraphicsContext.toIntArray( rect: RectI? = null) : IntArray{
+fun GLGraphicsContext.toIntArray(rect: RectI? = null) : IntArray{
     val rect2 = rect ?: RectI(0,0,width, height)
     gle.setTarget(image)
 

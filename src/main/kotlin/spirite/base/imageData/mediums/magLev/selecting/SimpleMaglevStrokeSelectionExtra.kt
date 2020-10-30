@@ -1,16 +1,14 @@
 package spirite.base.imageData.mediums.magLev.selecting
 
 import rb.extendo.extensions.stride
-import rb.glow.GraphicsContext
-import rb.glow.IImage
-import rb.glow.color.Colors
+import rb.glow.Colors
+import rb.glow.IGraphicsContext
+import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
-import rb.vectrix.mathUtil.MathUtil
-import rb.vectrix.mathUtil.f
-import rb.vectrix.mathUtil.floor
-import rb.vectrix.mathUtil.round
+import rb.vectrix.mathUtil.*
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -21,7 +19,6 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.debug.SpiriteException
 import spirite.base.util.linear.Rect
-import spirite.hybrid.Hybrid
 import kotlin.math.min
 
 class SimpleStrokeMaglevLiftedData(
@@ -61,7 +58,7 @@ class SimpleStrokeMaglevLiftedData(
         val img = Hybrid.imageCreator.createImage(dw, dh)
         val gc = img.graphics
 
-        gc.translate(-dx.f, -dy.f)
+        gc.translate(-dx.d, -dy.d)
         lines.forEach { line ->
             line.draw(gc, strokeProvider, dw, dh)
         }
@@ -93,10 +90,10 @@ class SimpleStrokeMaglevLiftedData(
         other.addThings(transformedLines,arranged, "Anchoring Lifted SimpleMaglevStroke to Maglev")
     }
 
-    override fun draw(gc: GraphicsContext) {
+    override fun draw(gc: IGraphicsContext) {
         gc.pushTransform()
         gc.preTransform(tInternalToContext)
-        gc.renderImage(image,dx, dy)
+        gc.renderImage(image,dx.d, dy.d)
         gc.popTransform()
     }
 
@@ -118,7 +115,7 @@ class SimpleMaglevStrokeSelectionExtra(
         val tInternalToContext: ITransformF)
     : IMaglevSelectionExtra
 {
-    override fun draw(gc: GraphicsContext) {
+    override fun draw(gc: IGraphicsContext) {
         gc.pushTransform()
         gc.preTransform(tInternalToContext)
         gc.color = Colors.WHITE
@@ -126,11 +123,9 @@ class SimpleMaglevStrokeSelectionExtra(
         lines.forEach { stroke ->
             val dp = stroke.drawPoints
             val xs = (0 until stroke.drawPoints.length).step(10)
-                    .map { dp.x[it] }
-                    .toFloatArray()
+                    .map { dp.x[it].d }
             val ys = (0 until stroke.drawPoints.length).step(10)
-                    .map{ dp.y[it]}
-                    .toFloatArray()
+                    .map{ dp.y[it].d}
             gc.drawPolyLine(xs, ys, min(xs.size, ys.size))
         }
         gc.popTransform()

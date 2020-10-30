@@ -2,13 +2,13 @@ package spirite.specialRendering.stroke
 
 import rb.glow.gl.GLC
 import rb.glow.gl.GLImage
+import rb.glow.gl.shader.programs.PolyRenderCall
 import rb.glow.gle.GLParameters
 import rb.glow.gle.GLPrimitive
 import rb.glow.gle.IGLEngine
-import rb.glow.gle.PolyRenderCall
 import rb.glow.glu.DoubleEndedSinglePrimitiveBuilder
 import rb.glow.glu.PrimitiveBuilder
-import rb.vectrix.linear.ITransformF
+import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import spirite.base.pen.stroke.DrawPoints
@@ -29,7 +29,7 @@ class GLStrokeDrawerV2(
         drawStroke(context.image, context.builder.currentPoints, context.builder.params.width, context.glParams, context.builder.params)
     }
 
-    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters, transform: ITransformF?) {
+    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters, transform: ITransform?) {
         drawStroke( image, drawPoints, params.width, glParams, params, transform)
     }
 
@@ -38,7 +38,7 @@ class GLStrokeDrawerV2(
         else -> DEFAULT
     }
 
-    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: ITransformF? = null) {
+    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: ITransform? = null) {
         val vb = composeVBuffer( states, lineWidth)
 
         if( true /* 330 */ ) {

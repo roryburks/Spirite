@@ -12,8 +12,8 @@
 //import spirite.base.imageData.mediums.FlatMedium
 //import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 //import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-//import rb.glow.color.Colors
-//import spirite.hybrid.Hybrid
+//import rb.glow.Colors
+//import sguiSwing.hybrid.Hybrid
 //import rbJvm.glow.awt.AwtImageConverter
 //import rbJvm.glow.awt.ImageBI
 //import java.io.File

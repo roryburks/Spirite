@@ -1,7 +1,7 @@
 package spirite.base.pen.stroke
 
-import rb.glow.color.Color
-import rb.glow.color.Colors
+import rb.glow.Color
+import rb.glow.Colors
 import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.brains.toolset.PenDrawMode.NORMAL
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC

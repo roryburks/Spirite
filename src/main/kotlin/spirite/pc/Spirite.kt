@@ -1,11 +1,11 @@
 package spirite.pc
 
 import rbJvm.vectrix.SetupVectrixForJvm
+import sguiSwing.hybrid.EngineLaunchpoint
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.FATAL
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
-import spirite.hybrid.EngineLaunchpoint
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.FATAL
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
@@ -28,8 +28,8 @@ class Spirite {
             SwingUtilities.invokeAndWait {
                 EngineLaunchpoint.gle
                 master = MasterControl()
-                master.frameManager.initUi()
-            }
+
+                master.frameManager.initUi()}
 
             SwingUtilities.invokeLater {
                 val ws1 = master.createWorkspace(640,480)

@@ -1,15 +1,16 @@
 package spirite.gui.views.animation
 
 import rb.extendo.delegates.OnChangeDelegate
-import rb.glow.color.SColor
+import rb.vectrix.mathUtil.d
+import rbJvm.glow.SColor
 import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
 import sguiSwing.components.SwComponent
+import sguiSwing.hybrid.Hybrid
 import sguiSwing.jcolor
 import sguiSwing.skin.Skin.Global.Bg
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.hybrid.Hybrid
 import java.awt.Graphics
 import javax.swing.JPanel
 import kotlin.math.floor
@@ -46,7 +47,7 @@ private constructor(private val imp: Imp) : IComponent by SwComponent(imp)
             Hybrid.gle.runInGLContext {
                 val image = Hybrid.imageCreator.createImage(width, height)
                 val gc = image.graphics
-                gc.preScale(anim.state.zoomF, anim.state.zoomF)
+                gc.preScale(anim.state.zoomF.d, anim.state.zoomF.d)
 
                 anim.drawFrame(gc,context.frame)
 

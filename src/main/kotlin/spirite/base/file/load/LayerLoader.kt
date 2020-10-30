@@ -1,6 +1,8 @@
 package spirite.base.file.load
 
 import rb.vectrix.mathUtil.i
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.SaveLoadUtil
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
@@ -9,8 +11,6 @@ import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.MediumType
 import spirite.base.util.StringUtil
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 
 interface ILayerLoader
 {

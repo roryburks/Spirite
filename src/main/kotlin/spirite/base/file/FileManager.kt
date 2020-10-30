@@ -1,8 +1,11 @@
 package spirite.base.file
 
-import rb.glow.IImage
-import rb.glow.color.Colors
+import rb.glow.Colors
+import rb.glow.img.IImage
 import rb.glow.using
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.FILE
 import spirite.base.brains.IMasterControl
 import spirite.base.file.load.BadSifFileException
 import spirite.base.file.load.LoadEngine
@@ -10,9 +13,6 @@ import spirite.base.file.save.SaveEngine
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
-import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.FILE
 import java.io.File
 import java.io.IOException
 
@@ -76,9 +76,9 @@ class FileManager( val master: IMasterControl)  : IFileManager{
                 using(Hybrid.imageCreator.createImage(wsImage.width, wsImage.height)) { img ->
                     val gc = img.graphics
                     gc.clear(Colors.WHITE)
-                    gc.renderImage(wsImage, 0, 0)
+                    gc.renderImage(wsImage, 0.0, 0.0)
 
-                    Hybrid.imageIO.saveImage(img, file)
+                    Hybrid.imageIO.saveImage(wsImage, file) // intentionally changed from img.  seems SLIGHTLY less completely broken
                 }
             }
             else -> Hybrid.imageIO.saveImage( master.renderEngine.renderWorkspace(workspace), file)

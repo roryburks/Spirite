@@ -1,9 +1,9 @@
 package spirite.base.brains.commands
 
+import sguiSwing.hybrid.MDebug
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.WorkViewCommandExecutor.WorkViewCommand.*
-import spirite.hybrid.MDebug
 
 class WorkViewCommandExecutor(val master: IMasterControl) : ICommandExecutor
 {

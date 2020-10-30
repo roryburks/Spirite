@@ -1,0 +1,13 @@
+root: ../src/main/kotlin
+
+/rb/clicker
+/rb/extendo
+/rb/glow
+/rb/hydra
+/rb/owl
+/rb/vectrix
+
+/rbJvm/file
+/rbJvm/glow
+/rbJvm/owl
+/rbJvm/vectrix

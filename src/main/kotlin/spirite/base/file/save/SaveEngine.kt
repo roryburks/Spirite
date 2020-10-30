@@ -3,6 +3,11 @@ package spirite.base.file.save
 import rb.clicker.telemetry.TelemetryEvent
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType
+import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
+import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.SaveLoadUtil.FFALAYER_CASCADING
 import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
@@ -23,11 +28,6 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.magLev.MaglevFill
 import spirite.base.imageData.mediums.magLev.MaglevStroke
-import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType
-import spirite.hybrid.MDebug.WarningType.STRUCTURAL
-import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 import java.io.File
 import java.io.RandomAccessFile
 import kotlin.math.min

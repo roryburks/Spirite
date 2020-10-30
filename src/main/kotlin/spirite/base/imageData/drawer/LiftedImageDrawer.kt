@@ -1,8 +1,8 @@
 package spirite.base.imageData.drawer
 
+import rb.glow.Color
 import rb.glow.Composite.DST_IN
-import rb.glow.RawImage
-import rb.glow.color.Color
+import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
@@ -96,7 +96,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
             lambda.invoke(this)
             this.graphics.also { gc ->
                 gc.composite = DST_IN
-                gc.renderImage(selection.mask, 0, 0)
+                gc.renderImage(selection.mask, 0.0, 0.0)
             }
         })
         workspace.selectionEngine.setSelectionWithLifted(selection,newLifted)
@@ -111,7 +111,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
             lambda.invoke(this, selection.transform)
             this.graphics.also { gc ->
                 gc.composite = DST_IN
-                gc.renderImage(selection.mask, 0, 0)
+                gc.renderImage(selection.mask, 0.0, 0.0)
             }
         })
         workspace.selectionEngine.setSelectionWithLifted(selection,newLifted)

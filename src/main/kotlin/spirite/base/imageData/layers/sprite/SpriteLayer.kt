@@ -13,6 +13,8 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.graphics.isolation.ISpriteLayerIsolator
 import spirite.base.graphics.rendering.TransformedHandle
@@ -36,8 +38,6 @@ import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.imageData.undo.UndoableDelegate
 import spirite.base.util.StringUtil
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType
 
 /**
  *  A SpriteLayer is a collection of Dynamic Mediums with various offsets, transforms, and

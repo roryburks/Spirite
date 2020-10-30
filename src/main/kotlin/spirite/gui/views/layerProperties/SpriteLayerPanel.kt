@@ -1,7 +1,7 @@
 package spirite.gui.views.layerProperties
 
-import rb.IContract
-import rb.glow.color.Colors
+import rb.global.IContract
+import rb.glow.Colors
 import rb.owl.Observer
 import rb.owl.bindable.Bindable
 import rbJvm.glow.awt.NativeImage
@@ -13,6 +13,7 @@ import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.components.crossContainer.ICrossPanel
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseButton.RIGHT
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.graphics.rendering.IThumbnailStore
@@ -21,7 +22,6 @@ import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.SpriteLayerContextMenus
 import spirite.gui.resources.SpiriteIcons
-import spirite.hybrid.Hybrid
 
 class SpriteLayerPanel(
         workspaceSet: IWorkspaceSet,
@@ -42,6 +42,9 @@ class SpriteLayerPanel(
     private var _tfScaleXK : IContract? = null
     private var _tfScaleYK : IContract? = null
     private var _tfRotK : IContract? = null
+
+    private var _boxWidth: Int = 48
+    private var _boxHeight: Int = 48
 
     var linkedSprite : SpriteLayer? = null
         set(value) {
@@ -101,7 +104,7 @@ class SpriteLayerPanel(
     private val activePartBind = Bindable<SpritePart?>(null)
     private var activePart: SpritePart? by activePartBind
 
-    val boxList = Hybrid.ui.BoxList<SpritePart>(32, 32)
+    val boxList = Hybrid.ui.BoxList<SpritePart>(_boxWidth, _boxHeight)
     private val tfTransX = Hybrid.ui.FloatField()
     private val tfTransY = Hybrid.ui.FloatField()
     private val tfScaleX =  Hybrid.ui.FloatField()
@@ -145,8 +148,8 @@ class SpriteLayerPanel(
             object : IBoxComponent {
                 override val component: IComponent = Hybrid.ui.CrossPanel {
                         cols += {
-                            width = 32
-                            addFlatGroup(22) {
+                            width = _boxWidth
+                            addFlatGroup(_boxHeight-8) {
                                 add(Hybrid.ui.Label(part.partName).also {it.textSize = 10;it.textColor= Colors.BLACK}, height = 8)
                             }
                             this += {
@@ -158,7 +161,7 @@ class SpriteLayerPanel(
                                     }
                                 }
                                 add( thumbnail)
-                                height = 32
+                                height = _boxHeight
                             }
                         }
                     }.apply {

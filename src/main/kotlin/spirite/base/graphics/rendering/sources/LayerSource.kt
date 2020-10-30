@@ -1,7 +1,7 @@
 package spirite.base.graphics.rendering.sources
 
-import rb.glow.GraphicsContext
-import rb.vectrix.mathUtil.f
+import rb.glow.IGraphicsContext
+import rb.vectrix.mathUtil.d
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -15,10 +15,10 @@ data class LayerSource(val layer: Layer, override val workspace: IImageWorkspace
     override val nodeDependencies: Collection<Node> get() = emptySet()
     override val rendersLifted: Boolean get() = false
 
-    override fun render(settings: RenderSettings, gc: GraphicsContext) {
+    override fun render(settings: RenderSettings, gc: IGraphicsContext) {
         gc.pushState()
-        gc.preTranslate( -layer.x.f, -layer.y.f)
-        gc.preScale(settings.width.f / layer.width.f, settings.height.f/layer.height.f)
+        gc.preTranslate( -layer.x.d, -layer.y.d)
+        gc.preScale(settings.width / layer.width.d, settings.height/layer.height.d)
         layer.getDrawList()
                 .sortedBy { it.drawDepth }
                 .forEach { it.handle.medium.render(gc, it.renderRubric) }

@@ -1,6 +1,6 @@
 package spirite.base.graphics.rendering
 
-import rb.glow.GraphicsContext
+import rb.glow.IGraphicsContext
 import rb.glow.gle.RenderMethod
 import rb.glow.gle.RenderRubric
 import rb.vectrix.linear.ITransformF
@@ -23,5 +23,5 @@ data class TransformedHandle(
     fun stack( other: RenderRubric) : TransformedHandle = TransformedHandle(handle, drawDepth, renderRubric.stack(other))
     fun stack( transform: ITransformF) : TransformedHandle = TransformedHandle(handle, drawDepth, renderRubric.stack(transform))
 
-    fun draw( gc: GraphicsContext) {handle.medium.render(gc, renderRubric)}
+    fun draw( gc: IGraphicsContext) {handle.medium.render(gc, renderRubric)}
 }

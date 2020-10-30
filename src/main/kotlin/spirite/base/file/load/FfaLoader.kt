@@ -1,6 +1,9 @@
 package spirite.base.file.load
 
 import rb.vectrix.mathUtil.i
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
+import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readUTF8NT
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
@@ -10,9 +13,6 @@ import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked.UnlinkedFrameClu
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.groupTree.GroupTree.*
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.STRUCTURAL
-import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 
 
 object FfaLoader : IAnimationLoader {

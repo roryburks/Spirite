@@ -1,6 +1,6 @@
 package rbJvm.owl
 
-import rb.IContract
+import rb.global.IContract
 import rb.extendo.dataStructures.SinglySequence
 import rb.owl.IObservable
 import rb.owl.IObserver

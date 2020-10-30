@@ -1,13 +1,13 @@
 package old
 
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
-import spirite.hybrid.Hybrid
+import sguiSwing.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 
 object TestConfig {
-    val save = true
+    val save = false
     val saveLocation = "C:\\Bucket\\sunit"
 
     fun trySave(image: IImage, name: String) {

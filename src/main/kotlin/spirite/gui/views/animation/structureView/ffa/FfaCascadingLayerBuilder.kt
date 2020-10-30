@@ -5,6 +5,7 @@ import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.components.crossContainer.ICrossPanel
 import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.components.events.MouseEvent.MouseEventType.RELEASED
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.base.imageData.animation.ffa.FfaLayerCascading
@@ -12,7 +13,6 @@ import spirite.base.imageData.animation.ffa.FfaLayerCascading.CascadingFrame
 import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.gui.resources.SpiriteIcons
-import spirite.hybrid.Hybrid
 import java.io.InvalidClassException
 
 private object SettingStore {
