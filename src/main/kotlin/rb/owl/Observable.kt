@@ -1,6 +1,6 @@
 package rb.owl
 
-import rb.IContract
+import rb.global.IContract
 import rb.extendo.dataStructures.SinglySequence
 
 

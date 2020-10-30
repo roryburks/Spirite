@@ -1,6 +1,6 @@
 package sgui.systems
 
-import rb.IContract
+import rb.global.IContract
 import sgui.components.IComponent
 import sgui.components.events.MouseEvent
 

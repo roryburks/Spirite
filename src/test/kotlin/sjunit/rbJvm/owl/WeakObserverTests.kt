@@ -1,7 +1,7 @@
 package sjunit.rbJvm.owl
 
 import org.junit.jupiter.api.Test
-import rb.IContract
+import rb.global.IContract
 import rb.owl.Observable
 import rbJvm.owl.WeakObserver
 import rbJvm.owl.addWeakObserver

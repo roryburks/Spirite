@@ -1,6 +1,6 @@
 package spirite.gui.views.layerProperties
 
-import rb.IContract
+import rb.global.IContract
 import rb.glow.Colors
 import rb.owl.Observer
 import rb.owl.bindable.Bindable

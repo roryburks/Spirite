@@ -16,17 +16,17 @@ interface ITransform
     val m12 : Double
 
     operator fun times(tx: ITransform) = ImmutableTransformD(
-            m00 * tx.m00 + m01 * tx.m10,
-            m00 * tx.m01 + m01 * tx.m11,
-            m00 * tx.m02 + m01 * tx.m12 + m02,
-            m10 * tx.m00 + m11 * tx.m10,
-            m10 * tx.m01 + m11 * tx.m11,
-            m10 * tx.m02 + m11 * tx.m12 + m12
+        m00 * tx.m00 + m01 * tx.m10,
+        m00 * tx.m01 + m01 * tx.m11,
+        m00 * tx.m02 + m01 * tx.m12 + m02,
+        m10 * tx.m00 + m11 * tx.m10,
+        m10 * tx.m01 + m11 * tx.m11,
+        m10 * tx.m02 + m11 * tx.m12 + m12
     )
 
     fun apply( v : Vec2) : Vec2 = Vec2d(
-            m00 * v.x + m01 * v.y + m02,
-            m10 * v.x + m11 * v.y + m12
+        m00 * v.x + m01 * v.y + m02,
+        m10 * v.x + m11 * v.y + m12
     )
 
     val determinant get() = m00*m11 - m01*m10
@@ -75,12 +75,12 @@ interface ITransformD : ITransform
 }
 
 data class ImmutableTransformD(
-        override val m00 : Double,
-        override val m01 : Double,
-        override val m02 : Double,
-        override val m10 : Double,
-        override val m11 : Double,
-        override val m12 : Double )
+    override val m00 : Double,
+    override val m01 : Double,
+    override val m02 : Double,
+    override val m10 : Double,
+    override val m11 : Double,
+    override val m12 : Double )
     : ImmutableTrasform(), ITransformD
 {
     override fun toImmutable() = this
@@ -89,21 +89,21 @@ data class ImmutableTransformD(
     companion object {
         val Identity = ImmutableTransformD(1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
         fun Translation( transX : Double, transY: Double) = ImmutableTransformD(
-                1.0, 0.0, transX,
-                0.0, 1.0, transY
+            1.0, 0.0, transX,
+            0.0, 1.0, transY
         )
 
         fun Scale( scaleX : Double, scaleY: Double) = ImmutableTransformD(
-                scaleX, 0.0, 0.0,
-                0.0, scaleY, 0.0
+            scaleX, 0.0, 0.0,
+            0.0, scaleY, 0.0
         )
 
         fun Rotation( theta: Double) : ImmutableTransformD {
             val c = cos(theta)
             val s = sin(theta)
             return ImmutableTransformD(
-                    c, -s, 0.0,
-                    s, c, 0.0
+                c, -s, 0.0,
+                s, c, 0.0
             )
         }
     }
@@ -111,12 +111,12 @@ data class ImmutableTransformD(
 
 
 data class MutableTransformD(
-        override var m00 : Double,
-        override var m01 : Double,
-        override var m02 : Double,
-        override var m10 : Double,
-        override var m11 : Double,
-        override var m12 : Double )
+    override var m00 : Double,
+    override var m01 : Double,
+    override var m02 : Double,
+    override var m10 : Double,
+    override var m11 : Double,
+    override var m12 : Double )
     : MutableTransform(), ITransformD
 {
     // = M * Translation(ox,oy)
@@ -227,19 +227,19 @@ data class MutableTransformD(
 
     companion object {
         fun Translation( transX: Double, transY: Double) = MutableTransformD(
-                1.0, 0.0, transX,
-                0.0, 1.0, transY
+            1.0, 0.0, transX,
+            0.0, 1.0, transY
         )
         fun Scale( scaleX: Double, scaleY: Double) = MutableTransformD(
-                scaleX, 0.0, 0.0,
-                0.0, scaleY, 0.0
+            scaleX, 0.0, 0.0,
+            0.0, scaleY, 0.0
         )
         fun RotationMatrix( theta: Double): MutableTransformD {
             val c = cos(theta)
             val s = sin(theta)
             return MutableTransformD(
-                    c, -s, 0.0,
-                    s, c, 0.0
+                c, -s, 0.0,
+                s, c, 0.0
             )
         }
         val Identity get() = MutableTransformD(1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
@@ -265,12 +265,12 @@ interface ITransformF : ITransform
     val determinantF get() = m00f*m11f - m01f*m10f
 
     operator fun times( tx : ITransformF) = ImmutableTransformF(
-            m00f * tx.m00f + m01f * tx.m10f,
-            m00f * tx.m01f + m01f * tx.m11f,
-            m00f * tx.m02f + m01f * tx.m12f + m02f,
-            m10f * tx.m00f + m11f * tx.m10f,
-            m10f * tx.m01f + m11f * tx.m11f,
-            m10f * tx.m02f + m11f * tx.m12f + m12f
+        m00f * tx.m00f + m01f * tx.m10f,
+        m00f * tx.m01f + m01f * tx.m11f,
+        m00f * tx.m02f + m01f * tx.m12f + m02f,
+        m10f * tx.m00f + m11f * tx.m10f,
+        m10f * tx.m01f + m11f * tx.m11f,
+        m10f * tx.m02f + m11f * tx.m12f + m12f
     )
 
     override fun invert(): ImmutableTransformF? {
@@ -288,8 +288,8 @@ interface ITransformF : ITransform
     }
 
     fun apply( v : Vec2f) = Vec2f(
-            m00f * v.xf + m01f * v.yf + m02f,
-            m10f * v.xf + m11f * v.yf + m12f
+        m00f * v.xf + m01f * v.yf + m02f,
+        m10f * v.xf + m11f * v.yf + m12f
     )
 
     override fun toImmutable() : ImmutableTransformF
@@ -301,12 +301,12 @@ interface ITransformF : ITransform
 }
 
 data class ImmutableTransformF(
-        override val m00f : Float,
-        override val m01f : Float,
-        override val m02f : Float,
-        override val m10f : Float,
-        override val m11f : Float,
-        override val m12f : Float)
+    override val m00f : Float,
+    override val m01f : Float,
+    override val m02f : Float,
+    override val m10f : Float,
+    override val m11f : Float,
+    override val m12f : Float)
     : ITransformF, ImmutableTrasform()
 {
     override fun toImmutable() = this
@@ -316,34 +316,35 @@ data class ImmutableTransformF(
     companion object {
         val Identity = ImmutableTransformF(1f, 0f, 0f, 0f, 1f, 0f)
         fun Translation( transX : Float, transY: Float) = ImmutableTransformF(
-                1f, 0f, transX,
-                0f, 1f, transY
+            1f, 0f, transX,
+            0f, 1f, transY
         )
 
         fun Scale( scaleX : Float, scaleY: Float) = ImmutableTransformF(
-                scaleX, 0f, 0f,
-                0f, scaleY, 0f
+            scaleX, 0f, 0f,
+            0f, scaleY, 0f
         )
 
         fun Rotation( theta: Float) : ImmutableTransformF {
             val c = cos(theta)
             val s = sin(theta)
             return ImmutableTransformF(
-                    c, -s, 0f,
-                    s, c, 0f
+                c, -s, 0f,
+                s, c, 0f
             )
         }
     }
+
 }
 
 
 data class MutableTransformF(
-        override var m00f : Float,
-        override var m01f : Float,
-        override var m02f : Float,
-        override var m10f : Float,
-        override var m11f : Float,
-        override var m12f : Float)
+    override var m00f : Float,
+    override var m01f : Float,
+    override var m02f : Float,
+    override var m10f : Float,
+    override var m11f : Float,
+    override var m12f : Float)
     : ITransformF, MutableTransform()
 {
     override fun toImmutable() = ImmutableTransformF(m00f, m01f, m02f, m10f, m11f, m12f)
@@ -457,21 +458,21 @@ data class MutableTransformF(
     companion object {
         val Identity get() = MutableTransformF(1f, 0f, 0f, 0f, 1f, 0f)
         fun Translation( transX : Float, transY: Float) = MutableTransformF(
-                1f, 0f, transX,
-                0f, 1f, transY
+            1f, 0f, transX,
+            0f, 1f, transY
         )
 
         fun Scale( scaleX : Float, scaleY: Float) = MutableTransformF(
-                scaleX, 0f, 0f,
-                0f, scaleY, 0f
+            scaleX, 0f, 0f,
+            0f, scaleY, 0f
         )
 
         fun Rotation( theta: Float) : MutableTransformF {
             val c = cos(theta)
             val s = sin(theta)
             return MutableTransformF(
-                    c, -s, 0f,
-                    s, c, 0f
+                c, -s, 0f,
+                s, c, 0f
             )
         }
     }

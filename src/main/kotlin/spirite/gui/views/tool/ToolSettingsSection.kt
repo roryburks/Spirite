@@ -1,6 +1,6 @@
 package spirite.gui.views.tool
 
-import rb.IContract
+import rb.global.IContract
 import rb.glow.Colors
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver

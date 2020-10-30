@@ -1,6 +1,6 @@
 package spirite.gui.views.animation.animationSpaceView
 
-import rb.IContract
+import rb.global.IContract
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
