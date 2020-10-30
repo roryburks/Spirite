@@ -11,6 +11,7 @@ import javax.swing.UIManager
 
 
 fun main( args: Array<String>) {
+    println()
     Spirite().run()
 }
 
