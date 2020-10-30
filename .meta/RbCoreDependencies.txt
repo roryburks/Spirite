@@ -1,6 +1,5 @@
 root: ../src/main/kotlin
 
-/rb/clicker
 /rb/extendo
 /rb/glow
 /rb/hydra
