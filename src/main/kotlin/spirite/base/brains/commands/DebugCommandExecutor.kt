@@ -61,4 +61,13 @@ object DebugCommands
         val partNames = selected.map { it.partName }
         SpriteLayerFixes.CycleParts(groupNode, partNames, 1, ws )
     }
+
+    val MaglevTotalColorChange = DebugCmd("maglev-total-color-change") { master ->
+        val ws = master.workspaceSet.currentMWorkspace ?: return@DebugCmd
+        val selectedNode = ws.groupTree.selectedNode ?: return@DebugCmd
+        val from = master.paletteManager.activeBelt.getColor(0)
+        val to = master.paletteManager.activeBelt.getColor(1)
+        val mode = master.toolsetManager.toolset.ColorChanger.mode
+        SpriteLayerFixes.colorChangeEntireNodeContext(selectedNode, from, to, mode, ws)
+    }
 }

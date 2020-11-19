@@ -164,24 +164,34 @@ class MaglevTransformModule(val arranged: ArrangedMediumData)
 class MaglevColorChangeModule(val arranged: ArrangedMediumData) : IColorChangeModule
 {
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
-        arranged.handle.workspace.undoEngine.performAndStore(object : MaglevImageAction(arranged) {
-            override val description: String get() = "Color Change Maglev Layer"
-            override val isHeavy: Boolean get() = true
-            override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
-                val things = maglev.thingsMap.values
-                things.asSequence()
-                        .filterIsInstance<IMaglevColorwiseThing>()
-                        .forEach { it.transformColor { color ->
-                            if( mode == AUTO || (color.red == from.red && color.blue == from.blue && color.green == from.green &&
-                                            (color.alpha == from.alpha || mode == IGNORE_ALPHA)))
-                                to
-                            else
-                                color
-                        } }
-                built.rawAccessComposite {it.graphics.clear()}
+        arranged.handle.workspace.undoEngine.performAndStore(MaglevColorChangeAction(arranged, from, to, mode))
+    }
+
+    class MaglevColorChangeAction(
+            arranged: ArrangedMediumData,
+            val from: Color,
+            val to: Color,
+            val mode: ColorChangeMode
+    ) : MaglevImageAction(arranged)
+    {
+        override val description: String get() = "Color Change Maglev Layer"
+        override val isHeavy: Boolean get() = true
+        override fun performMaglevAction(built: BuiltMediumData, maglev: MaglevMedium) {
+            val things = maglev.thingsMap.values
+            val changed = things.asSequence()
+                    .filterIsInstance<IMaglevColorwiseThing>()
+                    .fold(false) { hasChanged, thing -> thing.transformColor { color ->
+                        if( mode == AUTO || (color.red == from.red && color.blue == from.blue && color.green == from.green &&
+                                        (color.alpha == from.alpha || mode == IGNORE_ALPHA)))
+                            to
+                        else
+                            color
+                    } || hasChanged}
+            if( changed) {
+                built.rawAccessComposite { it.graphics.clear() }
                 things.forEach { it.draw(built) }
             }
-        })
+        }
     }
 }
 

@@ -67,11 +67,13 @@ data class MaglevFill(
         }
     }
 
-    override fun transformColor(lambda: (SColor) -> SColor) {
+    override fun transformColor(lambda: (SColor) -> SColor) : Boolean{
         val oldColor = color
         val newColor = lambda(oldColor)
         if( oldColor != newColor) {
             color = newColor
+            return true
         }
+        return false
     }
 }

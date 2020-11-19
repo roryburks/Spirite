@@ -1,10 +1,12 @@
 package spirite.base.brains.commands.specific
 
+import rb.glow.color.Color
 import rb.vectrix.mathUtil.MathUtil
+import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.mediums.magLev.MaglevColorChangeModule
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.mediums.magLev.util.MaglevConverter
 
@@ -59,6 +61,20 @@ object SpriteLayerFixes {
             newStructure.forEach { (handle, structure) -> sprite.insertPart(handle, structure) }
             puppetParts.forEach { sprite.removePart(it) }
         }
+    }
 
+    fun colorChangeEntireNodeContext(node: GroupTree.Node, from: Color, to: Color, mode: ColorChangeMode, ws: IImageWorkspace) {
+        val maglevMediums = node.getLayerNodes()
+                .flatMap { it.layer.allArrangedData }
+                .filter { it.handle.medium is MaglevMedium }
+
+        if( maglevMediums.any())
+        {
+            ws.undoEngine.doAsAggregateAction("Color Change Entire Node Context") {
+                maglevMediums.forEach { arranged ->
+                    ws.undoEngine.performAndStore(MaglevColorChangeModule.MaglevColorChangeAction( arranged, from, to, mode ))
+                }
+            }
+        }
     }
 }

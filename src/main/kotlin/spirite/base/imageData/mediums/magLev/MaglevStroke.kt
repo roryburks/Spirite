@@ -14,12 +14,14 @@ class MaglevStroke(
     : IMaglevThing,
         IMaglevPointwiseThing, IMaglevColorwiseThing
 {
-    override fun transformColor(lambda: (SColor) -> SColor) {
+    override fun transformColor(lambda: (SColor) -> SColor) : Boolean{
         val oldColor = params.color
         val newColor = lambda(oldColor)
         if( oldColor != newColor) {
             params = params.copy(color = newColor)
+            return true
         }
+        return false
     }
 
     override fun transformPoints(lambda: (Vec3f) -> Vec3f) {
