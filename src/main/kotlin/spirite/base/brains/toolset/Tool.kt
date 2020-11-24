@@ -4,6 +4,7 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.linear.MutableTransformF
 import rb.vectrix.linear.Vec2f
+import spirite.base.brains.commands.DebugCommands
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.ICommand
 import kotlin.reflect.KProperty
@@ -198,6 +199,8 @@ class Reshaper(toolset: Toolset) : Tool(toolset){
     var translation by translationBind
     val rotationBind by scheme.Property(FloatBoxProperty("Rotation", 0f))
     var rotation by rotationBind
+    val copyTransform by scheme.Property(ButtonProperty("Copy", DebugCommands.CopyTransform))
+    val pasteTransform by scheme.Property(ButtonProperty("Paste", DebugCommands.PasteTransform))
 
 }
 

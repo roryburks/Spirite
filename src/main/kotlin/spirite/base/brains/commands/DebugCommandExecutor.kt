@@ -1,5 +1,6 @@
 package spirite.base.brains.commands
 
+import rb.vectrix.linear.Vec2f
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.specific.SpriteLayerFixes
@@ -69,5 +70,23 @@ object DebugCommands
         val to = master.paletteManager.activeBelt.getColor(1)
         val mode = master.toolsetManager.toolset.ColorChanger.mode
         SpriteLayerFixes.colorChangeEntireNodeContext(selectedNode, from, to, mode, ws)
+    }
+
+    val CopyTransform = DebugCmd("copy-transform") { master ->
+        val tool = master.workspaceSet.currentMWorkspace?.toolset?.Reshape ?: return@DebugCmd
+        Hybrid.clipboard.postToClipboard("${tool.translation.xf};${tool.translation.yf};${tool.scale.xf};${tool.scale.yf};${tool.rotation}")
+    }
+    val PasteTransform = DebugCmd("paste-transform") { master ->
+        val tool = master.workspaceSet.currentMWorkspace?.toolset?.Reshape ?: return@DebugCmd
+        val copied = Hybrid.clipboard.getFromClipboard() as? String ?: return@DebugCmd
+        val split = copied.split(';')
+        val tx = split.getOrNull(0)?.toFloatOrNull() ?: 0f
+        val ty = split.getOrNull(1)?.toFloatOrNull() ?: 0f
+        val sx = split.getOrNull(2)?.toFloatOrNull() ?: 1f
+        val sy = split.getOrNull(3)?.toFloatOrNull() ?: 1f
+        val rot = split.getOrNull(4)?.toFloatOrNull() ?: 0f
+        tool.translation = Vec2f(tx, ty)
+        tool.scale = Vec2f(sx, sy)
+        tool.rotation = rot
     }
 }
