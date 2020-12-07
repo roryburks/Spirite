@@ -25,7 +25,7 @@ object MediumLoaderFactory
         SaveLoadUtil.MEDIUM_MAGLEV -> when {
             version < 0x1_0000 -> Legacy_pre_1_0000_MaglevMediumLoader
             version <= 0x1_0006 -> Legacy_1_0006_MagneticMediumPartialLoader
-            else -> MagneticMediumLoader
+            else -> MagneticMediumLoader_V2
         }
         else -> throw BadSifFileException("Unrecognized Medium Type Id: $typeId.  Trying to load a newer SIF version in an older program version or corrupt file.")
     }

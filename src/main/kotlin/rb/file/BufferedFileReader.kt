@@ -9,8 +9,8 @@ class BufferedFileReader(
         val mathLayer: IMathLayer = VectrixMathLayer.mathLayer)
     : IFileReader
 {
-    private var _buffer : ByteArray? = null
-    private var _bCarat : Int = 0
+    var _buffer : ByteArray? = null
+    var _bCarat : Int = 0
     private var _pointer: Long = 0
 
 
@@ -57,31 +57,13 @@ class BufferedFileReader(
         }
     }
 
-    override fun readUnsignedShort(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun readByte(): Byte {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
+    override fun readUnsignedShort() = read(LittleEndian.UShortInter)
+    override fun readByte() = read(ByteInter)
     override fun readInt() = read(LittleEndian.IntInter)
-
-    override fun readFloat(): Float {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun readUnsignedByte(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun readFloatArray(size: Int): FloatArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun readByteArray(size: Int): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun readFloat() = read(LittleEndian.FloatInter)
+    override fun readUnsignedByte() = read(LittleEndian.UByteInter)
+    override fun readFloatArray(size: Int) = read(LittleEndian.FloatArrayInter(size))
+    override fun readByteArray(size: Int) = read(ByteArrayInter(size))
 
     override var filePointer: Long
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
