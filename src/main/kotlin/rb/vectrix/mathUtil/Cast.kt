@@ -28,6 +28,7 @@ inline val Short.i get() = this.toInt()
 inline val Short.d get() = this.toDouble()
 
 inline val Byte.i get() = this.toInt()
+inline val Byte.ui get() = if( this < 0) this + 256 else this.toInt()
 inline val Byte.s get() = this.toShort()
 
 inline val Boolean.sign get() = if( this) 1 else -1
