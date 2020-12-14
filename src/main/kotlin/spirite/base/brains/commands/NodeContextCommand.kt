@@ -1,6 +1,7 @@
 package spirite.base.brains.commands
 
 import rb.glow.gle.RenderMethod
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.brains.commands.specific.SpriteLayerFixes
@@ -19,7 +20,6 @@ import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
 import spirite.gui.menus.dialogs.IDialog
-import sguiSwing.hybrid.Hybrid
 import java.security.acl.Group
 
 class NodeContextCommand(

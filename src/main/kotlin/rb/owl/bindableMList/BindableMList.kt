@@ -1,6 +1,6 @@
 package rb.owl.bindableMList
 
-import rb.IContract
+import rb.global.IContract
 import rb.extendo.extensions.mapRemoveIfNull
 
 

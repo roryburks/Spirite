@@ -1,6 +1,6 @@
 package rb.owl
 
-import rb.IContract
+import rb.global.IContract
 
 class GuardedObservable<T> : IObservable<T>
 {

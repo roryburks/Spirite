@@ -12,12 +12,12 @@ import sgui.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.components.crossContainer.ICrossPanel
 import sguiSwing.components.SwPanel
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.pen.Penner
 import spirite.base.util.linear.Rect
-import sguiSwing.hybrid.Hybrid
 import java.awt.Font
 import javax.swing.SwingUtilities
 

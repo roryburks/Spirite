@@ -1,6 +1,6 @@
 package rbJvm.owl
 
-import rb.IContract
+import rb.global.IContract
 import rb.owl.IObservable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindObserver

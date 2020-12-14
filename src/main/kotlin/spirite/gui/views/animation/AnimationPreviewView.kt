@@ -1,6 +1,6 @@
 package spirite.gui.views.animation
 
-import rb.IContract
+import rb.global.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer
@@ -11,6 +11,8 @@ import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sguiSwing.SwIcon
 import sguiSwing.components.SJPanel
 import sguiSwing.components.SwComponent
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.ITimer
 import sguiSwing.jcolor
 import sguiSwing.skin.Skin
 import spirite.base.brains.IMasterControl
@@ -20,8 +22,6 @@ import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChan
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.ITimer
 import java.awt.Graphics
 import kotlin.math.floor
 import kotlin.math.max
@@ -247,8 +247,8 @@ private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationView
             Hybrid.gle.runInGLContext {
                 val image = Hybrid.imageCreator.createImage(width, height)
                 val gc = image.graphics
-                gc.preScale(anim.state.zoomF, anim.state.zoomF)
-                gc.preTranslate(anim.state.offsetX.f, anim.state.offsetY.f)
+                gc.preScale(anim.state.zoomF.d, anim.state.zoomF.d)
+                gc.preTranslate(anim.state.offsetX.d, anim.state.offsetY.d)
 
                 anim.drawFrame(gc,anim.state.met)
 

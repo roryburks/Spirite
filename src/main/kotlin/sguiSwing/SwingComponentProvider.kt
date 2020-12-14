@@ -1,7 +1,7 @@
 package sguiSwing
 
-import rb.glow.IImage
-import rb.glow.color.SColor
+import rb.glow.img.IImage
+import rbJvm.glow.SColor
 import sgui.components.*
 import sgui.components.crossContainer.CrossInitializer
 import sgui.components.crossContainer.ICrossPanel

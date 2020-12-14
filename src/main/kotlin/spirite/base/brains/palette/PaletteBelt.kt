@@ -1,7 +1,7 @@
 package spirite.base.brains.palette
 
-import rb.glow.color.Color
-import rb.glow.color.Colors
+import rb.glow.Color
+import rb.glow.Colors
 import rb.owl.bindable.Bindable
 import rb.vectrix.mathUtil.MathUtil
 

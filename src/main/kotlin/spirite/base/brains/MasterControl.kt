@@ -1,7 +1,8 @@
 package spirite.base.brains
 
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rbJvm.glow.awt.NativeImage
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.commands.CentralCommandExecutor
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.base.brains.palette.IPaletteManager
@@ -23,7 +24,6 @@ import spirite.gui.implementations.topLevelFeedback.SwTopLevelFeedbackSystem
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.dialogs.IDialog
 import spirite.gui.menus.dialogs.JDialog
-import sguiSwing.hybrid.Hybrid
 import spirite.pc.menus.SwContextMenus
 import spirite.specialRendering.stroke.GLStrokeDrawerProvider
 

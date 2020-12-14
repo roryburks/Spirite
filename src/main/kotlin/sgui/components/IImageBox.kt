@@ -1,6 +1,6 @@
 package sgui.components
 
-import rb.glow.IImage
+import rb.glow.img.IImage
 
 interface IImageBox : IComponent {
     var stretch: Boolean

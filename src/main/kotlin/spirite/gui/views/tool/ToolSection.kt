@@ -1,6 +1,6 @@
 package spirite.gui.views.tool
 
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.owl.Observer
 import rb.owl.bindable.addObserver
 import sgui.components.IBoxList
@@ -8,6 +8,7 @@ import sgui.components.IBoxList.IBoxComponent
 import sgui.components.IComponent
 import sguiSwing.SwIcon
 import sguiSwing.components.SwToggleButton
+import sguiSwing.hybrid.Hybrid
 import sguiSwing.mouseSystem.adaptMouseSystem
 import sguiSwing.skin.Skin
 import spirite.base.brains.IMasterControl
@@ -15,7 +16,6 @@ import spirite.base.brains.toolset.Tool
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.ToolIcons
-import sguiSwing.hybrid.Hybrid
 import java.awt.Color
 import java.awt.GradientPaint
 import java.awt.Graphics

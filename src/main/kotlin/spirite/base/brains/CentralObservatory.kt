@@ -1,6 +1,6 @@
 package spirite.base.brains
 
-import rb.IContract
+import rb.global.IContract
 import rb.extendo.extensions.toHashMap
 import rb.owl.IObservable
 import rb.owl.IObserver
@@ -74,7 +74,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
         override fun addObserver(observer: IObserver<T>, trigger: Boolean): IContract = ObserverContract(observer)
 
         private val _binds = mutableListOf<ObserverContract>()
-        private inner class ObserverContract(val observer: IObserver<T>):IContract {
+        private inner class ObserverContract(val observer: IObserver<T>): IContract {
             init{ _binds.add(this)}
             override fun void() { _binds.remove(this) }
        }

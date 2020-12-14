@@ -1,12 +1,12 @@
 package spirite.base.imageData.animation.ffa
 
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.UndoableChangeDelegate
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
 
 
 interface IFFALayerLinked {

@@ -1,6 +1,6 @@
 package old
 
-import rb.glow.IImage
+import rb.glow.img.IImage
 
 fun verifyRawImagesAreEqual(raw1: IImage, raw2: IImage) {
     assert(raw1.width == raw2.width)

@@ -1,9 +1,9 @@
 package spirite.base.file.load
 
-import spirite.base.file.SaveLoadUtil
-import spirite.base.imageData.animation.Animation
 import sguiSwing.hybrid.MDebug
 import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
+import spirite.base.file.SaveLoadUtil
+import spirite.base.imageData.animation.Animation
 
 interface IAnimationLoader
 {

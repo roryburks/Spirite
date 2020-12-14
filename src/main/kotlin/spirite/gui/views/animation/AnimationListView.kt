@@ -10,6 +10,7 @@ import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import sguiSwing.SwIcon
 import sguiSwing.components.jcomponent
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.*
 import spirite.base.imageData.animation.Animation
@@ -19,7 +20,6 @@ import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.menus.MenuItem
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
-import sguiSwing.hybrid.Hybrid
 import java.awt.Point
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DragGestureEvent

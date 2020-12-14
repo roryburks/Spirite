@@ -5,7 +5,7 @@ package rb.glow.gl
  * management inherent in OpenGL, so should itself be wrapped in a Graphics Engine and shielded from the use sources.
  */
 interface IGL {
-    val tracker: IGLImageTracker
+    val tracker: IGLImageTracker?
 
     val preferredShaderVersion: GlShaderVersion
     val supportedShaderVersions: Set<GlShaderVersion>

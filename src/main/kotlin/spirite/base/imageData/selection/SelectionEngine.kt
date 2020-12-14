@@ -1,13 +1,15 @@
 package spirite.base.imageData.selection
 
 import rb.extendo.delegates.DerivedLazy
-import rb.glow.IImage
+import rb.glow.img.IImage
 import rb.owl.IObservable
 import rb.owl.Observable
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
+import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rbJvm.owl.addWeakObserver
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.IAnchorLiftModule
@@ -19,7 +21,6 @@ import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
-import sguiSwing.hybrid.Hybrid
 
 interface ISelectionEngine {
     val selectionChangeObserver: IObservable<(SelectionChangeEvent)->Any?>
@@ -182,8 +183,8 @@ class SelectionEngine(
         val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
         val gc = newImage.graphics
         gc.transform = transform
-        gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
-        gc.renderImage(selectionMask, 0, 0)
+        gc.preTranslate(-bakedArea.x.d, -bakedArea.y.d)
+        gc.renderImage(selectionMask, 0.0, 0.0)
         val newSelection = Selection(newImage, ImmutableTransformF.Translation(bakedArea.x.f, bakedArea.y.f) , false)
 
         workspace.undoEngine.doAsAggregateAction("Bake Lifted") {

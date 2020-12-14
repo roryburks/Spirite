@@ -1,10 +1,10 @@
 package sgui.components
 
-import rb.glow.IImage
-import rb.glow.NillImage
-import rb.glow.color.SColor
+import rb.glow.img.IImage
+import rb.glow.img.NillImage
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
+import rbJvm.glow.SColor
 import sgui.components.ITreeViewNonUI.ITreeNode
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
 import sgui.transfer.ITransferObject

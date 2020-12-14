@@ -4,6 +4,8 @@ import rb.clicker.telemetry.TelemetryEvent
 import rb.clicker.telemetry.TelemetryStopwatch
 import rb.glow.color.Color
 import rb.glow.color.ColorARGB32Normal
+import rb.glow.Color
+import rb.glow.ColorARGB32Normal
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.i
 import spirite.base.brains.IMasterControl

@@ -4,6 +4,7 @@ package rb.extendo.extensions
 infix fun <T> Sequence<T>.then(other: Sequence<T>) = ThenSequence(this,other)
 fun <T> Iterable<T>.then(other: Iterable<T>) : Iterable<T> = ThenIterable(this,other)
 
+fun <T> Sequence<T>.then( t: T) : Sequence<T> = PlusOneSequence(this, t)
 fun <T> Iterable<T>.then( t: T) : Iterable<T> = PlusOneIterable(this, t)
 
 class ThenSequence<T>(
@@ -98,6 +99,38 @@ constructor(
         val first: Iterable<T>,
         val then: T)
     : Iterable<T>
+{
+    override fun iterator(): Iterator<T> = ThenIterator()
+
+    inner class ThenIterator: Iterator<T> {
+        var iterator = first.iterator()
+        var doneThen = false
+
+        override fun hasNext(): Boolean {
+            return when {
+                doneThen -> false
+                else -> true
+            }
+        }
+
+        override fun next(): T {
+            return when {
+                doneThen -> throw IndexOutOfBoundsException()
+                iterator.hasNext() -> iterator.next()
+                else -> {
+                    doneThen = true
+                    then
+                }
+            }
+        }
+    }
+}
+
+private class PlusOneSequence<T>
+constructor(
+    val first: Sequence<T>,
+    val then: T)
+    : Sequence<T>
 {
     override fun iterator(): Iterator<T> = ThenIterator()
 

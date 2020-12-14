@@ -1,6 +1,6 @@
 package spirite.base.pen.behaviors
 
-import rb.glow.color.Color
+import rb.glow.Color
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.brains.toolset.PenDrawMode.NORMAL
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule

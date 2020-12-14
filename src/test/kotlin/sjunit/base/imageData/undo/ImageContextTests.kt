@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.Test
 import rb.glow.gl.GLImage
 import rbJvm.vectrix.SetupVectrixForJvm
+import sguiSwing.hybrid.EngineLaunchpoint
+import sguiSwing.hybrid.Hybrid
 import sjunit.testHelpers.runTest
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.MImageWorkspace
@@ -18,8 +20,6 @@ import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.undo.ImageContext
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
-import sguiSwing.hybrid.EngineLaunchpoint
-import sguiSwing.hybrid.Hybrid
 import spirite.pc.setupSwGuiStuff
 import javax.swing.SwingUtilities
 import kotlin.test.assertEquals

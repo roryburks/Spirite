@@ -1,13 +1,14 @@
 package spirite.base.imageData.mediums
 
-import rb.glow.GraphicsContext
-import rb.glow.IImage
+import rb.glow.IGraphicsContext
 import rb.glow.gle.RenderRubric
+import rb.glow.img.IImage
+import rb.vectrix.mathUtil.d
 
 interface IImageMedium : IMedium{
-    override fun render(gc: GraphicsContext, render: RenderRubric?) {
+    override fun render(gc: IGraphicsContext, render: RenderRubric?) {
         getImages()
-                .forEach {gc.renderImage(it.image, it.x, it.y, render)}
+                .forEach {gc.renderImage(it.image, it.x.d, it.y.d, render)}
     }
 
     fun getImages() : List<ShiftedImage>

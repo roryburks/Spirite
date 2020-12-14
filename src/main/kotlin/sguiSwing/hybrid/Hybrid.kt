@@ -1,8 +1,8 @@
 package sguiSwing.hybrid
 
+import rb.glow.IImageConverter
 import rb.glow.gl.IGL
 import rb.glow.gle.IGLEngine
-import rb.glow.gle.IImageConverter
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.jogl.JOGLProvider
 import sgui.components.IComponentProvider
@@ -11,9 +11,9 @@ import sgui.systems.IMouseSystem
 import sgui.systems.KeypressSystem
 import sgui.systems.MKeypressSystem
 import sguiSwing.SwingComponentProvider
-import sguiSwing.mouseSystem.SwMouseSystem
 import sguiSwing.hybrid.Transferables.IClipboard
 import sguiSwing.hybrid.Transferables.SwClipboard
+import sguiSwing.mouseSystem.SwMouseSystem
 
 /** Hybrid is a collection of components and interfaces that are platform-specific (things like Timers, GUI libraries,
  * OpenGL implementations, etc).  It wraps them such that they can code can be as portable as possible.

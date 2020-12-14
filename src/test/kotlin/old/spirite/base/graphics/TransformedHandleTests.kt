@@ -9,7 +9,7 @@
 //import rb.glow.gle.RenderRubric
 //import spirite.base.graphics.rendering.TransformedHandle
 //import spirite.base.imageData.MediumHandle
-//import rb.glow.color.Colors
+//import rb.glow.Colors
 //import sguiSwing.hybrid.Hybrid
 //import rbJvm.glow.awt.AwtImageConverter
 //import rbJvm.glow.awt.ImageBI

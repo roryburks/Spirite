@@ -1,9 +1,11 @@
 package spirite.base.pen.selectionBuilders
 
-import rb.glow.GraphicsContext
+import rb.glow.IGraphicsContext
+import rb.glow.drawer
+import rb.vectrix.mathUtil.d
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
-import sguiSwing.hybrid.Hybrid
 
 
 class OvalSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( workspace) {
@@ -27,15 +29,15 @@ class OvalSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( work
     override fun build(): Selection {
         // Lifecycle tied to the selection
         val img = Hybrid.imageCreator.createImage(workspace.width, workspace.height)
-        img.graphics.fillOval(
-                Math.min(startX, currentX), Math.min(startY, currentY),
-                Math.abs(startX - currentX), Math.abs(startY - currentY))
+        img.graphics.drawer.fillOval(
+                Math.min(startX, currentX).d, Math.min(startY, currentY).d,
+                Math.abs(startX - currentX).d, Math.abs(startY - currentY).d)
         return Selection(img, null, true)
     }
 
-    override fun drawBuilding(gc: GraphicsContext) {
-        gc.drawOval(
-                Math.min(startX, currentX), Math.min(startY, currentY),
-                Math.abs(startX - currentX), Math.abs(startY - currentY))
+    override fun drawBuilding(gc: IGraphicsContext) {
+        gc.drawer.drawOval(
+                Math.min(startX, currentX).d, Math.min(startY, currentY).d,
+                Math.abs(startX - currentX).d, Math.abs(startY - currentY).d)
     }
 }

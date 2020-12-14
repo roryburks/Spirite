@@ -1,6 +1,6 @@
 package demonstration
 
-import rb.glow.color.Colors
+import rb.glow.Colors
 import rb.vectrix.functions.InvertibleFunction
 import sgui.Orientation.HORIZONTAL
 import sgui.components.IButton

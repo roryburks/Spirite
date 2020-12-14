@@ -26,6 +26,7 @@ abstract class Vec2
         return Vec2d(x * cs - y * sn, x * sn + y * cs)
     }
 
+    val magnitude = sqrt(x*x + y*y)
     abstract val normalized : Vec2
 
     companion object {

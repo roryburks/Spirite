@@ -1,4 +1,4 @@
-package rb.glow.color
+package rb.glow
 
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.linear.Vec4f
@@ -6,8 +6,6 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.round
 import kotlin.math.sqrt
 
-
-// TODO: Eventually I will need a more robust color space... space.
 sealed class Color {
     val rgbComponent : Vec3f by lazy { Vec3f(red, green, blue) }
     val rgbaComponent : Vec4f by lazy { Vec4f(red, green, blue, alpha) }
@@ -16,6 +14,18 @@ sealed class Color {
     abstract val green: Float
     abstract val blue: Float
     abstract val alpha: Float
+
+    companion object {
+        fun FromArgb(argb: Int) = ColorARGB32Normal(argb)
+        fun Make(r: Int, g: Int, b: Int) : ColorARGB32Normal {
+            val argb =
+                    (255 shl 24) or
+                            ((r % 256) shl 16) or
+                            ((g % 256) shl 8) or
+                            ((b % 256))
+            return ColorARGB32Normal(argb)
+        }
+    }
 }
 
 abstract class ColorARGB32(val argb: Int)
@@ -38,25 +48,25 @@ class ColorARGB32Normal(argb: Int)
     override val alpha: Float get() = (a / 255.0f)
 
     companion object {
-        fun FromComponents( alpha: Float, red: Float, green: Float, blue: Float) : ColorARGB32Normal{
+        fun FromComponents( alpha: Float, red: Float, green: Float, blue: Float) : ColorARGB32Normal {
             val a = MathUtil.clip(0, (alpha*255).round, 255)
             val r = MathUtil.clip(0, (red*255).round, 255)
             val g = MathUtil.clip(0, (green*255).round, 255)
             val b = MathUtil.clip(0, (blue*255).round, 255)
 
-            return ColorARGB32Normal( (a shl 24) or (r shl 16) or (g shl 8) or (b shl 0))
+            return ColorARGB32Normal((a shl 24) or (r shl 16) or (g shl 8) or (b shl 0))
         }
     }
 }
-fun Int.toColor() = ColorARGB32Normal(this)
+fun Int.toColor() = if(this shr 24 == 0) ColorARGB32Normal(this or (0xff shl 24)) else ColorARGB32Normal(this)
 fun Int.toColorPremultiplied() = ColorARGB32Premultiplied(this)
 
 class ColorARGB32Premultiplied(argb: Int)
     : ColorARGB32(argb)
 {
-    override val red: Float get() = if( alpha == 0f) 0f else (r/255.0f) / alpha
-    override val green: Float get() = if( alpha == 0f) 0f else (g/255.0f) / alpha
-    override val blue: Float get() = if( alpha == 0f) 0f else (b/255.0f) / alpha
+    override val red: Float get() = (r/255.0f) / alpha
+    override val green: Float get() = (g/255.0f) / alpha
+    override val blue: Float get() = (b/255.0f) / alpha
     override val alpha: Float get() = (a/255.0f)
 }
 
@@ -125,8 +135,9 @@ object Colors {
 //    }
 }
 
+
 object ColorUtil {
-    fun colorDistance( c1: Color, c2: Color) : Double {
+    fun colorDistance(c1: Color, c2: Color) : Double {
         // I don't have to explain.  sqrt(2)^2 + 1^2 = c^2, c = sqrt(3), d = sqrt(4) = 2
         val dr = (c1.red - c2.red) * 255.0/2
         val dg = (c1.green - c2.green) * 255.0/2

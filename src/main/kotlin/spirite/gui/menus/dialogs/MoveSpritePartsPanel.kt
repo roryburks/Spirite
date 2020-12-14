@@ -3,10 +3,10 @@ package spirite.gui.menus.dialogs
 import cwShared.dialogSystem.IDialogPanel
 import rb.owl.bindable.addObserver
 import sgui.components.crossContainer.ICrossPanel
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import sguiSwing.hybrid.Hybrid
 
 class MoveSpritePartsPanel(
         val parts: List<SpritePart>) :ICrossPanel by Hybrid.ui.CrossPanel(), IDialogPanel<SpriteLayer?>

@@ -1,4 +1,4 @@
-package spirite.base.resources
+package rb.glow.resources
 
 /***
  * IScriptService mediates between some Script repository (be it hard-coded, file-based, or db-based) and the GLEngine's

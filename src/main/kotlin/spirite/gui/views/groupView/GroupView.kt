@@ -1,15 +1,15 @@
 package spirite.gui.views.groupView
 
-import rb.glow.color.ColorARGB32Normal
+import rb.glow.ColorARGB32Normal
 import rb.glow.gle.RenderMethodType
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
 import sgui.components.crossContainer.ICrossPanel
 import sguiSwing.SwIcon
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import sguiSwing.hybrid.Hybrid
 
 class GroupView
 private constructor(

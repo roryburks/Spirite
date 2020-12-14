@@ -2,10 +2,10 @@ package spirite.gui.views.animation.animationSpaceView
 
 import sgui.components.IComponent
 import sgui.components.crossContainer.ICrossPanel
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFALexicalPlayback
 import spirite.gui.menus.dialogs.IDialog
-import sguiSwing.hybrid.Hybrid
 
 class FFALexicalStagingView(
         val dialog: IDialog,

@@ -1,6 +1,6 @@
 package spirite.gui.views.animation.structureView.ffa
 
-import rb.IContract
+import rb.global.IContract
 import rb.vectrix.shapes.RectI
 import sgui.components.IComponent.BasicCursor.DEFAULT
 import sgui.components.IComponent.BasicCursor.E_RESIZE

@@ -1,6 +1,6 @@
 package spirite.base.brains.palette.paletteSwapDriver
 
-import rb.glow.color.Color
+import rb.glow.Color
 import rb.owl.bindable.addObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle

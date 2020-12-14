@@ -1,12 +1,12 @@
 package spirite.specialRendering
 
-import rb.glow.GraphicsContext
-import rb.glow.IImage
-import rb.glow.color.Color
-import rb.glow.color.Colors
+import rb.glow.Color
+import rb.glow.Colors
+import rb.glow.IGraphicsContext
+import rb.glow.gl.GLGraphicsContext
 import rb.glow.gl.GLImage
-import rb.glow.gle.BasicCall
-import rb.glow.gle.GLGraphicsContext
+import rb.glow.gl.shader.programs.BasicCall
+import rb.glow.img.IImage
 import rb.glow.using
 import rb.vectrix.mathUtil.f
 import spirite.base.brains.toolset.ColorChangeMode
@@ -22,7 +22,7 @@ interface ISpecialDrawer {
 }
 
 object SpecialDrawerFactory {
-    fun makeSpecialDrawer( gc: GraphicsContext) = when( gc) {
+    fun makeSpecialDrawer( gc: IGraphicsContext) = when( gc) {
         is GLGraphicsContext -> GLSpecialDrawer(gc)
         else -> TODO()
     }
@@ -85,7 +85,7 @@ class GLSpecialDrawer(private val _gc: GLGraphicsContext) : ISpecialDrawer{
                 val gc = buffer.graphics
                 gc.clear()
 
-                val texture = gle.converter.convert(image, GLImage::class) as GLImage // AwtImageConverter(gle).convert<GLImage>(image)
+                val texture = gle.converter.convertToGL(image, gle)
                 val bufferParams = cachedParams.copy(texture1 = texture)
                 gc.applyPassProgram(BasicCall(),
                         bufferParams, transform, 0f, 0f, image.width + 0f, image.height + 0f)

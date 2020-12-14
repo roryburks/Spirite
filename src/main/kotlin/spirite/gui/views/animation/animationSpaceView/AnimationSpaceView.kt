@@ -1,6 +1,6 @@
 package spirite.gui.views.animation.animationSpaceView
 
-import rb.IContract
+import rb.global.IContract
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
@@ -9,6 +9,9 @@ import sgui.components.IComponent
 import sguiSwing.SwIcon
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
@@ -19,9 +22,6 @@ import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSp
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetDragEvent

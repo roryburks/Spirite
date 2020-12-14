@@ -3,6 +3,7 @@ package old.spirite.base.imageData.layers
 
 import old.TestHelper
 import org.junit.jupiter.api.Test
+import rb.glow.drawer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import kotlin.test.assertEquals
@@ -13,7 +14,7 @@ class SpriteLayerTests {
     @Test fun makesSpriteLayer() {
         val spriteLayer = SpriteLayer(workspace)
         (spriteLayer.parts[0].handle.medium as DynamicMedium).image.drawToImage(100, 100, drawer = {
-            it.graphics.drawLine(0f,0f,10f,10f)
+            it.graphics.drawer.drawLine(0.0,0.0,10.0,10.0)
         })
 
         assertEquals(10, spriteLayer.width)

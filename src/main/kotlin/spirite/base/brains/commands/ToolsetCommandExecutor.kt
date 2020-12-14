@@ -1,10 +1,10 @@
 package spirite.base.brains.commands
 
+import sguiSwing.hybrid.MDebug
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.ToolsetCommandExecutor.ToolCommand.*
 import spirite.base.brains.toolset.DropDownProperty
 import spirite.base.brains.toolset.IToolsetManager
-import sguiSwing.hybrid.MDebug
 import kotlin.math.ceil
 import kotlin.math.floor
 

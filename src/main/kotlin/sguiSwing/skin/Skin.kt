@@ -1,6 +1,6 @@
 package sguiSwing.skin
 
-import rb.glow.color.SColor
+import rbJvm.glow.SColor
 import sguiSwing.scolor
 import java.awt.Color
 

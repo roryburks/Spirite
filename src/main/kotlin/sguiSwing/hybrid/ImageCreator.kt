@@ -1,7 +1,7 @@
 package sguiSwing.hybrid
 
-import rb.glow.RawImage
 import rb.glow.gl.GLImage
+import rb.glow.img.RawImage
 
 interface IImageCreator {
     fun createImage(width: Int, height: Int): RawImage

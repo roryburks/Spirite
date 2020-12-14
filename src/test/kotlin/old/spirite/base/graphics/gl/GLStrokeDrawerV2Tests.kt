@@ -4,13 +4,14 @@ import old.TestConfig
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.Test
-import rb.glow.color.Colors
+import rb.glow.Colors
+import rb.glow.drawer
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
+import sguiSwing.hybrid.Hybrid
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
-import sguiSwing.hybrid.Hybrid
 import spirite.specialRendering.stroke.GLStrokeDrawerV2
 import java.io.File
 import javax.imageio.ImageIO
@@ -47,7 +48,7 @@ class GLStrokeDrawerV2Tests {
         val image = GLImage(100, 100, gle)
         val gc = image.graphics
         gc.color = Colors.GRAY
-        gc.fillRect(0,0,100,100)
+        gc.drawer.fillRect(0.0,0.0,100.0,100.0)
 
         drawer.batchDraw(image.graphics, drawPoints, StrokeParams(Colors.GREEN, width = 5f, alpha = 0.75f, method = ERASE), 100, 100)
 

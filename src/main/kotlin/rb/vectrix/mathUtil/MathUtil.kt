@@ -1,5 +1,7 @@
 package rb.vectrix.mathUtil
 
+import rb.vectrix.linear.Vec2
+import rb.vectrix.linear.Vec2d
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -42,12 +44,18 @@ object MathUtil {
         else -> ((t - start) % diff + diff) % diff + start
     }
 
+    // Linear Interpolation
     fun lerp( min: Float, max: Float, t:Float) = min + (max - min)*t
     fun lerp( min: Double, max: Double, t:Double) = min + (max - min)*t
+    // Opposite of Lerp, so just scaling
     fun derp( minT: Float, maxT: Float, t:Float) = (t - minT)/(maxT-minT)
     fun derp( minT: Double, maxT: Double, t:Double) = (t - minT)/(maxT-minT)
+    // Combine Lerp + Derp to do a basic 1D Linear Transform
     fun lerpyDerp(min: Float, max:Float, lowT: Float, highT: Float, t: Float) = min + (max-min)*(t-lowT)/(highT-lowT)
     fun lerpyDerp(min: Double, max:Double, lowT: Double, highT: Double, t: Double) = min + (max-min)*(t-lowT)/(highT-lowT)
+    // Clip + LerpyDerp
+    fun cLerpyDerp(min: Float, max:Float, lowT: Float, highT: Float, t: Float) = clip(min,  min + (max-min)*(t-lowT)/(highT-lowT), max)
+    fun cLerpyDerp(min: Double, max:Double, lowT: Double, highT: Double, t: Double) = clip(min, min + (max-min)*(t-lowT)/(highT-lowT), max)
 
     //region minOrNull
     fun minOrNull(a: Int?, b: Int?) = when {
@@ -179,4 +187,7 @@ object MathUtil {
             else -> maxOf(a,b,c)
         }
     }
+    // endregion
+
+    fun projectOnto(vector: Vec2, theta: Double) = vector.dot( Vec2d(1.0,0.0).rotate(theta))
 }

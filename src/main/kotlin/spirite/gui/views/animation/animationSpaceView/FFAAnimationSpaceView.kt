@@ -14,6 +14,7 @@ import sgui.components.crossContainer.CrossInitializer
 import sgui.components.crossContainer.ICrossPanel
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SwComponent
+import sguiSwing.hybrid.Hybrid
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
@@ -21,7 +22,6 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.Spacial
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationPlayObserver
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
 import spirite.base.util.linear.Rect
-import sguiSwing.hybrid.Hybrid
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics

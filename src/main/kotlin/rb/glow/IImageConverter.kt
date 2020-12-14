@@ -1,7 +1,7 @@
-package rb.glow.gle
+package rb.glow
 
-import rb.glow.IImage
-import rb.glow.RawImage
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
 import kotlin.reflect.KClass
 
 interface IImageConverter {
@@ -11,7 +11,7 @@ interface IImageConverter {
     fun convertOrNull(image: IImage, toType : KClass<*>) : IImage?
 }
 
-object DummyConverter : IImageConverter{
+object DummyConverter : IImageConverter {
     override fun convertToInternal(image: IImage): RawImage {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

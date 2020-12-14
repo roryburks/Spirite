@@ -3,6 +3,8 @@ package spirite.gui.views
 import rbJvm.owl.addWeakObserver
 import sguiSwing.components.SwMenuBar
 import sguiSwing.components.jcomponent
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.SwHybrid
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DebugCommands
@@ -28,8 +30,6 @@ import spirite.gui.views.tool.PaletteSection
 import spirite.gui.views.tool.ToolSection
 import spirite.gui.views.tool.ToolSettingsSection
 import spirite.gui.views.work.WorkTabPane
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.SwHybrid
 import spirite.pc.menus.SwContextMenus
 import java.awt.Dimension
 import java.awt.GridLayout

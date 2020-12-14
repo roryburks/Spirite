@@ -10,6 +10,9 @@ import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.components.events.MouseEvent.MouseEventType.RELEASED
 import sguiSwing.components.SwComponent
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.customGui.ArrowPanel
+import sguiSwing.hybrid.customGui.DashedOutPanel
 import sguiSwing.skin.Skin.FFAAnimation.Arrow
 import sguiSwing.skin.Skin.Global.Bg
 import sguiSwing.skin.Skin.Global.Fg
@@ -21,9 +24,6 @@ import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.MenuItem
 import spirite.gui.menus.dialogs.IDialog
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.customGui.ArrowPanel
-import sguiSwing.hybrid.customGui.DashedOutPanel
 import java.awt.image.BufferedImage
 import java.io.InvalidClassException
 

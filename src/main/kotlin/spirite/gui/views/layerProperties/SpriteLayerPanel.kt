@@ -1,7 +1,7 @@
 package spirite.gui.views.layerProperties
 
-import rb.IContract
-import rb.glow.color.Colors
+import rb.global.IContract
+import rb.glow.Colors
 import rb.owl.Observer
 import rb.owl.bindable.Bindable
 import rbJvm.glow.awt.NativeImage
@@ -13,6 +13,7 @@ import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.components.crossContainer.ICrossPanel
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseButton.RIGHT
+import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.graphics.rendering.IThumbnailStore
@@ -21,7 +22,6 @@ import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.SpriteLayerContextMenus
 import spirite.gui.resources.SpiriteIcons
-import sguiSwing.hybrid.Hybrid
 
 class SpriteLayerPanel(
         workspaceSet: IWorkspaceSet,

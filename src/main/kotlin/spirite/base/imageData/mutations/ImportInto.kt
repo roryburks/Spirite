@@ -1,7 +1,7 @@
 package spirite.base.imageData.mutations
 
-import spirite.base.imageData.MImageWorkspace
 import sguiSwing.hybrid.Transferables.ILayerBuilder
+import spirite.base.imageData.MImageWorkspace
 
 
 fun MImageWorkspace.ImportInto(layerBuilder: ILayerBuilder) {

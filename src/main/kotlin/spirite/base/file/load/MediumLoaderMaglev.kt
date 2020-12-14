@@ -9,6 +9,10 @@ import rb.vectrix.interpolation.CubicSplineInterpolator2D
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.round
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.MDebug
+import sguiSwing.hybrid.MDebug.ErrorType.FILE
+import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.file.SaveLoadUtil
@@ -27,10 +31,6 @@ import spirite.base.pen.stroke.DrawPointsBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.ErrorType.FILE
-import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
 
 
 object MagneticMediumLoader : IMediumLoader

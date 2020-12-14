@@ -1,7 +1,7 @@
 package spirite.gui.views.work
 
-import rb.glow.GraphicsContext
-import rb.glow.color.Colors
+import rb.glow.Colors
+import rb.glow.IGraphicsContext
 import sguiSwing.components.ISwComponent
 import sguiSwing.skin.Skin
 import spirite.specialRendering.SpecialDrawerFactory
@@ -12,7 +12,7 @@ abstract class WorkArea(
 
     var i = 0
 
-    fun drawWork( gc: GraphicsContext) {
+    fun drawWork( gc: IGraphicsContext) {
         gc.clear( Skin.Global.Bg.scolor)
         gc.color = Colors.RED
 
@@ -24,10 +24,13 @@ abstract class WorkArea(
 
             val drawer = SpecialDrawerFactory.makeSpecialDrawer(gc)
             drawer.drawTransparencyBg(0, 0, workspace.width, workspace.height, 8)
+            gc.color = Colors.WHITE
 
             // TODO: Draw Reference Behind
 
-            gc.renderImage(workspace.renderEngine.renderWorkspace(workspace), 0, 0)
+            val rimg = workspace.renderEngine.renderWorkspace(workspace)
+            gc.renderImage(rimg, 0.0, 0.0)
+            //Hybrid.imageIO.saveImage(rimg, File("C:\\Bucket\\r.png"))
 
             // TODO: Draw Reference In Front
 
@@ -39,7 +42,7 @@ abstract class WorkArea(
                 gc.alpha = 0.3f
                 gc.color = Skin.DrawPanel.LayerBorder.scolor
                 gc.transform( active.tMediumToWorkspace)
-                gc.drawRect(active.handle.x, active.handle.y, active.handle.width, active.handle.height)
+                //gc.drawer.drawRect(active.handle.x.d, active.handle.y.d, active.handle.width.d, active.handle.height.d)
 
                 gc.popTransform()
             }

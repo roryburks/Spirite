@@ -1,6 +1,6 @@
 package sgui.components
 
-import rb.glow.color.Color
+import rb.glow.Color
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.functions.InvertibleFunction

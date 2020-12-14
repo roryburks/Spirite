@@ -1,6 +1,6 @@
 package spirite.gui.views.animation.structureView
 
-import rb.IContract
+import rb.global.IContract
 import rb.extendo.dataStructures.SinglySequence
 import rb.extendo.extensions.then
 import rbJvm.owl.addWeakObserver
@@ -14,6 +14,7 @@ import sgui.components.events.MouseEvent
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SJPanel
 import sguiSwing.components.SwComponent
+import sguiSwing.hybrid.Hybrid
 import sguiSwing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
@@ -26,7 +27,6 @@ import spirite.base.util.linear.Rect
 import spirite.gui.views.animation.structureView.ffa.FfaStructBuilderFactory
 import spirite.gui.views.animation.structureView.ffa.IAnimDragBehavior
 import spirite.gui.views.animation.structureView.ffa.IFFAStructView
-import sguiSwing.hybrid.Hybrid
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.lang.ref.WeakReference

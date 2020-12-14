@@ -2,21 +2,21 @@ package spirite.base.file.aaf
 
 import rb.extendo.extensions.pop
 import rb.extendo.extensions.toLookup
-import rb.glow.IImage
-import rb.glow.RawImage
+import rb.glow.img.IImage
+import rb.glow.img.RawImage
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rb.vectrix.rectanglePacking.PackedRectangle
+import sguiSwing.hybrid.Hybrid
+import sguiSwing.hybrid.IImageCreator
+import sguiSwing.hybrid.IImageIO
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.mediums.IImageMedium
 import spirite.base.util.linear.Rect
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.IImageCreator
-import sguiSwing.hybrid.IImageIO
 import java.io.File
 import java.io.RandomAccessFile
 
@@ -148,7 +148,7 @@ class AafExporter(
         val chunkMap = packed.packedRects
                 .mapIndexed { index, rect ->
                     val image= imagesByDimension[Vec2i(rect.wi, rect.hi)]!!.pop()
-                    img.graphics.renderImage(image, rect.x1i, rect.y1i)
+                    img.graphics.renderImage(image, rect.x1, rect.y1)
                     Pair(image, index)
                 }.toMap()
 
