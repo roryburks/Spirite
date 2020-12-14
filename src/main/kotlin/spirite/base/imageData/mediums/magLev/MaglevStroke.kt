@@ -40,6 +40,7 @@ class MaglevStroke(
     }
 
     fun draw(gc: IGraphicsContext, strokeProvider: IStrokeDrawerProvider, width: Int, height:Int) {
+        println("draw")
         strokeProvider.getStrokeDrawer(params).batchDraw(gc, drawPoints, params,width, height)
     }
 

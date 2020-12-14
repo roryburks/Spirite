@@ -37,14 +37,14 @@ object LittleEndian {
         override val len: Int get() = 4
 
         override fun interpret(byteArray: ByteArray): Float {
-            val w = ByteBuffer.wrap(byteArray).order(ByteOrder.LITTLE_ENDIAN)
+            val w = ByteBuffer.wrap(byteArray).order(ByteOrder.BIG_ENDIAN)
             return w.float
         }
     }
     class FloatArrayInter(val n: Int) : IBinaryInterpreter<FloatArray> {
         override val len: Int get() = n*4
         override fun interpret(byteArray: ByteArray): FloatArray {
-            val w = ByteBuffer.wrap(byteArray).order(ByteOrder.LITTLE_ENDIAN)
+            val w = ByteBuffer.wrap(byteArray).order(ByteOrder.BIG_ENDIAN)
             val fa = FloatArray(n) { w.float}
 
             return fa
