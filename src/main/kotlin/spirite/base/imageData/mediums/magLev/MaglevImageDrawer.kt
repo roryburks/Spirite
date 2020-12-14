@@ -242,6 +242,7 @@ class MaglevMagneticFillModule(val arranged: ArrangedMediumData, val maglev: Mag
         if( segments.filter{maglev.thingsMap[it.strokeId] !is MaglevStroke}.any()){
             println("brk")
         }
+        println(mode)
         val fill = MaglevFill(segments.map {StrokeSegment(it.strokeId, it.pivotPoint, it.pivotPoint + it.travel)}, mode, color)
         maglev.addThing(fill,  arranged, "Magnetic Fill")
     }
