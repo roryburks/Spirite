@@ -1,6 +1,6 @@
 package spirite.base.brains.commands.specific
 
-import rb.glow.color.Color
+import rb.glow.Color
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.imageData.IImageWorkspace
