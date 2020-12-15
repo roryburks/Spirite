@@ -60,7 +60,7 @@ class AafExporter(
         file.createNewFile()
 
         val ra = RandomAccessFile(file, "rw")
-        AafFileSaver.saveAAF(ra, animation, aafInfo)
+        AafFileSaver_3.saveAAF(ra, animation, aafInfo)
     }
 
     val regex = Regex("""\.([^.\\/]+)${'$'}""")
@@ -133,7 +133,7 @@ class AafExporter(
 //    }
 
 
-    internal data class AafInfo(
+    data class AafInfo(
             val img: RawImage,
             val chunks: List<Rect>,
             val chunkMap: Map<IImage,Int>)
