@@ -24,7 +24,7 @@ class AafV1Frame(
         val offsetX: Int,
         val offsetY: Int)
 
-object AafV1Importer : IAafImporter {
+class AafV1Importer(val version: Int) : IAafImporter {
     override fun importIntoWorkspace(context: AafLoadContext) {
         val ra = context.ra
         val ws = context.workspace
@@ -34,11 +34,18 @@ object AafV1Importer : IAafImporter {
         val anims = List(ra.readUnsignedShort()) {
             val name = ra.readUTF8NT()
             val rigs = List(ra.readUnsignedShort()) {
-                val frames = List(ra.readUnsignedByte()) {
-                    AafV1Frame(
+                val frames = List(ra.readUnsignedShort()) {
+                    var char: Char = ' '
+                    if( version >= 3) {
+                        char = ra.readByte().toChar()
+                        print(char)
+                    }
+                    val frame = AafV1Frame(
                             ra.readUnsignedShort(), // FrameId
                             ra.readUnsignedShort(), // ox
                             ra.readUnsignedShort()) // oy
+                    val drawdepth = ra.readInt()
+                    frame
                 }
 
                 AafV1Rig(frames)
@@ -49,10 +56,10 @@ object AafV1Importer : IAafImporter {
         // Frames
         val frames = List(ra.readUnsignedShort()) {
             RectI(
-                    ra.readInt(),
-                    ra.readInt(),
-                    ra.readInt(),
-                    ra.readInt())
+                    ra.readUnsignedShort(),
+                    ra.readUnsignedShort(),
+                    ra.readUnsignedShort(),
+                    ra.readUnsignedShort())
         }
 
         anims.forEach { importAnim(it, frames, context, rootImportNode) }

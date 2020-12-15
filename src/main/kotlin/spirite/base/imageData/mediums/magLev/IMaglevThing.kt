@@ -15,5 +15,6 @@ interface IMaglevPointwiseThing {
 }
 
 interface IMaglevColorwiseThing {
-    fun transformColor( lambda: (SColor) -> SColor)
+    // Returns whether or not it makes any changes.
+    fun transformColor( lambda: (SColor) -> SColor) :Boolean
 }

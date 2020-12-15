@@ -17,7 +17,8 @@ interface IClipboard
     {
         Image,
         Layer,
-        GroupNode
+        GroupNode,
+        String
     }
 
     fun postToClipboard( any: Any)
@@ -63,6 +64,8 @@ object SwClipboard : IClipboard
                 clip.getData(SpiriteLayerDataFlavor)
             (things?.contains(ClipboardThings.GroupNode) ?: true) && clip.isDataFlavorAvailable(SpiriteGroupNodeFlavor) ->
                 clip.getData(SpiriteGroupNodeFlavor)
+            (things?.contains(ClipboardThings.String) ?: true) && clip.isDataFlavorAvailable(DataFlavor.stringFlavor) ->
+                clip.getData(DataFlavor.stringFlavor)
             else -> null
         }
     }

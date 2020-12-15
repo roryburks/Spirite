@@ -1,6 +1,7 @@
 package spirite.base.file.load
 
 import rb.clicker.telemetry.TelemetryEvent
+import rb.clicker.telemetry.TelemetryStopwatch
 import rb.glow.Color
 import rb.glow.ColorARGB32Normal
 import rb.vectrix.mathUtil.d
@@ -34,6 +35,8 @@ class LoadContext(
     val nodes = mutableListOf<Node>()
     val animations = mutableListOf<Animation>()
     val telemetry = TelemetryEvent()
+    val tel2 = TelemetryStopwatch()
+
     lateinit var reindexingMap : Map<Int,Int>
 
     fun reindex( index : Int) = reindexingMap[index] ?: throw BadSifFileException("Medium Id $index does not correspond to any Medium Data")

@@ -1,17 +1,23 @@
 package spirite.base.file.aaf
 
+import rb.animo.io.aafWriter.AafWriterFactory
+import rb.animo.io.aafWriter.IAafWriterFactory
 import rb.extendo.extensions.pop
 import rb.extendo.extensions.toLookup
 import rb.glow.img.IImage
 import rb.glow.img.RawImage
+import rb.glow.using
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rb.vectrix.rectanglePacking.PackedRectangle
+import rbJvm.animo.JvmWriter
 import sguiSwing.hybrid.Hybrid
 import sguiSwing.hybrid.IImageCreator
 import sguiSwing.hybrid.IImageIO
+import spirite.base.file.aaf.export.AafExportConverter
+import spirite.base.file.aaf.export.IAafExportConverter
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
@@ -31,36 +37,39 @@ val defaultAafExporter : IAafExporter by lazy {
 }
 
 class AafExporter(
-        val imageCreator: IImageCreator,
-        val imageExporter: IImageIO,
-        val hasher: IDataStreamHasher)
+        private val imageCreator: IImageCreator,
+        private  val imageExporter: IImageIO,
+        private val hasher: IDataStreamHasher,
+        private val _aafWriterFactory : IAafWriterFactory = AafWriterFactory)
     : IAafExporter
 {
+    private val _converter : IAafExportConverter = AafExportConverter(imageCreator, ModifiedSleatorAlgorithm)
+
     override fun export(animation: FixedFrameAnimation, filename: String) {
+        // 0 : select file name
         val (pngFilename, aafFilename) = getFilenames(filename)
 
-        // Step 1: Gather all flat image segments needed by the animation
-        val uniqueImages = getAllImages(animation)
-                .toList()
+        // 1: Parse as data
+        val (aaf, mapping) = _converter.convert(animation)
 
-        // Step 3: Use RectShape Packing Algorithm to pack them.
-        val packed = ModifiedSleatorAlgorithm(
-                uniqueImages.map { Vec2i(it.width, it.height) })
+        // 2: Save PNG
+        imageExporter.saveImage(mapping.img, File(pngFilename))
 
-        // Step 3: Construct packed Image and map from Image -> Rect
-        val aafInfo = drawAndMap(packed, uniqueImages)
-
-        // Step 4: Save Png
-        imageExporter.saveImage(aafInfo.img, File(pngFilename))
-
-        // Step 5: Save Aaf
+        // 3: Save Aaf
         val file = File(aafFilename)
         if( file.exists())
             file.delete()
         file.createNewFile()
-
         val ra = RandomAccessFile(file, "rw")
-        AafFileSaver.saveAAF(ra, animation, aafInfo)
+        try {
+            val writer = JvmWriter(ra)
+            val aafWriter = _aafWriterFactory.get()
+            aafWriter.write(writer, aaf)
+        }
+        finally {
+            ra.close()
+        }
+
     }
 
     val regex = Regex("""\.([^.\\/]+)${'$'}""")
@@ -74,17 +83,6 @@ class AafExporter(
             null -> Pair("$filename.png", "$filename.aaf")
             else -> Pair(filename.substring(0,filename.length - extension.length) + "png", filename)
         }
-    }
-
-    fun getAllImages(animation: FixedFrameAnimation) : Sequence<IImage> {
-        return animation.layers.asSequence()
-                .flatMap { it.frames.asSequence().filterIsInstance<FFAFrame>().map { it.node }.filterIsInstance<LayerNode>() }
-                .flatMap { it.getDrawList().asSequence() }
-                .map { it.handle.medium }
-                .filterIsInstance<IImageMedium>()
-                .flatMap { it.getImages().asSequence() }
-                .map { it.image }
-                .distinct()
     }
 
 //    fun deDuplicateImages(images: Sequence<IImage>) : Map<IImage,MutableList<IImage>>
@@ -133,27 +131,5 @@ class AafExporter(
 //    }
 
 
-    internal data class AafInfo(
-            val img: RawImage,
-            val chunks: List<Rect>,
-            val chunkMap: Map<IImage,Int>)
 
-    private fun drawAndMap(packed: PackedRectangle, uniqueImages: List<IImage>)
-            : AafInfo
-    {
-        val img = imageCreator.createImage(packed.width, packed.height)
-
-        val imagesByDimension = uniqueImages.toLookup { Vec2i(it.width, it.height) }
-
-        val chunkMap = packed.packedRects
-                .mapIndexed { index, rect ->
-                    val image= imagesByDimension[Vec2i(rect.wi, rect.hi)]!!.pop()
-                    img.graphics.renderImage(image, rect.x1, rect.y1)
-                    Pair(image, index)
-                }.toMap()
-
-        val chunks = packed.packedRects.map { Rect(it.x1i, it.y1i,it.wi, it.hi) }
-
-        return AafInfo(img, chunks, chunkMap)
-    }
 }

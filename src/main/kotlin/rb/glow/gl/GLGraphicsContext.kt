@@ -60,7 +60,7 @@ class GLGraphicsContext : AGraphicsContext {
 
     override var color: Color = Colors.BLACK
     override var alpha = 1f
-    override var composite: Composite = SRC_OVER
+    override var composite: Composite = SRC_OVER ; set(value) {field = value ; setCompositeBlend(cachedParams, composite)}
     override var lineAttributes: LineAttributes = LineAttributes(1f)
 
     private fun setCompositeBlend(params: GLParameters, composite: Composite) {

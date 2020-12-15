@@ -113,5 +113,4 @@ object SpriteCommands {
     val FlattenMaglevs = SpriteCommand("flattenMaglevs"){ sprite, part, master ->
         SpriteLayerFixes.SpriteMaglevToDynamic(sprite)
     }
-
 }

@@ -54,7 +54,7 @@ object AafImporter {
 
 object AafImportFactory {
     fun getImporter(version: Int) = when(version) {
-        1 -> AafV1Importer
+        1, 3 -> AafV1Importer(version)
         else -> throw BadAaaFileException("Unrecognized version number: $version")
     }
 }

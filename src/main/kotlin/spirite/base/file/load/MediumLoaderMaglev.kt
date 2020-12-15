@@ -1,5 +1,8 @@
 package spirite.base.file.load
 
+import rb.file.BufferedFileReader
+import rb.file.IFileReader
+import rb.file.JvmRandomAccessFileBinaryReadStream
 import rb.glow.ColorARGB32Normal
 import rb.glow.toColor
 import rb.vectrix.interpolation.CubicSplineInterpolator2D
@@ -35,7 +38,9 @@ object MagneticMediumLoader : IMediumLoader
     override fun loadMedium(context: LoadContext): IMedium? {
         val ra = context.ra
 
+        context.tel2.start("MegMediumLoad1")
         val numThings = ra.readUnsignedShort()
+
 
         val things = List<IMaglevThing?>(numThings) {
                 val thingType = ra.readByte()
@@ -48,15 +53,21 @@ object MagneticMediumLoader : IMediumLoader
 
                         val numVertices = ra.readInt()
 
+                        context.tel2.start("MegMediumLoad_Stroke_ArrayRead")
                         val x = ra.readFloatArray(numVertices)
                         val y = ra.readFloatArray(numVertices)
                         val w = ra.readFloatArray(numVertices)
+                        context.tel2.end("MegMediumLoad_Stroke_ArrayRead")
 
-                        MaglevStroke(
+                        context.tel2.start("MegMediumLoad_Stroke_Convert")
+                        val stroke = MaglevStroke(
                                 StrokeParams(color, strokeMethod, width = strokeWidth, mode = mode),
                                 DrawPoints(x, y, w))
+                        context.tel2.end("MegMediumLoad_Stroke_Convert")
+                        stroke
                     }
                     SaveLoadUtil.MAGLEV_THING_FILL -> {
+                        context.tel2.start("MegMediumLoad_Stroke_Fill")
                         val color = ColorARGB32Normal(ra.readInt())
                         val mode = MagneticFillMode.fromFileId(ra.readByte().i)!!
 
@@ -67,7 +78,9 @@ object MagneticMediumLoader : IMediumLoader
                             val end = ra.readInt()
                             StrokeSegment(strokeId, start, end)
                         }
-                        MaglevFill(segments, mode, color)
+                        val fill = MaglevFill(segments, mode, color)
+                        context.tel2.end("MegMediumLoad_Stroke_Fill")
+                        fill
                     }
                     else -> {
                         MDebug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
@@ -76,6 +89,8 @@ object MagneticMediumLoader : IMediumLoader
 
                 }
             }.filterNotNull()
+        context.tel2.end("MegMediumLoad1")
+        context.tel2.start("MegMediumLoad2")
 
         val imgSize = if( context.version >= 0x0001_0009) ra.readInt() else 0
         val xoffset = if( context.version >= 0x0001_0009) ra.readUnsignedShort() else 0
@@ -90,9 +105,96 @@ object MagneticMediumLoader : IMediumLoader
         }
 
         val thingMap = things.mapIndexed { i, thing -> Pair(i,thing) }.toMap()
-        return MaglevMedium(context.workspace, thingMap, DynamicImage(img, xoffset, yoffset), (thingMap.keys.max() ?: 0)+1)
+        val ret = MaglevMedium(context.workspace, thingMap, DynamicImage(img, xoffset, yoffset), (thingMap.keys.max() ?: 0)+1)
+        context.tel2.end("MegMediumLoad2")
+        return ret
     }
 }
+
+object MagneticMediumLoader_V2 : IMediumLoader
+{
+    override fun loadMedium(context: LoadContext): IMedium? {
+        //val ra = context.ra
+        val ra = BufferedFileReader(JvmRandomAccessFileBinaryReadStream(context.ra))
+
+        context.tel2.start("MegMediumLoad1")
+        val numThings = ra.readUnsignedShort()
+
+
+        val things = List<IMaglevThing?>(numThings) {
+            val thingType = ra.readByte()
+            when (thingType.i) {
+                SaveLoadUtil.MAGLEV_THING_STROKE -> {
+                    val color = ra.readInt().toColor()
+                    val strokeMethod = Method.fromFileId(ra.readByte().i) ?: BASIC
+                    val strokeWidth = ra.readFloat()
+                    val mode = PenDrawMode.fromFileId(ra.readUnsignedByte())
+
+                    val numVertices = ra.readInt()
+
+                    context.tel2.start("MegMediumLoad_Stroke_ArrayRead")
+                    val x = ra.readFloatArray(numVertices)
+                    val y = ra.readFloatArray(numVertices)
+                    val w = ra.readFloatArray(numVertices)
+                    context.tel2.end("MegMediumLoad_Stroke_ArrayRead")
+
+                    context.tel2.start("MegMediumLoad_Stroke_Convert")
+                    val stroke = MaglevStroke(
+                            StrokeParams(color, strokeMethod, width = strokeWidth, mode = mode),
+                            DrawPoints(x, y, w))
+                    context.tel2.end("MegMediumLoad_Stroke_Convert")
+                    stroke
+                }
+                SaveLoadUtil.MAGLEV_THING_FILL -> {
+                    context.tel2.start("MegMediumLoad_Stroke_Fill")
+                    val color = ColorARGB32Normal(ra.readInt())
+                    val mode = MagneticFillMode.fromFileId(ra.readByte().i)!!
+
+                    val numSeqments = ra.readUnsignedShort()
+                    val segments = List(numSeqments) {
+                        val strokeId = ra.readInt()
+                        val start = ra.readInt()
+                        val end = ra.readInt()
+                        StrokeSegment(strokeId, start, end)
+                    }
+                    val fill = MaglevFill(segments, mode, color)
+                    context.tel2.end("MegMediumLoad_Stroke_Fill")
+                    fill
+                }
+                else -> {
+                    MDebug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
+                    null
+                }
+
+            }
+        }.filterNotNull()
+        context.tel2.end("MegMediumLoad1")
+        context.tel2.start("MegMediumLoad2")
+
+        val imgSize = if( context.version >= 0x0001_0009) ra.readInt() else 0
+        val xoffset = if( context.version >= 0x0001_0009) ra.readUnsignedShort() else 0
+        val yoffset = if( context.version >= 0x0001_0009) ra.readUnsignedShort() else 0
+
+        val img = when( imgSize) {
+            0 -> null
+            else -> {
+                val imgData = ra.readByteArray(imgSize)
+                //val imgData = ByteArray(imgSize).apply { ra.read( this) }
+                Hybrid.imageIO.loadImage(imgData)
+            }
+        }
+
+        val thingMap = things.mapIndexed { i, thing -> Pair(i,thing) }.toMap()
+        val ret = MaglevMedium(context.workspace, thingMap, DynamicImage(img, xoffset, yoffset), (thingMap.keys.max() ?: 0)+1)
+        context.tel2.end("MegMediumLoad2")
+        if( ra._buffer != null) {
+            val rollback = (ra.bufferSize - ra._bCarat)
+            context.ra.seek(context.ra.filePointer - rollback)
+        }
+        return ret
+    }
+}
+
 
 // region Legacy
 object Legacy_1_0006_MagneticMediumPartialLoader : IMediumLoader
