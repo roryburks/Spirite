@@ -1,11 +1,16 @@
 root: ../src/main/kotlin
 
+/rb/animo
+/rb/clicker
 /rb/extendo
+/rb/file
+/rb/global
 /rb/glow
 /rb/hydra
 /rb/owl
 /rb/vectrix
 
+/rbJvm/animo
 /rbJvm/file
 /rbJvm/glow
 /rbJvm/owl
