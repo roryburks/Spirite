@@ -75,7 +75,8 @@ class BindableMList<T>(col: Collection<T> = emptyList()) : IBindableMList<T>
         val bindings = hashSetOf(root)
     }
 
-    private inner class ObserverContract(val observer: IMutableListObserver<T>) : IContract {
+    private inner class ObserverContract(val observer: IMutableListObserver<T>) :
+        IContract {
         init {observers.add(observer) }
         override fun void() {observers.remove(observer)}
     }

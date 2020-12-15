@@ -1,7 +1,6 @@
 root: ../src/main/kotlin
 
 /rb/animo
-/rb/clicker
 /rb/extendo
 /rb/file
 /rb/global

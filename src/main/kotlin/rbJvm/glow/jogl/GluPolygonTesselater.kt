@@ -22,8 +22,8 @@ object GluPolygonTesselater :IPolygonTesselator {
         GLU.gluTessCallback(tess, GLU.GLU_TESS_COMBINE, callback)
 
         GLU.gluTessProperty(tess,
-                GLU.GLU_TESS_WINDING_RULE,
-                GLU.GLU_TESS_WINDING_ODD.toDouble())
+            GLU.GLU_TESS_WINDING_RULE,
+            GLU.GLU_TESS_WINDING_ODD.toDouble())
         GLU.gluTessBeginPolygon(tess, null)
         GLU.gluTessBeginContour(tess)
         for (i in 0 until count) {

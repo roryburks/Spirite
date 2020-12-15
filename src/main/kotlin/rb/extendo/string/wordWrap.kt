@@ -15,7 +15,7 @@ fun String.wordWrap(perLine: Int, splittingChars :Set<Char> = setOf(' ','-')) : 
             }
             else -> {
                 val start = caret
-                while( caret < input.length && input[++caret] !in splitOn) {}
+                while( caret < input.length && input.getOrNull(++caret) !in splitOn) {}
                 return input.substring(start, caret)
             }
         }

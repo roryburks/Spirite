@@ -5,7 +5,7 @@ import rb.glow.img.RawImage
 import java.awt.image.BufferedImage
 
 class ImageBI(
-        val bi: BufferedImage
+    val bi: BufferedImage
 ) : RawImage {
     override fun getARGB(x: Int, y: Int): Int = bi.getRGB(x,y)
 

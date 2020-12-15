@@ -8,7 +8,7 @@ import java.lang.ref.WeakReference
 
 object JvmImageTracker : IGLImageTracker{
     private data class ImageData(
-            val w: Int, val h: Int, val tex: IGLTexture, val gl: IGL)
+        val w: Int, val h: Int, val tex: IGLTexture, val gl: IGL)
 
     override val images get() = _images.mapNotNull { it.first.get() }
     private val _images = mutableListOf<Pair<WeakReference<GLImage>, ImageData>>()

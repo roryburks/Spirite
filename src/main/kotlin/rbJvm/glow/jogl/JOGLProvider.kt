@@ -17,10 +17,10 @@ object JOGLProvider {
     //  just a single variable and a ton of methods.
     val gl : IGL
         get() {
-        val gl2 = gl2 ?: _gl.gL2
+            val gl2 = gl2 ?: _gl.gL2
 
-        return JOGL(gl2)
-    }
+            return JOGL(gl2)
+        }
 
 
 
@@ -40,10 +40,10 @@ object JOGLProvider {
         caps.isOnscreen = false
 
         drawable = fact.createOffscreenAutoDrawable(
-                fact.defaultDevice,
-                caps,
-                DefaultGLCapabilitiesChooser(),
-                1, 1)
+            fact.defaultDevice,
+            caps,
+            DefaultGLCapabilitiesChooser(),
+            1, 1)
 
         var exception : Exception? = null
         var gl : GL? = null

@@ -14,7 +14,7 @@ import java.nio.IntBuffer
  * A wrapper to integrate JOGL's GL2 object into an IGL interface
  */
 class JOGL(
-        val gl : GL2
+    val gl : GL2
 ) : IGL {
     override val tracker: IGLImageTracker get() = JvmImageTracker
 
@@ -27,11 +27,11 @@ class JOGL(
     }
 
     override fun viewport(x: Int, y: Int, w: Int, h: Int) =
-            gl.glViewport(x,y,w,h)
+        gl.glViewport(x,y,w,h)
     override fun enable(cap: Int) =
-            gl.glEnable(cap)
+        gl.glEnable(cap)
     override fun disable(cap: Int) =
-            gl.glDisable(cap)
+        gl.glDisable(cap)
 
     override fun getError() =gl.glGetError()
 
@@ -46,7 +46,7 @@ class JOGL(
         return if(shaderId == 0) null else JOGLShader(shaderId)
     }
     override fun deleteShader(shader: IGLShader) =
-            gl.glDeleteShader((shader as JOGLShader).shaderId )
+        gl.glDeleteShader((shader as JOGLShader).shaderId )
     override fun shaderSource(shader: IGLShader, source: String) {
         val shaderId = (shader as JOGLShader).shaderId
         val lines = arrayOf(source)
@@ -54,7 +54,7 @@ class JOGL(
         gl.glShaderSource( shaderId, 1, lines, lengths)
     }
     override fun compileShader(shader: IGLShader) =
-            gl.glCompileShader( (shader as JOGLShader).shaderId)
+        gl.glCompileShader( (shader as JOGLShader).shaderId)
     override fun shaderCompiledSuccessfully(shader: IGLShader) : Boolean {
         val shaderId = (shader as JOGLShader).shaderId
         val status = IntBuffer.allocate(1)
@@ -87,9 +87,9 @@ class JOGL(
     override fun useProgram(program: IGLProgram?) = gl.glUseProgram((program as? JOGLProgram)?.programId ?: 0)
 
     override fun attachShader(program: IGLProgram, shader: IGLShader) =
-            gl.glAttachShader( (program as JOGLProgram).programId, (shader as JOGLShader).shaderId)
+        gl.glAttachShader( (program as JOGLProgram).programId, (shader as JOGLShader).shaderId)
     override fun detatchShader(program: IGLProgram, shader: IGLShader) =
-            gl.glDetachShader( (program as JOGLProgram).programId, (shader as JOGLShader).shaderId)
+        gl.glDetachShader( (program as JOGLProgram).programId, (shader as JOGLShader).shaderId)
 
     override fun linkProgram(program: IGLProgram) = gl.glLinkProgram((program as JOGLProgram).programId)
 
@@ -131,18 +131,18 @@ class JOGL(
     }
 
     override fun deleteTexture(texture: IGLTexture) =
-            gl.glDeleteTextures( 1, intArrayOf((texture as JOGLTexture).texId), 0)
+        gl.glDeleteTextures( 1, intArrayOf((texture as JOGLTexture).texId), 0)
     override fun bindTexture(target: Int, texture: IGLTexture?) =
-            gl.glBindTexture( target, (texture as JOGLTexture).texId)
+        gl.glBindTexture( target, (texture as JOGLTexture).texId)
     override fun activeTexture(texture: Int) =
-            gl.glActiveTexture( texture)
+        gl.glActiveTexture( texture)
     override fun texParameteri(target: Int, pname: Int, param: Int) =
-            gl.glTexParameteri(target, pname, param)
+        gl.glTexParameteri(target, pname, param)
 
     class JOGLTextureSource(
-            val width: Int,
-            val height: Int,
-            val buffer: Buffer
+        val width: Int,
+        val height: Int,
+        val buffer: Buffer
     ) : ITextureSource
 
     override fun texImage2D(target: Int, level: Int, internalformat: Int, format: Int, type: Int, source: ITextureSource) {
@@ -167,36 +167,36 @@ class JOGL(
     class JOGLUniformLocation( val locId: Int) : IGLUniformLocation
 
     override fun getUniformLocation(program: IGLProgram, name: String): IGLUniformLocation? =
-            JOGLUniformLocation(gl.glGetUniformLocation((program as JOGLProgram).programId, name))
+        JOGLUniformLocation(gl.glGetUniformLocation((program as JOGLProgram).programId, name))
 
     override fun uniform1f(location: IGLUniformLocation?, x: Float) =
-            gl.glUniform1f((location as JOGLUniformLocation).locId, x)
+        gl.glUniform1f((location as JOGLUniformLocation).locId, x)
     override fun uniform2f(location: IGLUniformLocation?, x: Float, y: Float) =
-            gl.glUniform2f((location as JOGLUniformLocation).locId, x, y)
+        gl.glUniform2f((location as JOGLUniformLocation).locId, x, y)
     override fun uniform3f(location: IGLUniformLocation?, x: Float, y: Float, z: Float) =
-            gl.glUniform3f((location as JOGLUniformLocation).locId, x, y, z)
+        gl.glUniform3f((location as JOGLUniformLocation).locId, x, y, z)
     override fun uniform4f(location: IGLUniformLocation?, x: Float, y: Float, z: Float, w: Float) =
-            gl.glUniform4f((location as JOGLUniformLocation).locId, x, y, z, w)
+        gl.glUniform4f((location as JOGLUniformLocation).locId, x, y, z, w)
 
     override fun uniform1i(location: IGLUniformLocation?, x: Int) =
-            gl.glUniform1i((location as JOGLUniformLocation).locId, x)
+        gl.glUniform1i((location as JOGLUniformLocation).locId, x)
     override fun uniform2i(location: IGLUniformLocation?, x: Int, y: Int) =
-            gl.glUniform2i((location as JOGLUniformLocation).locId, x, y)
+        gl.glUniform2i((location as JOGLUniformLocation).locId, x, y)
     override fun uniform3i(location: IGLUniformLocation?, x: Int, y: Int, z: Int) =
-            gl.glUniform3i((location as JOGLUniformLocation).locId, x, y, z)
+        gl.glUniform3i((location as JOGLUniformLocation).locId, x, y, z)
     override fun uniform4i(location: IGLUniformLocation?, x: Int, y: Int, z: Int, w: Int) =
-            gl.glUniform4i((location as JOGLUniformLocation).locId, x, y, z, w)
+        gl.glUniform4i((location as JOGLUniformLocation).locId, x, y, z, w)
 
     override fun uniformMatrix4fv(location: IGLUniformLocation?, data: IFloat32Source) =
         gl.glUniformMatrix4fv((location as JOGLUniformLocation).locId, 1, false, (data as JOGLFloat32Source).data)
 
     override fun uniform1iv(location: IGLUniformLocation?, data: IInt32Source) =
-            gl.glUniform1iv((location as JOGLUniformLocation).locId, data.length, (data as JOGLInt32Source).data)
+        gl.glUniform1iv((location as JOGLUniformLocation).locId, data.length, (data as JOGLInt32Source).data)
 
 
 
     override fun getAttribLocation(program: IGLProgram, name: String): Int =
-            gl.glGetAttribLocation((program as JOGLProgram).programId, name)
+        gl.glGetAttribLocation((program as JOGLProgram).programId, name)
     // endregion
 
     // region Buffers
@@ -211,9 +211,9 @@ class JOGL(
     }
 
     override fun deleteBuffer(buffer: IGLBuffer) =
-            gl.glDeleteBuffers(1, intArrayOf((buffer as JOGLBuffer).bufferId), 0)
+        gl.glDeleteBuffers(1, intArrayOf((buffer as JOGLBuffer).bufferId), 0)
     override fun bindBuffer(target: Int, buffer: IGLBuffer?) =
-            gl.glBindBuffer(target, (buffer as? JOGLBuffer)?.bufferId ?: 0)
+        gl.glBindBuffer(target, (buffer as? JOGLBuffer)?.bufferId ?: 0)
 
     override fun bufferData(target: Int, data: IArraySource, usage: Int) {
         if( data is JOGLFloat32Source)
@@ -225,19 +225,19 @@ class JOGL(
     override fun disableVertexAttribArray(index: Int) = gl.glDisableVertexAttribArray(index)
 
     override fun vertexAttribPointer(index: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int) =
-            gl.glVertexAttribPointer(index, size, type, normalized, stride, offset.toLong())
+        gl.glVertexAttribPointer(index, size, type, normalized, stride, offset.toLong())
     // endregion
 
     // region Blending
     override fun blendFunc(sfactor: Int, dfactor: Int) =
-            gl.glBlendFunc(sfactor, dfactor)
+        gl.glBlendFunc(sfactor, dfactor)
     override fun blendEquation(mode: Int) =
-            gl.glBlendEquation(mode)
+        gl.glBlendEquation(mode)
 
     override fun blendFuncSeparate(srcRGB: Int, destRGB: Int, srcAlpha: Int, destAlpha: Int) =
-            gl.glBlendFuncSeparate(srcRGB,destRGB,srcAlpha,destAlpha)
+        gl.glBlendFuncSeparate(srcRGB,destRGB,srcAlpha,destAlpha)
     override fun blendEquationSeparate(modeRGB: Int, modeAlpha: Int) =
-            gl.glBlendEquationSeparate( modeRGB, modeAlpha)
+        gl.glBlendEquationSeparate( modeRGB, modeAlpha)
     // endregion
 
     // region Framebuffer
@@ -251,13 +251,13 @@ class JOGL(
         return JOGLFramebuffer( result[0])
     }
     override fun deleteFramebuffer(buffer: IGLFramebuffer) =
-            gl.glDeleteFramebuffers( 1, intArrayOf((buffer as JOGLFramebuffer).fboID), 0)
+        gl.glDeleteFramebuffers( 1, intArrayOf((buffer as JOGLFramebuffer).fboID), 0)
     override fun bindFrameBuffer(target: Int, buffer: IGLFramebuffer?) =
-            gl.glBindFramebuffer( target, (buffer as? JOGLFramebuffer)?.fboID ?: 0)
+        gl.glBindFramebuffer( target, (buffer as? JOGLFramebuffer)?.fboID ?: 0)
     override fun framebufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: IGLTexture, level: Int) =
-            gl.glFramebufferTexture2D( target, attachment, textarget, (texture as JOGLTexture).texId, level)
+        gl.glFramebufferTexture2D( target, attachment, textarget, (texture as JOGLTexture).texId, level)
     override fun checkFramebufferStatus(target: Int) =
-            gl.glCheckFramebufferStatus(target)
+        gl.glCheckFramebufferStatus(target)
 
     inner class JOGLRenderbuffer(val dboId: Int) : IGLRenderbuffer {
         override val gl: IGL get() = this@JOGL
@@ -269,13 +269,13 @@ class JOGL(
     }
 
     override fun deleteRenderbuffer(renderBuffer: IGLRenderbuffer) =
-            gl.glDeleteRenderbuffers(1, intArrayOf((renderBuffer as JOGLRenderbuffer).dboId), 0)
+        gl.glDeleteRenderbuffers(1, intArrayOf((renderBuffer as JOGLRenderbuffer).dboId), 0)
     override fun bindRenderbuffer(target: Int, renderBuffer: IGLRenderbuffer) =
-            gl.glBindRenderbuffer(target, (renderBuffer as JOGLRenderbuffer).dboId)
+        gl.glBindRenderbuffer(target, (renderBuffer as JOGLRenderbuffer).dboId)
     override fun renderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int) =
-            gl.glRenderbufferStorage(target, internalformat, width, height)
+        gl.glRenderbufferStorage(target, internalformat, width, height)
     override fun framebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderBuffer: IGLRenderbuffer) =
-            gl.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, (renderBuffer as JOGLRenderbuffer).dboId)
+        gl.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, (renderBuffer as JOGLRenderbuffer).dboId)
     // endregion
 
     // region Data Sources
@@ -327,7 +327,7 @@ class JOGL(
     // endregion
 
     override fun drawArrays(mode: Int, first: Int, count: Int) =
-            gl.glDrawArrays( mode, first, count)
+        gl.glDrawArrays( mode, first, count)
 
     override fun readnPixels( x: Int, y: Int, w: Int, h: Int, format: Int, type: Int, n: Int, buffer: IArraySource){
         if( buffer is JOGLArraySource)

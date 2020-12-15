@@ -11,10 +11,10 @@ import java.awt.image.BufferedImage
 import java.nio.IntBuffer
 
 fun BufferedImage.deepCopy() = BufferedImage(
-        this.colorModel,
-        this.copyData(null),
-        this.isAlphaPremultiplied,
-        null)
+    this.colorModel,
+    this.copyData(null),
+    this.isAlphaPremultiplied,
+    null)
 
 fun GLImage.toBufferedImage() : BufferedImage {
     val gle = this.engine
@@ -37,9 +37,9 @@ fun IGLEngine.surfaceToBufferedImage(type: Int, width: Int, height: Int) : Buffe
             val ib = IntBuffer.wrap( internalStorage)
 
             gl.readPixels( 0, 0, width, height,
-                    GLC.BGRA,
-                    GLC.UNSIGNED_INT_8_8_8_8_REV,
-                    JOGLInt32Source(ib))
+                GLC.BGRA,
+                GLC.UNSIGNED_INT_8_8_8_8_REV,
+                JOGLInt32Source(ib))
 
             bi
         }
@@ -52,13 +52,13 @@ fun IGLEngine.surfaceToBufferedImage(type: Int, width: Int, height: Int) : Buffe
 /** Converts a MatTrans to an AffineTransform  */
 fun ITransformF.toAT(): AffineTransform {
     return AffineTransform(
-            this.m00f, this.m10f, this.m01f,
-            this.m11f, this.m02f, this.m12f)
+        this.m00f, this.m10f, this.m01f,
+        this.m11f, this.m02f, this.m12f)
 }
 
 /** Converts an AffineTransform to a MatTrans  */
 fun AffineTransform.toMT( ): MutableTransformF {
     return MutableTransformF(
-            this.scaleX.toFloat(), this.shearX.toFloat(), this.translateX.toFloat(),
-            this.shearY.toFloat(), this.scaleY.toFloat(), this.translateY.toFloat())
+        this.scaleX.toFloat(), this.shearX.toFloat(), this.translateX.toFloat(),
+        this.shearY.toFloat(), this.scaleY.toFloat(), this.translateY.toFloat())
 }
