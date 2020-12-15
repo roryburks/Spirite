@@ -5,8 +5,9 @@ interface IAafWriterFactory {
 }
 
 object AafWriterFactory : IAafWriterFactory {
-    override fun get(version: Int?) = when(version ?: 2) {
+    override fun get(version: Int?) = when( val v = version ?: 4) {
         2 -> AafWriter_v2
+        3, 4 -> AafWriter_v3_to_4(v)
         else -> throw NotImplementedError("unsupported Aaf Export Version: $version")
     }
 }
