@@ -2,6 +2,7 @@ package rbJvm.animo
 
 import rb.animo.animation.AafAnimation
 import rb.animo.io.*
+import rb.animo.io.aafReader.AafReaderFactory
 import rb.glow.gle.IGLEngine
 import rbJvm.glow.awt.ImageBI
 import java.awt.image.BufferedImage
@@ -22,7 +23,8 @@ class JvmAafLoader(private val _gle: IGLEngine) : ILoader<IAafScope> {
             loader.getResource(aafFile).openStream().use { inputStream ->
                 val dis = DataInputStream(inputStream)
                 val reader = JvmDataInputStreamReader(dis)
-                val aaf = AafParser.parseAaf(reader)
+                val version = reader.readInt()
+                val aaf = AafReaderFactory.getReader(version).read(reader)
 
                 val glimg = _gle.converter.convertToGL(ImageBI(img),_gle)
 
