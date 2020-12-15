@@ -1,7 +1,5 @@
 package spirite.base.file.load
 
-import rb.clicker.telemetry.TelemetryEvent
-import rb.clicker.telemetry.TelemetryStopwatch
 import rb.glow.Color
 import rb.glow.ColorARGB32Normal
 import rb.vectrix.mathUtil.d
@@ -17,6 +15,8 @@ import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.IMedium
+import spirite.base.telemetry.TelemetryEvent
+import spirite.base.telemetry.TelemetryStopwatch
 import java.io.File
 import java.io.RandomAccessFile
 import java.nio.charset.Charset

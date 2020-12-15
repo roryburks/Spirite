@@ -1,6 +1,5 @@
 package spirite.base.file.save
 
-import rb.clicker.telemetry.TelemetryEvent
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
 import sguiSwing.hybrid.Hybrid
@@ -28,6 +27,7 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.magLev.MaglevFill
 import spirite.base.imageData.mediums.magLev.MaglevStroke
+import spirite.base.telemetry.TelemetryEvent
 import java.io.File
 import java.io.RandomAccessFile
 import kotlin.math.min
