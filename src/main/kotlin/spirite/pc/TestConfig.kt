@@ -7,7 +7,7 @@ import java.io.File
 import javax.imageio.ImageIO
 
 object TestConfig {
-    val save = true
+    val save = false
     val saveLocation = "C:\\Bucket\\sunit"
 
     fun trySave(image: IImage, name: String) {

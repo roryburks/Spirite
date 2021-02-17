@@ -211,7 +211,11 @@ object LoadEngine {
         val endPointer = ra.filePointer + chunkSize
 
         while( ra.filePointer < endPointer) {
+            //if( ra.filePointer > 340000)
+              //  println("A")
             val id = ra.readInt()
+            //if( id == 38)
+              //  continue
             val typeId = if( context.version<4) 0 else ra.readByte().toInt()
 
             val medium = MediumLoaderFactory

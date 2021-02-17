@@ -20,7 +20,6 @@ import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.StringUtil
 import spirite.gui.menus.dialogs.IDialog
-import java.security.acl.Group
 
 class NodeContextCommand(
         val workspaceSet: MWorkspaceSet,
@@ -234,6 +233,6 @@ object NodeCommands {
     //endregion
 
     val ExportGroupToSMAP0 = NodeCommand("exportGroupToSmap0") { _, node, _ ->
-        val groupLayer = (node as? Group) ?: throw CommandNotValidException
+        val groupLayer = (node as? GroupNode) ?: throw CommandNotValidException
     }
 }
