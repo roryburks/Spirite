@@ -90,7 +90,7 @@ class DefaultImageDrawer(
         if( clearLifted) {
             workspace.undoEngine.performMaskedImageAction("lift-inner", arranged, null) { built, mask ->
                 built.rawAccessComposite {
-                    Hybrid.imageIO.saveImage(it, File( "C:\\Bucket\\1.png"))
+                    //Hybrid.imageIO.saveImage(it, File( "C:\\Bucket\\1.png"))
                     it.graphics.apply {
                         val tSelToImage = (built.tWorkspaceToComposite) * (selection.transform
                                 ?: ImmutableTransformF.Identity)

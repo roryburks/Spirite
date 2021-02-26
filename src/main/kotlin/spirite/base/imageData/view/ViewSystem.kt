@@ -15,6 +15,7 @@ interface IViewSystem
     fun set(node: Node, newProperties: NodeViewProperties)
 
     var numActiveViews: Int
+    val viewBind : Bindable<Int>
     var view : Int
     val currentNodeBind : Bindable<Node?>
     var currentNode: Node?
@@ -24,35 +25,34 @@ interface IViewSystem
 
 class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
 {
-    private val _viewMap get() = _viewMapMap[_currentViewMap]
-            ?: (mutableMapOf<Node,NodeViewProperties>().also { _viewMapMap[_currentViewMap] = it })
-    private var _currentViewMap = 0
+    private val _viewMap get() = _viewMapMap[view]
+            ?: (mutableMapOf<Node,NodeViewProperties>().also { _viewMapMap[view] = it })
     private val _viewMapMap = mutableMapOf<Int, MutableMap<Node, NodeViewProperties>>()
     private val _selectedNodeMap = mutableMapOf<Int, Node?>()
 
-    override val currentNodeBind = Bindable<Node?>(null)
-            .also { it.addObserver { new, _ -> _selectedNodeMap[_currentViewMap] = new } }
-    override var currentNode by currentNodeBind
-
     override var numActiveViews = 3
 
-    override var view: Int
-        get() = _currentViewMap
-        set(value) {
-            if( value == _currentViewMap) return
+    override val viewBind = Bindable<Int>(0)
+    override var view: Int by viewBind
+    private val _viewChangeK = viewBind.addObserver { new, old ->
+        if( new == old) return@addObserver
 
-            val effectedNodes = _viewMap.keys.toHashSet()
-                    .union(_viewMapMap[value]?.keys ?: emptySet())
-            if( _viewMapMap[value] == null) {
-                _viewMapMap[_currentViewMap]?.also { _viewMapMap[value] = it.toMutableMap() }
-                _selectedNodeMap[value] = _selectedNodeMap[_currentViewMap]
-            }
-            _currentViewMap = value
-            effectedNodes.forEach { it.triggerChange() }
-            currentNode = _selectedNodeMap[value]
+        val effectedNodes = (_viewMapMap[old]?.keys?.toHashSet() ?: emptySet<Node>())
+                .union(_viewMapMap[new]?.keys ?: emptySet())
+        if( _viewMapMap[new] == null) {
+            _viewMapMap[old]?.also { _viewMapMap[new] = it.toMutableMap() }
+            _selectedNodeMap[new] = _selectedNodeMap[old]
         }
+        effectedNodes.forEach { it.triggerChange() }
+        currentNode = _selectedNodeMap[new]
+    }
+
+    override val currentNodeBind = Bindable<Node?>(null)
+            .also { it.addObserver { new, _ -> _selectedNodeMap[view] = new } }
+    override var currentNode by currentNodeBind
 
     override fun get(node: Node) = _viewMap[node] ?: NodeViewProperties()
+
 
     override fun set(node: Node, newProperties: NodeViewProperties) {
         val current = get(node)
@@ -76,7 +76,7 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
         val mainMap = _viewMap
 
         _viewMapMap.keys.asSequence()
-                .filter { it != _currentViewMap }
+                .filter { it != view }
                 .forEach { _viewMapMap[it] = _viewMap.toMutableMap() }
     }
 
