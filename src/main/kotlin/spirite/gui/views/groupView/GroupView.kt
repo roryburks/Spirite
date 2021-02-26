@@ -3,6 +3,7 @@ package spirite.gui.views.groupView
 import rb.glow.ColorARGB32Normal
 import rb.glow.gle.RenderMethodType
 import rb.owl.bindable.addObserver
+import rb.vectrix.mathUtil.i
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
 import sgui.components.crossContainer.ICrossPanel
@@ -23,6 +24,7 @@ private constructor(
 
     constructor(master: IMasterControl) : this(master, panel = Hybrid.ui.CrossPanel())
 
+    private val _viewLabel = Hybrid.ui.Label("-")
 
     init {
         panel.setLayout {
@@ -41,9 +43,16 @@ private constructor(
                 add( Hybrid.ui.Button("3"))
                 addGap(2)
                 add( Hybrid.ui.Button("4"))
+                addGap(0,0, Short.MAX_VALUE.i)
+
+                _viewLabel.textSize = 16
+                add( _viewLabel)
+
             }
         }
     }
+
+    val _viewLabelK = master.centralObservatory.currentViewNum.addObserver { new, old -> _viewLabel.text = new ?.toString() ?: "-" }
 }
 
 class NodeProperties

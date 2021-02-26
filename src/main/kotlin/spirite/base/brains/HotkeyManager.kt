@@ -87,6 +87,7 @@ private val defaultHotkeys = mapOf(
         NodeCommands.Duplicate.keyCommand to (Hotkey(KeyEvent.VK_U, CTRL)),
 
         WorkspaceCommands.ToggleView.keyCommand to (Hotkey(KeyEvent.VK_TAB,0)),
+        WorkspaceCommands.CycleView.keyCommand to (Hotkey(KeyEvent.VK_TAB,  SHIFT)),
         WorkspaceCommands.ResetOtherView.keyCommand to (Hotkey(KeyEvent.VK_TAB, CTRL or SHIFT)),
         WorkspaceCommands.ResetOtherView.keyCommand to (Hotkey(KeyEvent.VK_TAB, CTRL)),
 

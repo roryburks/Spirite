@@ -37,6 +37,7 @@ interface ICentralObservatory {
     val selectedNode : IBindable<Node?>
     val currentAnimationBind : IBindable<Animation?>
     val currentAnimationSpaceBind : IBindable<AnimationSpace?>
+    val currentViewNum : IBindable<Int?>
 }
 
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
@@ -69,6 +70,8 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
             = TrackingBinder { it.animationManager.currentAnimationBind}
     override val currentAnimationSpaceBind: IBindable<AnimationSpace?>
             = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
+    override val currentViewNum: IBindable<Int?>
+            = TrackingBinder { it.viewSystem.viewBind }
 
     private inner  class OmniObserver<T>(val finder: (IImageWorkspace) -> IObservable<T>) : IObservable<T> {
         override fun addObserver(observer: IObserver<T>, trigger: Boolean): IContract = ObserverContract(observer)
