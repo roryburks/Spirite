@@ -8,7 +8,7 @@ import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.ICentralObservatory
 import spirite.base.graphics.IResourceUseTracker
 import spirite.base.graphics.rendering.sources.GroupNodeSource
-import spirite.base.graphics.rendering.sources.RenderSource
+import spirite.base.graphics.rendering.sources.IRenderSource
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
@@ -29,8 +29,8 @@ interface IRenderEngine {
 }
 
 data class RenderTarget(
-        val renderSource: RenderSource,
-        val renderSettings: RenderSettings = RenderSettings( renderSource.defaultWidth, renderSource.defaultHeight, true))
+    val renderSource: IRenderSource,
+    val renderSettings: RenderSettings = RenderSettings( renderSource.defaultWidth, renderSource.defaultHeight, true))
 
 data class RenderSettings(
         val width: Int,

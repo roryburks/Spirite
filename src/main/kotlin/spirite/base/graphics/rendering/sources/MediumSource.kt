@@ -8,7 +8,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.Node
 
-data class MediumSource(val medium: MediumHandle, override val workspace: IImageWorkspace) : RenderSource {
+data class MediumSource(val medium: MediumHandle, override val workspace: IImageWorkspace) : IRenderSource {
     override val defaultWidth: Int get() = medium.width
     override val defaultHeight: Int get() = medium.height
     override val imageDependencies: Collection<MediumHandle> get() = SinglyList(medium)

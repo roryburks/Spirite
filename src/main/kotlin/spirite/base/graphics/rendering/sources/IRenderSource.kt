@@ -15,7 +15,7 @@ import spirite.base.imageData.groupTree.GroupTree.*
  * (or better yet be data classes), so that Identical Calls are correctly identified
  * as being identical.
  */
-interface RenderSource {
+interface IRenderSource {
     val workspace: IImageWorkspace
     val defaultWidth: Int
     val defaultHeight: Int
@@ -26,7 +26,7 @@ interface RenderSource {
     fun render( settings: RenderSettings, gc: IGraphicsContext)
 }
 
-fun getRenderSourceForNode( node: Node, workspace: IImageWorkspace) : RenderSource {
+fun getRenderSourceForNode( node: Node, workspace: IImageWorkspace) : IRenderSource {
     when( node) {
         is GroupNode -> return GroupNodeSource(node, workspace)
         is LayerNode -> return LayerSource(node.layer, workspace)
