@@ -100,7 +100,8 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem(".Commands To Clipboard", DebugCommands.CommandHistoryToClipboard),
                 MenuItem(".Brk", DebugCommands.Breakpoint),
                 MenuItem(".Cycle Sprite", DebugCommands.CycleSpriteParts),
-                MenuItem(".Color Change Context", DebugCommands.MaglevTotalColorChange)
+                MenuItem(".Color Change Context", DebugCommands.MaglevTotalColorChange),
+            MenuItem(".Anim Filter Set", DebugCommands.ChangeFilterSet)
 
         )
 

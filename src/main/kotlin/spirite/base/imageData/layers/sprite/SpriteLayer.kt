@@ -15,6 +15,7 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import sguiSwing.hybrid.MDebug
 import sguiSwing.hybrid.MDebug.WarningType
+import spirite.base.brains.DBGlobal
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.graphics.isolation.ISpriteLayerIsolator
 import spirite.base.graphics.rendering.TransformedHandle
@@ -200,9 +201,12 @@ class SpriteLayer : Layer {
 
     override val imageDependencies: List<MediumHandle> get() = parts.map { it.handle }
     override fun getDrawList(isolator: IIsolator?): List<TransformedHandle> {
+        var base = parts
+            .filter { it.isVisible }
+            .filter { !DBGlobal.filterSet.contains(it.partName.first()) }
+
         return when (isolator) {
-            is ISpriteLayerIsolator -> parts
-                    .filter { it.isVisible }
+            is ISpriteLayerIsolator -> base
                     .mapNotNull {
                         val subIsolator = isolator.getIsolationForPart(it)
                         val rubric = subIsolator.rubric
@@ -212,9 +216,8 @@ class SpriteLayer : Layer {
                             else -> TransformedHandle(it.handle, it.depth, it.tPartToWhole, it.alpha).stack(rubric)
                         }
                     }
-            else -> parts
-                    .filter { it.isVisible }
-                    .map { TransformedHandle(it.handle, it.depth, it.tPartToWhole, it.alpha) }
+            else -> base
+                .map { TransformedHandle(it.handle, it.depth, it.tPartToWhole, it.alpha) }
         }
     }
 

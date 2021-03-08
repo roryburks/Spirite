@@ -2,6 +2,7 @@ package spirite.base.brains.commands
 
 import rb.vectrix.linear.Vec2f
 import sguiSwing.hybrid.Hybrid
+import spirite.base.brains.DBGlobal
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.specific.SpriteLayerFixes
@@ -88,5 +89,11 @@ object DebugCommands
         tool.translation = Vec2f(tx, ty)
         tool.scale = Vec2f(sx, sy)
         tool.rotation = rot
+    }
+
+    val ChangeFilterSet = DebugCmd("change-filter-set") {master ->
+        val str = master.dialog.promptForString("Inter ToFilter Chars", "") ?: return@DebugCmd
+        DBGlobal.filterSet = str.toSet()
+        println(DBGlobal.filterSet.joinToString(" "))
     }
 }
