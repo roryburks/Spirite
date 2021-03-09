@@ -1,6 +1,8 @@
 package rb.animo.animation
 
 import rb.animo.DrawContract
+import rb.animo.io.aaf.AafColisionMapper
+import rb.animo.io.aaf.AafFile
 import rb.glow.gl.GLImage
 import rb.vectrix.intersect.CollisionMultiObj
 import rb.vectrix.intersect.CollisionObject
@@ -14,6 +16,30 @@ import rb.vectrix.shapes.RectI
 class AafStructure(
         val animations: List<AafAnimStructure>
 )
+{
+    companion object{
+        fun fromFile(file: AafFile) : AafStructure {
+            return AafStructure( file.animations.map { anim-> AafAnimStructure(
+                name = anim.name,
+                originX = anim.ox,
+                originY = anim.oy,
+                frames = anim.frames.map { frame-> AafFrame(
+                    chunks = frame.chunks.map { chunk -> AafChunk(
+                        celRect = file.cels[chunk.celId].run { RectI(x, y, w, h) },
+                        offsetX = chunk.offsetX,
+                        offsetY = chunk.offsetY,
+                        drawDepth = chunk.drawDepth,
+                        idc = chunk.group ) },
+                    hitbox = frame.hitboxes.map { hitbox -> AafHitbox(
+                        hitbox.typeId,
+                        AafColisionMapper.mapToVectrix(hitbox.col) ) }
+
+                ) }
+            ) })
+
+        }
+    }
+}
 
 class AafAnimStructure(
         val name: String,

@@ -1,28 +1,17 @@
 package spirite.base.file.aaf
 
-import rb.animo.io.aafWriter.AafWriterFactory
-import rb.animo.io.aafWriter.IAafWriterFactory
-import rb.extendo.extensions.pop
-import rb.extendo.extensions.toLookup
-import rb.glow.img.IImage
-import rb.glow.img.RawImage
-import rb.glow.using
-import rb.vectrix.linear.Vec2i
+import rb.animo.io.aaf.writer.AafWriterFactory
+import rb.animo.io.aaf.writer.IAafWriterFactory
 import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
-import rb.vectrix.rectanglePacking.PackedRectangle
 import rbJvm.animo.JvmWriter
 import sguiSwing.hybrid.Hybrid
 import sguiSwing.hybrid.IImageCreator
 import sguiSwing.hybrid.IImageIO
 import spirite.base.file.aaf.export.AafExportConverter
 import spirite.base.file.aaf.export.IAafExportConverter
-import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
-import spirite.base.imageData.mediums.IImageMedium
-import spirite.base.util.linear.Rect
 import java.io.File
 import java.io.RandomAccessFile
 
@@ -40,7 +29,7 @@ class AafExporter(
         private val imageCreator: IImageCreator,
         private  val imageExporter: IImageIO,
         private val hasher: IDataStreamHasher,
-        private val _aafWriterFactory : IAafWriterFactory = AafWriterFactory)
+        private val _aafWriterFactory : IAafWriterFactory = AafWriterFactory )
     : IAafExporter
 {
     private val _converter : IAafExportConverter = AafExportConverter(imageCreator, ModifiedSleatorAlgorithm)
@@ -50,10 +39,10 @@ class AafExporter(
         val (pngFilename, aafFilename) = getFilenames(filename)
 
         // 1: Parse as data
-        val (aaf, mapping) = _converter.convert(animation)
+        val (aaf, img) = _converter.convert2(animation)
 
         // 2: Save PNG
-        imageExporter.saveImage(mapping.img, File(pngFilename))
+        imageExporter.saveImage(img, File(pngFilename))
 
         // 3: Save Aaf
         val file = File(aafFilename)
@@ -63,7 +52,7 @@ class AafExporter(
         val ra = RandomAccessFile(file, "rw")
         try {
             val writer = JvmWriter(ra)
-            val aafWriter = _aafWriterFactory.get()
+            val aafWriter = _aafWriterFactory.makeWriter(4)
             aafWriter.write(writer, aaf)
         }
         finally {
