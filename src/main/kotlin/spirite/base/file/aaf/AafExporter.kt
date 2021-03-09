@@ -50,13 +50,10 @@ class AafExporter(
             file.delete()
         file.createNewFile()
         val ra = RandomAccessFile(file, "rw")
-        try {
+        ra.use { ra ->
             val writer = JvmWriter(ra)
             val aafWriter = _aafWriterFactory.makeWriter(4)
             aafWriter.write(writer, aaf)
-        }
-        finally {
-            ra.close()
         }
 
     }
