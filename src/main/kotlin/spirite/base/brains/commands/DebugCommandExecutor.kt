@@ -7,6 +7,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.specific.SpriteLayerFixes
 import spirite.base.exceptions.CommandNotValidException
+import spirite.base.imageData.IImageObservatory
 import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
 
@@ -94,6 +95,14 @@ object DebugCommands
     val ChangeFilterSet = DebugCmd("change-filter-set") {master ->
         val str = master.dialog.promptForString("Inter ToFilter Chars", "") ?: return@DebugCmd
         DBGlobal.filterSet = str.toSet()
-        println(DBGlobal.filterSet.joinToString(" "))
+
+        master.workspaceSet.currentMWorkspace?.run {
+            imageObservatory?.triggerRefresh(
+                IImageObservatory.ImageChangeEvent(
+                    emptySet(),
+                    emptySet(),
+                    this,
+                    true ))
+        }
     }
 }

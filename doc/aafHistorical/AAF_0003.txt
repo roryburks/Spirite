@@ -1,26 +1,23 @@
-AAF file:
-Version 0004
+CWA File:
+Version 0003
 
-An AAF file is linked to a PNG file.  The PNG file stores a bunch of animation frames packed into a single sheet and the AAF file describes how to unpack them and how to interpret them as an animation.
-
-Note, unlike SIF files, AAF files are not versioned for backwards compatibility.  A simpler file format intended to be used as an end-product if conversions are needed scripts can be made manually.
+An extension of the AAF file to include certain game-related properties.
 
 [4, uint] : Version Number (3)
 [2, ushort] : Num Animations
   : Per Animation
     [n, UTF8] : Name of Animation
-    [2, short] OriginX // Added v3
-    [2, short] OriginY // Added v3
+    [2, short] OriginX
+    [2, short] OriginY
     [2, ushort] : Number  of Frame
       : Per Frame
         [1, ubyte] : Number of Chunk
           : Per Chunk
-            [1, char] Id of Chunk Group // Added v4
             [2, ushort] CelId
             [2, short] OffsetX
             [2, short] OffsetY
             [4, int] DrawDepth
-        [1, ubyte] : Number of Hit/Hurtboxes // Added v3
+        [1, ubyte] : Number of Hit/Hurtboxes
           : Per Box
             [1, ubyte] : Box TypeId (to be interpretted by the engine)
             [1, ubyte] : Collision Kind
@@ -29,7 +26,8 @@ Note, unlike SIF files, AAF files are not versioned for backwards compatibility.
   : Per Cel
     [8] : (x,y,w,h), each UShort : Cel's Rectangle
 
-=== CollisionKinds: ===
+
+CollisionKinds:
 0: Point
 	[4, float] X
 	[4, float] Y
