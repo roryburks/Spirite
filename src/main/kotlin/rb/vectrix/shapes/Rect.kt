@@ -110,4 +110,9 @@ data class RectI(
     fun contains(x: Int, y: Int) =
             if (w <= 0 || h <= 0) false
             else !(x2 < x || y2 < y || x2 > x + w || y2 > y + h)
+
+    companion object{
+        fun FromEndpoints( x1: Int, y1: Int, x2: Int, y2: Int) = RectI(
+            min(x1, x2), min(y1, y2), abs(x2-x1), abs(y2-y1) )
+    }
 }
