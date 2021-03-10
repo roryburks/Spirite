@@ -1,11 +1,11 @@
 package rb.animo.io.aaf.reader
 
-import rb.animo.io.IReader
 import rb.animo.io.aaf.*
+import rb.file.IFileReader
 
 object AafColisionReader {
-    fun read( reader: IReader) : AafFCollisionKind {
-        return when(val type = reader.readByte()) {
+    fun read( reader: IFileReader) : AafFCollisionKind {
+        return when(val type = reader.readUnsignedByte()) {
             0 -> AafFColPoint(
                 x = reader.readFloat(),
                 y = reader.readFloat())
@@ -36,7 +36,7 @@ object AafColisionReader {
                 len = reader.readFloat(),
                 theta = reader.readFloat() )
             6 -> {
-                val numPoints = reader.readUShort()
+                val numPoints = reader.readUnsignedShort()
                 AafFColPoly(List(numPoints){
                     AafFColPoint(
                         x = reader.readFloat(),

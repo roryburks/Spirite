@@ -2,13 +2,13 @@ package spirite.base.file.load
 
 import rb.file.BufferedFileReader
 import rb.file.IFileReader
-import rb.file.JvmRandomAccessFileBinaryReadStream
 import rb.glow.ColorARGB32Normal
 import rb.glow.toColor
 import rb.vectrix.interpolation.CubicSplineInterpolator2D
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.round
+import rbJvm.file.JvmRandomAccessFileBinaryReadStream
 import sguiSwing.hybrid.Hybrid
 import sguiSwing.hybrid.MDebug
 import sguiSwing.hybrid.MDebug.ErrorType.FILE

@@ -56,6 +56,15 @@ object LittleEndian {
         override fun interpret(byteArray: ByteArray) =  byteArray[0].ui
     }
 
+    object ShortInter : IBinaryInterpreter<Short> {
+        override val len: Int get() = 2
+        override fun interpret(byteArray: ByteArray): Short {
+            return (byteArray[1].ui or
+                    (byteArray[0].ui shl 8)).toShort()
+        }
+
+    }
+
     object UShortInter : IBinaryInterpreter<Int> {
         override val len: Int get() = 2
         override fun interpret(byteArray: ByteArray): Int {

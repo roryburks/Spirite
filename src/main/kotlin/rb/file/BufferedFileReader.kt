@@ -57,6 +57,7 @@ class BufferedFileReader(
         }
     }
 
+    override fun readShort() = read(LittleEndian.ShortInter)
     override fun readUnsignedShort() = read(LittleEndian.UShortInter)
     override fun readByte() = read(ByteInter)
     override fun readInt() = read(LittleEndian.IntInter)
