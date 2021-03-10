@@ -6,8 +6,6 @@ import rb.animo.io.aaf.writer.AafWriterFactory
 import rb.file.BufferedFileReader
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
-import rbJvm.animo.JvmAafLoader
-import rbJvm.animo.JvmDataInputStreamReader
 import rbJvm.animo.JvmWriter
 import rbJvm.file.JvmInputStreamFileReader
 import sguiSwing.hybrid.Hybrid
@@ -16,13 +14,11 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.specific.SpriteLayerFixes
 import spirite.base.exceptions.CommandNotValidException
-import spirite.base.file.aaf.defaultAafExporter
 import spirite.base.file.aaf.export.AafExportConverter
 import spirite.base.imageData.IImageObservatory
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import java.io.DataInputStream
 import java.io.File
 import java.io.RandomAccessFile
 

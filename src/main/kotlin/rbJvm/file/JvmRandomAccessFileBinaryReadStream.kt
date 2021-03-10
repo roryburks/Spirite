@@ -18,6 +18,6 @@ class JvmRandomAccessFileBinaryReadStream (val ba: RandomAccessFile) : IBinaryRe
     override var filePointer: Long
         get() = ba.filePointer
         set(value) {ba.seek(value)}
-    override val len: Int get() = ba.length().i
+    val len: Int get() = ba.length().i
 
 }
