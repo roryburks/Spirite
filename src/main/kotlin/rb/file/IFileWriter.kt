@@ -2,7 +2,6 @@ package rb.file
 
 import java.nio.charset.Charset
 
-
 interface IFileWriter {
     fun writeInt(i : Int)
     fun writeShort( i : Int)
