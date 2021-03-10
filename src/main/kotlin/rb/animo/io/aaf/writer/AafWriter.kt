@@ -36,7 +36,7 @@ class AafWriter_v2_to_v4(val version: Int) : IAafWriter{
                 }
 
                 if( version >= 3) {
-                    writer.writeShort(frame.hitboxes.count()) // [1] Num Hitboxes
+                    writer.writeByte(frame.hitboxes.count()) // [1] Num Hitboxes
                     for ( hitbox in frame.hitboxes) {
                         writer.writeByte(hitbox.typeId) // [1] TypeId
                         AafColisionWriter.write(writer, hitbox.col) // [N] Collision Data

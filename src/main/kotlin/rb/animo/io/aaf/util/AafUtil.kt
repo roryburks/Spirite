@@ -22,8 +22,8 @@ object AafUtil {
                 if( frame1.hitboxes.size != frame2.hitboxes.size) return "Hitbox Size Mismatch"
 
                 for( j in frame1.chunks.indices) {
-                    val chunk1 = frame1.chunks[i]
-                    val chunk2 = frame2.chunks[i]
+                    val chunk1 = frame1.chunks[j]
+                    val chunk2 = frame2.chunks[j]
                     val cel1 = aaf1.cels[chunk1.celId]
                     val cel2 = aaf2.cels[chunk2.celId]
                     if( cel1.x != cel2.x || cel1.y != cel2.y || cel1.w != cel2.w || cel1.h != cel2.h) return "Cel detail mismatch"

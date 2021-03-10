@@ -1,15 +1,28 @@
 package spirite.base.brains.commands
 
+import rb.animo.io.aaf.reader.AafReaderFactory
+import rb.animo.io.aaf.util.AafUtil
+import rb.animo.io.aaf.writer.AafWriterFactory
 import rb.vectrix.linear.Vec2f
+import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
+import rbJvm.animo.JvmAafLoader
+import rbJvm.animo.JvmDataInputStreamReader
+import rbJvm.animo.JvmWriter
 import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.DBGlobal
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.specific.SpriteLayerFixes
 import spirite.base.exceptions.CommandNotValidException
+import spirite.base.file.aaf.defaultAafExporter
+import spirite.base.file.aaf.export.AafExportConverter
 import spirite.base.imageData.IImageObservatory
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import java.io.DataInputStream
+import java.io.File
+import java.io.RandomAccessFile
 
 class DebugCommandExecutor(
         val master: IMasterControl)
@@ -104,5 +117,34 @@ object DebugCommands
                     this,
                     true ))
         }
+    }
+
+    val TestAaf = DebugCmd("test-aaf") { master ->
+        val anim = master.workspaceSet.currentMWorkspace
+            ?.animationManager
+            ?.currentAnimation as? FixedFrameAnimation ?: return@DebugCmd
+
+        val converter = AafExportConverter(Hybrid.imageCreator, ModifiedSleatorAlgorithm)
+        val (aaf1, img) = converter.convert2(anim)
+
+        // Save Aaf
+        val file = File("E://bucket/sif/aaf-test.aaf")
+        if( file.exists())
+            file.delete()
+        file.createNewFile()
+        val ra = RandomAccessFile(file, "rw")
+        ra.use { ra ->
+            val writer = JvmWriter(ra)
+            val aafWriter = AafWriterFactory.makeWriter(4)
+            aafWriter.write(writer, aaf1)
+        }
+
+        // Load Aaf
+        val dis = DataInputStream(file.inputStream())
+        val reader = JvmDataInputStreamReader(dis)
+        val aafReader = AafReaderFactory.readVersionAndGetReader(reader)
+        val aaf2 = aafReader.read(reader)
+
+        println(AafUtil.deepCompare(aaf1, aaf2))
     }
 }
