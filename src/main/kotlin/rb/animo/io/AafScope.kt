@@ -4,10 +4,6 @@ import rb.animo.animation.*
 import rb.animo.animationSpace.IAnimationSpace
 
 
-interface IAafContract
-{
-
-}
 
 interface IAafScope {
     val animations: Map<String,IAnimation>
@@ -38,4 +34,3 @@ object AafFileNameChooser {
         }
     }
 }
-

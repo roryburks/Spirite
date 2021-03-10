@@ -6,8 +6,8 @@ import rb.animo.io.aaf.writer.AafWriterFactory
 import rb.file.BufferedFileReader
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
-import rbJvm.animo.JvmWriter
 import rbJvm.file.JvmInputStreamFileReader
+import rbJvm.file.writing.JvmRaWriter
 import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.DBGlobal
 import spirite.base.brains.IMasterControl
@@ -132,7 +132,7 @@ object DebugCommands
         file.createNewFile()
         val ra = RandomAccessFile(file, "rw")
         ra.use { ra ->
-            val writer = JvmWriter(ra)
+            val writer = JvmRaWriter(ra)
             val aafWriter = AafWriterFactory.makeWriter(4)
             aafWriter.write(writer, aaf1)
         }

@@ -1,15 +1,16 @@
 package rb.animo.io.aaf.writer
 
-import rb.animo.io.IWriter
 import rb.animo.io.aaf.AafFile
+import rb.file.IFileWriter
+import rb.file.writeUtf8
 import rb.vectrix.mathUtil.i
 
 interface IAafWriter {
-    fun write(writer: IWriter, aafFile: AafFile)
+    fun write(writer: IFileWriter, aafFile: AafFile)
 }
 
 class AafWriter_v2_to_v4(val version: Int) : IAafWriter{
-    override fun write(writer: IWriter, aafFile: AafFile) {
+    override fun write(writer: IFileWriter, aafFile: AafFile) {
         writer.writeInt(version)
 
         writer.writeShort(aafFile.animations.count()) // [2] : NumAnims

@@ -5,7 +5,7 @@ import rb.animo.io.aaf.writer.IAafWriterFactory
 import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
-import rbJvm.animo.JvmWriter
+import rbJvm.file.writing.JvmRaWriter
 import sguiSwing.hybrid.Hybrid
 import sguiSwing.hybrid.IImageCreator
 import sguiSwing.hybrid.IImageIO
@@ -51,7 +51,7 @@ class AafExporter(
         file.createNewFile()
         val ra = RandomAccessFile(file, "rw")
         ra.use { ra ->
-            val writer = JvmWriter(ra)
+            val writer = JvmRaWriter(ra)
             val aafWriter = _aafWriterFactory.makeWriter(4)
             aafWriter.write(writer, aaf)
         }
