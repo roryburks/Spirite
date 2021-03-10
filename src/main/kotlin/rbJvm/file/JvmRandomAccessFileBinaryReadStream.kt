@@ -16,8 +16,8 @@ class JvmRandomAccessFileBinaryReadStream (val ba: RandomAccessFile) : IBinaryRe
     }
 
     override var filePointer: Long
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-        set(value) {}
+        get() = ba.filePointer
+        set(value) {ba.seek(value)}
     override val len: Int get() = ba.length().i
 
 }

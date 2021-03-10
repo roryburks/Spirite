@@ -35,7 +35,6 @@ interface IBinaryReadStream {
     fun readBytes( size: Int) : ByteArray
     fun readInto( byteArray: ByteArray, offset: Int, length: Int)
     var filePointer : Long
-    val len: Int
 }
 
 class ByteArrayReadStream(
@@ -56,5 +55,5 @@ class ByteArrayReadStream(
     }
 
     override var filePointer: Long = 0
-    override val len: Int get() = data.size
+    val len: Int get() = data.size
 }
