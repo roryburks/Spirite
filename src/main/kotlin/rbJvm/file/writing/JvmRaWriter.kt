@@ -1,7 +1,6 @@
 package rbJvm.file.writing
 
 import rb.file.IFileWriter
-import spirite.base.file.writeFloatArray
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 
