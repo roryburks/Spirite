@@ -15,8 +15,7 @@ class JvmInputStreamFileReader(val i: InputStream) : IBinaryReadStream {
 
     override fun readInto(byteArray: ByteArray, offset: Int, length: Int) {
         caret += length
-        val ba = ByteArray(length)
-        i.read(ba, offset, length)
+        i.read(byteArray, offset, length)
     }
 
     override var filePointer: Long

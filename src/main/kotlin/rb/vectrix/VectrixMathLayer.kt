@@ -26,15 +26,15 @@ interface IMathLayer {
 object BaseMathLayer : IMathLayer {
 
     override fun arraycopy(src: IntArray, srcPos: Int, dest: IntArray, destPos: Int, len: Int) {
-        (0 until len).forEach { dest[destPos + it] = src[srcPos + len] }
+        (0 until len).forEach { dest[destPos + it] = src[srcPos + it] }
     }
 
     override fun arraycopy(src: FloatArray, srcPos: Int, dest: FloatArray, destPos: Int, len: Int) {
-        (0 until len).forEach { dest[destPos + it] = src[srcPos + len] }
+        (0 until len).forEach { dest[destPos + it] = src[srcPos + it] }
     }
 
     override fun arraycopy(src: ByteArray, srcPos: Int, dest: ByteArray, destPos: Int, len: Int) {
-        (0 until len).forEach { dest[destPos + it] = src[srcPos + len] }
+        (0 until len).forEach { dest[destPos + it] = src[srcPos + it] }
     }
 
     override fun fastSin(theta: Double) = sin(theta)
