@@ -40,7 +40,7 @@ class AafReader_v2_to_4( val version: Int) : IAafReader {
                 }
 
                 val hitboxes : List<AafFHitbox>
-                if( version< 2)
+                if( version<= 2)
                     hitboxes = emptyList<AafFHitbox>()
                 else {
                     val numHitboxes = reader.readUnsignedByte()
