@@ -1,9 +1,9 @@
 package rb.owl.bindableMList
 
-import rb.global.IContract
 import rb.extendo.dataStructures.SinglyCollection
 import rb.extendo.dataStructures.SinglySet
 import rb.extendo.extensions.asHashSet
+import rb.global.IContract
 import rb.owl.IObserver
 
 

@@ -1,7 +1,7 @@
 package spirite.base.brains
 
-import rb.global.IContract
 import rb.extendo.extensions.toHashMap
+import rb.global.IContract
 import rb.owl.IObservable
 import rb.owl.IObserver
 import rb.owl.bindable.IBindObserver

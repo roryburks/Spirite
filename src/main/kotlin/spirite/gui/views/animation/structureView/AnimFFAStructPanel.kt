@@ -1,8 +1,8 @@
 package spirite.gui.views.animation.structureView
 
-import rb.global.IContract
 import rb.extendo.dataStructures.SinglySequence
 import rb.extendo.extensions.then
+import rb.global.IContract
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicCursor.DEFAULT

@@ -1,7 +1,7 @@
 package sguiSwing.advancedComponents
 
-import rb.global.IContract
 import rb.extendo.delegates.OnChangeDelegate
+import rb.global.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
@@ -96,7 +96,7 @@ private constructor(private val imp : SwTreeViewImp<T>,
     override var buildingPaused = false
     private fun rebuildTree() {
         if( buildingPaused) return
-        println("Intenal build event")
+        //println("Intenal build event")
         compToNodeMap.clear()
         bindKs.forEach { it.void() }
         bindKs.clear()

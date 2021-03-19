@@ -1,7 +1,6 @@
 package spirite.base.telemetry
 
 import sguiSwing.hybrid.Hybrid
-import spirite.base.imageData.selection.drawLiftedTransform
 
 class TelemetryStopwatch {
     private val _telemetryMap = mutableMapOf<String, Long>()

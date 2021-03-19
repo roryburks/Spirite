@@ -1,10 +1,8 @@
 package rb.file
 
-import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.ui
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import kotlin.experimental.or
 
 interface IBinaryInterpreter<T> {
     val len: Int

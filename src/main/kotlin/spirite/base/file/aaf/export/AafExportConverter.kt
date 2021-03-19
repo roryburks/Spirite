@@ -16,7 +16,6 @@ import rb.vectrix.rectanglePacking.IRectanglePackingAlgorithm
 import rb.vectrix.rectanglePacking.PackedRectangle
 import rb.vectrix.shapes.RectI
 import sguiSwing.hybrid.IImageCreator
-import spirite.base.file.aaf.AafExporter
 import spirite.base.imageData.animation.ffa.FFALayer
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree

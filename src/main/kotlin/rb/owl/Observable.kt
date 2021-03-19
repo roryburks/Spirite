@@ -1,7 +1,7 @@
 package rb.owl
 
-import rb.global.IContract
 import rb.extendo.dataStructures.SinglySequence
+import rb.global.IContract
 
 
 interface IObserver<T> {

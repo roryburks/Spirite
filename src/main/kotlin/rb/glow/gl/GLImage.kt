@@ -2,7 +2,6 @@ package rb.glow.gl
 
 import rb.glow.ColorARGB32Normal
 import rb.glow.ColorARGB32Premultiplied
-import rb.glow.IGraphicsContext
 import rb.glow.exceptions.GLResourcException
 import rb.glow.exceptions.InvalidImageDimensionsExeption
 import rb.glow.gle.GLParameters

@@ -1,6 +1,5 @@
 package spirite.pc
 
-import rb.vectrix.mathUtil.f
 import rbJvm.vectrix.SetupVectrixForJvm
 import sguiSwing.hybrid.EngineLaunchpoint
 import sguiSwing.hybrid.MDebug

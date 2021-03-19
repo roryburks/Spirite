@@ -76,7 +76,7 @@ private constructor(
         tree.constructTree (constructor)
 
 
-        println("Rebuilt Tree in ${Hybrid.timing.currentMilli - startTime} ms")
+        //println("Rebuilt Tree in ${Hybrid.timing.currentMilli - startTime} ms")
     }
 
     // region SubComponents

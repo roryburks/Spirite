@@ -1,7 +1,6 @@
 package spirite.base.file.load
 
 import rb.file.BufferedFileReader
-import rb.file.IFileReader
 import rb.glow.ColorARGB32Normal
 import rb.glow.toColor
 import rb.vectrix.interpolation.CubicSplineInterpolator2D

@@ -67,7 +67,7 @@ class SettingsManager (
     override val paletteList : List<String> get() = _paletteList
     private val _paletteList: MutableList<String> by lazy {
         (preferences.getString("PaletteList") ?: "")
-                .split("${0.toChar()}")
+                .split("§")
                 .toMutableList()
     }
 
@@ -75,7 +75,7 @@ class SettingsManager (
     override fun saveRawPalette( name: String, raw: ByteArray) {
         if( !_paletteList.contains(name)) {
             _paletteList.add( name)
-            preferences.putString("PaletteList", _paletteList.joinToString("${0.toChar()}"))
+            preferences.putString("PaletteList", _paletteList.joinToString("§"))
         }
 
         preferences.putByteArray("palette.$name", raw)

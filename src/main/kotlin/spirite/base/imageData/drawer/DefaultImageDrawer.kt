@@ -34,7 +34,6 @@ import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import spirite.specialRendering.SpecialDrawerFactory
-import java.io.File
 import kotlin.math.min
 
 

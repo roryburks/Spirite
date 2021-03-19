@@ -1,7 +1,7 @@
 package spirite.base.imageData
 
-import rb.global.IContract
 import rb.extendo.dataStructures.SinglyList
+import rb.global.IContract
 import rb.owl.GuardedObservable
 import rb.owl.IObservable
 import rb.owl.Observer
