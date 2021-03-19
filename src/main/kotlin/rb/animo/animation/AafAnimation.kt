@@ -6,11 +6,9 @@ import rb.animo.io.aaf.AafFile
 import rb.glow.gl.GLImage
 import rb.vectrix.intersect.CollisionMultiObj
 import rb.vectrix.intersect.CollisionObject
-import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.ImmutableTransformD
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.floor
-import rb.vectrix.shapes.Rect
 import rb.vectrix.shapes.RectI
 
 class AafStructure(
@@ -68,10 +66,15 @@ class AafAnimation(
     override val length: Double get() = len.d
     val len = structure.frames.count()
 
-    override fun draw(met: Double, properties: RenderProperties, depth: Int): Collection<DrawContract> {
+    override fun draw(met: Double, properties: AnimationDrawSettings, depth: Int): Collection<DrawContract> {
         val localMet = ((met.floor % len) + len ) % len
         val frame = structure.frames[localMet]
+        val filterOutGroups = properties.groupMap
+            .filter { !it.value.drawn  || it.value.alpha <= 0f}
+            .map { it.key }
+            .toHashSet()
         val chunks = frame.chunks
+            .filter { !filterOutGroups.contains(it.idc)  }
 
         val drawTrans =
                 properties.trans *
@@ -80,7 +83,9 @@ class AafAnimation(
 
 
         return chunks.map {
-            DrawContract(-it.drawDepth - depth, properties.copy(trans = drawTrans)) { gc -> gc.renderImage(img, it.offsetX.d, it.offsetY.d, imgPart = it.celRect)}
+            val groupProperties = properties.groupMap[it.idc]
+            val alpha = if( groupProperties == null) properties.alpha else properties.alpha * groupProperties.alpha
+            DrawContract(-it.drawDepth - depth, properties.copy(trans = drawTrans,alpha = alpha)) { gc -> gc.renderImage(img, it.offsetX.d, it.offsetY.d, imgPart = it.celRect)}
         }
 
     }

@@ -4,7 +4,6 @@ import rb.animo.DrawContract
 import rb.extendo.dataStructures.SinglyCollection
 import rb.glow.IGraphicsContext
 import rb.glow.gl.GLImage
-import rb.vectrix.linear.ITransform
 
 class FlatAnimation( val img: GLImage)
     : IAnimation
@@ -14,7 +13,7 @@ class FlatAnimation( val img: GLImage)
         gc.renderImage(img, 0.0, 100.0)
     }
 
-    override fun draw(met: Double, properties: RenderProperties, depth: Int) = SinglyCollection(DrawContract(depth, properties){draw(it,0.0)})
+    override fun draw(met: Double, properties: AnimationDrawSettings, depth: Int) = SinglyCollection(DrawContract(depth, properties){draw(it,0.0)})
 
     override fun getHitbox(met: Double, type: Int) = null
 }
