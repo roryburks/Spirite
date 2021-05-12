@@ -1,5 +1,10 @@
 package rb.extendo.extensions
 
+/**
+ * Splits up a MutableIterable, leaving the non-removed items in place, and outputting the removed items into a
+ * Sequence as an output.  (Note: The Sequence must be completely iterated over in order to remove all items from the
+ * source)
+ */
 fun <From,To> MutableIterable<From>.mapRemoveIfNull(mapping: (From) -> To?) : Sequence<To>
         = MapRemoveIfNullSequence(this, mapping)
 
