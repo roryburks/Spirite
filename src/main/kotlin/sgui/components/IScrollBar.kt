@@ -2,6 +2,7 @@ package sgui.components
 
 import rb.owl.bindable.Bindable
 import rb.vectrix.mathUtil.MathUtil
+import sgui.core.Orientation
 
 interface IScrollBarNonUI {
     var scroll: Int
@@ -18,7 +19,7 @@ interface IScrollBarNonUIImp : IScrollBarNonUI {
 }
 
 interface IScrollBar  : IScrollBarNonUI, IComponent {
-    var orientation : sgui.Orientation
+    var orientation : Orientation
 }
 
 class ScrollBarNonUI(

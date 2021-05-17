@@ -1,6 +1,6 @@
 package sguiSwing
 
-import sgui.IIcon
+import sgui.core.IIcon
 import javax.swing.ImageIcon
 
 interface SwIcon : IIcon

@@ -7,7 +7,7 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
 import rbJvm.owl.addWeakObserver
-import sgui.UIPoint
+import sgui.core.UIPoint
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BASIC
 import sgui.components.crossContainer.CrossInitializer

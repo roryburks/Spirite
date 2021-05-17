@@ -1,13 +1,14 @@
 package sguiSwing.hybrid.customGui
 
 import rb.vectrix.mathUtil.round
-import sgui.Direction.*
+import sgui.core.Direction
+import sgui.core.Direction.*
 import sguiSwing.JColor
 import sguiSwing.components.SJPanel
 import java.awt.Graphics
 
 
-class ArrowPanel(val bgcol: JColor?, val fgcol: JColor, val dir: sgui.Direction) : SJPanel() {
+class ArrowPanel(val bgcol: JColor?, val fgcol: JColor, val dir: Direction) : SJPanel() {
     init {
         background = null
         isOpaque = false

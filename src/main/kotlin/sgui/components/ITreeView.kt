@@ -7,8 +7,8 @@ import rb.owl.bindable.IBindable
 import rb.glow.SColor
 import sgui.components.ITreeViewNonUI.ITreeNode
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
-import sgui.transfer.ITransferObject
-import sgui.transfer.StringTransferObject
+import sgui.core.transfer.ITransferObject
+import sgui.core.transfer.StringTransferObject
 
 interface ITreeViewNonUI<T>{
     var buildingPaused : Boolean
@@ -45,7 +45,7 @@ interface ITreeViewNonUI<T>{
 
     interface TreeDragInterpreter<T> {
         fun canImport( trans: ITransferObject) : Boolean
-        fun interpretDrop( trans: ITransferObject, dropInto: ITreeNode<T>, dropDirection: DropDirection)
+        fun interpretDrop(trans: ITransferObject, dropInto: ITreeNode<T>, dropDirection: DropDirection)
     }
 
     interface ITreeNodeAttributes<T> : TreeDragInterpreter<T> {

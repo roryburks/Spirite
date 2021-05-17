@@ -1,7 +1,7 @@
 package sguiSwing.transfer
 
-import sgui.transfer.ITransferObject
-import sgui.transfer.StringTransferObject
+import sgui.core.transfer.ITransferObject
+import sgui.core.transfer.StringTransferObject
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 

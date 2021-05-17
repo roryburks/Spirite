@@ -4,7 +4,7 @@ import rb.global.IContract
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
-import sgui.Orientation.HORIZONTAL
+import sgui.core.Orientation.HORIZONTAL
 import sgui.components.IComponent
 import sguiSwing.SwIcon
 import sguiSwing.components.ResizeContainerPanel

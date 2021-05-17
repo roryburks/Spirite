@@ -2,7 +2,7 @@ package sgui.components
 
 import rb.vectrix.shapes.RectI
 import rb.glow.SColor
-import sgui.UIPoint
+import sgui.core.UIPoint
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseWheelEvent
 

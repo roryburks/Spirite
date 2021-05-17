@@ -5,6 +5,7 @@ import rb.glow.SColor
 import sgui.components.*
 import sgui.components.crossContainer.CrossInitializer
 import sgui.components.crossContainer.ICrossPanel
+import sgui.core.Orientation
 import sguiSwing.advancedComponents.SwTreeView
 import sguiSwing.components.*
 
@@ -19,7 +20,7 @@ object SwingComponentProvider : IComponentProvider {
     override fun GradientSlider(minValue: Float, maxValue: Float, label: String) : IGradientSlider = SwGradientSlider(minValue, maxValue, label)
     override fun Label(text: String): ILabel = SwLabel(text)
     override fun EditableLabel(text: String): IEditableLabel = SwEditableLabel(text)
-    override fun ScrollBar(orientation: sgui.Orientation, context: IComponent, minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidth: Int) : IScrollBar
+    override fun ScrollBar(orientation: Orientation, context: IComponent, minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidth: Int) : IScrollBar
         = SwScrollBar(orientation, context, minScroll, maxScroll, startScroll, scrollWidth)
     override fun ScrollContainer(component: IComponent) = SwScrollContainer(component)
 
@@ -35,7 +36,7 @@ object SwingComponentProvider : IComponentProvider {
 
     override fun TextArea(): ITextArea = SwTextArea()
 
-    override fun Separator(orientation: sgui.Orientation): ISeparator = SwSeparator(orientation)
+    override fun Separator(orientation: Orientation): ISeparator = SwSeparator(orientation)
     override fun ColorSquare(color: SColor): IColorSquare = SwColorSquare(color)
 
     override fun Slider(min: Int, max: Int, value: Int): ISlider = SwSlider(min, max, value)

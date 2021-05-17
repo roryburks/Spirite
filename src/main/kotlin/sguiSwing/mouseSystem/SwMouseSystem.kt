@@ -7,8 +7,8 @@ import rb.global.IContract
 import sgui.components.IComponent
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseEventType.*
-import sgui.systems.IGlobalMouseHook
-import sgui.systems.IMouseSystem
+import sgui.core.systems.IGlobalMouseHook
+import sgui.core.systems.IMouseSystem
 import sguiSwing.components.SwComponent
 import java.awt.Component
 import java.lang.ref.WeakReference
@@ -27,8 +27,8 @@ private class SwMouseSystem_imp : IMouseSystem
 
     private abstract inner  class AbstractContract
     constructor(
-            val hook: IGlobalMouseHook,
-            component: IComponent)
+        val hook: IGlobalMouseHook,
+        component: IComponent)
         : IContract
     {
         val hc = component.component.hashCode()

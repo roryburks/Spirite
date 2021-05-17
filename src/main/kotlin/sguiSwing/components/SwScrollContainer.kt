@@ -8,8 +8,8 @@ import sgui.components.IScrollBar
 import sgui.components.IScrollContainer
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseEventType.*
-import sgui.systems.IGlobalMouseHook
-import sgui.systems.KeypressSystem
+import sgui.core.systems.IGlobalMouseHook
+import sgui.core.systems.KeypressSystem
 import sguiSwing.mouseSystem.SwMouseSystem
 import java.awt.Component
 

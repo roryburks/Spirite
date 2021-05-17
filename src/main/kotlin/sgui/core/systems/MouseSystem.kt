@@ -1,4 +1,4 @@
-package sgui.systems
+package sgui.core.systems
 
 import rb.global.IContract
 import sgui.components.IComponent

@@ -2,7 +2,7 @@ package sguiSwing.components
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import sgui.IIcon
+import sgui.core.IIcon
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.components.IToggleButton

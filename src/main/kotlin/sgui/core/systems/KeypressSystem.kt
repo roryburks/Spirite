@@ -1,4 +1,4 @@
-package sgui.systems
+package sgui.core.systems
 
 interface IKeypressSystem
 {

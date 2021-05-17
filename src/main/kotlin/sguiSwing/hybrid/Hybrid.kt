@@ -6,10 +6,10 @@ import rb.glow.gle.IGLEngine
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.jogl.JOGLProvider
 import sgui.components.IComponentProvider
-import sgui.systems.IKeypressSystem
-import sgui.systems.IMouseSystem
-import sgui.systems.KeypressSystem
-import sgui.systems.MKeypressSystem
+import sgui.core.systems.IKeypressSystem
+import sgui.core.systems.IMouseSystem
+import sgui.core.systems.KeypressSystem
+import sgui.core.systems.MKeypressSystem
 import sguiSwing.SwingComponentProvider
 import sguiSwing.hybrid.Transferables.IClipboard
 import sguiSwing.hybrid.Transferables.SwClipboard

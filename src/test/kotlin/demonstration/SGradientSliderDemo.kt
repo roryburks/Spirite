@@ -2,7 +2,7 @@ package demonstration
 
 import rb.glow.Colors
 import rb.vectrix.functions.InvertibleFunction
-import sgui.Orientation.HORIZONTAL
+import sgui.core.Orientation.HORIZONTAL
 import sgui.components.IButton
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent

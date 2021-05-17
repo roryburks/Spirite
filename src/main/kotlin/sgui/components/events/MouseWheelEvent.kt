@@ -1,7 +1,7 @@
 package sgui.components.events
 
-import sgui.UIPoint
+import sgui.core.UIPoint
 
 data class MouseWheelEvent(
-        val point: UIPoint,
-        val moveAmount : Int)
+    val point: UIPoint,
+    val moveAmount : Int)

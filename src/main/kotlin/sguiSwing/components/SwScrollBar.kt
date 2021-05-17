@@ -1,12 +1,13 @@
 package sguiSwing.components
 
 import rb.owl.bindable.addObserver
-import sgui.Orientation.HORIZONTAL
-import sgui.Orientation.VERTICAL
+import sgui.core.Orientation.HORIZONTAL
+import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.components.IScrollBar
 import sgui.components.IScrollBarNonUIImp
 import sgui.components.ScrollBarNonUI
+import sgui.core.Orientation
 import sguiSwing.components.SScrollPane.ModernScrollBarUI
 import sguiSwing.mouseSystem.adaptMouseSystem
 import javax.swing.JComponent
@@ -19,19 +20,19 @@ private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidt
         ISwComponent by SwComponent(imp)
 {
     constructor(
-            orientation: sgui.Orientation,
-            context: IComponent,
-            minScroll: Int = 0,
-            maxScroll: Int = 100,
-            startScroll: Int = 0,
-            scrollWidth : Int = 10) : this( minScroll, maxScroll, startScroll, scrollWidth, SwScrollBarImp(orientation, context))
+        orientation: Orientation,
+        context: IComponent,
+        minScroll: Int = 0,
+        maxScroll: Int = 100,
+        startScroll: Int = 0,
+        scrollWidth : Int = 10) : this( minScroll, maxScroll, startScroll, scrollWidth, SwScrollBarImp(orientation, context))
 
     constructor(imp: JScrollBar) : this( imp.minimum, imp.maximum, imp.value, imp.visibleAmount, imp)
 
 
 
 
-    override var orientation: sgui.Orientation
+    override var orientation: Orientation
         get() = map(imp.orientation)
         set(value) { imp.orientation = if( value == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL}
 
@@ -43,16 +44,16 @@ private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidt
         imp.addAdjustmentListener {scroll = imp.value}
     }
 
-    private class SwScrollBarImp(orientation: sgui.Orientation, context: IComponent) : JScrollBar() {
+    private class SwScrollBarImp(orientation: Orientation, context: IComponent) : JScrollBar() {
         init {
             adaptMouseSystem()
             isOpaque = false
             setUI( ModernScrollBarUI(context.component as JComponent))
-            this.setOrientation(if( orientation == sgui.Orientation.VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL)
+            this.setOrientation(if( orientation == Orientation.VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL)
         }
     }
 
 
-    private fun map(jOrientation: Int) =  if( jOrientation == JScrollBar.VERTICAL) sgui.Orientation.VERTICAL else HORIZONTAL
-    private fun map(sOrientation: sgui.Orientation) =  if( sOrientation == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL
+    private fun map(jOrientation: Int) =  if( jOrientation == JScrollBar.VERTICAL) Orientation.VERTICAL else HORIZONTAL
+    private fun map(sOrientation: Orientation) =  if( sOrientation == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL
 }

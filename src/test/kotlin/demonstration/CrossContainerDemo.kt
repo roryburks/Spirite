@@ -1,7 +1,7 @@
 package demonstration
 
-import sgui.Orientation.HORIZONTAL
-import sgui.Orientation.VERTICAL
+import sgui.core.Orientation.HORIZONTAL
+import sgui.core.Orientation.VERTICAL
 import sguiSwing.advancedComponents.CrossContainer.CrossContainer
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent

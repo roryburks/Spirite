@@ -1,6 +1,6 @@
 package sgui.components
 
-import sgui.IIcon
+import sgui.core.IIcon
 
 interface IButton : IComponent {
     data class ButtonActionEvent(

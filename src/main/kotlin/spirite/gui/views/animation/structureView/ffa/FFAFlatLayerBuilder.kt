@@ -2,13 +2,14 @@ package spirite.gui.views.animation.structureView.ffa
 
 import rb.owl.bindable.addObserver
 import rbJvm.glow.awt.ImageBI
-import sgui.UIPoint
+import sgui.core.UIPoint
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.components.crossContainer.ICrossPanel
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.components.events.MouseEvent.MouseEventType.RELEASED
+import sgui.core.Direction
 import sguiSwing.components.SwComponent
 import sguiSwing.hybrid.Hybrid
 import sguiSwing.hybrid.customGui.ArrowPanel
@@ -177,7 +178,7 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
         override val component = Hybrid.ui.CrossPanel {
             cols.add(imgBox, width = tickLen)
             if( frame.length > 1) {
-                cols.add(SwComponent(ArrowPanel(null, Arrow.jcolor, sgui.Direction.RIGHT)), width = tickLen * (frame.length - 1))
+                cols.add(SwComponent(ArrowPanel(null, Arrow.jcolor, Direction.RIGHT)), width = tickLen * (frame.length - 1))
             }
         }
         override val height: Int get() = tickLen

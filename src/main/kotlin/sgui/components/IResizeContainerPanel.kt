@@ -1,10 +1,12 @@
 package sgui.components
 
+import sgui.core.Orientation
+
 interface IResizeContainerPanel : IComponent
 {
 
     var minStretch : Int
-    var orientation : sgui.Orientation
+    var orientation : Orientation
     var barSize : Int
     var stretchComponent : IComponent
 

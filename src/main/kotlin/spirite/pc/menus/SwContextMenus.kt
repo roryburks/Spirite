@@ -1,6 +1,6 @@
 package spirite.pc.menus
 
-import sgui.UIPoint
+import sgui.core.UIPoint
 import sguiSwing.hybrid.Hybrid
 import sguiSwing.hybrid.MDebug
 import sguiSwing.hybrid.MDebug.WarningType

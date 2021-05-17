@@ -4,8 +4,8 @@ import rb.extendo.extensions.then
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
-import sgui.Orientation.HORIZONTAL
-import sgui.Orientation.VERTICAL
+import sgui.core.Orientation.HORIZONTAL
+import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.components.IResizeContainerPanel
 import sgui.components.IResizeContainerPanel.IResizeBar
@@ -13,7 +13,8 @@ import sgui.components.crossContainer.ICrossPanel
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseEventType.DRAGGED
 import sgui.components.events.MouseEvent.MouseEventType.PRESSED
-import sgui.systems.IGlobalMouseHook
+import sgui.core.Orientation
+import sgui.core.systems.IGlobalMouseHook
 import sguiSwing.PrimaryIcon.*
 import sguiSwing.SwPrimaryIconSet
 import sguiSwing.SwingComponentProvider
@@ -23,12 +24,12 @@ import kotlin.reflect.KProperty
 
 open class ResizeContainerPanel
 private constructor(
-        stretchComponent: IComponent,
-        orientation: sgui.Orientation,
-        private val defaultSize: Int,
-        private val panel : ICrossPanel
+    stretchComponent: IComponent,
+    orientation: Orientation,
+    private val defaultSize: Int,
+    private val panel : ICrossPanel
 ) : IComponent by panel, IResizeContainerPanel {
-    constructor(stretchComponent: IComponent, orientation: sgui.Orientation, defaultSize: Int = 100) : this(stretchComponent, orientation, defaultSize, SwingComponentProvider.CrossPanel())
+    constructor(stretchComponent: IComponent, orientation: Orientation, defaultSize: Int = 100) : this(stretchComponent, orientation, defaultSize, SwingComponentProvider.CrossPanel())
 
     override var minStretch: Int by LayoutDelegate(0)
     override var orientation by LayoutDelegate(orientation)

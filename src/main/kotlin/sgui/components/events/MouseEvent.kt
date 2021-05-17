@@ -1,14 +1,14 @@
 package sgui.components.events
 
-import sgui.UIPoint
+import sgui.core.UIPoint
 import sgui.components.IComponent
 
 data class MouseEvent
 constructor(
-        val point: UIPoint,
-        val button: MouseButton,
-        private val modifierMask : Int,
-        val type : MouseEventType)
+    val point: UIPoint,
+    val button: MouseButton,
+    private val modifierMask : Int,
+    val type : MouseEventType)
 {
     var consumed = false ; private set
 

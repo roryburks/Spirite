@@ -1,4 +1,4 @@
-package sgui.modules
+package sgui.core.modules
 
 import rb.extendo.delegates.OnChangeDelegate
 import rb.extendo.extensions.then

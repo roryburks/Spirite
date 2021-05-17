@@ -1,6 +1,6 @@
 package spirite.gui.menus
 
-import sgui.UIPoint
+import sgui.core.UIPoint
 
 
 interface IContextMenus {

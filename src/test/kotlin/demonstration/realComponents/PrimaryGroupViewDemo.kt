@@ -2,7 +2,7 @@ package demonstration.realComponents
 
 import demonstration.DemoLauncher
 import old.TestHelper
-import sgui.Orientation.HORIZONTAL
+import sgui.core.Orientation.HORIZONTAL
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
 import sguiSwing.hybrid.Hybrid

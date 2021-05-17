@@ -1,4 +1,4 @@
-package sgui.transfer
+package sgui.core.transfer
 
 interface ITransferObject {
     val dataTypes: Set<String>

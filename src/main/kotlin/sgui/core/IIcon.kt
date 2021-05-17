@@ -1,4 +1,4 @@
-package sgui
+package sgui.core
 
 interface IIcon
 

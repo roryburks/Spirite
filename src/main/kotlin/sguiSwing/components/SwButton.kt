@@ -1,6 +1,6 @@
 package sguiSwing.components
 
-import sgui.IIcon
+import sgui.core.IIcon
 import sgui.components.IButton
 import sgui.components.IButton.ButtonActionEvent
 import sguiSwing.SwIcon

@@ -1,7 +1,7 @@
 package sguiSwing.components
 
 import rb.glow.SColor
-import sgui.UIPoint
+import sgui.core.UIPoint
 import sgui.components.IComponent
 import sgui.components.IComponent.*
 import sgui.components.IComponent.BasicBorder.*
@@ -9,7 +9,7 @@ import sgui.components.Invokable
 import sgui.components.events.MouseEvent
 import sgui.components.events.MouseEvent.MouseEventType.*
 import sgui.components.events.MouseWheelEvent
-import sgui.systems.IGlobalMouseHook
+import sgui.core.systems.IGlobalMouseHook
 import sguiSwing.jcolor
 import sguiSwing.mouseSystem.SwMouseSystem
 import sguiSwing.scolor

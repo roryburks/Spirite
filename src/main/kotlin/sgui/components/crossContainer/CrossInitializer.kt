@@ -1,8 +1,9 @@
 package sgui.components.crossContainer
 
-import sgui.Orientation.HORIZONTAL
-import sgui.Orientation.VERTICAL
+import sgui.core.Orientation.HORIZONTAL
+import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
+import sgui.core.Orientation
 
 class CrossInitializer {
     val rows
@@ -31,7 +32,7 @@ class CrossInitializer {
      * constructing its layout it has to know which orientation its going to use before hand, so to help with things
      * that algorithmically construct layouts that could be oriented either vertically or horizontally, this exists
      * so you can write something in one orientation and then have it built in another*/
-    var overwriteOrientation : sgui.Orientation? = null
+    var overwriteOrientation : Orientation? = null
 
     internal val scheme get() = when {
         _cols != null -> CrossScheme(overwriteOrientation ?: HORIZONTAL,

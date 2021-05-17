@@ -1,5 +1,7 @@
 package sgui.components.crossContainer
 
+import sgui.core.Orientation
+
 data class CrossScheme(
-        val baseOrientation: sgui.Orientation,
-        val rootGroup: CSE_Group?)
+    val baseOrientation: Orientation,
+    val rootGroup: CSE_Group?)

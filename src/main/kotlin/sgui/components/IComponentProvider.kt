@@ -5,6 +5,7 @@ import rb.glow.img.IImage
 import rb.glow.SColor
 import sgui.components.crossContainer.CrossInitializer
 import sgui.components.crossContainer.ICrossPanel
+import sgui.core.Orientation
 
 interface IComponentProvider {
     fun Button(str: String? = null) : IButton
@@ -17,12 +18,12 @@ interface IComponentProvider {
     fun Label( text: String = "") : ILabel
     fun EditableLabel( text: String = "") : IEditableLabel
     fun ScrollBar(
-            orientation: sgui.Orientation,
-            context: IComponent,
-            minScroll: Int = 0,
-            maxScroll: Int = 100,
-            startScroll: Int = 0,
-            scrollWidth : Int = 10) : IScrollBar
+        orientation: Orientation,
+        context: IComponent,
+        minScroll: Int = 0,
+        maxScroll: Int = 100,
+        startScroll: Int = 0,
+        scrollWidth : Int = 10) : IScrollBar
     fun ScrollContainer( component: IComponent) : IScrollContainer
     fun ToggleButton(startChecked: Boolean = false) : IToggleButton
     fun CrossPanel(constructor: (CrossInitializer.()->Unit)? = null ) : ICrossPanel
@@ -35,7 +36,7 @@ interface IComponentProvider {
 
     fun TextArea() : ITextArea
 
-    fun Separator( orientation: sgui.Orientation) : ISeparator
+    fun Separator( orientation: Orientation) : ISeparator
     fun ColorSquare( color: SColor = Colors.BLACK) : IColorSquare
 
     fun <T:Any> BoxList(boxWidth: Int, boxHeight: Int, entries: Collection<T>? = null) : IBoxList<T>

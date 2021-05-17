@@ -1,6 +1,6 @@
 package sguiSwing
 
-import sgui.UIPoint
+import sgui.core.UIPoint
 import sgui.components.IComponent
 import sguiSwing.components.jcomponent
 import java.awt.Component

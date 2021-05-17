@@ -3,7 +3,7 @@ package spirite.gui.views.animation.animationSpaceView
 import rb.glow.Colors
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
-import sgui.Orientation.VERTICAL
+import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.components.crossContainer.ICrossPanel

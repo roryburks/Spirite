@@ -5,7 +5,7 @@ import rb.owl.bindable.addObserver
 import rb.glow.SColor
 import sgui.components.IComponent
 import sgui.components.IEditableLabel
-import sgui.systems.KeypressSystem
+import sgui.core.systems.KeypressSystem
 import sguiSwing.jcolor
 import sguiSwing.skin.Skin.Global.Bg
 import sguiSwing.skin.Skin.Global.Text

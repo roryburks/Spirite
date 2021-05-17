@@ -3,8 +3,8 @@ package spirite.gui.menus.dialogs
 import cwShared.dialogSystem.IDialogPanel
 import rb.glow.Color
 import rb.glow.Colors
-import sgui.Orientation.HORIZONTAL
-import sgui.Orientation.VERTICAL
+import sgui.core.Orientation.HORIZONTAL
+import sgui.core.Orientation.VERTICAL
 import sgui.components.crossContainer.ICrossPanel
 import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl

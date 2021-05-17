@@ -1,4 +1,4 @@
-package sgui
+package sgui.core
 
 
 enum class Orientation { HORIZONTAL, VERTICAL}

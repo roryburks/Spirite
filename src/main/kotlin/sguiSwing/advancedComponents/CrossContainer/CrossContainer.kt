@@ -2,11 +2,12 @@ package sguiSwing.advancedComponents.CrossContainer
 
 import sgui.components.crossContainer.CSE_Group
 import sgui.components.crossContainer.CrossInitializer
+import sgui.core.Orientation
 import sguiSwing.components.SwPanel
 
 open class CrossContainer(constructor: CrossInitializer.()->Unit): SwPanel()
 {
-    val rootOrientation: sgui.Orientation
+    val rootOrientation: Orientation
     internal val rootGroup : CSE_Group?
 
     init {

@@ -1,6 +1,6 @@
 //package demonstration
 //
-//import sgui.Orientation.VERTICAL
+//import sgui.core.Orientation.VERTICAL
 //import sgui.components.ITreeView.*
 //import sgui.components.ITreeViewNonUI.*
 //import sguiSwing.components.ResizeContainerPanel

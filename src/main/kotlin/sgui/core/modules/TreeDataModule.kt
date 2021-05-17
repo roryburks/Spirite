@@ -1,4 +1,4 @@
-package sgui.modules
+package sgui.core.modules
 
 interface ITreeDataModule
 {

@@ -7,8 +7,8 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
 import rbJvm.owl.addWeakObserver
-import sgui.Orientation.HORIZONTAL
-import sgui.Orientation.VERTICAL
+import sgui.core.Orientation.HORIZONTAL
+import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.components.crossContainer.ICrossPanel
 import sguiSwing.components.SwPanel
