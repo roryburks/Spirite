@@ -9,7 +9,7 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.ColorChangeMode.AUTO
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA

@@ -7,7 +7,7 @@ import rb.glow.gle.GLParameters
 import rb.vectrix.linear.Vec4f
 import rb.vectrix.mathUtil.f
 import rb.vectrix.shapes.RectI
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import rbJvm.glow.jogl.JOGL.JOGLTextureSource
 import spirite.specialRendering.FillAfterpassCall
 import java.nio.IntBuffer

@@ -4,7 +4,7 @@ import rb.glow.ColorARGB32Normal
 import rb.glow.IGraphicsContext
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import spirite.base.imageData.drawer.IImageDrawer.IMagneticFillModule
 import spirite.base.pen.Penner
 import spirite.gui.views.work.WorkSectionView

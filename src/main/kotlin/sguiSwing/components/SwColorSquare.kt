@@ -1,7 +1,7 @@
 package sguiSwing.components
 
 import rb.owl.bindable.addObserver
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import sgui.components.ColorSquareNonUI
 import sgui.components.IColorSquare
 import sgui.components.IColorSquareNonUI
@@ -14,8 +14,8 @@ import javax.swing.JColorChooser
 
 class SwColorSquare
 private constructor(
-        defaultColor: SColor,
-        private val imp : SwColorSquareImp)
+    defaultColor: SColor,
+    private val imp : SwColorSquareImp)
     : IColorSquare, ISwComponent by SwComponent(imp), IColorSquareNonUI by ColorSquareNonUI(defaultColor)
 {
     constructor(defaultColor: SColor) : this(defaultColor, SwColorSquareImp())

@@ -3,7 +3,7 @@ package sguiSwing.components
 import rb.extendo.delegates.OnChangeDelegate
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import sgui.components.GradientSliderNonUI
 import sgui.components.IGradientSlider
 import sgui.components.IGradientSliderNonUIImpl

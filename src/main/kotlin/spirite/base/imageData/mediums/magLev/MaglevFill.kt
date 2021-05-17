@@ -3,7 +3,7 @@ package spirite.base.imageData.mediums.magLev
 import rb.glow.Composite.DST_OVER
 import rb.glow.Composite.SRC_OVER
 import rb.vectrix.mathUtil.d
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.MagneticFillMode.BEHIND
 import spirite.base.brains.toolset.MagneticFillMode.NORMAL
@@ -13,7 +13,8 @@ import kotlin.math.abs
 data class MaglevFill(
         val segments: List<StrokeSegment>,
         val mode: MagneticFillMode,
-        var color: SColor) :
+        var color: SColor
+) :
         IMaglevThing, IMaglevColorwiseThing
 {
     data class StrokeSegment(

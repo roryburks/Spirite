@@ -2,7 +2,7 @@ package sguiSwing.components
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import sgui.components.IComponent
 import sgui.components.IEditableLabel
 import sgui.systems.KeypressSystem

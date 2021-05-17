@@ -2,7 +2,7 @@ package spirite.gui.views.animation
 
 import rb.extendo.delegates.OnChangeDelegate
 import rb.vectrix.mathUtil.d
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
 import sguiSwing.components.SwComponent

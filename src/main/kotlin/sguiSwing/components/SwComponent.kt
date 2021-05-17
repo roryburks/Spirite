@@ -1,6 +1,6 @@
 package sguiSwing.components
 
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import sgui.UIPoint
 import sgui.components.IComponent
 import sgui.components.IComponent.*

@@ -1,6 +1,6 @@
 package sguiSwing.components
 
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import sgui.components.ILabel
 import sguiSwing.jcolor
 import sguiSwing.mouseSystem.adaptMouseSystem

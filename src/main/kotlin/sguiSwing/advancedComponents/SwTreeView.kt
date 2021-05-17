@@ -5,7 +5,7 @@ import rb.global.IContract
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
 import sgui.components.IToggleButton

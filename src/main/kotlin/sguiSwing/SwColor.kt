@@ -1,7 +1,7 @@
 package sguiSwing
 
 import rb.glow.ColorARGB32Normal
-import rbJvm.glow.SColor
+import rb.glow.SColor
 
 typealias JColor = java.awt.Color
 

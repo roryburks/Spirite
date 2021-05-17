@@ -6,7 +6,7 @@ import rb.glow.IGraphicsContext
 import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle

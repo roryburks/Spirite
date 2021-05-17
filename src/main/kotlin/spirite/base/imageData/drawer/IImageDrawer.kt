@@ -3,7 +3,7 @@ package spirite.base.imageData.drawer
 import rb.glow.Color
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import rbJvm.glow.SColor
+import rb.glow.SColor
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.imageData.deformation.IDeformation
