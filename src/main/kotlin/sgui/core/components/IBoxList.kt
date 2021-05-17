@@ -1,12 +1,13 @@
-package sgui.components
+package sgui.core.components
 
 import rb.extendo.delegates.OnChangeDelegate
 import rb.extendo.extensions.removeToList
 import rb.owl.Observer
-import sgui.components.IBoxList.IBoxComponent
-import sgui.components.IBoxList.IMovementContract
-import sgui.components.crossContainer.CrossInitializer
-import sgui.components.events.MouseEvent
+import sgui.components.IComponent
+import sgui.core.components.IBoxList.IBoxComponent
+import sgui.core.components.IBoxList.IMovementContract
+import sgui.core.components.crossContainer.CrossInitializer
+import sgui.core.components.events.MouseEvent
 import sgui.core.modules.ISelectableDataModule
 import sgui.core.modules.SelectableDataModule
 import kotlin.math.max
@@ -39,12 +40,12 @@ interface IBoxList<T> : IComponent where T : Any
 }
 
 abstract class BoxList<T> constructor(
-        boxWidth: Int,
-        boxHeight: Int,
-        entries: Collection<T>?,
-        private val _provider: IComponentProvider,
-        val del: IBoxListImp,
-        multiSelect: Boolean = false)
+    boxWidth: Int,
+    boxHeight: Int,
+    entries: Collection<T>?,
+    private val _provider: IComponentProvider,
+    val del: IBoxListImp,
+    multiSelect: Boolean = false)
     : IBoxList<T>, IComponent by del.component
         where T: Any
 {

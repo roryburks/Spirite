@@ -4,10 +4,10 @@ import rb.extendo.delegates.OnChangeDelegate
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
 import rb.glow.SColor
-import sgui.components.GradientSliderNonUI
-import sgui.components.IGradientSlider
-import sgui.components.IGradientSliderNonUIImpl
-import sgui.components.events.MouseEvent
+import sgui.core.components.GradientSliderNonUI
+import sgui.core.components.IGradientSlider
+import sgui.core.components.IGradientSliderNonUIImpl
+import sgui.core.components.events.MouseEvent
 import sguiSwing.SwUtil
 import sguiSwing.jcolor
 import sguiSwing.mouseSystem.adaptMouseSystem
@@ -23,7 +23,7 @@ class SwGradientSlider
 private constructor(minValue: Float, maxValue: Float, label: String, private val imp : SwGradientSliderImp)
     :
         IGradientSliderNonUIImpl by GradientSliderNonUI(minValue, maxValue),
-        IGradientSlider,
+    IGradientSlider,
         ISwComponent by SwComponent(imp)
 {
     init {

@@ -1,7 +1,8 @@
-package sgui.components
+package sgui.core.components
 
 import rb.owl.bindable.Bindable
 import rb.vectrix.mathUtil.MathUtil
+import sgui.components.IComponent
 import sgui.core.Orientation
 
 interface IScrollBarNonUI {

@@ -7,7 +7,7 @@ import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLCanvas
 import rb.glow.gl.GLGraphicsContext
 import rbJvm.glow.jogl.JOGLProvider
-import sgui.components.events.MouseEvent
+import sgui.core.components.events.MouseEvent
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent
 import sguiSwing.hybrid.Hybrid

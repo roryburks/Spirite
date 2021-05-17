@@ -8,13 +8,13 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.glow.SColor
 import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
-import sgui.components.IToggleButton
+import sgui.core.components.IToggleButton
 import sgui.components.ITreeElementConstructor
 import sgui.components.ITreeElementConstructor.ITNode
 import sgui.components.ITreeView
 import sgui.components.ITreeViewNonUI.*
 import sgui.components.ITreeViewNonUI.DropDirection.*
-import sgui.components.crossContainer.CrossColInitializer
+import sgui.core.components.crossContainer.CrossColInitializer
 import sguiSwing.*
 import sguiSwing.PrimaryIcon.*
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout

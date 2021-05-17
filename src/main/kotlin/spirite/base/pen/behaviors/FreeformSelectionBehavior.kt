@@ -4,7 +4,7 @@ import rb.glow.Colors
 import rb.glow.IGraphicsContext
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
-import sgui.components.events.MouseEvent.MouseButton
+import sgui.core.components.events.MouseEvent.MouseButton
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.pen.Penner
 import spirite.base.pen.selectionBuilders.FreeformSelectionBuilder

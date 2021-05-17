@@ -5,8 +5,8 @@ import rb.extendo.extensions.deref
 import rb.extendo.extensions.lookup
 import rb.global.IContract
 import sgui.components.IComponent
-import sgui.components.events.MouseEvent
-import sgui.components.events.MouseEvent.MouseEventType.*
+import sgui.core.components.events.MouseEvent
+import sgui.core.components.events.MouseEvent.MouseEventType.*
 import sgui.core.systems.IGlobalMouseHook
 import sgui.core.systems.IMouseSystem
 import sguiSwing.components.SwComponent

@@ -5,10 +5,10 @@ import rbJvm.glow.awt.ImageBI
 import sgui.core.UIPoint
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
-import sgui.components.crossContainer.ICrossPanel
-import sgui.components.events.MouseEvent
-import sgui.components.events.MouseEvent.MouseButton.RIGHT
-import sgui.components.events.MouseEvent.MouseEventType.RELEASED
+import sgui.core.components.crossContainer.ICrossPanel
+import sgui.core.components.events.MouseEvent
+import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
+import sgui.core.components.events.MouseEvent.MouseEventType.RELEASED
 import sgui.core.Direction
 import sguiSwing.components.SwComponent
 import sguiSwing.hybrid.Hybrid

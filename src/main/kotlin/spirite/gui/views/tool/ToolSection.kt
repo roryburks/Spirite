@@ -3,8 +3,8 @@ package spirite.gui.views.tool
 import rb.glow.Colors
 import rb.owl.Observer
 import rb.owl.bindable.addObserver
-import sgui.components.IBoxList
-import sgui.components.IBoxList.IBoxComponent
+import sgui.core.components.IBoxList
+import sgui.core.components.IBoxList.IBoxComponent
 import sgui.components.IComponent
 import sguiSwing.SwIcon
 import sguiSwing.components.SwToggleButton

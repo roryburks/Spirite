@@ -6,7 +6,7 @@ import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.i
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
-import sgui.components.crossContainer.ICrossPanel
+import sgui.core.components.crossContainer.ICrossPanel
 import sguiSwing.SwIcon
 import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl

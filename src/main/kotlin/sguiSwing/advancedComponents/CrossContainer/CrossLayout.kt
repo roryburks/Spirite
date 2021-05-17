@@ -4,10 +4,10 @@ import rb.vectrix.mathUtil.floor
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
-import sgui.components.crossContainer.CSE_Component
-import sgui.components.crossContainer.CSE_Gap
-import sgui.components.crossContainer.CSE_Group
-import sgui.components.crossContainer.CrossInitializer
+import sgui.core.components.crossContainer.CSE_Component
+import sgui.core.components.crossContainer.CSE_Gap
+import sgui.core.components.crossContainer.CSE_Group
+import sgui.core.components.crossContainer.CrossInitializer
 import java.awt.Component
 import java.awt.Container
 import javax.swing.GroupLayout

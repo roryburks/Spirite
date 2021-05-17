@@ -3,7 +3,7 @@ package sguiSwing.components
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.glow.SColor
-import sgui.components.*
+import sgui.core.components.*
 import sgui.core.systems.KeypressSystem
 import sguiSwing.jcolor
 import sguiSwing.mouseSystem.adaptMouseSystem
@@ -163,7 +163,7 @@ private constructor(
 }
 
 class SwIntField(min: Int, max: Int, allowsNegatives: Boolean = true) : SwNumberField(allowsNegatives, false),
-        IIntField, IIntFieldNonUI by IntFieldNonUI(min, max)
+    IIntField, IIntFieldNonUI by IntFieldNonUI(min, max)
 {
     override fun isOob(str: String): Boolean {
         val num = str.toIntOrNull(10) ?: 0
@@ -177,7 +177,7 @@ class SwIntField(min: Int, max: Int, allowsNegatives: Boolean = true) : SwNumber
 }
 
 class SwFloatField(min: Float, max: Float, allowsNegatives: Boolean = true) : SwNumberField(allowsNegatives, true),
-        IFloatField, IFloatFieldNonUI by FloatFieldNonUI(min, max)
+    IFloatField, IFloatFieldNonUI by FloatFieldNonUI(min, max)
 {
     override fun isOob(str: String): Boolean {
         val num = str.toFloatOrNull() ?: 0f

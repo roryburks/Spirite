@@ -12,7 +12,7 @@ import jpen.owner.multiAwt.AwtPenToolkit
 import rb.glow.gl.GLGraphicsContext
 import rb.vectrix.mathUtil.round
 import rbJvm.glow.jogl.JOGLProvider
-import sgui.components.events.MouseEvent.MouseButton
+import sgui.core.components.events.MouseEvent.MouseButton
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent
 import sguiSwing.hybrid.Hybrid

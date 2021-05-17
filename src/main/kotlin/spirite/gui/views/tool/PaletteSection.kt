@@ -3,11 +3,11 @@ package spirite.gui.views.tool
 import rb.owl.bindable.addObserver
 import rb.owl.observer
 import rbJvm.owl.addWeakObserver
-import sgui.components.IColorSquare
+import sgui.core.components.IColorSquare
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
-import sgui.components.crossContainer.ICrossPanel
-import sgui.components.events.MouseEvent.MouseButton.RIGHT
+import sgui.core.components.crossContainer.ICrossPanel
+import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sguiSwing.SwIcon
 import sguiSwing.components.SJPanel
 import sguiSwing.components.SwComponent

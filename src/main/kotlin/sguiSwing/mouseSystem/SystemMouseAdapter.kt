@@ -1,8 +1,8 @@
 package sguiSwing.mouseSystem
 
-import sgui.components.events.MouseEvent.MouseButton.*
-import sgui.components.events.MouseEvent.MouseEventType
-import sgui.components.events.MouseEvent.MouseEventType.*
+import sgui.core.components.events.MouseEvent.MouseButton.*
+import sgui.core.components.events.MouseEvent.MouseEventType
+import sgui.core.components.events.MouseEvent.MouseEventType.*
 import sguiSwing.components.SwComponent
 import java.awt.Component
 import java.awt.event.InputEvent
@@ -56,15 +56,15 @@ class SystemMouseAdapter(val comp : JComponent) : MouseListener, MouseMotionList
         SwMouseSystem.broadcastMouseEvent(evt, SwingUtilities.getRoot(e.component))
     }
 
-    fun convert(e: MouseEvent, type: MouseEventType) : sgui.components.events.MouseEvent {
+    fun convert(e: MouseEvent, type: MouseEventType) : sgui.core.components.events.MouseEvent {
         val scomp = SwComponent(e.component as Component)
         val smask = e.modifiersEx
-        val mask = sgui.components.events.MouseEvent.toMask(
+        val mask = sgui.core.components.events.MouseEvent.toMask(
                 (smask and InputEvent.SHIFT_DOWN_MASK) == InputEvent.SHIFT_DOWN_MASK,
                 (smask and InputEvent.CTRL_DOWN_MASK) == InputEvent.CTRL_DOWN_MASK,
                 (smask and InputEvent.ALT_DOWN_MASK) == InputEvent.ALT_DOWN_MASK)
 
-        return sgui.components.events.MouseEvent(
+        return sgui.core.components.events.MouseEvent(
                 sguiSwing.SUIPoint(e.x, e.y, scomp.component),
                 when (e.button) {
                     MouseEvent.BUTTON1 -> LEFT

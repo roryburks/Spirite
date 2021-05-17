@@ -7,6 +7,7 @@ import rb.owl.bindable.IBindable
 import rb.glow.SColor
 import sgui.components.ITreeViewNonUI.ITreeNode
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
+import sgui.core.components.IComponentProvider
 import sgui.core.transfer.ITransferObject
 import sgui.core.transfer.StringTransferObject
 

@@ -1,6 +1,7 @@
-package sgui.components
+package sgui.core.components
 
 import rb.glow.Color
+import sgui.components.IComponent
 
 
 interface ILabel : IComponent {

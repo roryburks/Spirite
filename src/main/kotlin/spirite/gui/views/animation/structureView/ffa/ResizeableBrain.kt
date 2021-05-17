@@ -4,9 +4,9 @@ import rb.global.IContract
 import rb.vectrix.shapes.RectI
 import sgui.components.IComponent.BasicCursor.DEFAULT
 import sgui.components.IComponent.BasicCursor.E_RESIZE
-import sgui.components.events.MouseEvent
-import sgui.components.events.MouseEvent.MouseButton.LEFT
-import sgui.components.events.MouseEvent.MouseEventType.*
+import sgui.core.components.events.MouseEvent
+import sgui.core.components.events.MouseEvent.MouseButton.LEFT
+import sgui.core.components.events.MouseEvent.MouseEventType.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
 import java.awt.BasicStroke

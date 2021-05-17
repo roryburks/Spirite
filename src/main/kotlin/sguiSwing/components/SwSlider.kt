@@ -3,7 +3,7 @@ package sguiSwing.components
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import sgui.components.IComponent
-import sgui.components.ISlider
+import sgui.core.components.ISlider
 import sguiSwing.SwingComponentProvider
 import sguiSwing.skin.Skin.BevelBorder.*
 import sguiSwing.skin.Skin.Global.*

@@ -5,7 +5,7 @@ import rb.glow.Colors
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
-import sgui.components.IImageBox
+import sgui.core.components.IImageBox
 import sguiSwing.SwProvider
 import sguiSwing.jcolor
 import java.awt.Graphics

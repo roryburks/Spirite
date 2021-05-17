@@ -6,8 +6,8 @@ import rb.glow.IGraphicsContext
 import rb.vectrix.compaction.FloatCompactor
 import rb.vectrix.interpolation.CubicSplineInterpolator2D
 import rb.vectrix.mathUtil.d
-import sgui.components.events.MouseEvent.MouseButton
-import sgui.components.events.MouseEvent.MouseButton.*
+import sgui.core.components.events.MouseEvent.MouseButton
+import sgui.core.components.events.MouseEvent.MouseButton.*
 import spirite.base.imageData.deformation.StrokeDeformationPiece
 import spirite.base.imageData.deformation.StrokeDeformationV2
 import spirite.base.imageData.drawer.IImageDrawer.IDeformDrawer

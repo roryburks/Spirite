@@ -2,7 +2,7 @@ package sgui.core.systems
 
 import rb.global.IContract
 import sgui.components.IComponent
-import sgui.components.events.MouseEvent
+import sgui.core.components.events.MouseEvent
 
 /**
  * The SwMouseSystem gives components a semi-direct access to the Mouse Events broadcast by various components.  It gets

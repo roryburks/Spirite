@@ -17,7 +17,7 @@ import rb.vectrix.shapes.IShape
 import rb.vectrix.shapes.OvalShape
 import rb.vectrix.shapes.RectShape
 import rbJvm.owl.bindWeaklyTo
-import sgui.components.events.MouseEvent.MouseButton
+import sgui.core.components.events.MouseEvent.MouseButton
 import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.pen.Penner

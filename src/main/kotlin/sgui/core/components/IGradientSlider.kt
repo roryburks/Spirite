@@ -1,10 +1,11 @@
-package sgui.components
+package sgui.core.components
 
 import rb.glow.Color
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.functions.InvertibleFunction
 import rb.vectrix.mathUtil.MathUtil
+import sgui.components.IComponent
 
 
 interface IGradientSliderNonUI {

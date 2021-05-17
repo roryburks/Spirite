@@ -6,11 +6,11 @@ import rb.global.IContract
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicCursor.DEFAULT
-import sgui.components.IScrollContainer
-import sgui.components.crossContainer.CrossInitializer
-import sgui.components.crossContainer.CrossRowInitializer
-import sgui.components.crossContainer.ICrossPanel
-import sgui.components.events.MouseEvent
+import sgui.core.components.IScrollContainer
+import sgui.core.components.crossContainer.CrossInitializer
+import sgui.core.components.crossContainer.CrossRowInitializer
+import sgui.core.components.crossContainer.ICrossPanel
+import sgui.core.components.events.MouseEvent
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SJPanel
 import sguiSwing.components.SwComponent

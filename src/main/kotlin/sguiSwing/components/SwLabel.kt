@@ -1,7 +1,7 @@
 package sguiSwing.components
 
 import rb.glow.SColor
-import sgui.components.ILabel
+import sgui.core.components.ILabel
 import sguiSwing.jcolor
 import sguiSwing.mouseSystem.adaptMouseSystem
 import sguiSwing.scolor

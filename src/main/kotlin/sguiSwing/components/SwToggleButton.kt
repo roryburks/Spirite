@@ -5,7 +5,7 @@ import rb.owl.bindable.addObserver
 import sgui.core.IIcon
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
-import sgui.components.IToggleButton
+import sgui.core.components.IToggleButton
 import sguiSwing.SwIcon
 import sguiSwing.mouseSystem.adaptMouseSystem
 import sguiSwing.skin.Skin

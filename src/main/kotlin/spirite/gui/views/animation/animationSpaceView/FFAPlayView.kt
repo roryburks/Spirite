@@ -6,7 +6,7 @@ import rbJvm.owl.bindWeaklyTo
 import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
-import sgui.components.crossContainer.ICrossPanel
+import sgui.core.components.crossContainer.ICrossPanel
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.hybrid.Hybrid
 import sguiSwing.skin.Skin

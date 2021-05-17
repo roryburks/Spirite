@@ -10,8 +10,8 @@ import rbJvm.owl.addWeakObserver
 import sgui.core.UIPoint
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BASIC
-import sgui.components.crossContainer.CrossInitializer
-import sgui.components.crossContainer.ICrossPanel
+import sgui.core.components.crossContainer.CrossInitializer
+import sgui.core.components.crossContainer.ICrossPanel
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SwComponent
 import sguiSwing.hybrid.Hybrid

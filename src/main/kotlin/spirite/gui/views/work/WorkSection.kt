@@ -10,7 +10,7 @@ import rbJvm.owl.addWeakObserver
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
-import sgui.components.crossContainer.ICrossPanel
+import sgui.core.components.crossContainer.ICrossPanel
 import sguiSwing.components.SwPanel
 import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl

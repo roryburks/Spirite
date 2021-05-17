@@ -2,9 +2,9 @@ package sguiSwing.components
 
 import rb.owl.bindable.addObserver
 import rb.glow.SColor
-import sgui.components.ColorSquareNonUI
-import sgui.components.IColorSquare
-import sgui.components.IColorSquareNonUI
+import sgui.core.components.ColorSquareNonUI
+import sgui.core.components.IColorSquare
+import sgui.core.components.IColorSquareNonUI
 import sguiSwing.jcolor
 import sguiSwing.scolor
 import java.awt.Graphics

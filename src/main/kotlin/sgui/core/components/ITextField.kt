@@ -1,8 +1,9 @@
-package sgui.components
+package sgui.core.components
 
 import rb.glow.Color
 import rb.owl.bindable.Bindable
 import rb.vectrix.mathUtil.MathUtil
+import sgui.components.IComponent
 
 interface ITextFieldNonUI {
     val textBind : Bindable<String>

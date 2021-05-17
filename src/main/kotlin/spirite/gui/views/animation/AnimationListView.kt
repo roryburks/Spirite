@@ -6,8 +6,8 @@ import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
 import sgui.components.ITreeViewNonUI.ITreeComponent
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
-import sgui.components.events.MouseEvent
-import sgui.components.events.MouseEvent.MouseButton.RIGHT
+import sgui.core.components.events.MouseEvent
+import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sguiSwing.SwIcon
 import sguiSwing.components.jcomponent
 import sguiSwing.hybrid.Hybrid

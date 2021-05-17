@@ -1,7 +1,7 @@
 package sguiSwing.advancedComponents.CrossContainer
 
-import sgui.components.crossContainer.CSE_Group
-import sgui.components.crossContainer.CrossInitializer
+import sgui.core.components.crossContainer.CSE_Group
+import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.Orientation
 import sguiSwing.components.SwPanel
 

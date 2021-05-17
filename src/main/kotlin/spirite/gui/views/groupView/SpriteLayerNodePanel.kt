@@ -4,9 +4,9 @@ import rb.glow.Colors
 import rb.owl.bindable.addObserver
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BASIC
-import sgui.components.IToggleButton
-import sgui.components.crossContainer.ICrossPanel
-import sgui.components.events.MouseEvent.MouseButton.RIGHT
+import sgui.core.components.IToggleButton
+import sgui.core.components.crossContainer.ICrossPanel
+import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sguiSwing.hybrid.Hybrid
 import sguiSwing.skin.Skin.AnimSchemePanel.ActiveNodeBg
 import spirite.base.brains.IMasterControl

@@ -5,7 +5,7 @@ import rb.glow.gl.IGL
 import rb.glow.gle.IGLEngine
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.jogl.JOGLProvider
-import sgui.components.IComponentProvider
+import sgui.core.components.IComponentProvider
 import sgui.core.systems.IKeypressSystem
 import sgui.core.systems.IMouseSystem
 import sgui.core.systems.KeypressSystem

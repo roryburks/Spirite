@@ -1,8 +1,8 @@
 package spirite.gui.components.views
 
 import sgui.components.IComponent
-import sgui.components.ITextArea
-import sgui.components.crossContainer.ICrossPanel
+import sgui.core.components.ITextArea
+import sgui.core.components.crossContainer.ICrossPanel
 import sguiSwing.SwIcon
 import sguiSwing.hybrid.Hybrid
 import spirite.gui.components.advanced.omniContainer.IOmniComponent

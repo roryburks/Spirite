@@ -3,8 +3,8 @@ package spirite.gui.views.work
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
-import sgui.components.ITabbedPane
-import sgui.components.crossContainer.ICrossPanel
+import sgui.core.components.ITabbedPane
+import sgui.core.components.crossContainer.ICrossPanel
 import sguiSwing.SwIcon
 import sguiSwing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl

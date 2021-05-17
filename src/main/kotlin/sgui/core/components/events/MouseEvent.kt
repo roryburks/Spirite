@@ -1,4 +1,4 @@
-package sgui.components.events
+package sgui.core.components.events
 
 import sgui.core.UIPoint
 import sgui.components.IComponent

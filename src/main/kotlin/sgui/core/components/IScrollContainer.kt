@@ -1,6 +1,7 @@
-package sgui.components
+package sgui.core.components
 
 import rb.vectrix.shapes.RectI
+import sgui.components.IComponent
 
 
 interface IScrollContainer : IComponent {

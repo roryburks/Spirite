@@ -1,8 +1,8 @@
 package sguiSwing.components
 
 import sgui.core.IIcon
-import sgui.components.IButton
-import sgui.components.IButton.ButtonActionEvent
+import sgui.core.components.IButton
+import sgui.core.components.IButton.ButtonActionEvent
 import sguiSwing.SwIcon
 import sguiSwing.mouseSystem.adaptMouseSystem
 import sguiSwing.skin.Skin

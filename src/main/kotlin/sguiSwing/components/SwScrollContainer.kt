@@ -4,10 +4,10 @@ import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.round
 import rb.vectrix.shapes.RectI
 import sgui.components.IComponent
-import sgui.components.IScrollBar
-import sgui.components.IScrollContainer
-import sgui.components.events.MouseEvent
-import sgui.components.events.MouseEvent.MouseEventType.*
+import sgui.core.components.IScrollBar
+import sgui.core.components.IScrollContainer
+import sgui.core.components.events.MouseEvent
+import sgui.core.components.events.MouseEvent.MouseEventType.*
 import sgui.core.systems.IGlobalMouseHook
 import sgui.core.systems.KeypressSystem
 import sguiSwing.mouseSystem.SwMouseSystem

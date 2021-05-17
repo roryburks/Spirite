@@ -9,10 +9,10 @@ import rb.owl.interprettedBindings.bindToY
 import rb.vectrix.functions.InvertibleFunction
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
-import sgui.components.IComboBox
+import sgui.core.components.IComboBox
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
-import sgui.components.crossContainer.ICrossPanel
+import sgui.core.components.crossContainer.ICrossPanel
 import sguiSwing.SwIcon
 import sguiSwing.hybrid.Hybrid
 import sguiSwing.skin.Skin

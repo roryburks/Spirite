@@ -2,7 +2,7 @@ package spirite.gui.views.animation.structureView.ffa
 
 import rb.global.IContract
 import sgui.components.IComponent
-import sgui.components.events.MouseEvent
+import sgui.core.components.events.MouseEvent
 import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel

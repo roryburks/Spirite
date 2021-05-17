@@ -1,8 +1,8 @@
 package sguiSwing.components
 
 import sgui.components.IComponent
-import sgui.components.crossContainer.CrossInitializer
-import sgui.components.crossContainer.ICrossPanel
+import sgui.core.components.crossContainer.CrossInitializer
+import sgui.core.components.crossContainer.ICrossPanel
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.mouseSystem.adaptMouseSystem
 import sguiSwing.skin.Skin.Global.Bg

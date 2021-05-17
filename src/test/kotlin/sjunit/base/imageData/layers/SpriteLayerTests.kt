@@ -3,7 +3,7 @@ package sjunit.base.imageData.layers
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
-import sgui.components.IButton
+import sgui.core.components.IButton
 import sjunit.testHelpers.MockedWorkspaceSet
 import sjunit.testHelpers.PassthroughUndoEngine
 import spirite.base.imageData.MImageWorkspace

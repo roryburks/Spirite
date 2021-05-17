@@ -3,9 +3,10 @@ package sguiSwing
 import rb.glow.img.IImage
 import rb.glow.SColor
 import sgui.components.*
-import sgui.components.crossContainer.CrossInitializer
-import sgui.components.crossContainer.ICrossPanel
+import sgui.core.components.crossContainer.CrossInitializer
+import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.Orientation
+import sgui.core.components.*
 import sguiSwing.advancedComponents.SwTreeView
 import sguiSwing.components.*
 

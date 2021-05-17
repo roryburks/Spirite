@@ -1,7 +1,7 @@
 package demonstration
 
 import sgui.core.Orientation.HORIZONTAL
-import sgui.components.IBoxList.IBoxComponent
+import sgui.core.components.IBoxList.IBoxComponent
 import sguiSwing.components.*
 import java.awt.Color
 import java.awt.GridLayout

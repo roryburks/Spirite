@@ -2,7 +2,7 @@ package sguiSwing.components
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import sgui.components.ITextArea
+import sgui.core.components.ITextArea
 import sgui.core.systems.KeypressSystem
 import sguiSwing.mouseSystem.adaptMouseSystem
 import sguiSwing.skin.Skin.BevelBorder.Dark

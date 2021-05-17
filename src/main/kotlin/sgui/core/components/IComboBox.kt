@@ -1,7 +1,8 @@
-package sgui.components
+package sgui.core.components
 
 import rb.owl.bindable.Bindable
 import rb.vectrix.mathUtil.MathUtil
+import sgui.components.IComponent
 
 interface IComboBox<T> : IComponent
 {
