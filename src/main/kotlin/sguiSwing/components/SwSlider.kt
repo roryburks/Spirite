@@ -4,9 +4,9 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import sgui.components.IComponent
 import sgui.core.components.ISlider
-import sguiSwing.SwingComponentProvider
-import sguiSwing.skin.Skin.BevelBorder.*
-import sguiSwing.skin.Skin.Global.*
+import sgui.swing.SwingComponentProvider
+import sgui.swing.skin.Skin.BevelBorder.*
+import sgui.swing.skin.Skin.Global.*
 import java.awt.*
 import java.util.*
 import javax.swing.JSlider

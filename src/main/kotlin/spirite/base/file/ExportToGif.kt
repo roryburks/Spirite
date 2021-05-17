@@ -8,7 +8,7 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f
 import rbJvm.file.util.GifSequenceWriter
 import rbJvm.glow.awt.ImageBI
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.imageData.animation.AnimationUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.GroupNode

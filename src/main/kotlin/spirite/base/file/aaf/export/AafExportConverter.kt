@@ -15,7 +15,7 @@ import rb.vectrix.mathUtil.round
 import rb.vectrix.rectanglePacking.IRectanglePackingAlgorithm
 import rb.vectrix.rectanglePacking.PackedRectangle
 import rb.vectrix.shapes.RectI
-import sguiSwing.hybrid.IImageCreator
+import sgui.swing.hybrid.IImageCreator
 import spirite.base.imageData.animation.ffa.FFALayer
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree

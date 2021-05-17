@@ -4,7 +4,7 @@ import rb.glow.IFlushable
 import rb.glow.img.IImage
 import rb.glow.img.RawImage
 import rb.owl.observer
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.brains.ICentralObservatory
 import spirite.base.graphics.IResourceUseTracker
 import spirite.base.graphics.rendering.sources.GroupNodeSource

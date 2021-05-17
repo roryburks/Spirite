@@ -1,9 +1,9 @@
 package spirite.base.imageData.undo
 
 import rb.extendo.dataStructures.SinglySet
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
-import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
+import sgui.swing.hybrid.MDebug
+import sgui.swing.hybrid.MDebug.ErrorType.STRUCTURAL
+import sgui.swing.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData

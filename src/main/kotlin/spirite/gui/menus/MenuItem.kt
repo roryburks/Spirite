@@ -1,6 +1,6 @@
 package spirite.gui.menus
 
-import sguiSwing.SwIcon
+import sgui.swing.SwIcon
 import spirite.base.brains.commands.ICommand
 
 /***
@@ -24,8 +24,8 @@ import spirite.base.brains.commands.ICommand
  *   array (in fact they don't need to exist).
  */
 data class MenuItem(
-        val lexicon : String,
-        val command: ICommand? = null,
-        val icon: SwIcon? = null,
-        val customAction :(()->Unit)? = null,
-        val enabled: Boolean = true)
+    val lexicon : String,
+    val command: ICommand? = null,
+    val icon: SwIcon? = null,
+    val customAction :(()->Unit)? = null,
+    val enabled: Boolean = true)

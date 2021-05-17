@@ -3,8 +3,8 @@ package spirite.gui.components.views
 import sgui.components.IComponent
 import sgui.core.components.ITextArea
 import sgui.core.components.crossContainer.ICrossPanel
-import sguiSwing.SwIcon
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.SwIcon
+import sgui.swing.hybrid.Hybrid
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 
 class DebugView

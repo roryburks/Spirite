@@ -1,8 +1,8 @@
 package spirite.pc.shaders
 
 import rb.glow.resources.IScriptService
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.ErrorType.RESOURCE
+import sgui.swing.hybrid.MDebug
+import sgui.swing.hybrid.MDebug.ErrorType.RESOURCE
 import java.io.IOException
 import java.util.*
 

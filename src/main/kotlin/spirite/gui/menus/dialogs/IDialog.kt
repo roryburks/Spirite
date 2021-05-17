@@ -3,9 +3,9 @@ package spirite.gui.menus.dialogs
 import cwShared.dialogSystem.IDialogPanel
 import rb.glow.SColor
 import sguiSwing.components.jcomponent
-import sguiSwing.jcolor
-import sguiSwing.scolor
-import sguiSwing.skin.Skin.Global
+import sgui.swing.jcolor
+import sgui.swing.scolor
+import sgui.swing.skin.Skin.Global
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract

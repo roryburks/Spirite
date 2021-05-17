@@ -1,7 +1,7 @@
 package spirite.gui.components.advanced.omniContainer
 
 import sgui.components.IComponent
-import sguiSwing.SwIcon
+import sgui.swing.SwIcon
 
 interface IOmniComponent {
     val component: IComponent

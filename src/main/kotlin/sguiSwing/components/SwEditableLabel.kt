@@ -6,9 +6,9 @@ import rb.glow.SColor
 import sgui.components.IComponent
 import sgui.core.components.IEditableLabel
 import sgui.core.systems.KeypressSystem
-import sguiSwing.jcolor
-import sguiSwing.skin.Skin.Global.Bg
-import sguiSwing.skin.Skin.Global.Text
+import sgui.swing.jcolor
+import sgui.swing.skin.Skin.Global.Bg
+import sgui.swing.skin.Skin.Global.Text
 import java.awt.KeyboardFocusManager
 import java.awt.event.*
 import javax.swing.*

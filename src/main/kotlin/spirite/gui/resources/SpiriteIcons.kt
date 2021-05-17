@@ -1,6 +1,6 @@
 package spirite.gui.resources
 
-import sguiSwing.SwIcon
+import sgui.swing.SwIcon
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon

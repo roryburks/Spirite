@@ -10,10 +10,11 @@ import sgui.core.components.events.MouseEvent
 import sgui.core.components.events.MouseEvent.MouseEventType.*
 import sgui.core.components.events.MouseWheelEvent
 import sgui.core.systems.IGlobalMouseHook
-import sguiSwing.jcolor
-import sguiSwing.mouseSystem.SwMouseSystem
-import sguiSwing.scolor
-import sguiSwing.skin.Skin
+import sgui.swing.SUIPoint
+import sgui.swing.jcolor
+import sgui.swing.mouseSystem.SwMouseSystem
+import sgui.swing.scolor
+import sgui.swing.skin.Skin
 import java.awt.Component
 import java.awt.Cursor
 import java.awt.event.*
@@ -42,8 +43,8 @@ abstract class ASwComponent : ISwComponent {
     override val x : Int get() = component.x
     override val y : Int get() = component.y
 
-    override val topLeft: UIPoint get() = sguiSwing.SUIPoint(x, y, this.component.parent)
-    override val bottomRight: UIPoint get() = sguiSwing.SUIPoint(x + width, y + height, this.component.parent)
+    override val topLeft: UIPoint get() = SUIPoint(x, y, this.component.parent)
+    override val bottomRight: UIPoint get() = SUIPoint(x + width, y + height, this.component.parent)
 
     override var background: SColor
         get() = component.background.scolor
@@ -176,7 +177,7 @@ abstract class ASwComponent : ISwComponent {
     private class JSMouseWheelListener( var onWheelMove : ((MouseWheelEvent)-> Unit)? = null) : MouseWheelListener {
         fun convert( e: java.awt.event.MouseWheelEvent) : MouseWheelEvent {
             val scomp = SwComponent(e.component as JComponent)
-            return MouseWheelEvent(sguiSwing.SUIPoint(e.x, e.y, scomp.component), e.wheelRotation)
+            return MouseWheelEvent(SUIPoint(e.x, e.y, scomp.component), e.wheelRotation)
         }
 
         override fun mouseWheelMoved(e: java.awt.event.MouseWheelEvent) {onWheelMove?.invoke(convert(e))}

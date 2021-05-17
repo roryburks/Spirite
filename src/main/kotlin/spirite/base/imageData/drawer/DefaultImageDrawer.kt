@@ -13,7 +13,7 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
 import rb.glow.SColor
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.MagneticFillMode.BEHIND

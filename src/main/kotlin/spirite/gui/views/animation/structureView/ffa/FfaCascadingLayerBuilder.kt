@@ -5,7 +5,7 @@ import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.core.components.events.MouseEvent.MouseEventType.RELEASED
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.base.imageData.animation.ffa.FfaLayerCascading

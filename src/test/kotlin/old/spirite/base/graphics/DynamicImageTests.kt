@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import rb.glow.drawer
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.awt.ImageBI
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.graphics.DynamicImage
 import java.io.File
 import javax.imageio.ImageIO

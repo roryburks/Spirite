@@ -5,8 +5,8 @@ import rb.glow.SColor
 import sgui.core.components.ColorSquareNonUI
 import sgui.core.components.IColorSquare
 import sgui.core.components.IColorSquareNonUI
-import sguiSwing.jcolor
-import sguiSwing.scolor
+import sgui.swing.jcolor
+import sgui.swing.scolor
 import java.awt.Graphics
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent

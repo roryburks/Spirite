@@ -1,9 +1,9 @@
 package spirite.pc
 
-import sguiSwing.PrimaryIcon.*
-import sguiSwing.SwPrimaryIconSet
-import sguiSwing.SwProvider
-import sguiSwing.hybrid.EngineLaunchpoint
+import sgui.swing.PrimaryIcon.*
+import sgui.swing.SwPrimaryIconSet
+import sgui.swing.SwProvider
+import sgui.swing.hybrid.EngineLaunchpoint
 import spirite.gui.resources.SpiriteIcons
 
 fun setupSwGuiStuff() {

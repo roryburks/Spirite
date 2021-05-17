@@ -4,10 +4,10 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import sgui.core.components.ITextArea
 import sgui.core.systems.KeypressSystem
-import sguiSwing.mouseSystem.adaptMouseSystem
-import sguiSwing.skin.Skin.BevelBorder.Dark
-import sguiSwing.skin.Skin.BevelBorder.Light
-import sguiSwing.skin.Skin.TextField.Background
+import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.skin.Skin.BevelBorder.Dark
+import sgui.swing.skin.Skin.BevelBorder.Light
+import sgui.swing.skin.Skin.TextField.Background
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.BorderFactory

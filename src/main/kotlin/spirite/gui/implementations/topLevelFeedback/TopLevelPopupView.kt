@@ -4,7 +4,7 @@ import rb.extendo.extensions.removeFirst
 import rb.vectrix.mathUtil.i
 import sgui.components.IComponent
 import sgui.core.components.crossContainer.ICrossPanel
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 
 class TopLevelPopupView(private  val imp: ICrossPanel = Hybrid.ui.CrossPanel())
     : IComponent by imp

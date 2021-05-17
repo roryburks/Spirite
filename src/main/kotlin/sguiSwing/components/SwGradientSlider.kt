@@ -8,10 +8,10 @@ import sgui.core.components.GradientSliderNonUI
 import sgui.core.components.IGradientSlider
 import sgui.core.components.IGradientSliderNonUIImpl
 import sgui.core.components.events.MouseEvent
-import sguiSwing.SwUtil
-import sguiSwing.jcolor
-import sguiSwing.mouseSystem.adaptMouseSystem
-import sguiSwing.skin.Skin
+import sgui.swing.SwUtil
+import sgui.swing.jcolor
+import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.skin.Skin
 import java.awt.Color
 import java.awt.GradientPaint
 import java.awt.Graphics

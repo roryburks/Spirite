@@ -1,9 +1,9 @@
 package spirite.base.file.load
 
 import rb.vectrix.mathUtil.i
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
+import sgui.swing.hybrid.Hybrid
+import sgui.swing.hybrid.MDebug
+import sgui.swing.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.SaveLoadUtil
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.mediums.DynamicMedium

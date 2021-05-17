@@ -2,10 +2,10 @@ package sguiSwing.components
 
 import rb.glow.SColor
 import sgui.core.components.ILabel
-import sguiSwing.jcolor
-import sguiSwing.mouseSystem.adaptMouseSystem
-import sguiSwing.scolor
-import sguiSwing.skin.Skin
+import sgui.swing.jcolor
+import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.scolor
+import sgui.swing.skin.Skin
 import java.awt.Font
 import javax.swing.JLabel
 

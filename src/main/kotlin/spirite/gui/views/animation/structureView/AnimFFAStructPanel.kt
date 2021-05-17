@@ -14,8 +14,8 @@ import sgui.core.components.events.MouseEvent
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SJPanel
 import sguiSwing.components.SwComponent
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.skin.Skin
+import sgui.swing.hybrid.Hybrid
+import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver

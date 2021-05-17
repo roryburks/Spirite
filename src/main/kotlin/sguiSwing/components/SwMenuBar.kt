@@ -1,8 +1,8 @@
 package sguiSwing.components
 
-import sguiSwing.mouseSystem.adaptMouseSystem
-import sguiSwing.skin.Skin.BevelBorder.Dark
-import sguiSwing.skin.Skin.Global.*
+import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.skin.Skin.BevelBorder.Dark
+import sgui.swing.skin.Skin.Global.*
 import java.awt.GradientPaint
 import java.awt.Graphics
 import java.awt.Graphics2D

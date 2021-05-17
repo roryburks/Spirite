@@ -5,7 +5,7 @@ import sgui.core.Orientation.VERTICAL
 import sguiSwing.advancedComponents.CrossContainer.CrossContainer
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import java.awt.GridLayout
 import javax.swing.JFrame
 

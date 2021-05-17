@@ -8,11 +8,11 @@ import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
-import sguiSwing.SwIcon
+import sgui.swing.SwIcon
 import sguiSwing.components.SJPanel
 import sguiSwing.components.SwComponent
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.jcolor
+import sgui.swing.hybrid.Hybrid
+import sgui.swing.jcolor
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.palette.Palette

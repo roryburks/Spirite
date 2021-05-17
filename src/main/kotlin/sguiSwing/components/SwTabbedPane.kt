@@ -3,8 +3,8 @@ package sguiSwing.components
 import rb.owl.bindable.addObserver
 import sgui.components.IComponent
 import sgui.core.components.TabbedPanePartial
-import sguiSwing.skin.Skin.BevelBorder.*
-import sguiSwing.skin.Skin.TabbedPane.*
+import sgui.swing.skin.Skin.BevelBorder.*
+import sgui.swing.skin.Skin.TabbedPane.*
 import java.awt.*
 import javax.swing.JTabbedPane
 import javax.swing.plaf.basic.BasicTabbedPaneUI

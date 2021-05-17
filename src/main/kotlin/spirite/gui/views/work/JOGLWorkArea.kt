@@ -10,7 +10,7 @@ import rbJvm.glow.jogl.JOGLProvider
 import sgui.core.components.events.MouseEvent
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.pen.Penner
 
 class JOGLWorkArea

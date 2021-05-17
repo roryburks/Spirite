@@ -2,7 +2,7 @@ package old
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 

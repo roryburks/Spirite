@@ -13,9 +13,9 @@ import sgui.core.components.IComboBox
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
 import sgui.core.components.crossContainer.ICrossPanel
-import sguiSwing.SwIcon
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.skin.Skin
+import sgui.swing.SwIcon
+import sgui.swing.hybrid.Hybrid
+import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.gui.components.advanced.RadioButtonCluster

@@ -1,9 +1,9 @@
 package spirite.base.file.load
 
 import rb.vectrix.mathUtil.i
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
-import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
+import sgui.swing.hybrid.MDebug
+import sgui.swing.hybrid.MDebug.WarningType.STRUCTURAL
+import sgui.swing.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readUTF8NT
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract

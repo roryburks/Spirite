@@ -10,7 +10,7 @@ import rb.glow.Colors
 import rb.glow.drawer
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.abs

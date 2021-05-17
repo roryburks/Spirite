@@ -3,8 +3,8 @@ package sguiSwing.components
 import rb.owl.bindable.addObserver
 import sgui.core.components.ComboBox
 import sgui.components.IComponent
-import sguiSwing.skin.Skin.Global.Fg
-import sguiSwing.skin.Skin.Global.TextDark
+import sgui.swing.skin.Skin.Global.Fg
+import sgui.swing.skin.Skin.Global.TextDark
 import java.awt.event.ActionListener
 import javax.swing.JComboBox
 import javax.swing.ListCellRenderer

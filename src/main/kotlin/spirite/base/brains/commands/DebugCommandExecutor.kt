@@ -8,7 +8,7 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rbJvm.file.JvmInputStreamFileReader
 import rbJvm.file.writing.JvmRaWriter
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.brains.DBGlobal
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand

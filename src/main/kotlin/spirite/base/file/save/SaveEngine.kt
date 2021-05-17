@@ -2,11 +2,11 @@ package spirite.base.file.save
 
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.ErrorType
-import sguiSwing.hybrid.MDebug.WarningType.STRUCTURAL
-import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
+import sgui.swing.hybrid.Hybrid
+import sgui.swing.hybrid.MDebug
+import sgui.swing.hybrid.MDebug.ErrorType
+import sgui.swing.hybrid.MDebug.WarningType.STRUCTURAL
+import sgui.swing.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.SaveLoadUtil.FFALAYER_CASCADING
 import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED

@@ -6,12 +6,12 @@ import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
 import sgui.core.Orientation.HORIZONTAL
 import sgui.components.IComponent
-import sguiSwing.SwIcon
+import sgui.swing.SwIcon
 import sguiSwing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.WarningType.UNSUPPORTED
+import sgui.swing.hybrid.Hybrid
+import sgui.swing.hybrid.MDebug
+import sgui.swing.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation

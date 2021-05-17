@@ -10,7 +10,7 @@ import sgui.core.components.events.MouseEvent
 import sgui.core.components.events.MouseEvent.MouseEventType.*
 import sgui.core.systems.IGlobalMouseHook
 import sgui.core.systems.KeypressSystem
-import sguiSwing.mouseSystem.SwMouseSystem
+import sgui.swing.mouseSystem.SwMouseSystem
 import java.awt.Component
 
 class SwScrollContainer

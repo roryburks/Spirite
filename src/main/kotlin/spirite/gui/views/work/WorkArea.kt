@@ -3,7 +3,7 @@ package spirite.gui.views.work
 import rb.glow.Colors
 import rb.glow.IGraphicsContext
 import sguiSwing.components.ISwComponent
-import sguiSwing.skin.Skin
+import sgui.swing.skin.Skin
 import spirite.specialRendering.SpecialDrawerFactory
 
 abstract class WorkArea(

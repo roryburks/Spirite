@@ -9,8 +9,8 @@ import rb.glow.gle.IGLEngine
 import rb.glow.using
 import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.ITransformF
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
+import sgui.swing.hybrid.MDebug
+import sgui.swing.hybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.brains.toolset.PenDrawMode.BEHIND
 import spirite.base.brains.toolset.PenDrawMode.KEEP_ALPHA
 import spirite.base.pen.stroke.DrawPoints

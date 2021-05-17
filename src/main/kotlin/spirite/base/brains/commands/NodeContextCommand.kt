@@ -1,7 +1,7 @@
 package spirite.base.brains.commands
 
 import rb.glow.gle.RenderMethod
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.brains.commands.specific.SpriteLayerFixes

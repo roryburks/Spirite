@@ -5,7 +5,7 @@ import rb.glow.Colors
 import rb.glow.drawer
 import rb.glow.gl.GLImage
 import rb.vectrix.mathUtil.d
-import sguiSwing.hybrid.EngineLaunchpoint
+import sgui.swing.hybrid.EngineLaunchpoint
 import spirite.specialRendering.fill.V0FillArrayAlgorithm
 import spirite.specialRendering.fill.toIntArray
 import kotlin.system.measureTimeMillis

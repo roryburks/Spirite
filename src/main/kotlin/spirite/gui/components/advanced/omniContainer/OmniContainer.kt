@@ -6,7 +6,7 @@ import sgui.components.IComponent
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.Orientation
 import sguiSwing.components.ResizeContainerPanel
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 
 class OmniContainer
 private constructor( init: OmniInitializer.()->Unit, val root: ICrossPanel) : IComponent by root

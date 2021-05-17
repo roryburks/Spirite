@@ -7,8 +7,8 @@ import rb.vectrix.mathUtil.i
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
 import sgui.core.components.crossContainer.ICrossPanel
-import sguiSwing.SwIcon
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.SwIcon
+import sgui.swing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 

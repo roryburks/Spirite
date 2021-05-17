@@ -13,10 +13,10 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.hybrid.Transferables.IClipboard.ClipboardThings.Image
-import sguiSwing.hybrid.Transferables.ILayerBuilder
-import sguiSwing.hybrid.Transferables.INodeBuilder
+import sgui.swing.hybrid.Hybrid
+import sgui.swing.hybrid.Transferables.IClipboard.ClipboardThings.Image
+import sgui.swing.hybrid.Transferables.ILayerBuilder
+import sgui.swing.hybrid.Transferables.INodeBuilder
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet

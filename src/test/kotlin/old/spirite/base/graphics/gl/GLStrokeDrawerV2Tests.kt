@@ -8,7 +8,7 @@ import rb.glow.Colors
 import rb.glow.drawer
 import rb.glow.gl.GLImage
 import rbJvm.glow.awt.toBufferedImage
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE

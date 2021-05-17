@@ -4,8 +4,8 @@ import sgui.core.components.BoxList
 import sgui.components.IComponent
 import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
-import sguiSwing.SwUtil
-import sguiSwing.SwingComponentProvider
+import sgui.swing.SwUtil
+import sgui.swing.SwingComponentProvider
 import sguiSwing.advancedComponents.CrossContainer.CrossLayout
 import java.awt.Component
 import java.awt.GridLayout

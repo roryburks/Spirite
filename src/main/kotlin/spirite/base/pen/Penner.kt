@@ -8,7 +8,7 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import sgui.core.components.events.MouseEvent.MouseButton
 import sgui.core.components.events.MouseEvent.MouseButton.LEFT
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*

@@ -3,9 +3,9 @@ package sguiSwing.components
 import sgui.core.IIcon
 import sgui.core.components.IButton
 import sgui.core.components.IButton.ButtonActionEvent
-import sguiSwing.SwIcon
-import sguiSwing.mouseSystem.adaptMouseSystem
-import sguiSwing.skin.Skin
+import sgui.swing.SwIcon
+import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.skin.Skin
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.swing.BorderFactory

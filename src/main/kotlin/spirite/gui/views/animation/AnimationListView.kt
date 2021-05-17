@@ -8,9 +8,9 @@ import sgui.components.ITreeViewNonUI.ITreeComponent
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
 import sgui.core.components.events.MouseEvent
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
-import sguiSwing.SwIcon
+import sgui.swing.SwIcon
 import sguiSwing.components.jcomponent
-import sguiSwing.hybrid.Hybrid
+import sgui.swing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.*
 import spirite.base.imageData.animation.Animation

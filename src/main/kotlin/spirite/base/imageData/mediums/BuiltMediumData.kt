@@ -4,8 +4,8 @@ import rb.glow.IGraphicsContext
 import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import sguiSwing.hybrid.MDebug
-import sguiSwing.hybrid.MDebug.ErrorType.STRUCTURAL
+import sgui.swing.hybrid.MDebug
+import sgui.swing.hybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.imageData.MMediumRepository
 
 abstract class BuiltMediumData(

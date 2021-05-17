@@ -15,11 +15,11 @@ import sgui.core.components.events.MouseEvent.MouseEventType.DRAGGED
 import sgui.core.components.events.MouseEvent.MouseEventType.PRESSED
 import sgui.core.Orientation
 import sgui.core.systems.IGlobalMouseHook
-import sguiSwing.PrimaryIcon.*
-import sguiSwing.SwPrimaryIconSet
-import sguiSwing.SwingComponentProvider
-import sguiSwing.mouseSystem.SwMouseSystem
-import sguiSwing.skin.Skin.ResizePanel.BarLineColor
+import sgui.swing.PrimaryIcon.*
+import sgui.swing.SwPrimaryIconSet
+import sgui.swing.SwingComponentProvider
+import sgui.swing.mouseSystem.SwMouseSystem
+import sgui.swing.skin.Skin.ResizePanel.BarLineColor
 import kotlin.reflect.KProperty
 
 open class ResizeContainerPanel

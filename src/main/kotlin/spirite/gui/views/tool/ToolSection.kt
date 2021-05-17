@@ -6,11 +6,11 @@ import rb.owl.bindable.addObserver
 import sgui.core.components.IBoxList
 import sgui.core.components.IBoxList.IBoxComponent
 import sgui.components.IComponent
-import sguiSwing.SwIcon
+import sgui.swing.SwIcon
 import sguiSwing.components.SwToggleButton
-import sguiSwing.hybrid.Hybrid
-import sguiSwing.mouseSystem.adaptMouseSystem
-import sguiSwing.skin.Skin
+import sgui.swing.hybrid.Hybrid
+import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.Tool
 import spirite.base.imageData.drawer.NillImageDrawer
