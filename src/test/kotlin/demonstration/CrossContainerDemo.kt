@@ -2,8 +2,8 @@ package demonstration
 
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.Orientation.VERTICAL
-import sguiSwing.advancedComponents.CrossContainer.CrossContainer
-import sguiSwing.components.ResizeContainerPanel
+import sgui.swing.advancedComponents.CrossContainer.CrossContainer
+import sgui.swing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
 import sgui.swing.hybrid.Hybrid
 import java.awt.GridLayout

@@ -1,6 +1,6 @@
 package demonstration
 
-import sguiSwing.components.SwMenuBar
+import sgui.swing.components.SwMenuBar
 import spirite.base.brains.MasterControl
 import spirite.base.brains.commands.GlobalCommands
 import spirite.gui.menus.MenuItem

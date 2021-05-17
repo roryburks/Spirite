@@ -7,7 +7,7 @@ import sgui.core.components.IBoxList
 import sgui.core.components.IBoxList.IBoxComponent
 import sgui.components.IComponent
 import sgui.swing.SwIcon
-import sguiSwing.components.SwToggleButton
+import sgui.swing.components.SwToggleButton
 import sgui.swing.hybrid.Hybrid
 import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin

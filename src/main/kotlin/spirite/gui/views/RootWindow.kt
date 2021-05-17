@@ -1,7 +1,7 @@
 package spirite.gui.views
 
 import rbJvm.owl.addWeakObserver
-import sguiSwing.components.SwMenuBar
+import sgui.swing.components.SwMenuBar
 import sguiSwing.components.jcomponent
 import sgui.swing.hybrid.Hybrid
 import sgui.swing.hybrid.SwHybrid

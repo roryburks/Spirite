@@ -1,8 +1,10 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import sgui.core.components.ISeparator
 import sgui.core.Orientation
 import sgui.swing.mouseSystem.adaptMouseSystem
+import sguiSwing.components.ISwComponent
+import sguiSwing.components.SwComponent
 import javax.swing.JSeparator
 import javax.swing.SwingConstants
 

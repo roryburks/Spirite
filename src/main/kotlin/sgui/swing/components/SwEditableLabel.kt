@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
@@ -9,6 +9,7 @@ import sgui.core.systems.KeypressSystem
 import sgui.swing.jcolor
 import sgui.swing.skin.Skin.Global.Bg
 import sgui.swing.skin.Skin.Global.Text
+import sguiSwing.components.SwComponent
 import java.awt.KeyboardFocusManager
 import java.awt.event.*
 import javax.swing.*
@@ -16,7 +17,8 @@ import javax.swing.*
 class SwEditableLabel
 private constructor(
         defaultText: String,
-        private val imp : SwELabelImp)
+        private val imp : SwELabelImp
+)
     : IEditableLabel, IComponent by SwComponent(imp)
 {
 

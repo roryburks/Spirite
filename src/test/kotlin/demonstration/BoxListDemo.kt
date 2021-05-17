@@ -2,6 +2,10 @@ package demonstration
 
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.components.IBoxList.IBoxComponent
+import sgui.swing.components.ResizeContainerPanel
+import sgui.swing.components.SJPanel
+import sgui.swing.components.SwBoxList
+import sgui.swing.components.SwLabel
 import sguiSwing.components.*
 import java.awt.Color
 import java.awt.GridLayout
@@ -19,7 +23,8 @@ class BoxListDemo : JFrame() {
         val x = SwBoxList(24, 24, (0..100).toList())
         x.renderer = {
             object : IBoxComponent {
-                override val component = SwComponent(SJPanel().apply { border = BorderFactory.createRaisedBevelBorder(); add(SwLabel(it.toString()).jcomponent) })
+                override val component = SwComponent(SJPanel().apply { border = BorderFactory.createRaisedBevelBorder(); add(
+                    SwLabel(it.toString()).jcomponent) })
 
                 override fun setSelected(selected: Boolean) {
                     component.component.background = if (selected) Color.BLACK else Color.WHITE

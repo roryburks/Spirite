@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import rb.extendo.delegates.OnChangeDelegate
 import rb.owl.bindable.addObserver
@@ -12,6 +12,8 @@ import sgui.swing.SwUtil
 import sgui.swing.jcolor
 import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin
+import sguiSwing.components.ISwComponent
+import sguiSwing.components.SwComponent
 import java.awt.Color
 import java.awt.GradientPaint
 import java.awt.Graphics

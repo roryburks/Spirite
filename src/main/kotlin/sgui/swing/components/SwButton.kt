@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import sgui.core.IIcon
 import sgui.core.components.IButton
@@ -6,6 +6,8 @@ import sgui.core.components.IButton.ButtonActionEvent
 import sgui.swing.SwIcon
 import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin
+import sguiSwing.components.ISwComponent
+import sguiSwing.components.SwComponent
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.swing.BorderFactory

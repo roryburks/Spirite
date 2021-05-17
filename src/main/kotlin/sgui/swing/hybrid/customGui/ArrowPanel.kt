@@ -4,7 +4,7 @@ import rb.vectrix.mathUtil.round
 import sgui.core.Direction
 import sgui.core.Direction.*
 import sgui.swing.JColor
-import sguiSwing.components.SJPanel
+import sgui.swing.components.SJPanel
 import java.awt.Graphics
 
 

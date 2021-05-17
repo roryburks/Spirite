@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
@@ -8,6 +8,8 @@ import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin.BevelBorder.Dark
 import sgui.swing.skin.Skin.BevelBorder.Light
 import sgui.swing.skin.Skin.TextField.Background
+import sguiSwing.components.ISwComponent
+import sguiSwing.components.SwComponent
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.BorderFactory

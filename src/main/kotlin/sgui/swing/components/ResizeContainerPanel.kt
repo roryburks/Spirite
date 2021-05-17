@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import rb.extendo.extensions.then
 import rb.owl.bindable.Bindable

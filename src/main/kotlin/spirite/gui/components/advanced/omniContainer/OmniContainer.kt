@@ -5,7 +5,7 @@ import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.Orientation
-import sguiSwing.components.ResizeContainerPanel
+import sgui.swing.components.ResizeContainerPanel
 import sgui.swing.hybrid.Hybrid
 
 class OmniContainer

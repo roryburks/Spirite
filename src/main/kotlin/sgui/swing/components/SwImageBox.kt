@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import rb.extendo.delegates.OnChangeDelegate
 import rb.glow.Colors
@@ -8,13 +8,15 @@ import sgui.components.IComponent
 import sgui.core.components.IImageBox
 import sgui.swing.SwProvider
 import sgui.swing.jcolor
+import sguiSwing.components.SwComponent
 import java.awt.Graphics
 import java.awt.Image
 
 class SwImageBox
 private constructor(
         img: IImage?,
-        private val imp : SwImageBoxImp)
+        private val imp : SwImageBoxImp
+)
     : IImageBox, IComponent by SwComponent(imp)
 {
     init { imp.context = this }

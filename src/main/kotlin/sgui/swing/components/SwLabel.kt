@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import rb.glow.SColor
 import sgui.core.components.ILabel
@@ -6,6 +6,8 @@ import sgui.swing.jcolor
 import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.scolor
 import sgui.swing.skin.Skin
+import sguiSwing.components.ISwComponent
+import sguiSwing.components.SwComponent
 import java.awt.Font
 import javax.swing.JLabel
 

@@ -4,7 +4,7 @@ import rb.glow.Colors
 import rb.vectrix.functions.InvertibleFunction
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.components.IButton
-import sguiSwing.components.ResizeContainerPanel
+import sgui.swing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
 import sgui.swing.hybrid.Hybrid
 import java.awt.GridLayout

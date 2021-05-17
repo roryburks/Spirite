@@ -1,10 +1,13 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import rb.owl.bindable.addObserver
 import sgui.core.components.ComboBox
 import sgui.components.IComponent
 import sgui.swing.skin.Skin.Global.Fg
 import sgui.swing.skin.Skin.Global.TextDark
+import sguiSwing.components.ISwComponent
+import sguiSwing.components.SwComponent
+import sguiSwing.components.jcomponent
 import java.awt.event.ActionListener
 import javax.swing.JComboBox
 import javax.swing.ListCellRenderer
@@ -12,7 +15,8 @@ import javax.swing.ListCellRenderer
 class SwComboBox<T>
 private constructor(
         things: Array<T>,
-        private val imp: SwComboBoxImp<T>)
+        private val imp: SwComboBoxImp<T>
+)
     : ComboBox<T>(things.toList()), ISwComponent by SwComponent(imp)
 {
     override var renderer: ((value: T?, index: Int, isSelected: Boolean, hasFocus: Boolean) -> IComponent)? = null

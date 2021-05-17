@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import rb.owl.bindable.addObserver
 import sgui.core.Orientation.HORIZONTAL
@@ -8,8 +8,10 @@ import sgui.core.components.IScrollBar
 import sgui.core.components.IScrollBarNonUIImp
 import sgui.core.components.ScrollBarNonUI
 import sgui.core.Orientation
-import sguiSwing.components.SScrollPane.ModernScrollBarUI
+import sgui.swing.components.SScrollPane.ModernScrollBarUI
 import sgui.swing.mouseSystem.adaptMouseSystem
+import sguiSwing.components.ISwComponent
+import sguiSwing.components.SwComponent
 import javax.swing.JComponent
 import javax.swing.JScrollBar
 

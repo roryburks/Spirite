@@ -1,9 +1,9 @@
-package sguiSwing.advancedComponents.CrossContainer
+package sgui.swing.advancedComponents.CrossContainer
 
 import sgui.core.components.crossContainer.CSE_Group
 import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.Orientation
-import sguiSwing.components.SwPanel
+import sgui.swing.components.SwPanel
 
 open class CrossContainer(constructor: CrossInitializer.()->Unit): SwPanel()
 {

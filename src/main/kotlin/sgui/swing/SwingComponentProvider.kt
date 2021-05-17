@@ -7,8 +7,8 @@ import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.Orientation
 import sgui.core.components.*
-import sguiSwing.advancedComponents.SwTreeView
-import sguiSwing.components.*
+import sgui.swing.advancedComponents.SwTreeView
+import sgui.swing.components.*
 
 object SwingComponentProvider : IComponentProvider {
 

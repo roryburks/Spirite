@@ -7,7 +7,7 @@ import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.core.components.crossContainer.ICrossPanel
-import sguiSwing.components.ResizeContainerPanel
+import sgui.swing.components.ResizeContainerPanel
 import sgui.swing.hybrid.Hybrid
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl

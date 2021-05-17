@@ -7,7 +7,7 @@ import rbJvm.owl.bindWeaklyTo
 import sgui.core.Orientation.HORIZONTAL
 import sgui.components.IComponent
 import sgui.swing.SwIcon
-import sguiSwing.components.ResizeContainerPanel
+import sgui.swing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
 import sgui.swing.hybrid.Hybrid
 import sgui.swing.hybrid.MDebug

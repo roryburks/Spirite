@@ -1,11 +1,13 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import sgui.components.IComponent
 import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.crossContainer.ICrossPanel
-import sguiSwing.advancedComponents.CrossContainer.CrossLayout
+import sgui.swing.advancedComponents.CrossContainer.CrossLayout
 import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin.Global.Bg
+import sguiSwing.components.ISwComponent
+import sguiSwing.components.SwComponent
 import java.awt.Graphics
 import javax.swing.JPanel
 

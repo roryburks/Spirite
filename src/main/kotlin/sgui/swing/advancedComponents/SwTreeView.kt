@@ -1,4 +1,4 @@
-package sguiSwing.advancedComponents
+package sgui.swing.advancedComponents
 
 import rb.extendo.delegates.OnChangeDelegate
 import rb.global.IContract
@@ -17,8 +17,8 @@ import sgui.components.ITreeViewNonUI.DropDirection.*
 import sgui.core.components.crossContainer.CrossColInitializer
 import sgui.swing.*
 import sgui.swing.PrimaryIcon.*
-import sguiSwing.advancedComponents.CrossContainer.CrossLayout
-import sguiSwing.components.SJPanel
+import sgui.swing.advancedComponents.CrossContainer.CrossLayout
+import sgui.swing.components.SJPanel
 import sguiSwing.components.SwComponent
 import sgui.swing.dragAndDrop.addDragSource
 import sgui.swing.dragAndDrop.setDragTarget

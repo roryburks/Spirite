@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import sgui.core.components.BoxList
 import sgui.components.IComponent
@@ -6,7 +6,9 @@ import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.swing.SwUtil
 import sgui.swing.SwingComponentProvider
-import sguiSwing.advancedComponents.CrossContainer.CrossLayout
+import sgui.swing.advancedComponents.CrossContainer.CrossLayout
+import sguiSwing.components.SwComponent
+import sguiSwing.components.jcomponent
 import java.awt.Component
 import java.awt.GridLayout
 import java.awt.Point

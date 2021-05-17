@@ -12,7 +12,7 @@ import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BASIC
 import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.crossContainer.ICrossPanel
-import sguiSwing.advancedComponents.CrossContainer.CrossLayout
+import sgui.swing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SwComponent
 import sgui.swing.hybrid.Hybrid
 import spirite.base.imageData.animation.Animation

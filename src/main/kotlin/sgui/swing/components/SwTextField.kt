@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
@@ -11,6 +11,8 @@ import sgui.swing.skin.Skin.BevelBorder.Dark
 import sgui.swing.skin.Skin.BevelBorder.Light
 import sgui.swing.skin.Skin.TextField.Background
 import sgui.swing.skin.Skin.TextField.InvalidBg
+import sguiSwing.components.ISwComponent
+import sguiSwing.components.SwComponent
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.BorderFactory
@@ -80,7 +82,8 @@ sealed class SwNumberField
 private constructor(
         val allowsNegatives: Boolean,
         val allowsFloats: Boolean,
-        val imp : SwNumberFieldImp)
+        val imp : SwNumberFieldImp
+)
     : ISwComponent by SwComponent(imp), INumberFieldUI
 {
     override var validBg: SColor = Background.scolor

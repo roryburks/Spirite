@@ -1,4 +1,4 @@
-package sguiSwing.advancedComponents.CrossContainer
+package sgui.swing.advancedComponents.CrossContainer
 
 import rb.vectrix.mathUtil.floor
 import sgui.core.Orientation.HORIZONTAL

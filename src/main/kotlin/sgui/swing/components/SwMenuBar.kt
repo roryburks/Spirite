@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import sgui.swing.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin.BevelBorder.Dark

@@ -11,8 +11,8 @@ import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.crossContainer.CrossRowInitializer
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.components.events.MouseEvent
-import sguiSwing.advancedComponents.CrossContainer.CrossLayout
-import sguiSwing.components.SJPanel
+import sgui.swing.advancedComponents.CrossContainer.CrossLayout
+import sgui.swing.components.SJPanel
 import sguiSwing.components.SwComponent
 import sgui.swing.hybrid.Hybrid
 import sgui.swing.skin.Skin

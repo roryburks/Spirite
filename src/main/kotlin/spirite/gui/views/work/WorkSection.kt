@@ -11,7 +11,7 @@ import sgui.core.Orientation.HORIZONTAL
 import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.core.components.crossContainer.ICrossPanel
-import sguiSwing.components.SwPanel
+import sgui.swing.components.SwPanel
 import sgui.swing.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver

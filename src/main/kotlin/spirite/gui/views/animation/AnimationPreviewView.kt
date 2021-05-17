@@ -9,7 +9,7 @@ import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.swing.SwIcon
-import sguiSwing.components.SJPanel
+import sgui.swing.components.SJPanel
 import sguiSwing.components.SwComponent
 import sgui.swing.hybrid.Hybrid
 import sgui.swing.hybrid.ITimer

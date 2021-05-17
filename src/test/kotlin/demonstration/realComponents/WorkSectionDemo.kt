@@ -3,7 +3,7 @@ package demonstration.realComponents
 import demonstration.DemoLauncher
 import old.TestHelper
 import sgui.core.Orientation.HORIZONTAL
-import sguiSwing.components.ResizeContainerPanel
+import sgui.swing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
 import sgui.swing.hybrid.Hybrid
 import spirite.base.brains.MasterControl

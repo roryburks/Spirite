@@ -1,4 +1,4 @@
-package sguiSwing.components
+package sgui.swing.components
 
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.round
@@ -11,6 +11,8 @@ import sgui.core.components.events.MouseEvent.MouseEventType.*
 import sgui.core.systems.IGlobalMouseHook
 import sgui.core.systems.KeypressSystem
 import sgui.swing.mouseSystem.SwMouseSystem
+import sguiSwing.components.SwComponent
+import sguiSwing.components.jcomponent
 import java.awt.Component
 
 class SwScrollContainer
