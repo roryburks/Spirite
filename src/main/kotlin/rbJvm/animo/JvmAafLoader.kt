@@ -2,15 +2,16 @@ package rbJvm.animo
 
 import rb.animo.animation.AafAnimation
 import rb.animo.animation.AafStructure
-import rb.animo.io.*
+import rb.animo.io.AafFileNameChooser
+import rb.animo.io.AafScope
+import rb.animo.io.IAafScope
+import rb.animo.io.ILoader
 import rb.animo.io.aaf.reader.AafReaderFactory
 import rb.file.BufferedFileReader
 import rb.glow.gle.IGLEngine
 import rbJvm.file.JvmInputStreamFileReader
-import rbJvm.file.JvmRandomAccessFileBinaryReadStream
 import rbJvm.glow.awt.ImageBI
 import java.awt.image.BufferedImage
-import java.io.*
 import javax.imageio.ImageIO
 
 class JvmAafLoader(private val _gle: IGLEngine) : ILoader<IAafScope> {

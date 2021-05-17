@@ -1,6 +1,9 @@
 package rbJvm.glow.awt
 
-import rb.glow.*
+import rb.glow.Color
+import rb.glow.ColorARGB32Normal
+import rb.glow.ColorARGB32Premultiplied
+import rb.glow.IGraphicsContext
 import rb.glow.img.RawImage
 import java.awt.image.BufferedImage
 

@@ -1,8 +1,7 @@
 package rb.animo.io
 
-import rb.animo.animation.*
+import rb.animo.animation.IAnimation
 import rb.animo.animationSpace.IAnimationSpace
-
 
 
 interface IAafScope {
