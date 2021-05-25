@@ -13,6 +13,7 @@ import sgui.swing.components.SJPanel
 import sguiSwing.components.SwComponent
 import sgui.swing.hybrid.Hybrid
 import sgui.swing.hybrid.ITimer
+import sgui.swing.hybrid.ITimerEngine
 import sgui.swing.jcolor
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
@@ -88,13 +89,27 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
     }
 
-    private val timer : ITimer = Hybrid.timing.createTimer(15, true) {Hybrid.gle.runInGLContext { tick()}}
+    // region Timer Stuff
+    private val _timing : ITimerEngine get() = Hybrid.timing
+    private val _timer : ITimer = _timing.createTimer(15, true) {Hybrid.gle.runInGLContext { tick()}}
 
+    private var _prevTime : Long? = null
     private fun tick() {
+        // Set _prevTime to null in case early exit, means tick's not running
+        val prevTime = _prevTime
+        _prevTime = null
+
+        // Return if not playing
         if( !btnPlay.checked) return
         val anim = animation ?: return
-        anim.state.met = anim.state.met + anim.state.speed/66.666f
+
+        // Uptick the animation using the actual ms passed, rather than relying it on being close to 15
+        val now = _timing.currentMilli
+        val actualMsElapsed = if( prevTime == null) 15 else now - prevTime
+        anim.state.met = anim.state.met + anim.state.speed/(1000f/actualMsElapsed)
+        _prevTime = now
     }
+    // endregion
 
 
     // region Bindings
@@ -229,7 +244,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         unbind()
         _curAnimK.void()
         _animStructObsK.void()
-        timer.stop()
+        _timer.stop()
     }
 }
 
