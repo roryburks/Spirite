@@ -43,7 +43,8 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, priv
         onMousePress += {e ->
             if( enabled) {
                 imp.requestFocus()
-                val comp = imp.content.getComponentAt(Point(e.point.x, e.point.y))
+                val newPoint = e.point.convert(SwComponent(imp.content))
+                val comp = imp.content.getComponentAt(Point(newPoint.x, newPoint.y))
                 val index = getIndexFromComponent(comp)
                 if (index != null) {
                     val t = data.entries[index]
