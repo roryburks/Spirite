@@ -11,6 +11,7 @@ import sgui.hybrid.transferables.IClipboard
 import sgui.hybrid.transferables.SwClipboard
 import sgui.swing.*
 import sgui.core.systems.IImageCreator
+import sgui.swing.systems.JImageIO
 import sgui.swing.systems.JLock
 import sgui.swing.systems.SwImageCreator
 import sgui.swing.systems.mouseSystem.SwMouseSystem
@@ -44,9 +45,9 @@ object SwHybrid : IHybrid {
     override val timing: ITimerEngine get() = SwTimerEngine
     override val gle: IGLEngine = EngineLaunchpoint.gle
     override val gl: IGL get() = JOGLProvider.gl
-    override val imageCreator: IImageCreator get() = SwImageCreator
     override val imageConverter: AwtImageConverter get() = AwtImageConverter{EngineLaunchpoint.gle}
-    override val imageIO: IImageIO get() = JImageIO
+    override val imageCreator: IImageCreator by lazy { SwImageCreator(gle)}
+    override val imageIO: IImageIO get() = JImageIO(imageConverter)
     override val clipboard: IClipboard get() = SwClipboard
 
     override val mouseSystem: IMouseSystem get() = SwMouseSystem
