@@ -130,7 +130,8 @@ class SpriteLayerPanel(
         }
         btnRemovePart.action = { evt ->
             activePart?.also { activePart ->
-                linkedSprite?.removePart(activePart, evt.pressingShift)
+                val ran = linkedSprite?.removePart(activePart, evt.pressingShift) ?: false
+                if(!ran) Hybrid.beep()
             }
         }
 

@@ -13,6 +13,7 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
+import sgui.swing.hybrid.Hybrid
 import sgui.swing.hybrid.MDebug
 import sgui.swing.hybrid.MDebug.WarningType
 import spirite.base.brains.DBGlobal
@@ -273,42 +274,51 @@ class SpriteLayer : Layer {
         _addPart(structure, handle)
     }
 
-    fun removePart( toRemove: SpritePart, linked: Boolean = false) {
-        fun removeSub( layer: SpriteLayer, part: SpritePart) {
+    fun removePart( toRemove: SpritePart, linked: Boolean = false) : Boolean  {
+        fun removeSub( layer: SpriteLayer, part: SpritePart) : Boolean{
             layer.run {
-                undoEngine.performAndStore(object : NullAction() {
-                    override val description: String get() = "Remove Sprite Part"
+                if( !_parts.contains(part) || _parts.count() <= 1)
+                    return false
+                else {
+                    undoEngine.performAndStore(object : NullAction() {
+                        override val description: String get() = "Remove Sprite Part"
 
-                    override fun performAction() {
-                        if (activePart == part)
-                            activePart = null
-                        _parts.remove(part)
-                        triggerChange()
-                    }
+                        override fun performAction() {
+                            if (activePart == part)
+                                activePart = null
+                            _parts.remove(part)
+                            triggerChange()
+                        }
 
-                    override fun undoAction() {
-                        // Note: Since _parts are automatically sorted by drawDepth, no need to remember its old drawDepth
-                        _parts.add(part)
-                        _sort()
-                        triggerChange()
-                    }
+                        override fun undoAction() {
+                            // Note: Since _parts are automatically sorted by drawDepth, no need to remember its old drawDepth
+                            _parts.add(part)
+                            _sort()
+                            triggerChange()
+                        }
 
-                    override fun getDependencies() = SinglyList(part.handle)
-                })
-            }
-        }
-
-        if( linked) {
-            undoEngine.doAsAggregateAction("Removing Sprite Part [Linked]") {
-                getAllLinkedLayers().forEach { layer ->
-                    layer._parts.firstOrNull { it.partName == toRemove.partName }?.also { removeSub(layer, it) }
+                        override fun getDependencies() = SinglyList(part.handle)
+                    })
+                    return true
                 }
             }
         }
-        else
-            removeSub(this, toRemove)
 
+        return if( linked) {
+            var hasChanged = false
+            undoEngine.doAsAggregateAction("Removing Sprite Part [Linked]") {
+                hasChanged = getAllLinkedLayers()
+                    .map { layer -> layer._parts
+                        .firstOrNull { it.partName == toRemove.partName }
+                        ?.run { removeSub(layer,this) } ?: false
+                    }
+                    .any()
+            }
+            hasChanged
+        } else
+            removeSub(this, toRemove)
     }
+
     fun movePart( fromIndex: Int, toIndex: Int) {
         if( fromIndex == toIndex) return
 
