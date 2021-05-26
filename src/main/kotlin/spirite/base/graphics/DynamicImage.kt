@@ -8,7 +8,7 @@ import rb.glow.with
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.d
-import sgui.hybrid.ContentBoundsFinder
+import rbJvm.glow.util.ContentBoundsFinder
 import sgui.hybrid.Hybrid
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
@@ -91,14 +91,14 @@ class DynamicImage(
                 // Step 2: Crop the Combining Bounds
                 val contentBounds = ContentBoundsFinder.findContentBounds(combiningImage, 0, true)
                 val newBase = when {
-                    contentBounds.isEmpty -> null
-                    else -> Hybrid.imageCreator.createImage(contentBounds.width, contentBounds.height)
+                    contentBounds.w <= 0 || contentBounds.h <= 0 -> null
+                    else -> Hybrid.imageCreator.createImage(contentBounds.wi, contentBounds.hi)
                 }
                 //println("${contentBounds.width} , ${contentBounds.height}")
-                newBase?.graphics?.renderImage(combiningImage, -contentBounds.x.d, -contentBounds.y.d)
+                newBase?.graphics?.renderImage(combiningImage, -contentBounds.x1, -contentBounds.y1)
 
-                xOffset = contentBounds.x + combiningBounds.x
-                yOffset = contentBounds.y + combiningBounds.y
+                xOffset = contentBounds.x1i + combiningBounds.x
+                yOffset = contentBounds.y1i + combiningBounds.y
 
                 base = newBase
             }

@@ -4,7 +4,7 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import sgui.core.components.ITextArea
 import sgui.core.systems.KeypressSystem
-import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin.BevelBorder.Dark
 import sgui.swing.skin.Skin.BevelBorder.Light
 import sgui.swing.skin.Skin.TextField.Background

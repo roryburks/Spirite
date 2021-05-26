@@ -10,7 +10,7 @@ import sgui.core.components.IGradientSliderNonUIImpl
 import sgui.core.components.events.MouseEvent
 import sgui.swing.SwUtil
 import sgui.swing.jcolor
-import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent

@@ -1,4 +1,4 @@
-package sgui.hybrid
+package sgui.core.systems
 
 /**
  * The ILock interface encapsulates whatever locking/messaging system the underlying language libraries have access to.
@@ -8,10 +8,4 @@ package sgui.hybrid
 
 interface ILock {
     fun withLock( run: ()->Any? )
-}
-
-class JLock( val o: Any) : ILock {
-    override fun withLock(run: () -> Any?) {
-        synchronized( o, run)
-    }
 }

@@ -22,7 +22,7 @@ import sgui.swing.components.SJPanel
 import sguiSwing.components.SwComponent
 import sgui.swing.dragAndDrop.addDragSource
 import sgui.swing.dragAndDrop.setDragTarget
-import sgui.swing.mouseSystem.SimpleMouseListener
+import sgui.swing.systems.mouseSystem.SimpleMouseListener
 import sgui.swing.skin.Skin.ContentTree.Background
 import sgui.swing.skin.Skin.ContentTree.SelectedBackground
 import sgui.swing.transfer.SwTransferObjectConverter

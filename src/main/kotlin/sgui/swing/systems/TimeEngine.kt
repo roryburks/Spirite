@@ -1,24 +1,17 @@
-package sgui.hybrid
+package sgui.swing
 
+import sgui.core.systems.ITimer
+import sgui.core.systems.ITimerEngine
 import javax.swing.Timer
 
-interface ITimerEngine {
-    fun createTimer(waitMilli : Int, repeat : Boolean = false,  action: ()-> Unit) : ITimer
-    val currentMilli : Long
-}
-
-interface ITimer {
-    fun stop()
-}
-
-class SwTimer(val jtimer : Timer) : ITimer{
+class SwTimer(val jtimer : Timer) : ITimer {
     override fun stop() {
         jtimer.stop()
     }
 }
 
 object SwTimerEngine : ITimerEngine {
-    override fun createTimer(waitMilli: Int, repeat: Boolean, action: () -> Unit) : ITimer{
+    override fun createTimer(waitMilli: Int, repeat: Boolean, action: () -> Unit) : ITimer {
         val timer = Timer( waitMilli) {action.invoke()}
         if( repeat)
             timer.isRepeats = true

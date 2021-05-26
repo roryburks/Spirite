@@ -12,7 +12,7 @@ import sgui.core.components.events.MouseWheelEvent
 import sgui.core.systems.IGlobalMouseHook
 import sgui.swing.SUIPoint
 import sgui.swing.jcolor
-import sgui.swing.mouseSystem.SwMouseSystem
+import sgui.swing.systems.mouseSystem.SwMouseSystem
 import sgui.swing.scolor
 import sgui.swing.skin.Skin
 import java.awt.Component

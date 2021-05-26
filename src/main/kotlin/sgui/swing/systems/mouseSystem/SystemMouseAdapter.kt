@@ -1,4 +1,4 @@
-package sgui.swing.mouseSystem
+package sgui.swing.systems.mouseSystem
 
 import sgui.core.components.events.MouseEvent.MouseButton.*
 import sgui.core.components.events.MouseEvent.MouseEventType

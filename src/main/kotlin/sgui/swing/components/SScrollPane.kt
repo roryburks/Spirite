@@ -1,6 +1,6 @@
 package sgui.swing.components
 
-import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin.Global
 import java.awt.*
 import javax.swing.*

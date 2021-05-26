@@ -12,8 +12,8 @@ import sgui.swing.SwIcon
 import sgui.swing.components.SJPanel
 import sguiSwing.components.SwComponent
 import sgui.hybrid.Hybrid
-import sgui.hybrid.ITimer
-import sgui.hybrid.ITimerEngine
+import sgui.core.systems.ITimer
+import sgui.core.systems.ITimerEngine
 import sgui.swing.jcolor
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl

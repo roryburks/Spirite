@@ -3,7 +3,7 @@ package sgui.swing.components
 import rb.glow.SColor
 import sgui.core.components.ILabel
 import sgui.swing.jcolor
-import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.scolor
 import sgui.swing.skin.Skin
 import sguiSwing.components.ISwComponent

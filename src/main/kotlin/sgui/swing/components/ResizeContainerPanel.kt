@@ -18,7 +18,7 @@ import sgui.core.systems.IGlobalMouseHook
 import sgui.swing.PrimaryIcon.*
 import sgui.swing.SwPrimaryIconSet
 import sgui.swing.SwingComponentProvider
-import sgui.swing.mouseSystem.SwMouseSystem
+import sgui.swing.systems.mouseSystem.SwMouseSystem
 import sgui.swing.skin.Skin.ResizePanel.BarLineColor
 import kotlin.reflect.KProperty
 

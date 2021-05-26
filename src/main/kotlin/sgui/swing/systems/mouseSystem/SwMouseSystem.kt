@@ -1,4 +1,4 @@
-package sgui.swing.mouseSystem
+package sgui.swing.systems.mouseSystem
 
 import rb.extendo.extensions.append
 import rb.extendo.extensions.deref

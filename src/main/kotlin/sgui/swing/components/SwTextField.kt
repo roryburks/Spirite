@@ -6,7 +6,7 @@ import rb.glow.SColor
 import sgui.core.components.*
 import sgui.core.systems.KeypressSystem
 import sgui.swing.jcolor
-import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin.BevelBorder.Dark
 import sgui.swing.skin.Skin.BevelBorder.Light
 import sgui.swing.skin.Skin.TextField.Background

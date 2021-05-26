@@ -9,7 +9,7 @@ import sgui.components.IComponent
 import sgui.swing.SwIcon
 import sgui.swing.components.SwToggleButton
 import sgui.hybrid.Hybrid
-import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.Tool

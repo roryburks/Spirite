@@ -1,4 +1,4 @@
-package sgui.swing.mouseSystem
+package sgui.swing.systems.mouseSystem
 
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener

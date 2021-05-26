@@ -5,7 +5,7 @@ import rb.owl.bindable.addObserver
 import sgui.core.components.ICheckBox
 import sgui.components.IComponent
 import sgui.core.components.IRadioButton
-import sgui.swing.mouseSystem.adaptMouseSystem
+import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin
 import sguiSwing.components.SwComponent
 import javax.swing.JCheckBox

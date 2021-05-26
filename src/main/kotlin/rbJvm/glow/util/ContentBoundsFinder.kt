@@ -1,10 +1,10 @@
-package sgui.hybrid
+package rbJvm.glow.util
 
 import com.jogamp.opengl.GL2
 import rb.glow.gl.GLImage
 import rb.glow.img.IImage
+import rb.vectrix.shapes.RectI
 import rbJvm.glow.awt.ImageBI
-import spirite.base.util.linear.Rect
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.awt.image.DataBufferInt
@@ -33,7 +33,7 @@ object ContentBoundsFinder {
      * to the a supported format
      */
     @Throws(UnsupportedImageTypeException::class)
-    fun findContentBounds(raw: IImage, buffer: Int, transparentOnly: Boolean): Rect {
+    fun findContentBounds(raw: IImage, buffer: Int, transparentOnly: Boolean): RectI {
         val data: _ImageCropHelper
 
         if (raw is ImageBI) {
@@ -70,7 +70,7 @@ object ContentBoundsFinder {
         var y2: Int
 
         // Don't feel like going through and special-casing 1-size things.
-        if (data.w < 2 || data.h < 2) return Rect(0, 0, data.w, data.h)
+        if (data.w < 2 || data.h < 2) return RectI(0, 0, data.w, data.h)
 
         data.setBG(0, 0)
 
@@ -84,7 +84,7 @@ object ContentBoundsFinder {
             data.setBG(data.w - 1, data.h - 1)
 
         if (transparentOnly && !data.isBGTransparent)
-            return Rect(0, 0, data.w, data.h)
+            return RectI(0, 0, data.w, data.h)
 
         val leftRet = AtomicReference<Int>(null)
         val left = Thread { leftRet.set(data.findFirstEmptyLine((0 until data.w).toList(), false)) }
@@ -109,12 +109,12 @@ object ContentBoundsFinder {
         }
 
         if (leftRet.get() == -1)
-            return Rect(0, 0, 0, 0)
+            return RectI(0, 0, 0, 0)
         x1 = leftRet.get()
         x2 = if (rightRet.get() == -1) data.w - 1 else data.w - 1 - rightRet.get()
 
         if (topRet.get() == -1)
-            return Rect(0, 0, 0, 0)
+            return RectI(0, 0, 0, 0)
         y1 = topRet.get()
         y2 = if (bottomRet.get() == -1) data.h - 1 else data.h - 1 - bottomRet.get()
 
@@ -123,7 +123,7 @@ object ContentBoundsFinder {
         x2 = Math.min(data.w - 1, x2 + buffer)
         y2 = Math.min(data.h - 1, y2 + buffer)
 
-        return Rect(x1, y1 , x2 - x1 + 1, y2 - y1 + 1)
+        return RectI(x1, y1 , x2 - x1 + 1, y2 - y1 + 1)
     }
 
     private abstract class _ImageCropHelper {

@@ -12,7 +12,7 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
-import sgui.hybrid.ContentBoundsFinder
+import rbJvm.glow.util.ContentBoundsFinder
 import sgui.hybrid.Hybrid
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
@@ -46,12 +46,12 @@ class Selection(mask: IImage, transform: ITransformF? = null, crop: Boolean = fa
         else {
             val cropped = ContentBoundsFinder.findContentBounds(mask, 1, true)
 
-            empty = cropped.isEmpty
-            val maskBeingBuilt = Hybrid.imageCreator.createImage(max(1,cropped.width), max(1,cropped.height))
-            maskBeingBuilt.graphics.renderImage(mask, -cropped.x.d, -cropped.y.d)
+            empty = cropped.w <= 0 || cropped.h <= 0
+            val maskBeingBuilt = Hybrid.imageCreator.createImage(max(1,cropped.wi), max(1,cropped.hi))
+            maskBeingBuilt.graphics.renderImage(mask, -cropped.x1, -cropped.y1)
 
             this.mask = maskBeingBuilt
-            this.transform = transform ?: ImmutableTransformF.Translation(cropped.x.f, cropped.y.f)
+            this.transform = transform ?: ImmutableTransformF.Translation(cropped.x1i.f, cropped.y1i.f)
         }
     }
 
