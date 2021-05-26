@@ -1,4 +1,4 @@
-package sgui.swing.hybrid.customGui
+package sgui.hybrid.customGui
 
 import sgui.swing.JColor
 import java.awt.Graphics

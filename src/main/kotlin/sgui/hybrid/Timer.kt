@@ -1,4 +1,4 @@
-package sgui.swing.hybrid
+package sgui.hybrid
 
 import javax.swing.Timer
 

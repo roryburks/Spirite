@@ -3,8 +3,8 @@ package spirite.gui.views
 import rbJvm.owl.addWeakObserver
 import sgui.swing.components.SwMenuBar
 import sguiSwing.components.jcomponent
-import sgui.swing.hybrid.Hybrid
-import sgui.swing.hybrid.SwHybrid
+import sgui.hybrid.Hybrid
+import sgui.hybrid.SwHybrid
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.DebugCommands

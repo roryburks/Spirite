@@ -1,6 +1,6 @@
 package spirite.base.pen.behaviors
 
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.PenState
 import spirite.base.pen.Penner

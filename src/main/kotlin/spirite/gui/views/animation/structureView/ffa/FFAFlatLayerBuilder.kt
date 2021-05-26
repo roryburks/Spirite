@@ -11,9 +11,9 @@ import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.core.components.events.MouseEvent.MouseEventType.RELEASED
 import sgui.core.Direction
 import sguiSwing.components.SwComponent
-import sgui.swing.hybrid.Hybrid
-import sgui.swing.hybrid.customGui.ArrowPanel
-import sgui.swing.hybrid.customGui.DashedOutPanel
+import sgui.hybrid.Hybrid
+import sgui.hybrid.customGui.ArrowPanel
+import sgui.hybrid.customGui.DashedOutPanel
 import sgui.swing.skin.Skin.FFAAnimation.Arrow
 import sgui.swing.skin.Skin.Global.Bg
 import sgui.swing.skin.Skin.Global.Fg

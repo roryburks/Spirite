@@ -14,7 +14,7 @@ import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.swing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SwComponent
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace

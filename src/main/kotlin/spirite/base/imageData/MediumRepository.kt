@@ -1,8 +1,8 @@
 package spirite.base.imageData
 
-import sgui.swing.hybrid.Hybrid
-import sgui.swing.hybrid.MDebug
-import sgui.swing.hybrid.MDebug.ErrorType.STRUCTURAL
+import sgui.hybrid.Hybrid
+import sgui.hybrid.MDebug
+import sgui.hybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.imageData.mediums.IMedium
 
 /**

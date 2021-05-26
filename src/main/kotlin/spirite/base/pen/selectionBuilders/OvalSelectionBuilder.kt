@@ -3,7 +3,7 @@ package spirite.base.pen.selectionBuilders
 import rb.glow.IGraphicsContext
 import rb.glow.drawer
 import rb.vectrix.mathUtil.d
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
 

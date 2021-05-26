@@ -2,7 +2,7 @@ package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
 import sgui.core.components.crossContainer.ICrossPanel
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.gui.menus.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.resources.SpiriteIcons
 

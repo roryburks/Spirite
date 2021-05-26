@@ -1,4 +1,4 @@
-package sgui.swing.hybrid
+package sgui.hybrid
 
 import rb.glow.gl.GLImage
 import rb.glow.img.RawImage

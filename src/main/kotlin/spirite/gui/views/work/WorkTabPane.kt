@@ -6,7 +6,7 @@ import sgui.components.IComponent
 import sgui.core.components.ITabbedPane
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.swing.SwIcon
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace

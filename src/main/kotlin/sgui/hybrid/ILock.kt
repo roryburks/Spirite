@@ -1,4 +1,4 @@
-package sgui.swing.hybrid
+package sgui.hybrid
 
 /**
  * The ILock interface encapsulates whatever locking/messaging system the underlying language libraries have access to.

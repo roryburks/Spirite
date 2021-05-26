@@ -3,9 +3,9 @@ package spirite.base.file
 import rb.glow.Colors
 import rb.glow.img.IImage
 import rb.glow.using
-import sgui.swing.hybrid.Hybrid
-import sgui.swing.hybrid.MDebug
-import sgui.swing.hybrid.MDebug.ErrorType.FILE
+import sgui.hybrid.Hybrid
+import sgui.hybrid.MDebug
+import sgui.hybrid.MDebug.ErrorType.FILE
 import spirite.base.brains.IMasterControl
 import spirite.base.file.load.BadSifFileException
 import spirite.base.file.load.LoadEngine

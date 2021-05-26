@@ -2,7 +2,7 @@ package spirite.pc
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 

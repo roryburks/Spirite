@@ -8,10 +8,10 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.round
 import rbJvm.file.JvmRandomAccessFileBinaryReadStream
-import sgui.swing.hybrid.Hybrid
-import sgui.swing.hybrid.MDebug
-import sgui.swing.hybrid.MDebug.ErrorType.FILE
-import sgui.swing.hybrid.MDebug.WarningType.UNSUPPORTED
+import sgui.hybrid.Hybrid
+import sgui.hybrid.MDebug
+import sgui.hybrid.MDebug.ErrorType.FILE
+import sgui.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.file.SaveLoadUtil

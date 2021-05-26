@@ -3,7 +3,7 @@ package demonstration
 import sgui.core.Orientation.HORIZONTAL
 import sgui.swing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import java.awt.GridLayout
 import javax.swing.JFrame
 

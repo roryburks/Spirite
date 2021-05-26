@@ -17,7 +17,7 @@ import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.core.components.events.MouseEvent.MouseEventType.RELEASED
 import sgui.core.systems.IGlobalMouseHook
 import sgui.core.transfer.ITransferObject
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract

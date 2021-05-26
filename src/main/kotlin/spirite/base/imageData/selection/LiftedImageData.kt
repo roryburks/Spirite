@@ -4,7 +4,7 @@ import rb.glow.IGraphicsContext
 import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.mathUtil.d
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.LiftedImageDrawer

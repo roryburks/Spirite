@@ -5,7 +5,7 @@ import sgui.components.IComponent
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
 import sgui.components.ITreeViewNonUI.SimpleTreeComponent
 import sgui.swing.SwIcon
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import spirite.base.imageData.undo.UndoIndex

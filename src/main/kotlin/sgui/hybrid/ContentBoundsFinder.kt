@@ -1,4 +1,4 @@
-package sgui.swing.hybrid
+package sgui.hybrid
 
 import com.jogamp.opengl.GL2
 import rb.glow.gl.GLImage

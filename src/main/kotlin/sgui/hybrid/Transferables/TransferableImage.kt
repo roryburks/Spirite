@@ -1,8 +1,8 @@
-package sgui.swing.hybrid.Transferables
+package sgui.hybrid.Transferables
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException

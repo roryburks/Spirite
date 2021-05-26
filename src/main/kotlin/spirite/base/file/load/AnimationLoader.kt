@@ -1,7 +1,7 @@
 package spirite.base.file.load
 
-import sgui.swing.hybrid.MDebug
-import sgui.swing.hybrid.MDebug.WarningType.UNSUPPORTED
+import sgui.hybrid.MDebug
+import sgui.hybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.SaveLoadUtil
 import spirite.base.imageData.animation.Animation
 

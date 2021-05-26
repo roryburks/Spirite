@@ -1,7 +1,7 @@
 package demonstration
 
-import sgui.swing.hybrid.MDebug
-import sgui.swing.hybrid.MDebug.ErrorType.FATAL
+import sgui.hybrid.MDebug
+import sgui.hybrid.MDebug.ErrorType.FATAL
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import javax.swing.UIManager

@@ -1,6 +1,6 @@
 package spirite.base.brains.commands
 
-import sgui.swing.hybrid.MDebug
+import sgui.hybrid.MDebug
 import spirite.base.brains.IFrameManager
 import spirite.base.brains.IFrameManager.Views.*
 import spirite.base.brains.KeyCommand

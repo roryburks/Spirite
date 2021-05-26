@@ -13,7 +13,7 @@ import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.components.events.MouseEvent
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.graphics.rendering.IThumbnailStore

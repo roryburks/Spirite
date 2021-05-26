@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.Test
 import rb.glow.gl.GLImage
 import rbJvm.vectrix.SetupVectrixForJvm
-import sgui.swing.hybrid.EngineLaunchpoint
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.EngineLaunchpoint
+import sgui.hybrid.Hybrid
 import sjunit.testHelpers.runTest
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.MImageWorkspace

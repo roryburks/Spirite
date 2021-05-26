@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.Test
 import rb.glow.drawer
 import rb.glow.gl.GLImage
-import sgui.swing.hybrid.ContentBoundsFinder
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.ContentBoundsFinder
+import sgui.hybrid.Hybrid
 import spirite.base.util.linear.Rect
 import kotlin.test.assertEquals
 

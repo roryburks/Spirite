@@ -1,4 +1,4 @@
-package sgui.swing.hybrid
+package sgui.hybrid
 
 import rb.owl.IObservable
 import rb.owl.Observable

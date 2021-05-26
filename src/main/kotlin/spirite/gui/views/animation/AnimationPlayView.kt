@@ -6,7 +6,7 @@ import rb.glow.SColor
 import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
 import sguiSwing.components.SwComponent
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import sgui.swing.jcolor
 import sgui.swing.skin.Skin.Global.Bg
 import spirite.base.imageData.animation.Animation

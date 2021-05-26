@@ -5,7 +5,7 @@ import old.TestHelper
 import sgui.core.Orientation.HORIZONTAL
 import sgui.swing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.gui.views.work.WorkTabPane

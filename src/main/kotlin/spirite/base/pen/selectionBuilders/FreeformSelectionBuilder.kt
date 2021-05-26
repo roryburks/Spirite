@@ -5,7 +5,7 @@ import rb.glow.IGraphicsContext
 import rb.vectrix.compaction.IntCompactor
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
 

@@ -2,7 +2,7 @@ package spirite.gui.views.groupView
 
 import sgui.components.IComponent
 import sgui.swing.SwIcon
-import sgui.swing.hybrid.Hybrid
+import sgui.hybrid.Hybrid
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 
 class ReferenceView() : IOmniComponent
