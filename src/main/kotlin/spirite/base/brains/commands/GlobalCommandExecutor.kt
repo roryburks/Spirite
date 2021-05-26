@@ -14,9 +14,9 @@ import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import sgui.hybrid.Hybrid
-import sgui.hybrid.Transferables.IClipboard.ClipboardThings.Image
-import sgui.hybrid.Transferables.ILayerBuilder
-import sgui.hybrid.Transferables.INodeBuilder
+import sgui.hybrid.transferables.IClipboard.ClipboardThings.Image
+import sgui.hybrid.transferables.ILayerBuilder
+import sgui.hybrid.transferables.INodeBuilder
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet

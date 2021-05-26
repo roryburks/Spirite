@@ -1,4 +1,4 @@
-package sgui.hybrid.Transferables
+package sgui.hybrid.transferables
 
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable

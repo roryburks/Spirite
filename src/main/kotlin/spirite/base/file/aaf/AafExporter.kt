@@ -7,8 +7,8 @@ import rb.vectrix.mathUtil.IDataStreamHasher
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rbJvm.file.writing.JvmRaWriter
 import sgui.hybrid.Hybrid
-import sgui.hybrid.IImageCreator
-import sgui.hybrid.IImageIO
+import sgui.core.systems.IImageCreator
+import sgui.core.systems.IImageIO
 import spirite.base.file.aaf.export.AafExportConverter
 import spirite.base.file.aaf.export.IAafExportConverter
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -26,10 +26,10 @@ val defaultAafExporter : IAafExporter by lazy {
 }
 
 class AafExporter(
-        private val imageCreator: IImageCreator,
-        private  val imageExporter: IImageIO,
-        private val hasher: IDataStreamHasher,
-        private val _aafWriterFactory : IAafWriterFactory = AafWriterFactory )
+    private val imageCreator: IImageCreator,
+    private  val imageExporter: IImageIO,
+    private val hasher: IDataStreamHasher,
+    private val _aafWriterFactory : IAafWriterFactory = AafWriterFactory )
     : IAafExporter
 {
     private val _converter : IAafExportConverter = AafExportConverter(imageCreator, ModifiedSleatorAlgorithm)

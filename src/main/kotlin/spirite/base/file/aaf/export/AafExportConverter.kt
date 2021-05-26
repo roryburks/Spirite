@@ -15,7 +15,7 @@ import rb.vectrix.mathUtil.round
 import rb.vectrix.rectanglePacking.IRectanglePackingAlgorithm
 import rb.vectrix.rectanglePacking.PackedRectangle
 import rb.vectrix.shapes.RectI
-import sgui.hybrid.IImageCreator
+import sgui.core.systems.IImageCreator
 import spirite.base.imageData.animation.ffa.FFALayer
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree
@@ -32,8 +32,8 @@ interface IAafExportConverter  {
 }
 
 class AafExportConverter(
-        private val _imageCreator: IImageCreator,
-        private val _rpa : IRectanglePackingAlgorithm
+    private val _imageCreator: IImageCreator,
+    private val _rpa : IRectanglePackingAlgorithm
 )  : IAafExportConverter {
     override fun convert(ffa: FixedFrameAnimation): Pair<AafStructure,AafFileMapping> {
         val mmap = MediumNameMapper.getMap(ffa.workspace)

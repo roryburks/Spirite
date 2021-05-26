@@ -1,4 +1,4 @@
-package sgui.hybrid.customGui
+package sgui.swing.customGui
 
 import rb.vectrix.mathUtil.round
 import sgui.core.Direction

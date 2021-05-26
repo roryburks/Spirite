@@ -1,4 +1,4 @@
-package sgui.hybrid.Transferables
+package sgui.hybrid.transferables
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
