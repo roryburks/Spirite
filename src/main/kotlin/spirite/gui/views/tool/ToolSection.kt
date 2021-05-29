@@ -8,7 +8,7 @@ import sgui.core.components.IBoxList.IBoxComponent
 import sgui.components.IComponent
 import sgui.swing.SwIcon
 import sgui.swing.components.SwToggleButton
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl

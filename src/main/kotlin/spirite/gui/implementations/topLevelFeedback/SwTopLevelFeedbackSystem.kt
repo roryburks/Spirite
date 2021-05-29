@@ -1,7 +1,7 @@
 package spirite.gui.implementations.topLevelFeedback
 
 import rb.extendo.extensions.removeToList
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.ITopLevelFeedbackSystem
 import spirite.base.brains.SwFrameManager
 

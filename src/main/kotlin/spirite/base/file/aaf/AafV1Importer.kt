@@ -3,7 +3,7 @@ package spirite.base.file.aaf
 import rb.glow.img.IImage
 import rb.glow.img.RawImage
 import rb.vectrix.shapes.RectI
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.file.readUTF8NT
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.groupTree.GroupTree.GroupNode

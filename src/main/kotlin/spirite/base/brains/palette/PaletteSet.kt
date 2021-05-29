@@ -1,8 +1,8 @@
 package spirite.base.brains.palette
 
 import rb.owl.bindable.Bindable
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.WarningType.STRUCTURAL
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.brains.palette.IPaletteManager.PaletteChangeEvent
 import spirite.base.brains.palette.IPaletteManager.PaletteSetChangeEvent
 import spirite.base.util.StringUtil

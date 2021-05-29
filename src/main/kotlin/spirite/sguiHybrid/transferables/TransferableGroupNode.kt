@@ -1,4 +1,4 @@
-package sgui.hybrid.transferables
+package spirite.sguiHybrid.transferables
 
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.MovableGroupTree

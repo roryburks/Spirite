@@ -1,7 +1,7 @@
 package spirite.base.file.save
 
 import rbJvm.glow.awt.ImageBI
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium

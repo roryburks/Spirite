@@ -10,7 +10,7 @@ import rb.glow.gle.RenderMethodType.MULTIPLY
 import rb.glow.img.RawImage
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.awt.ImageBI
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer

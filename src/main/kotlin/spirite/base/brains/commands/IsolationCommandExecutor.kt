@@ -1,6 +1,6 @@
 package spirite.base.brains.commands
 
-import sgui.hybrid.MDebug
+import spirite.sguiHybrid.MDebug
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.IsolationCommandExecutor.IsolationCommand.*

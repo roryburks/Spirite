@@ -4,7 +4,7 @@ import sgui.components.IComponent
 import sgui.core.components.ITextArea
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.swing.SwIcon
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 
 class DebugView

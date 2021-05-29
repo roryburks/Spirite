@@ -13,8 +13,8 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.WarningType
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.WarningType
 import spirite.base.brains.DBGlobal
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.graphics.isolation.ISpriteLayerIsolator

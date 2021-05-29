@@ -2,7 +2,7 @@ package spirite.base.file.aaf
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.MImageWorkspace
 import java.io.File
 import java.io.RandomAccessFile

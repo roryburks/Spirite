@@ -9,7 +9,7 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rbJvm.owl.addWeakObserver
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.IAnchorLiftModule

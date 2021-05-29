@@ -4,8 +4,8 @@ import rb.owl.IObservable
 import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.WarningType.UNSUPPORTED
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSpaceObserver
 import spirite.base.imageData.undo.NullAction

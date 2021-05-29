@@ -11,7 +11,7 @@ import rb.glow.gl.GLImage
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
 import rbJvm.glow.awt.toBufferedImage
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.specialRendering.SpecialDrawerFactory
 import java.io.File
 import javax.imageio.ImageIO

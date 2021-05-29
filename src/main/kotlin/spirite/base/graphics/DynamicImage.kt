@@ -9,7 +9,7 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.d
 import rbJvm.glow.util.ContentBoundsFinder
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 

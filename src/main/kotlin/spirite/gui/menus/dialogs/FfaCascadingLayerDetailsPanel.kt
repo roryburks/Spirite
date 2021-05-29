@@ -2,7 +2,7 @@ package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
 import sgui.core.components.crossContainer.ICrossPanel
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 
 

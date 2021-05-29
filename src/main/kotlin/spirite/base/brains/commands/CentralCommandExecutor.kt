@@ -2,8 +2,8 @@ package spirite.base.brains.commands
 
 import rb.extendo.dataStructures.Deque
 import rb.extendo.extensions.toHashMap
-import sgui.hybrid.Hybrid
-import sgui.hybrid.MDebug
+import spirite.sguiHybrid.Hybrid
+import spirite.sguiHybrid.MDebug
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MWorkspaceSet
 import spirite.gui.menus.dialogs.IDialog

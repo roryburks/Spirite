@@ -13,7 +13,7 @@ import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
 import rbJvm.glow.util.ContentBoundsFinder
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
 import kotlin.math.max

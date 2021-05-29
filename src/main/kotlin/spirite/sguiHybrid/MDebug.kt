@@ -1,4 +1,4 @@
-package sgui.hybrid
+package spirite.sguiHybrid
 
 import rb.owl.IObservable
 import rb.owl.Observable

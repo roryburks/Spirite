@@ -1,4 +1,4 @@
-package sgui.hybrid
+package spirite.sguiHybrid
 
 import rb.glow.gl.shader.ShaderManager
 import rb.glow.gle.GLEngine

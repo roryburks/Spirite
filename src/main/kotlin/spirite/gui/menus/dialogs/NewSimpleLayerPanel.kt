@@ -6,7 +6,7 @@ import rb.glow.Colors
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.Orientation.VERTICAL
 import sgui.core.components.crossContainer.ICrossPanel
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.MediumType

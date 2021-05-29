@@ -9,9 +9,9 @@ import sgui.components.IComponent
 import sgui.swing.SwIcon
 import sgui.swing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
-import sgui.hybrid.Hybrid
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.WarningType.UNSUPPORTED
+import spirite.sguiHybrid.Hybrid
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation

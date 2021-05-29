@@ -1,4 +1,4 @@
-package sgui.hybrid.transferables
+package spirite.sguiHybrid.transferables
 
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable

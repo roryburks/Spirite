@@ -1,10 +1,10 @@
-package sgui.hybrid.transferables
+package spirite.sguiHybrid.transferables
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
-import sgui.hybrid.Hybrid
-import sgui.hybrid.transferables.IClipboard.ClipboardThings
-import sgui.hybrid.transferables.IClipboard.ClipboardThings.Image
+import spirite.sguiHybrid.Hybrid
+import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings
+import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings.Image
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.layers.Layer
 import java.awt.Toolkit

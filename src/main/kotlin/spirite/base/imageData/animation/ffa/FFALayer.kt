@@ -1,7 +1,7 @@
 package spirite.base.imageData.animation.ffa
 
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.WarningType.STRUCTURAL
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.LayerNode

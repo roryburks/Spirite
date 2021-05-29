@@ -1,7 +1,7 @@
 package spirite.base.telemetry
 
 import rb.extendo.dataStructures.Deque
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 
 
 class TelemetryEvent {

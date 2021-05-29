@@ -4,9 +4,9 @@ import rb.glow.img.IImage
 import rb.glow.img.RawImage
 import rb.owl.observer
 import rbJvm.glow.awt.NativeImage
-import sgui.hybrid.Hybrid
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.WarningType.STRUCTURAL
+import spirite.sguiHybrid.Hybrid
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.brains.ICentralObservatory
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.settings.ISettingsManager

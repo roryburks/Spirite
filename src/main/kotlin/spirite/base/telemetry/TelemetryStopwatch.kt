@@ -1,6 +1,6 @@
 package spirite.base.telemetry
 
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 
 class TelemetryStopwatch {
     private val _telemetryMap = mutableMapOf<String, Long>()

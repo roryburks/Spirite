@@ -2,9 +2,9 @@ package spirite.pc.menus
 
 import sgui.core.UIPoint
 import sgui.swing.SUIPoint
-import sgui.hybrid.Hybrid
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.WarningType
+import spirite.sguiHybrid.Hybrid
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.WarningType
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.MenuItem

@@ -8,7 +8,7 @@ import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.swing.components.ResizeContainerPanel
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace

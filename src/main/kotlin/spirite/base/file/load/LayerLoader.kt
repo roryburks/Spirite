@@ -1,8 +1,8 @@
 package spirite.base.file.load
 
 import rb.vectrix.mathUtil.i
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.WarningType.UNSUPPORTED
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.SaveLoadUtil
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer

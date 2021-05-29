@@ -1,7 +1,7 @@
 package spirite.base.graphics
 
 import rb.glow.gl.GLImage
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 
 interface IResourceUseTracker {
     val bytesUsed: Long

@@ -3,7 +3,7 @@ package spirite.gui.components.advanced
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 
 
 class RadioButtonCluster<T>(

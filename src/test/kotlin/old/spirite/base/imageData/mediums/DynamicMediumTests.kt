@@ -10,8 +10,8 @@
 //import spirite.base.imageData.mediums.ArrangedMediumData
 //import spirite.base.imageData.mediums.DynamicMedium
 //import rb.glow.Colors
-//import sgui.hybrid.EngineLaunchpoint
-//import sgui.hybrid.Hybrid
+//import spirite.hybrid.EngineLaunchpoint
+//import spirite.hybrid.Hybrid
 //import rbJvm.glow.awt.AwtImageConverter
 //import rbJvm.glow.awt.ImageBI
 //import java.io.File

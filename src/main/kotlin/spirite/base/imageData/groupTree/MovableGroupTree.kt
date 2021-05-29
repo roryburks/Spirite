@@ -1,7 +1,7 @@
 package spirite.base.imageData.groupTree
 
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.WarningType.STRUCTURAL
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior
 import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.*

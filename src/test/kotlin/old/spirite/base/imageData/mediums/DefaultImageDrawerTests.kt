@@ -6,7 +6,7 @@ import old.TestConfig
 import old.TestHelper
 import org.junit.jupiter.api.Test
 import rb.glow.Colors
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.imageData.layers.SimpleLayer

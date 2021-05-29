@@ -11,7 +11,7 @@ import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.swing.SwIcon
 import sgui.swing.components.SJPanel
 import sguiSwing.components.SwComponent
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import sgui.swing.jcolor
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.palette.IPaletteManager.*

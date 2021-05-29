@@ -6,9 +6,9 @@ import rb.owl.IObservable
 import rb.owl.Observable
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.MutableTransformF
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.ErrorType
-import sgui.hybrid.MDebug.ErrorType.STRUCTURAL
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.ErrorType
+import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.GroupNode

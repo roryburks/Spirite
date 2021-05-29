@@ -1,7 +1,7 @@
 package spirite.base.imageData.undo
 
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL_MINOR
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 

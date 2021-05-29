@@ -15,7 +15,7 @@ import rbJvm.glow.jogl.JOGLProvider
 import sgui.core.components.events.MouseEvent.MouseButton
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.pen.Penner
 import java.awt.event.MouseAdapter
 import javax.swing.SwingUtilities

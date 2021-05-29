@@ -11,7 +11,7 @@ import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
 import sgui.swing.SwIcon
 import sgui.swing.components.SJPanel
 import sguiSwing.components.SwComponent
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import sgui.core.systems.ITimer
 import sgui.core.systems.ITimerEngine
 import sgui.swing.jcolor

@@ -2,7 +2,7 @@ package spirite.base.brains
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.NativeImage
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.commands.CentralCommandExecutor
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.base.brains.palette.IPaletteManager

@@ -1,6 +1,6 @@
 package spirite.base.imageData.mutations
 
-import sgui.hybrid.transferables.ILayerBuilder
+import spirite.sguiHybrid.transferables.ILayerBuilder
 import spirite.base.imageData.MImageWorkspace
 
 

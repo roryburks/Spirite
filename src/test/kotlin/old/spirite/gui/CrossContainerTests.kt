@@ -2,7 +2,7 @@ package old.spirite.gui
 
 import org.junit.jupiter.api.Test
 import sgui.swing.advancedComponents.CrossContainer.CrossContainer
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 
 class CrossContainerTests {
     @Test

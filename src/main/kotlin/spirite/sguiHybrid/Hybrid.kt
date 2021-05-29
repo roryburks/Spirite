@@ -1,4 +1,4 @@
-package sgui.hybrid
+package spirite.sguiHybrid
 
 import rb.glow.IImageConverter
 import rb.glow.gl.IGL
@@ -7,8 +7,8 @@ import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.jogl.JOGLProvider
 import sgui.core.components.IComponentProvider
 import sgui.core.systems.*
-import sgui.hybrid.transferables.IClipboard
-import sgui.hybrid.transferables.SwClipboard
+import spirite.sguiHybrid.transferables.IClipboard
+import spirite.sguiHybrid.transferables.SwClipboard
 import sgui.swing.*
 import sgui.core.systems.IImageCreator
 import sgui.swing.systems.JImageIO

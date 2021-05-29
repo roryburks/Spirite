@@ -6,7 +6,7 @@ import sgui.core.Orientation.HORIZONTAL
 import sgui.core.components.IButton
 import sgui.swing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import java.awt.GridLayout
 import javax.swing.JFrame
 

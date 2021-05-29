@@ -1,9 +1,9 @@
 package spirite.pc
 
 import rbJvm.vectrix.SetupVectrixForJvm
-import sgui.hybrid.EngineLaunchpoint
-import sgui.hybrid.MDebug
-import sgui.hybrid.MDebug.ErrorType.FATAL
+import spirite.sguiHybrid.EngineLaunchpoint
+import spirite.sguiHybrid.MDebug
+import spirite.sguiHybrid.MDebug.ErrorType.FATAL
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import javax.swing.SwingUtilities

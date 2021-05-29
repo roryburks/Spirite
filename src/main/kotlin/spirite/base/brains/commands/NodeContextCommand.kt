@@ -1,7 +1,7 @@
 package spirite.base.brains.commands
 
 import rb.glow.gle.RenderMethod
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.brains.commands.specific.SpriteLayerFixes
@@ -138,8 +138,7 @@ object NodeCommands {
             else ->throw CommandNotValidException
         }
 
-        val previousNode = node.previousNode
-        when(previousNode) {
+        when(val previousNode = node.previousNode) {
             null -> {
                 val parent = node.parent ?: throw CommandNotValidException
                 parent.parent ?: throw CommandNotValidException
@@ -157,8 +156,7 @@ object NodeCommands {
             else -> throw CommandNotValidException
         }
 
-        val nextNode = node.nextNode
-        when(nextNode) {
+        when(val nextNode = node.nextNode) {
             null -> {
                 val parent = node.parent ?: throw CommandNotValidException
                 parent.parent ?: throw CommandNotValidException
@@ -229,6 +227,10 @@ object NodeCommands {
             if( node.layer is SpriteLayer)
                 SpriteLayerFixes.SpriteMaglevToDynamic(node.layer)
         }
+    }
+
+    val NormalizeLayers = NodeCommand("spriteLayer-Normalize") { workspace, node, dialogs ->
+
     }
     //endregion
 

@@ -6,7 +6,7 @@ import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rbJvm.file.writing.JvmRaWriter
-import sgui.hybrid.Hybrid
+import spirite.sguiHybrid.Hybrid
 import sgui.core.systems.IImageCreator
 import sgui.core.systems.IImageIO
 import spirite.base.file.aaf.export.AafExportConverter
