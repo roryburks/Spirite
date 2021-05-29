@@ -6,6 +6,15 @@ package rb.extendo.dataStructures
  * You can iterate over it.
  */
 class MutableSparseArray<T> : Iterable<T> {
+    constructor() {}
+    constructor(toFillFrom: List<Pair<Int,T>>){
+        val sorted = toFillFrom.sortedBy { it.first }
+        for (pair in sorted) {
+            _backingList.add(pair)
+            _indexMap[pair.first] = _backingList.lastIndex
+        }
+    }
+
     fun get(i: Int) : T? = _indexMap[i]?.run { _backingList[this]?.second }
 
     fun set(i: Int, t:T) {
@@ -38,6 +47,8 @@ class MutableSparseArray<T> : Iterable<T> {
         }
     }
     fun remove( i:Int) : T? { TODO()}
+
+    fun values() = _backingList.toList()
 
     override fun iterator(): Iterator<T> {
         return _backingList

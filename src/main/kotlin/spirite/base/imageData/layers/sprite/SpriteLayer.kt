@@ -226,13 +226,15 @@ class SpriteLayer : Layer {
     // endregion
 
     // region Part Add/Insert/Move/Remove
+    /***
+     * Behavior modes:
+     * Unlinked: Creates a new sprite with a name that doesn't collide with any of the existing names in the entire
+     *      GroupNode context
+     * Linked: Creates a new sprite with a name that doesn't collide with any of the existing names in the current sprite.
+     *      Then for each Sprite in the GroupNode context that doesn't already have a part by that name, it makes one.
+     */
     fun addPart(partName: String, depth: Int? = null, linked: Boolean = false)
     {
-        val namesToAccountFor =
-                if(linked) parts.asSequence().map { it.partName }
-                else getAllLinkedLayers().flatMap { sprite -> sprite.parts.asSequence().map { it.partName } }
-        val realName = StringUtil.getNonDuplicateName(namesToAccountFor.distinct().toHashSet(), partName)
-
         fun addPartSub( layer: SpriteLayer, partName: String, depth: Int? = null) {
             layer.run {
                 val handle = workspace.mediumRepository.addMedium(makeThing(workspace))
@@ -259,11 +261,25 @@ class SpriteLayer : Layer {
             }
         }
 
+        var realName :String = partName
         undoEngine.doAsAggregateAction("Add Sprite Part") {
-            if (linked)
-                getAllLinkedLayers().forEach { addPartSub(it, realName, depth) }
-            else
-                addPartSub(this, realName, depth)
+            when( linked) {
+                true -> {
+                    val incompatibleNames = parts.map { it.partName }.toSet()
+                    realName = StringUtil.getNonDuplicateName(incompatibleNames, partName)
+                    getAllLinkedLayers()
+                        .filter { sl -> !sl.parts.any { it.partName == realName } }
+                        .forEach { addPartSub(it, realName, depth) }
+                }
+                false -> {
+                    val incompatibleNames = getAllLinkedLayers()
+                        .flatMap { sprite -> sprite.parts.asSequence()
+                            .map { it.partName } }
+                        .toHashSet()
+                    realName = StringUtil.getNonDuplicateName(incompatibleNames, partName)
+                    addPartSub(this, realName, depth)
+                }
+            }
         }
 
         activePart = _parts.firstOrNull { it.partName == realName } ?: activePart

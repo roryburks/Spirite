@@ -1,10 +1,12 @@
 package spirite.base.brains.commands
 
+import rb.global.SuccessKind
 import rb.glow.gle.RenderMethod
 import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.brains.commands.specific.SpriteLayerFixes
+import spirite.base.brains.commands.specific.spriteLayers.SpriteLayerNormalizer
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -229,7 +231,12 @@ object NodeCommands {
         }
     }
 
-    val NormalizeLayers = NodeCommand("spriteLayer-Normalize") { workspace, node, dialogs ->
+    val NormalizeSpriteLayers = NodeCommand("spriteLayer-Normalize") { workspace, node, dialogs ->
+        node ?: throw CommandNotValidException
+        val respone = SpriteLayerNormalizer.normalizeSpriteLayers(node, workspace)
+        when(respone.kind()) {
+            SuccessKind.Failure -> Hybrid.beep()
+        }
 
     }
     //endregion
