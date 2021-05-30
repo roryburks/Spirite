@@ -114,8 +114,16 @@ object SpriteCommands {
         SpriteLayerFixes.SpriteMaglevToDynamic(sprite)
     }
 
+    /**
+     * Given a given part, goes through all sprites in its LinkedContext and if any of them are missing that part, adds it.
+     */
     val FillInLinked = SpriteCommand("fill-in-linked") { sprite, part, master ->
-        //sprite.addPart()
-
+        part ?: throw CommandNotValidException
+        val ws = sprite.workspace
+        ws.undoEngine.doAsAggregateAction("Fill in Linked SpritePart. Part: ${part.partName}") {
+            for (spriteLayer in sprite.getAllLinkedLayers()) {
+                spriteLayer.addPart(part.partName, part.depth, SpriteLayer.SpritePartAddMode.CreateIfAbsent)
+            }
+        }
     }
 }

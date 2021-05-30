@@ -233,11 +233,18 @@ object NodeCommands {
 
     val NormalizeSpriteLayers = NodeCommand("spriteLayer-Normalize") { workspace, node, dialogs ->
         node ?: throw CommandNotValidException
-        val respone = SpriteLayerNormalizer.normalizeSpriteLayers(node, workspace)
-        when(respone.kind()) {
+        val response = SpriteLayerNormalizer.normalizeSpriteLayers(node, workspace, false)
+        when(response.kind()) {
             SuccessKind.Failure -> Hybrid.beep()
         }
+    }
 
+    val NormalizeSpriteLayerDepths = NodeCommand("spriteLayer-Normalize-DepthOnly") { workspace, node, dialogs ->
+        node ?: throw CommandNotValidException
+        val response = SpriteLayerNormalizer.normalizeSpriteLayers(node, workspace,true)
+        when(response.kind()) {
+            SuccessKind.Failure -> Hybrid.beep()
+        }
     }
     //endregion
 

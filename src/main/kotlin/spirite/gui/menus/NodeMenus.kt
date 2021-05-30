@@ -59,6 +59,7 @@ object NodeMenus {
                             scheme.add(MenuItem(".Diffuse Sprite Layer", NodeCommands.DiffuseSpriteLayer))
                             scheme.add(MenuItem(".Shift Sprite Layer Depth", NodeCommands.ShiftSpriteLayerDepth))
                             scheme.add(MenuItem(".Normalize Sprite Layers", NodeCommands.NormalizeSpriteLayers))
+                            scheme.add(MenuItem(".Normalize Sprite Layers (Depths Only)", NodeCommands.NormalizeSpriteLayerDepths))
                             if( layer.parts.any { it.handle.medium is MaglevMedium })
                                 scheme.add(MenuItem(".Flatten All Magleve", NodeCommands.FlattenAllSprites))
                             scheme.add(MenuItem("Construct &Rig Animation From Sprite", NodeCommands.NewRigAnimation))

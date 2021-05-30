@@ -16,8 +16,10 @@ object SpriteLayerNormalizer {
      *    part, finding the part prior to it (if it exists), and create a Mapping This->Previous.  If Previous is in the
      *    canonical map, add this after the previous (while incrementing ordinals as necessary).  If not, recursively act
      *    on Previous until one is found.  (note previous can be null at which point canonicalmap.first - 1 is used)
+     *
+     * normalizeLayersOnly : If true, will only re-map depths to be compatible.  If false, will add parts which are missing
      */
-    fun normalizeSpriteLayers( node: GroupTree.Node, workspace: IImageWorkspace): SuccessResponse {
+    fun normalizeSpriteLayers( node: GroupTree.Node, workspace: IImageWorkspace, normalizeLayersOnly: Boolean): SuccessResponse {
         val group = if( node is GroupTree.GroupNode) node else node.parent ?: return SuccessResponse.Error("No Group Found")
         val spriteLayers = group.children
             .filterIsInstance<GroupTree.LayerNode>()
@@ -37,10 +39,13 @@ object SpriteLayerNormalizer {
                 val remappedDepth = sl.parts.associateWith { canonicalMap[it.partName] ?: 0 }
                 sl.remapDepth(remappedDepth)
 
-                val existingParts = sl.parts.map { it.partName }.toSet()
-                val missingParts = canonicalMap
-                    .filter { !existingParts.contains(it.key)  }
-                missingParts.forEach { mp -> sl.addPart(mp.key, mp.value, SpriteLayer.SpritePartAddMode.CreateIfAbsent) }
+                if(!normalizeLayersOnly) {
+                    val existingParts = sl.parts.map { it.partName }.toSet()
+                    val missingParts = canonicalMap
+                        .filter { !existingParts.contains(it.key) }
+                    missingParts
+                        .forEach { mp -> sl.addPart( mp.key, mp.value, SpriteLayer.SpritePartAddMode.CreateIfAbsent ) }
+                }
             }
         }
 
