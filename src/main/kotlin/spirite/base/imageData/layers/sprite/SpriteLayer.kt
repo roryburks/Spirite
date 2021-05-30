@@ -227,62 +227,70 @@ class SpriteLayer : Layer {
 
     // region Part Add/Insert/Move/Remove
     /***
-     * Behavior modes:
-     * Unlinked: Creates a new sprite with a name that doesn't collide with any of the existing names in the entire
-     *      GroupNode context
-     * Linked: Creates a new sprite with a name that doesn't collide with any of the existing names in the current sprite.
-     *      Then for each Sprite in the GroupNode context that doesn't already have a part by that name, it makes one.
+     * Adds the PartName as a new Part (pre-vetted that its part-name does not conflict with any existing part names).
+     * It makes sure depths do not overlap, by incrementing depths if necessary
      */
-    fun addPart(partName: String, depth: Int? = null, linked: Boolean = false)
-    {
-        fun addPartSub( layer: SpriteLayer, partName: String, depth: Int? = null) {
-            layer.run {
-                val handle = workspace.mediumRepository.addMedium(makeThing(workspace))
+    private fun addPartDirect( partName: String, depth: Int? = null) {
+        val handle = workspace.mediumRepository.addMedium(makeThing(workspace))
 
-                val aPart = activePart
-                val realDepth = depth ?: when {
-                    !_parts.any() -> 0
-                    aPart == null -> _parts.last().depth + 1
-                    else -> aPart.depth + 1
-                }
-
-                undoEngine.doAsAggregateAction("Add Sprite Part") {
-
-                    if (aPart != null) {
-                        val remapping = _parts.toHashMap({it.partName}, {it.depth})
-                        _bubbleUpDepth(
-                                realDepth + 1,
-                                _parts.asSequence().drop(_parts.indexOf(aPart) + 1),
-                                remapping)
-                        undoEngine.performAndStore(DepthRemappingAction(remapping, _parts.toHashMap({it.partName}, {it.depth})))
-                    }
-                    _addPart(SpritePartStructure(realDepth, partName), handle)
-                }
-            }
+        val aPart = activePart
+        val realDepth = depth ?: when {
+            !_parts.any() -> 0
+            aPart == null -> _parts.last().depth + 1
+            else -> aPart.depth + 1
         }
 
-        var realName :String = partName
+        if (aPart != null) {
+            val remapping = _parts.toHashMap({it.partName}, {it.depth})
+            _bubbleUpDepth(
+                realDepth + 1,
+                _parts.asSequence().drop(_parts.indexOf(aPart) + 1),
+                remapping)
+            undoEngine.performAndStore(DepthRemappingAction(remapping, _parts.toHashMap({it.partName}, {it.depth})))
+        }
+        _addPart(SpritePartStructure(realDepth, partName), handle)
+    }
+
+    /***
+     * Creates a new Part.
+     */
+    enum class SpritePartAddMode {
+        CreateDisjoint,
+        CreateLinked,
+        CreateIfAbsent
+    }
+    fun addPart(partName: String, depth: Int? = null, mode: SpritePartAddMode = SpritePartAddMode.CreateDisjoint)
+    {
         undoEngine.doAsAggregateAction("Add Sprite Part") {
-            when( linked) {
-                true -> {
-                    val incompatibleNames = parts.map { it.partName }.toSet()
-                    realName = StringUtil.getNonDuplicateName(incompatibleNames, partName)
-                    getAllLinkedLayers()
-                        .filter { sl -> !sl.parts.any { it.partName == realName } }
-                        .forEach { addPartSub(it, realName, depth) }
-                }
-                false -> {
+            when( mode) {
+                SpritePartAddMode.CreateLinked -> {
                     val incompatibleNames = getAllLinkedLayers()
                         .flatMap { sprite -> sprite.parts.asSequence()
                             .map { it.partName } }
                         .toHashSet()
-                    realName = StringUtil.getNonDuplicateName(incompatibleNames, partName)
-                    addPartSub(this, realName, depth)
+                    val realName = StringUtil.getNonDuplicateName(incompatibleNames, partName)
+                    getAllLinkedLayers()
+                        .forEach { it.addPartDirect(realName, depth) }
+                    activePart = _parts.firstOrNull { it.partName == realName } ?: activePart
+                }
+                SpritePartAddMode.CreateDisjoint -> {
+                    val incompatibleNames = getAllLinkedLayers()
+                        .flatMap { sprite -> sprite.parts.asSequence()
+                            .map { it.partName } }
+                        .toHashSet()
+                    val realName = StringUtil.getNonDuplicateName(incompatibleNames, partName)
+                    addPartDirect(realName, depth)
+                    activePart = _parts.firstOrNull { it.partName == realName } ?: activePart
+                }
+                SpritePartAddMode.CreateIfAbsent -> {
+                    if( !_parts.any{ it.partName == partName}) {
+                        addPartDirect(partName, depth)
+                        activePart = _parts.firstOrNull { it.partName == partName } ?: activePart
+                    }
                 }
             }
         }
 
-        activePart = _parts.firstOrNull { it.partName == realName } ?: activePart
     }
 
     fun insertPart( handle: MediumHandle, structure: SpritePartStructure) {

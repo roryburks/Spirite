@@ -126,7 +126,9 @@ class SpriteLayerPanel(
         btnRemovePart.setIcon(SpiriteIcons.SmallIcons.Rig_Remove)
 
         btnNewPart.action = {evt ->
-            linkedSprite?.addPart("new", linked = evt.pressingShift)
+            val mode = if( evt.pressingShift) SpriteLayer.SpritePartAddMode.CreateLinked
+                else SpriteLayer.SpritePartAddMode.CreateDisjoint
+            linkedSprite?.addPart("new", mode = mode)
         }
         btnRemovePart.action = { evt ->
             activePart?.also { activePart ->

@@ -40,7 +40,7 @@ object SpriteLayerNormalizer {
                 val existingParts = sl.parts.map { it.partName }.toSet()
                 val missingParts = canonicalMap
                     .filter { !existingParts.contains(it.key)  }
-                missingParts.forEach { mp -> sl.addPart(mp.key, mp.value) }
+                missingParts.forEach { mp -> sl.addPart(mp.key, mp.value, SpriteLayer.SpritePartAddMode.CreateIfAbsent) }
             }
         }
 

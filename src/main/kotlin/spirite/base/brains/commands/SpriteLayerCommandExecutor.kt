@@ -113,4 +113,9 @@ object SpriteCommands {
     val FlattenMaglevs = SpriteCommand("flattenMaglevs"){ sprite, part, master ->
         SpriteLayerFixes.SpriteMaglevToDynamic(sprite)
     }
+
+    val FillInLinked = SpriteCommand("fill-in-linked") { sprite, part, master ->
+        //sprite.addPart()
+
+    }
 }
