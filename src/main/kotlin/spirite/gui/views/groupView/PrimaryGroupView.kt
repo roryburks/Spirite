@@ -173,6 +173,7 @@ private constructor(
         private val thumbnail = Hybrid.ui.ImageBox()
         private val thumbnailContract : IThumbnailAccessContract?
         private val editableLabel =  Hybrid.ui.EditableLabel(node.name)
+        private val littleLabel = Hybrid.ui.Label()
 
         init {
             thumbnailContract =  master.workspaceSet.currentWorkspace?.run {
@@ -185,12 +186,18 @@ private constructor(
 
             //editableLabel.opaque = false
             editableLabel.textBind.addObserver { new, _ -> node.name = new }
+            littleLabel.textSize = 8
+            if( (node as? GroupNode)?.flattened == true)
+                littleLabel.text = "FLAT"
 
             imp.setLayout {
                 rows += {
                     add(thumbnail, 32, 32)
                     addGap(2)
-                    add(editableLabel, height = 16)
+                    this += {
+                        add(editableLabel, height = 16)
+                        add(littleLabel, height = 10)
+                    }
                     height = 32
                 }
             }
@@ -210,7 +217,7 @@ private constructor(
 
     private val groupTreeObserver = object: TreeObserver {
         override fun treeStructureChanged(evt : TreeChangeEvent) {rebuild()}
-        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {_nodeMap[node]?.checked = node.isVisible}
+        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {_nodeMap[node]?.checked = node.isVisible;rebuild()}
     }
 
     private var treeObsK : IContract? = null
