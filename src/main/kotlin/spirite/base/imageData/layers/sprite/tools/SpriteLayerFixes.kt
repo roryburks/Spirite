@@ -1,6 +1,5 @@
-package spirite.base.brains.commands.specific
+package spirite.base.imageData.layers.sprite.tools
 
-import rb.extendo.dataStructures.SinglyList
 import rb.glow.Color
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.brains.toolset.ColorChangeMode

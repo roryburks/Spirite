@@ -1,4 +1,4 @@
-package spirite.base.brains.commands.specific.spriteLayers
+package spirite.base.imageData.layers.sprite.tools
 
 import rb.extendo.dataStructures.MutableSparseArray
 import rb.global.SuccessResponse

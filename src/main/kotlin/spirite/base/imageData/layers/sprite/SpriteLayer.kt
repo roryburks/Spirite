@@ -83,6 +83,7 @@ class SpriteLayer : Layer {
 
     lateinit var workspace: MImageWorkspace ; private set
     val undoEngine get() = workspace.undoEngine
+    /** Gets a list of SpriteParts that are pre-sorted by Depth */
     val parts : List<SpritePart> get() = _parts
     private val _parts = mutableListOf<SpritePart>()
     private var _workingId = 0
@@ -201,7 +202,7 @@ class SpriteLayer : Layer {
 
     override val imageDependencies: List<MediumHandle> get() = parts.map { it.handle }
     override fun getDrawList(isolator: IIsolator?): List<TransformedHandle> {
-        var base = parts
+        val base = parts
             .filter { it.isVisible }
             .filter { !DBGlobal.filterSet.contains(it.partName.first()) }
 

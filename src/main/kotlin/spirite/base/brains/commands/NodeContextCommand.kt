@@ -5,8 +5,8 @@ import rb.glow.gle.RenderMethod
 import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
-import spirite.base.brains.commands.specific.SpriteLayerFixes
-import spirite.base.brains.commands.specific.spriteLayers.SpriteLayerNormalizer
+import spirite.base.imageData.layers.sprite.tools.SpriteLayerFixes
+import spirite.base.imageData.layers.sprite.tools.SpriteLayerNormalizer
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation

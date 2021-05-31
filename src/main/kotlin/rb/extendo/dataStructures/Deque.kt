@@ -106,4 +106,19 @@ class Deque<T> : Iterable<T> {
 
     override fun iterator(): Iterator<T> = DequeueIterator(frontNode)
     fun backIterator(): Iterator<T> = DequeueIterator(frontNode)
+
+    companion object {
+        fun <T> From(t: T) : Deque<T> {
+            val deque = Deque<T>()
+            deque.addBack(t)
+            return deque
+        }
+
+        fun <T> From(it: Iterable<T>) : Deque<T> {
+            val deque = Deque<T>()
+            for (t in it)
+                deque.addBack(t)
+            return deque
+        }
+    }
 }
