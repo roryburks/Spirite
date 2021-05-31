@@ -275,7 +275,7 @@ object LoadEngine {
                     workspace.groupTree.addGroupNode(nodeLayer[depth - 1], name)
                             .apply {
                                 nodeLayer[depth] = this
-                                this.flatenned = flatenned
+                                this.flattened = flatenned
                             }
                 }
                 else -> {

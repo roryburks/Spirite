@@ -89,7 +89,7 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
             strokeParams.mode == BEHIND -> glgc.composite = DST_OVER
             strokeParams.mode == KEEP_ALPHA -> glgc.composite = SRC_ATOP
         }
-        println("${strokeParams.method} , ${strokeParams.mode} , ${glgc.composite}")
+        //println("${strokeParams.method} , ${strokeParams.mode} , ${glgc.composite}")
 
         glgc.applyPassProgram(StrokeApplyCall(strokeParams.color.rgbComponent, strokeParams.alpha * gc.alpha), image)
 

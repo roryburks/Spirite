@@ -95,7 +95,7 @@ class NodeRenderer(
                         when (child) {
                             is GroupNode -> {
                                 when {
-                                    flat || child.flatenned -> drawList.addAll(_getDrawListUnsorted(child, depth + 1, subIsolator, true))
+                                    flat || child.flattened -> drawList.addAll(_getDrawListUnsorted(child, depth + 1, subIsolator, true))
                                     else -> drawList.add(GroupDrawThing(depth, child, subIsolator))
                                 }
                             }

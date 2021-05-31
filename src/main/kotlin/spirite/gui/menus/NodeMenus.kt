@@ -46,7 +46,7 @@ object NodeMenus {
                     if( node.children.any { it is LayerNode && it.layer is SpriteLayer && it.layer.parts.any{ it.handle.medium is MaglevMedium} })
                         scheme.add(MenuItem("`Flatten All Magleve", NodeCommands.FlattenAllSprites))
 
-                    scheme.add(MenuItem(if(node.flatenned)"Unflatten Group Node" else "Flatten Group Node", NodeCommands.ToggleFlatness))
+                    scheme.add(MenuItem(if(node.flattened)"Unflatten Group Node" else "Flatten Group Node", NodeCommands.ToggleFlatness))
                 }
                 is LayerNode -> {
                     scheme.add(MenuItem("-"))

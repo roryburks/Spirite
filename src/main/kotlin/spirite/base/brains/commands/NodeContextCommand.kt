@@ -199,7 +199,7 @@ object NodeCommands {
     }
     val ToggleFlatness = NodeCommand("toggleFlatness") {workspace, node, dialogs ->
         val group = node as? GroupNode ?: throw CommandNotValidException
-        group.flatenned = !group.flatenned
+        group.flattened = !group.flattened
     }
 
     //region Sprite Layer

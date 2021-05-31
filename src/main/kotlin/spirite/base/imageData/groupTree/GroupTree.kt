@@ -1,6 +1,7 @@
 package spirite.base.imageData.groupTree
 
 import rb.extendo.dataStructures.Deque
+import rb.extendo.dataStructures.SinglySet
 import rb.extendo.extensions.then
 import rb.owl.IObservable
 import rb.owl.Observable
@@ -16,6 +17,7 @@ import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
+import spirite.base.imageData.undo.UndoableChangeDelegate
 import spirite.base.imageData.undo.UndoableDelegate
 import spirite.base.imageData.view.IViewSystem
 import kotlin.reflect.KProperty
@@ -247,7 +249,9 @@ open class GroupTree(
         private val _children = mutableListOf<Node>()
 
         val children: List<Node> get() = _children
-        var flatenned : Boolean by UndoableDelegate(false, undoEngine, "Toggled Group GroupNode Flattened")
+        var flattened : Boolean by UndoableChangeDelegate(false, undoEngine, "Toggled Group GroupNode Flattened") {
+            triggerChange( renderChanged = true)
+        }
 
         override val imageDependencies : Collection<MediumHandle> get() {
             val set = mutableSetOf<MediumHandle>()

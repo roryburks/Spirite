@@ -3,6 +3,9 @@ package spirite.base.imageData.undo
 import kotlin.reflect.KProperty
 
 
+/**
+ * A delegate that when the field is changed, creates and Undoable NullAction into the provided undoEngine
+ */
 class UndoableDelegate<T>(
         defaultValue : T,
         val undoEngine: IUndoEngine?,
@@ -25,6 +28,11 @@ class UndoableDelegate<T>(
     }
 }
 
+/**
+ * A delegate that when the field is changed, creates and Undoable NullAction into the provided undoEngine.  As well,
+ * when the underlying is changed (either by an external driven change or through the UndoEngine), causes an on-change
+ * trigger to be invoked.
+ */
 class UndoableChangeDelegate<T>(
         defaultValue : T,
         val undoEngine: IUndoEngine?,
@@ -54,6 +62,11 @@ class UndoableChangeDelegate<T>(
     }
 }
 
+/**
+ * A delegate that when the field is changed, creates and Undoable NullAction into the provided undoEngine.  This action
+ * will Stack on itself within the UndoEngine (meaning that if this field is changed repeatedly without any other Undo
+ * Action happening in between each change, they will coalesce into a single undo action initial_value -> final_value)
+ */
 class StackableUndoableDelegate<T>(
         defaultValue : T,
         val undoEngine: IUndoEngine?,
