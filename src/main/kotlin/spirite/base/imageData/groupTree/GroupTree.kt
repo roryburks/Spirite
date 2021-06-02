@@ -71,9 +71,9 @@ open class GroupTree(
 
     abstract class Node(
         val tree: GroupTree,
-        private val _trigger : IGroupTreeTrigger,
-        private val _viewSystem : IViewSystem,
-        private val _undoEngine : IUndoEngine?,
+        protected val _trigger : IGroupTreeTrigger,
+        protected val _viewSystem : IViewSystem,
+        protected val _undoEngine : IUndoEngine?,
         parent: GroupNode?,
         name: String)
     {
@@ -258,7 +258,7 @@ open class GroupTree(
         }
     }
 
-    inner class GroupNode(
+    class GroupNode(
         tree: GroupTree,
         trigger : IGroupTreeTrigger,
         viewSystem: IViewSystem,
@@ -292,13 +292,13 @@ open class GroupTree(
         }
 
         internal fun move( toMove: Node, newParent: GroupNode, newBefore: Node?) {
-            if( undoEngine == null) _move(toMove, newParent, newBefore)
+            if( _undoEngine == null) _move(toMove, newParent, newBefore)
             else {
                 val oldParent = this
                 val oldBefore = toMove.nextNode
 
-                undoEngine.performAndStore(object: NullAction() {
-                    override val description: String get() = "Add GroupNode to $treeDescription "
+                _undoEngine.performAndStore(object: NullAction() {
+                    override val description: String get() = "Add GroupNode to ${tree.treeDescription} "
                     override fun performAction() = _move(toMove, newParent, newBefore)
                     override fun undoAction() = newParent._move(toMove, oldParent, oldBefore)
                 })
@@ -313,17 +313,17 @@ open class GroupTree(
         }
 
         internal fun add(toAdd: Node, before: Node?) {
-            if( undoEngine == null) _add(toAdd, before)
+            if( _undoEngine == null) _add(toAdd, before)
             else {
-                undoEngine.performAndStore(object: NullAction() {
-                    override val description: String get() = "Add GroupNode to $treeDescription "
+                _undoEngine.performAndStore(object: NullAction() {
+                    override val description: String get() = "Add GroupNode to ${tree.treeDescription} "
 
                     override fun performAction() = _add(toAdd, before)
 
                     override fun undoAction() {
                         _remove(toAdd)
-                        if( selectedNode == toAdd)
-                            selectedNode = null
+                        if( tree.selectedNode == toAdd)
+                            tree.selectedNode = null
                     }
                 })
             }
@@ -345,16 +345,16 @@ open class GroupTree(
 
 
         internal fun remove( toRemove: Node) {
-            if( undoEngine == null) _remove(toRemove)
+            if( _undoEngine == null) _remove(toRemove)
             else {
                 val before = toRemove.nextNode
-                undoEngine.performAndStore(object: NullAction() {
-                    override val description: String get() = "Remove GroupNode from $treeDescription "
+                _undoEngine.performAndStore(object: NullAction() {
+                    override val description: String get() = "Remove GroupNode from ${tree.treeDescription} "
 
                     override fun performAction() {
                         _remove(toRemove)
-                        if( selectedNode == toRemove)
-                            selectedNode = null
+                        if( tree.selectedNode == toRemove)
+                            tree.selectedNode = null
                     }
 
                     override fun undoAction() = _add(toRemove, before)
@@ -368,7 +368,7 @@ open class GroupTree(
         }
     }
 
-    inner class LayerNode(
+     class LayerNode(
         tree: GroupTree,
         trigger: IGroupTreeTrigger,
         viewSystem: IViewSystem,
