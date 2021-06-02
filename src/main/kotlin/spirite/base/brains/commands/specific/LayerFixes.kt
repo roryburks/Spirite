@@ -24,7 +24,7 @@ object LayerFixes {
             }
         }
 
-        workspace.undoEngine.doAsAggregateAction("Mass Scaline") {
+        workspace.undoEngine.doAsAggregateAction("Mass Transform") {
             rec(node)
         }
     }

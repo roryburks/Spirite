@@ -217,7 +217,7 @@ private constructor(
 
     private val groupTreeObserver = object: TreeObserver {
         override fun treeStructureChanged(evt : TreeChangeEvent) {rebuild()}
-        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {_nodeMap[node]?.checked = node.isVisible;rebuild()}
+        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {_nodeMap[node]?.checked = node.isVisible}
     }
 
     private var treeObsK : IContract? = null
