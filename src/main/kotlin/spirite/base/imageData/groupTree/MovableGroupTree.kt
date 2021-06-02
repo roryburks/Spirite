@@ -21,7 +21,7 @@ open class MovableGroupTree(
     }
 
     fun addGroupNode( contextNode: Node?, name: String, behavior: InsertBehavior? = null) : GroupNode {
-        val new = GroupNode(null, name)
+        val new = makeGroupNode(null, name)
         insertNode(contextNode, new, behavior)
         return new
     }

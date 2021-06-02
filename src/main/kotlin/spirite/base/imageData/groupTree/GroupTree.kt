@@ -33,7 +33,7 @@ open class GroupTree(
         // everything that accesses view properties direct from the node
         val viewSystem: IViewSystem)
 {
-    val root = GroupNode(null, "ROOT")
+    val root : GroupNode
     open val treeDescription = "Abstract Group Tree"
 
     // TODO: right now this is coupled to the view system in an unpleasant way
@@ -57,14 +57,29 @@ open class GroupTree(
     val treeObservable : IObservable<TreeObserver> get() = _treeObs
     private val _treeObs = Observable<TreeObserver>()
 
-    protected fun triggerChange(evt : TreeChangeEvent) {_treeObs.trigger { it.treeStructureChanged(evt) }}
-    protected fun triggerNodeAttributeChanged( node:  Node, renderChanged: Boolean) {_treeObs.trigger { it.nodePropertiesChanged(node, renderChanged) }}
+    interface IGroupTreeTrigger
+    {
+        fun triggerChange(evt : TreeChangeEvent)
+        fun triggerNodeAttributeChanged( node:  Node, renderChanged: Boolean)
+    }
+    private val _trigger = object : IGroupTreeTrigger {
+        override fun triggerChange(evt: TreeChangeEvent) {_treeObs.trigger { it.treeStructureChanged(evt) } }
+        override fun triggerNodeAttributeChanged(node: Node, renderChanged: Boolean)
+            {_treeObs.trigger { it.nodePropertiesChanged(node, renderChanged) }}
+    }
     // endregion
 
-    abstract inner class Node( parent: GroupNode?, name: String) {
-        fun triggerChange( renderChanged: Boolean = true) = triggerNodeAttributeChanged(this, renderChanged)
+    abstract class Node(
+        val tree: GroupTree,
+        private val _trigger : IGroupTreeTrigger,
+        private val _viewSystem : IViewSystem,
+        private val _undoEngine : IUndoEngine?,
+        parent: GroupNode?,
+        name: String)
+    {
+        fun triggerChange( renderChanged: Boolean = true) = _trigger.triggerNodeAttributeChanged(this, renderChanged)
         // region Properties
-        private var view get() = viewSystem.get(this) ; set(value) {viewSystem.set(this, value)}
+        private var view get() = _viewSystem.get(this) ; set(value) {_viewSystem.set(this, value)}
 
         var visible get() = view.visible ; set(value)  {view = view.copy(visible = value)}
         var alpha get() = view.alpha ; set(value) {view = view.copy(alpha = value)}
@@ -72,8 +87,8 @@ open class GroupTree(
         var x get() = view.ox ; set(value) {view = view.copy(ox = value)}
         var y get() = view.oy ; set(value) {view = view.copy(oy = value)}
 
-        var expanded : Boolean by NodePropertyDelegate( true, undoEngine,"SmallExpanded/Contracted $treeDescription GroupNode", false)
-        var name : String by NodePropertyDelegate( name, undoEngine,"Changed $treeDescription GroupNode's Name", false)
+        var expanded : Boolean by NodePropertyDelegate( true, _undoEngine,"SmallExpanded/Contracted ${tree.treeDescription} GroupNode", false)
+        var name : String by NodePropertyDelegate( name, _undoEngine,"Changed ${tree.treeDescription} GroupNode's Name", false)
         val isVisible : Boolean get() = visible && alpha > 0f
 
         val tNodeToContext get() = ImmutableTransformF.Translation(x+0f, y+0f)
@@ -93,7 +108,7 @@ open class GroupTree(
             var field = defaultValue
                 set(value) {
                     field = value
-                    triggerNodeAttributeChanged(this@Node, isRenderPropert)
+                    _trigger.triggerNodeAttributeChanged(this@Node, isRenderPropert)
                 }
 
             operator fun getValue(thisRef: Any, prop: KProperty<*>): T = field
@@ -126,15 +141,13 @@ open class GroupTree(
             // Note: non-looping integrity is handled by the insert/change parent functionality
             var node : Node? = this
             var d = 0
-            while( node != root) {
+            while( node != tree.root) {
                 ++d
                 if( node == null) return -1
                 node = node.parent
             }
             return d
         }
-
-        val tree get() = this@GroupTree
 
         fun getDepthFrom( ancestor: Node) : Int {
             tailrec fun sub(nodeToTest: Node?, layer: Int = 0): Int = when (nodeToTest) {
@@ -245,7 +258,14 @@ open class GroupTree(
         }
     }
 
-    inner class GroupNode(parent: GroupNode?, name: String) : Node(parent, name) {
+    inner class GroupNode(
+        tree: GroupTree,
+        trigger : IGroupTreeTrigger,
+        viewSystem: IViewSystem,
+        undoEngine: IUndoEngine?,
+        parent: GroupNode?,
+        name: String) : Node(tree, trigger, viewSystem, undoEngine, parent, name)
+    {
         private val _children = mutableListOf<Node>()
 
         val children: List<Node> get() = _children
@@ -289,7 +309,7 @@ open class GroupTree(
             val oldParent = toMove.parent
             _remove( toMove, false)
             newParent._add( toMove, newBefore, false)
-            triggerChange(TreeChangeEvent(setOf(toMove, newParent, oldParent ?: toMove)))
+            _trigger.triggerChange(TreeChangeEvent(setOf(toMove, newParent, oldParent ?: toMove)))
         }
 
         internal fun add(toAdd: Node, before: Node?) {
@@ -320,7 +340,7 @@ open class GroupTree(
             }
             toAdd.parent = this
             if( trigger)
-                triggerChange(TreeChangeEvent(setOf(toAdd, this)))
+                _trigger.triggerChange(TreeChangeEvent(setOf(toAdd, this)))
         }
 
 
@@ -344,15 +364,18 @@ open class GroupTree(
         private fun _remove( toRemove: Node, trigger: Boolean = true) {
             val parent = toRemove.parent
             _children.remove( toRemove)
-            triggerChange(TreeChangeEvent(setOf(toRemove, parent ?: toRemove)))
+            _trigger.triggerChange(TreeChangeEvent(setOf(toRemove, parent ?: toRemove)))
         }
     }
 
     inner class LayerNode(
-            parent: GroupNode?,
-            name: String,
-            val layer: Layer)
-        : Node(parent, name)
+        tree: GroupTree,
+        trigger: IGroupTreeTrigger,
+        viewSystem: IViewSystem,
+        undoEngine: IUndoEngine?,
+        parent: GroupNode?,
+        name: String,
+        val layer: Layer) : Node(tree, trigger, viewSystem, undoEngine, parent, name)
     {
         override val imageDependencies: Collection<MediumHandle> get() = layer.imageDependencies
 
@@ -361,6 +384,15 @@ open class GroupTree(
             return layer.getDrawList().map { it.stack(transform) }
         }
     }
+
+    init {
+        root = GroupNode( this, _trigger, viewSystem, undoEngine, null, "ROOT")
+    }
+
+    fun makeLayerNode(parent: GroupNode?, name:String, layer: Layer) =
+        LayerNode(this, _trigger, viewSystem, undoEngine, parent, name, layer)
+    fun makeGroupNode(parent: GroupNode?, name: String) =
+        GroupNode(this, _trigger, viewSystem, undoEngine, parent, name)
 }
 
 fun GroupNode.traverse() : Sequence<Node> = GroupNodeTraversalSequence(this)

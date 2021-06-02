@@ -48,7 +48,7 @@ class PrimaryGroupTree(workspace: MImageWorkspace) : MovableGroupTree( workspace
     }
 
     fun importLayer( contextNode: Node?, name: String, layer:Layer, select: Boolean = true, behavior: InsertBehavior? = null) : LayerNode {
-        val layerNode = LayerNode(null, getNonDuplicateName(name), layer)
+        val layerNode = makeLayerNode(null, getNonDuplicateName(name), layer)
         insertNode( contextNode, layerNode, behavior)
 
         if( select)
