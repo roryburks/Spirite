@@ -22,7 +22,7 @@ import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChan
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.Node
 import spirite.base.util.linear.Rect
 import spirite.gui.views.animation.structureView.ffa.FfaStructBuilderFactory
 import spirite.gui.views.animation.structureView.ffa.IAnimDragBehavior

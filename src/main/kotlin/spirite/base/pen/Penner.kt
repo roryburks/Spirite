@@ -14,7 +14,7 @@ import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.drawer.IImageDrawer.*
-import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
@@ -121,7 +121,7 @@ class Penner(
 
                 // Shortcut level controls
                 if( holdingCtrl && holdingAlt) {
-                    val layer = (workspace.groupTree.selectedNode as? GroupTree.LayerNode)?.layer
+                    val layer = (workspace.groupTree.selectedNode as? LayerNode)?.layer
                     if( layer is SpriteLayer)  behavior = SpriteSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
                 }
 

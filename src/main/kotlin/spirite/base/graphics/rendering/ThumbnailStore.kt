@@ -19,7 +19,9 @@ import spirite.base.graphics.rendering.sources.MediumSource
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import java.lang.ref.WeakReference

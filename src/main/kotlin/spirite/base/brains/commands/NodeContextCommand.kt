@@ -10,9 +10,7 @@ import spirite.base.imageData.layers.sprite.tools.SpriteLayerNormalizer
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.groupTree.GroupTree.*
-import spirite.base.imageData.groupTree.MovableGroupTree
-import spirite.base.imageData.groupTree.duplicateInto
+import spirite.base.imageData.groupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure

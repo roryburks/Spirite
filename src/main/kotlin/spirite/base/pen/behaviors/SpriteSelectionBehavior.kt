@@ -8,8 +8,8 @@ import rb.vectrix.mathUtil.floor
 import spirite.base.brains.toolset.WorkspaceScope
 import spirite.base.brains.toolset.WorkspaceScope.*
 import spirite.base.imageData.groupTree.GroupTree
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.traverse
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
@@ -30,7 +30,7 @@ class SpriteSelectionBehavior(
         val y = penner.y
         val groupTree : GroupTree = penner.workspace?.groupTree ?: return
         val selectedNode = groupTree.selectedNode
-        val validSpriteLayers : Sequence<GroupTree.Node> = when(scope) {
+        val validSpriteLayers : Sequence<spirite.base.imageData.groupTree.Node> = when(scope) {
             Node -> (selectedNode)?.run { SinglySequence(this) } ?: emptySequence()
             Group -> {
                 val group = (selectedNode as? GroupNode) ?: selectedNode?.parent ?: return

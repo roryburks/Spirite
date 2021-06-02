@@ -4,7 +4,7 @@ package old.spirite.base.imageData.groupTree
 import old.TestHelper
 import org.junit.jupiter.api.Test
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.duplicateInto
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium

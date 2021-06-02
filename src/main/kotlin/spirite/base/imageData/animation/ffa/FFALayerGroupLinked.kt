@@ -3,18 +3,20 @@ package spirite.base.imageData.animation.ffa
 import rb.extendo.delegates.OnChangeDelegate
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.undo.UndoableChangeDelegate
 
 
 class FfaLayerGroupLinked(
-        context: FixedFrameAnimation,
-        val groupLink : GroupNode,
-        includeSubtrees: Boolean,
-        name: String = groupLink.name,
-        frameMap : Map<Node,FfaFrameStructure>? = null,
-        unlinkedClusters: List<UnlinkedFrameCluster>? = null,
-        asynchronous: Boolean = false)
+    context: FixedFrameAnimation,
+    val groupLink : GroupNode,
+    includeSubtrees: Boolean,
+    name: String = groupLink.name,
+    frameMap : Map<Node,FfaFrameStructure>? = null,
+    unlinkedClusters: List<UnlinkedFrameCluster>? = null,
+    asynchronous: Boolean = false)
     : FFALayer(context, asynchronous), IFFALayerLinked
 {
     // TODO: Make Undoable?
@@ -60,14 +62,14 @@ class FfaLayerGroupLinked(
         }.toMap()
 
     data class UnlinkedFrameCluster(
-            val nodeBefore: Node?,
-            val unlinkedFrames: List<FfaFrameStructure>)
+        val nodeBefore: Node?,
+        val unlinkedFrames: List<FfaFrameStructure>)
 
     private data class UnlinkedFrameClusterDetailed(
-            val nodeBefore: Node?,
-            val nodeAfter: Node?,
-            val parentNode: Node?,
-            val unlinkedFrames: List<FfaFrameStructure>)
+        val nodeBefore: Node?,
+        val nodeAfter: Node?,
+        val parentNode: Node?,
+        val unlinkedFrames: List<FfaFrameStructure>)
 
     private fun getUnlinkedNodeClusters() : List<UnlinkedFrameClusterDetailed> {
         val clusters = mutableListOf<UnlinkedFrameClusterDetailed>()
@@ -104,8 +106,8 @@ class FfaLayerGroupLinked(
     }
 
     private fun groupLinkImported(
-            links: Map<Node,FfaFrameStructure>? = null,
-            clusters: List<UnlinkedFrameCluster>? = null)
+        links: Map<Node,FfaFrameStructure>? = null,
+        clusters: List<UnlinkedFrameCluster>? = null)
     {
         buildFramesFromGroupTree(links ?: mapOf())
 

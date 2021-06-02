@@ -4,16 +4,18 @@ import rb.extendo.delegates.OnChangeDelegate
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.FRAME
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.GAP
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 
 class FfaLayerLexical
 constructor(
-        context: FixedFrameAnimation,
-        val groupLink: GroupNode,
-        lexicon: String = "",
-        name: String = groupLink.name,
-        val sharedExplicitMap: MutableMap<Char, Node> = mutableMapOf(),
-        asynchronous: Boolean = false)
+    context: FixedFrameAnimation,
+    val groupLink: GroupNode,
+    lexicon: String = "",
+    name: String = groupLink.name,
+    val sharedExplicitMap: MutableMap<Char, Node> = mutableMapOf(),
+    asynchronous: Boolean = false)
     : FFALayer(context, asynchronous), IFFALayerLinked
 {
     // TODO: Make Undoable?

@@ -22,7 +22,9 @@ import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked
 import spirite.base.imageData.animation.ffa.FfaLayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.magLev.MaglevFill
@@ -125,13 +127,13 @@ object SaveEngine {
             val depth = 0
             var met = 0
 
-            fun buildReferences( node: Node, depth: Int) {
+            fun buildReferences(node: Node, depth: Int) {
                 // Fills out a map from nodes to an int identifier (constructed here) for use in any nodes that
                 //  reference other nodes (such as ReferenceLayers)
                 context.nodeMap.put( node, met++)
                 (node as? GroupNode)?.children?.forEach { buildReferences(it, depth+1) }
             }
-            fun writeNode( node: Node, depth: Int) {
+            fun writeNode(node: Node, depth: Int) {
                 // [1] : Depth of GroupNode in GroupTree
                 ra.writeByte(depth)
 

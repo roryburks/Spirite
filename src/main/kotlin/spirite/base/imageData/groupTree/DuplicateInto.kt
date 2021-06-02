@@ -1,7 +1,6 @@
 package spirite.base.imageData.groupTree
 
 import rb.extendo.dataStructures.Deque
-import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.Bellow
 import spirite.base.util.StringUtil
 

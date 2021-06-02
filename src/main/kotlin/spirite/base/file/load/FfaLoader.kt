@@ -12,7 +12,9 @@ import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animation.ffa.IFfaLayer
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 
 
 object FfaLoader : IAnimationLoader {

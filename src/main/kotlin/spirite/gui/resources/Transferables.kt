@@ -2,7 +2,7 @@ package spirite.gui.resources
 
 import sgui.core.transfer.ITransferObject
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.Node
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException

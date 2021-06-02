@@ -16,7 +16,7 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animationSpaces.AnimationSpace
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 

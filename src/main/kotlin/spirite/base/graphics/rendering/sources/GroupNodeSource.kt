@@ -6,10 +6,10 @@ import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.Node
 
-data class GroupNodeSource( val group: GroupNode, override val workspace: IImageWorkspace) : IRenderSource {
+data class GroupNodeSource(val group: GroupNode, override val workspace: IImageWorkspace) : IRenderSource {
     override val defaultWidth: Int get() = workspace.width
     override val defaultHeight: Int get() = workspace.width
     override val imageDependencies: Collection<MediumHandle> get() = group.imageDependencies

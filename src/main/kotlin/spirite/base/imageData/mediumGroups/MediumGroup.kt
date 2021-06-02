@@ -1,7 +1,7 @@
 package spirite.base.imageData.mediumGroups
 
 import rb.extendo.dataStructures.SinglySet
-import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.undo.NullAction
 
 
@@ -9,8 +9,8 @@ class MediumGroup (){
     private val _groupObjects = mutableListOf<MediumGroupObject>()
 
     data class MediumGroupObject(
-            val node: GroupTree.Node,
-            val useFullHierarchy: Boolean)
+        val node: Node,
+        val useFullHierarchy: Boolean)
 
 
     // region Interactions

@@ -1,12 +1,13 @@
 package spirite.base.pen.behaviors
 
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.Node
 import spirite.base.pen.Penner
 
 
 class MovingNodeBehavior(
         penner: Penner,
-        val node: Node)
+        val node: Node
+)
     : PennerBehavior(penner)
 {
     override fun onStart() {}

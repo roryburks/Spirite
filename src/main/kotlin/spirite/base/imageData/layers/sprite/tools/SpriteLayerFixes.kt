@@ -4,19 +4,21 @@ import rb.glow.Color
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.magLev.MaglevColorChangeModule
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.mediums.magLev.util.MaglevConverter
 
 object SpriteLayerFixes {
-    fun CycleParts(group: GroupTree.GroupNode, partNames: List<String>,  met: Int, ws: IImageWorkspace){
+    fun CycleParts(group: GroupNode, partNames: List<String>, met: Int, ws: IImageWorkspace){
         ws.undoEngine.doAsAggregateAction("Cycle Sprite Parts $met")
         {
             val pnFilter = partNames.toHashSet()
             val spriteLayers = group.children
-                    .filterIsInstance<GroupTree.LayerNode>()
+                    .filterIsInstance<LayerNode>()
                     .map { it.layer }
                     .filterIsInstance<SpriteLayer>()
 
@@ -63,7 +65,7 @@ object SpriteLayerFixes {
         }
     }
 
-    fun colorChangeEntireNodeContext(node: GroupTree.Node, from: Color, to: Color, mode: ColorChangeMode, ws: IImageWorkspace) {
+    fun colorChangeEntireNodeContext(node: Node, from: Color, to: Color, mode: ColorChangeMode, ws: IImageWorkspace) {
         val maglevMediums = node.getLayerNodes()
                 .flatMap { it.layer.allArrangedData }
                 .filter { it.handle.medium is MaglevMedium }

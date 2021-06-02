@@ -3,7 +3,7 @@ package spirite.base.imageData.view
 import rb.glow.gle.RenderMethod
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
@@ -83,9 +83,9 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
 
 
     private inner class GenericNodeViewPropertyAction(
-            val node: Node,
-            val oldViewProperties: NodeViewProperties,
-            val newViewProperties: NodeViewProperties)
+        val node: Node,
+        val oldViewProperties: NodeViewProperties,
+        val newViewProperties: NodeViewProperties)
         : NullAction()
     {
         override val description: String get() = "Change GroupNode View Settings"
@@ -102,9 +102,9 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
     }
 
     private inner class NodeAlphaChangeAction(
-            val node: Node,
-            val orgAlpha: Float,
-            var newAlpha: Float)
+        val node: Node,
+        val orgAlpha: Float,
+        var newAlpha: Float)
         :NullAction(), StackableAction
     {
         override val description: String get() = "Change GroupNode Alpha"
@@ -124,9 +124,9 @@ class ViewSystem(private val _undoEngine : IUndoEngine) : IViewSystem
     }
 
     private inner class NodePositionChangeAction(
-            val node: Node,
-            val orgX: Int, val orgY: Int,
-            var newX: Int, var newY: Int)
+        val node: Node,
+        val orgX: Int, val orgY: Int,
+        var newX: Int, var newY: Int)
         :NullAction(), StackableAction
     {
         override val description: String get() = "Change GroupNode Position"

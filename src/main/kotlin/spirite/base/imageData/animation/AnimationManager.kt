@@ -10,6 +10,7 @@ import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.undo.NullAction
 
 

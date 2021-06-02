@@ -7,7 +7,9 @@ import rbJvm.owl.addWeakObserver
 import spirite.base.graphics.isolation.IIsolationManager.IsolationState
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 
@@ -94,12 +96,12 @@ class IsolationManager(
     }
 
     internal data class SpriteIsolationStruct(
-            val root: GroupNode,
-            val partName: String,
-            val isDrawn: Boolean,
-            val alpha: Float,
-            val includeSubtree: Boolean,
-            val inverted: Boolean)
+        val root: GroupNode,
+        val partName: String,
+        val isDrawn: Boolean,
+        val alpha: Float,
+        val includeSubtree: Boolean,
+        val inverted: Boolean)
     private  val _spriteIsolations  = mutableMapOf<Pair<GroupNode,String?>,SpriteIsolationStruct>()
 
     override fun getIsolationStateForSpritePartKind(root: GroupNode, partName: String): IsolationState {

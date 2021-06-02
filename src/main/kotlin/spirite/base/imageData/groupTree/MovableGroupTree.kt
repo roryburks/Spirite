@@ -20,13 +20,13 @@ open class MovableGroupTree(
         else -> context
     }
 
-    fun addGroupNode( contextNode: Node?, name: String, behavior: InsertBehavior? = null) : GroupNode {
+    fun addGroupNode(contextNode: Node?, name: String, behavior: InsertBehavior? = null) : GroupNode {
         val new = makeGroupNode(null, name)
         insertNode(contextNode, new, behavior)
         return new
     }
 
-    fun moveAbove( nodeToMove: Node, nodeAbove: Node) {
+    fun moveAbove(nodeToMove: Node, nodeAbove: Node) {
         if( nodeToMove.nextNode == nodeAbove) return
 
         val newParent = nodeAbove.parent
@@ -37,7 +37,7 @@ open class MovableGroupTree(
         moveNode(nodeToMove, newParent, nodeAbove)
     }
 
-    fun moveBelow( nodeToMove: Node, nodeUnder: Node) {
+    fun moveBelow(nodeToMove: Node, nodeUnder: Node) {
         if( nodeToMove.previousNode == nodeUnder) return
 
         val newParent = nodeUnder.parent
@@ -48,7 +48,7 @@ open class MovableGroupTree(
         moveNode(nodeToMove, newParent, nodeUnder.nextNode)
     }
 
-    fun moveInto( nodeToMove: Node, nodeInto: GroupNode, top: Boolean = false) {
+    fun moveInto(nodeToMove: Node, nodeInto: GroupNode, top: Boolean = false) {
         moveNode( nodeToMove, nodeInto, if( top) nodeInto.children.firstOrNull() else null)
     }
 
@@ -81,7 +81,7 @@ open class MovableGroupTree(
     }
 
 
-    protected fun moveNode( nodeToMove: Node, newParent: GroupNode, newBefore: Node?) {
+    protected fun moveNode(nodeToMove: Node, newParent: GroupNode, newBefore: Node?) {
         val parent = nodeToMove.parent
 
         if( newParent == nodeToMove) return

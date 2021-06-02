@@ -5,7 +5,7 @@ import rbJvm.glow.awt.ImageBI
 import spirite.sguiHybrid.Hybrid
 import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings
 import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings.Image
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.layers.Layer
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor

@@ -22,7 +22,10 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.menus.NodeMenus
 import spirite.gui.resources.SpiriteIcons
@@ -131,7 +134,7 @@ private constructor(
         override fun makeTransferable(t: Node): ITransferObject {return Transferables.NodeTransferObject(t)}
 
         override fun canDrag(): Boolean = true
-        override fun dragOut( t: Node, up: Boolean, inArea: Boolean) {}
+        override fun dragOut(t: Node, up: Boolean, inArea: Boolean) {}
         override fun canImport(trans: ITransferObject) = trans.dataTypes.contains(Transferables.NodeTransferObject.Key)
         override fun interpretDrop(trans: ITransferObject, dropInto: ITreeNode<Node>, dropDirection: DropDirection) {
             val node = trans.getData(Transferables.NodeTransferObject.Key) as? Node ?: return
@@ -153,7 +156,7 @@ private constructor(
 
     private inner class SpriteLayerNodeAttributes: BaseNodeAttributes() {
         override fun makeComponent(t: Node) = TreeComponent(t)
-        private inner class TreeComponent(t:Node) : BaseNodeTreeComponent(t) {
+        private inner class TreeComponent(t: Node) : BaseNodeTreeComponent(t) {
             override val component = SpriteLayerNodePanel(t, (t as LayerNode).layer as SpriteLayer, master)
 
             override fun onRename() {component.editableLabel.startEditing()}
@@ -163,9 +166,9 @@ private constructor(
 
     private inner class NodeLayerPanel
     private constructor(
-            val node: Node,
-            master: IMasterControl,
-            private val imp: ICrossPanel) : IComponent by imp
+        val node: Node,
+        master: IMasterControl,
+        private val imp: ICrossPanel) : IComponent by imp
     {
         constructor(node: Node, master: IMasterControl)
                 : this(node,  master, Hybrid.ui.CrossPanel())

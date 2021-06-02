@@ -4,7 +4,9 @@ import rb.glow.Color
 import rb.owl.bindable.addObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import kotlin.math.min
@@ -20,8 +22,8 @@ interface IPaletteMediumMap
     fun getSpriteMappings() : Map<Pair<GroupNode,String>,List<Color>>
 
     fun import(
-            nodeMappings: Map<Node,List<Color>>,
-            spriteMappings: Map<Pair<GroupNode,String>, List<Color>>)
+        nodeMappings: Map<Node,List<Color>>,
+        spriteMappings: Map<Pair<GroupNode,String>, List<Color>>)
 }
 
 class PaletteMediumMap(private val _workspace: IImageWorkspace)

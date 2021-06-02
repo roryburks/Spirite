@@ -5,21 +5,23 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
-import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.ArrangedMediumData
 
 object LayerFixes {
-    fun ApplyTransformAccrossNode(workspace: IImageWorkspace, node: GroupTree.Node, transform: ITransformF) {
-        fun rec(node: GroupTree.Node) {
-            if (node is GroupTree.LayerNode) {
+    fun ApplyTransformAccrossNode(workspace: IImageWorkspace, node: Node, transform: ITransformF) {
+        fun rec(node: Node) {
+            if (node is LayerNode) {
                 val layer = node.layer
                 val drawers = layer.imageDependencies.map { it.medium.getImageDrawer(ArrangedMediumData(it)) }
                 drawers
                         .filterIsInstance<IImageDrawer.ITransformModule>()
                         .forEach { it.transform(transform, false) }
             }
-            if (node is GroupTree.GroupNode) {
+            if (node is GroupNode) {
                 node.children.forEach { rec(it) }
             }
         }
@@ -29,7 +31,7 @@ object LayerFixes {
         }
     }
 
-    fun bakeOffset(workspace: IImageWorkspace, node: GroupTree.LayerNode) {
+    fun bakeOffset(workspace: IImageWorkspace, node: LayerNode) {
         val layer = node.layer
         val oldProperties = workspace.viewSystem.get(node)
         val ox = workspace.viewSystem.get(node).ox
