@@ -48,6 +48,7 @@ class Penner(
         val paletteManager: IPaletteManager)
     : IPenner
 {
+    var intContext: Int = 0
     val holdingSpace get() = Hybrid.keypressSystem.holdingSpace
     var holdingShift = false
     var holdingAlt = false

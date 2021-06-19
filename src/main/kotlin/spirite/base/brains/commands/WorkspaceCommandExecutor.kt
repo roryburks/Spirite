@@ -5,6 +5,7 @@ import spirite.base.brains.MWorkspaceSet
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.MImageWorkspace
 import spirite.gui.menus.dialogs.IDialog
+import spirite.sguiHybrid.SwHybrid
 
 class WorkspaceCommandExecutor (
         val workspaceSet: MWorkspaceSet,
@@ -41,16 +42,17 @@ class WorkspaceCommand(
 
 object WorkspaceCommands {
     val ToggleView = WorkspaceCommand("toggleView") {workspace, dialogs ->
-        when(workspace.viewSystem.view) {
-            0 -> workspace.viewSystem.view = 1
-            else -> workspace.viewSystem.view = 0
-        }
+        workspace.viewSystem.run { view = (view + 1 ) % numActiveViews }
     }
     val ResetOtherView = WorkspaceCommand("resetOtherViews") {workspace, _ ->
         workspace.viewSystem.resetOtherViews()
     }
     val CycleView = WorkspaceCommand("cycleView")  {workspace, dialog ->
-        workspace.viewSystem.run { view = (view + 1 ) % numActiveViews }
+        val key = SwHybrid.keypressSystem.lastAlphaNumPressed.toInt()
+        if( key > '0'.toInt() && key <= '9'.toInt()){
+            val num = key - '0'.toInt()
+            workspace.viewSystem.numActiveViews = num
+        }
     }
     val ResizeWorkspace = WorkspaceCommand("resize") {workspace, dialog ->
         val size = dialog.invokeWorkspaceSizeDialog("New Workspace") ?: return@WorkspaceCommand
