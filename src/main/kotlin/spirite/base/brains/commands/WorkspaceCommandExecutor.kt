@@ -42,16 +42,36 @@ class WorkspaceCommand(
 
 object WorkspaceCommands {
     val ToggleView = WorkspaceCommand("toggleView") {workspace, dialogs ->
-        workspace.viewSystem.run { view = (view + 1 ) % numActiveViews }
+        _steppedUp = false
+        val key = SwHybrid.keypressSystem.lastAlphaNumPressed.toInt()
+        if( key > '0'.toInt() && key <= '9'.toInt()){
+            val num = key - '0'.toInt()
+            workspace.viewSystem.numActiveViews = num
+            SwHybrid.keypressSystem.lastAlphaNumPressed = '-'
+        }
+        else {
+            workspace.viewSystem.run { view = (view + 1) % numActiveViews }
+        }
     }
     val ResetOtherView = WorkspaceCommand("resetOtherViews") {workspace, _ ->
         workspace.viewSystem.resetOtherViews()
     }
+
+
+    var _steppedUp = false
     val CycleView = WorkspaceCommand("cycleView")  {workspace, dialog ->
         val key = SwHybrid.keypressSystem.lastAlphaNumPressed.toInt()
         if( key > '0'.toInt() && key <= '9'.toInt()){
             val num = key - '0'.toInt()
             workspace.viewSystem.numActiveViews = num
+            SwHybrid.keypressSystem.lastAlphaNumPressed = '-'
+        }
+        else {
+            when (_steppedUp) {
+                false -> workspace.viewSystem.run { view = (view + 1) % numActiveViews }
+                true -> workspace.viewSystem.run { view = (view - 1 + numActiveViews) % numActiveViews }
+            }
+            _steppedUp = !_steppedUp
         }
     }
     val ResizeWorkspace = WorkspaceCommand("resize") {workspace, dialog ->

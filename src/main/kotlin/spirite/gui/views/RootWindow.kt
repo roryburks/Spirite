@@ -178,9 +178,11 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                         if (evt.keyCode == KeyEvent.VK_SPACE)
                             SwHybrid.keypressSystem.holdingSpace = true
 
-                        val asChar = vkToChar(evt.keyCode)
-                        if( asChar != null)
-                            SwHybrid.keypressSystem.lastAlphaNumPressed = asChar
+                        if( evt.isAltDown && ! evt.isControlDown && !evt.isShiftDown) {
+                            val asChar = vkToChar(evt.keyCode)
+                            if (asChar != null)
+                                SwHybrid.keypressSystem.lastAlphaNumPressed = asChar
+                        }
 
                         val key = evt.keyCode
                         val modifier = evt.modifiersEx
