@@ -8,6 +8,7 @@ import rb.glow.SColor
 import sgui.components.ITreeViewNonUI.ITreeNode
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
 import sgui.core.components.IComponentProvider
+import sgui.core.components.events.MouseEvent
 import sgui.core.transfer.ITransferObject
 import sgui.core.transfer.StringTransferObject
 
@@ -22,6 +23,7 @@ interface ITreeViewNonUI<T>{
     val selectedNode : ITreeNode<T>?
     val selectedBind : IBindable<T?>
     var selected : T?
+    var onClickHandler : (evt: MouseEvent, node: ITreeNode<T>?) -> Unit
 
     fun addRoot( value: T, attributes: ITreeNodeAttributes<T> ) : ITreeNode<T>
     fun removeRoot( toRemove: ITreeNode<T>)

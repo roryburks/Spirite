@@ -185,7 +185,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                         }
 
                         val key = evt.keyCode
-                        val modifier = evt.modifiersEx
+                        val modifier = evt.modifiersEx and 8191 // first 12 bits
 
                         val command = master.hotkeyManager.getCommand(Hotkey(key, modifier))
                         command?.apply { master.commandExecutor.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }

@@ -41,8 +41,7 @@ class WorkspaceCommand(
 }
 
 object WorkspaceCommands {
-    val ToggleView = WorkspaceCommand("toggleView") {workspace, dialogs ->
-        _steppedUp = false
+    val StepUpViewModule = WorkspaceCommand("view-mod-step") { workspace, _ ->
         val key = SwHybrid.keypressSystem.lastAlphaNumPressed.toInt()
         if( key > '0'.toInt() && key <= '9'.toInt()){
             val num = key - '0'.toInt()
@@ -50,35 +49,31 @@ object WorkspaceCommands {
             SwHybrid.keypressSystem.lastAlphaNumPressed = '-'
         }
         else {
-            workspace.viewSystem.run { view = (view + 1) % numActiveViews }
+            workspace.viewSystem.animScrollViewModule.step()
         }
     }
+
+    val ToggleViewModuleMode = WorkspaceCommand("view_mod-toggle")  { workspace, _ ->
+        workspace.viewSystem.animScrollViewModule.run { toggleMode = !toggleMode }
+    }
+
     val ResetOtherView = WorkspaceCommand("resetOtherViews") {workspace, _ ->
         workspace.viewSystem.resetOtherViews()
     }
 
 
-    var _steppedUp = false
-    val CycleView = WorkspaceCommand("cycleView")  {workspace, dialog ->
-        val key = SwHybrid.keypressSystem.lastAlphaNumPressed.toInt()
-        if( key > '0'.toInt() && key <= '9'.toInt()){
-            val num = key - '0'.toInt()
-            workspace.viewSystem.numActiveViews = num
-            SwHybrid.keypressSystem.lastAlphaNumPressed = '-'
-        }
-        else {
-            when (_steppedUp) {
-                false -> workspace.viewSystem.run { view = (view + 1) % numActiveViews }
-                true -> workspace.viewSystem.run { view = (view - 1 + numActiveViews) % numActiveViews }
-            }
-            _steppedUp = !_steppedUp
-        }
-    }
     val ResizeWorkspace = WorkspaceCommand("resize") {workspace, dialog ->
         val size = dialog.invokeWorkspaceSizeDialog("New Workspace") ?: return@WorkspaceCommand
         workspace.undoEngine.doAsAggregateAction("Resize Workspace") {
             workspace.width = size.width
             workspace.height = size.height
         }
+    }
+
+    val ViewScrollAnimViewUp = WorkspaceCommand("animViewMode-Up") { workspace, dialog ->
+        workspace.viewSystem.animScrollViewModule.shift(1)
+    }
+    val ViewScrollAnimViewDown = WorkspaceCommand("animViewMode-Down") { workspace, dialog ->
+        workspace.viewSystem.animScrollViewModule.shift(-1)
     }
 }

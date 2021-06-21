@@ -86,10 +86,12 @@ private val defaultHotkeys = mapOf(
         NodeCommands.MoveUp.keyCommand to (Hotkey(KeyEvent.VK_UP, CTRL)),
         NodeCommands.Duplicate.keyCommand to (Hotkey(KeyEvent.VK_U, CTRL)),
 
-        WorkspaceCommands.ToggleView.keyCommand to (Hotkey(KeyEvent.VK_TAB,0)),
-        WorkspaceCommands.CycleView.keyCommand to (Hotkey(KeyEvent.VK_TAB,  SHIFT)),
+        WorkspaceCommands.StepUpViewModule.keyCommand to (Hotkey(KeyEvent.VK_TAB,0)),
+        WorkspaceCommands.ToggleViewModuleMode.keyCommand to (Hotkey(KeyEvent.VK_TAB,  SHIFT)),
         WorkspaceCommands.ResetOtherView.keyCommand to (Hotkey(KeyEvent.VK_TAB, CTRL or SHIFT)),
         WorkspaceCommands.ResetOtherView.keyCommand to (Hotkey(KeyEvent.VK_TAB, CTRL)),
+    WorkspaceCommands.ViewScrollAnimViewDown.keyCommand to (Hotkey(KeyEvent.VK_UP, ALT)),
+    WorkspaceCommands.ViewScrollAnimViewUp.keyCommand to (Hotkey(KeyEvent.VK_DOWN, ALT)),
 
         IsolationCommand.TOGGLE_ISOLATION.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, 0)),
         IsolationCommand.ISOLATE_LAYER.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, CTRL)),
@@ -122,6 +124,7 @@ private val defaultHotkeys = mapOf(
         GlobalCommands.Cut.keyCommand to (Hotkey( KeyEvent.VK_X, CTRL)),
         GlobalCommands.Open.keyCommand to (Hotkey( KeyEvent.VK_O, CTRL)),
         GlobalCommands.NewWorkspace.keyCommand to (Hotkey( KeyEvent.VK_N, CTRL)),
+
 
         // DEBUG
         GlobalCommands.PurgeUndoHistory.keyCommand to (Hotkey(KeyEvent.VK_F11, ALT or SHIFT)),

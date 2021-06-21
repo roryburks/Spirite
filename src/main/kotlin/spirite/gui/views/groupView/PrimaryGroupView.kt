@@ -190,8 +190,16 @@ private constructor(
             //editableLabel.opaque = false
             editableLabel.textBind.addObserver { new, _ -> node.name = new }
             littleLabel.textSize = 8
-            if( (node as? GroupNode)?.flattened == true)
-                littleLabel.text = "FLAT"
+
+            if( node is GroupNode){
+                if( node.flattened)
+                    littleLabel.text = "FLAT"
+
+                val selected = workspace?.viewSystem?.animScrollViewModule?.selectedGroups ?: emptyList()
+                if( selected.contains(node))
+                    littleLabel.text = "A"
+
+            }
 
             imp.setLayout {
                 rows += {
@@ -235,21 +243,43 @@ private constructor(
             }
         })
 
+    init {
+        tree.onClickHandler = {evt, node ->
+            val ws = workspace
+            val altMode = evt.holdingAlt && !evt.holdingCtrl && !evt.holdingShift
+            if( evt.button == LEFT && node != null  && !altMode)
+                tree.selected = node.value
 
-    private val mouseHookK = Hybrid.mouseSystem.attachHook(object: IGlobalMouseHook {
-        override fun processMouseEvent(evt: MouseEvent) {
-            val point = evt.point.convert(tree)
+            if( node != null && ws != null) {
+                val spNode = node.value
+                if (evt.button == RIGHT && evt.type == RELEASED ) {
+                    println("A")
+                    master.contextMenus.LaunchContextMenu(evt.point, NodeMenus.schemeForNode(ws, spNode), spNode)
+                }
 
-            if( evt.button == RIGHT && evt.type == RELEASED) {
-                val ws = workspace ?: return
-                val node = tree.getNodeFromY(point.y)?.value
-                master.contextMenus.LaunchContextMenu(evt.point, NodeMenus.schemeForNode(ws, node), node)
-            }
-            else if(evt.button == LEFT && evt.type == RELEASED) {
-                val node = tree.getNodeFromY(point.y)?.value
-                tree.selected = node ?: tree.selected
+                if( altMode && spNode is GroupNode) {
+                    val on = evt.button == LEFT
+                    ws.viewSystem.animScrollViewModule.setGroup( spNode, on )
+                    rebuild()
+                }
             }
         }
-    }, tree)
+    }
+
+//    private val mouseHookK = Hybrid.mouseSystem.attachHook(object: IGlobalMouseHook {
+//        override fun processMouseEvent(evt: MouseEvent) {
+//            val point = evt.point.convert(tree)
+//
+//            if( evt.button == RIGHT && evt.type == RELEASED) {
+//                val ws = workspace ?: return
+//                val node = tree.getNodeFromY(point.y)?.value
+//                master.contextMenus.LaunchContextMenu(evt.point, NodeMenus.schemeForNode(ws, node), node)
+//            }
+//            else if(evt.button == LEFT && evt.type == RELEASED) {
+//                val node = tree.getNodeFromY(point.y)?.value
+//                tree.selected = node ?: tree.selected
+//            }
+//        }
+//    }, tree)
     // endregion
 }
