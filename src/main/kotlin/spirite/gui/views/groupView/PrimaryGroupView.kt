@@ -244,7 +244,7 @@ private constructor(
         })
 
     init {
-        tree.onClickHandler = {evt, node ->
+            tree.onClickHandler = {evt, node ->
             val ws = workspace
             val altMode = evt.holdingAlt && !evt.holdingCtrl && !evt.holdingShift
             if( evt.button == LEFT && node != null  && !altMode)
