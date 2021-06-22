@@ -7,9 +7,11 @@ import rb.glow.drawer
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.services.AnimationStateBind
 
 class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace,
-        AnimationState(11.1f, 3, 5.53f))
+        AnimationStateBind(11.1f, 3, 5.53f)
+)
 {
 
     override val startFrame: Float

@@ -18,7 +18,7 @@ import spirite.sguiHybrid.Hybrid
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
+import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer

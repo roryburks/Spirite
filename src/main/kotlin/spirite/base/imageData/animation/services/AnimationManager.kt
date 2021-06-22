@@ -1,4 +1,4 @@
-package spirite.base.imageData.animation
+package spirite.base.imageData.animation.services
 
 import rb.owl.IObservable
 import rb.owl.Observable
@@ -6,23 +6,27 @@ import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
 import rb.owl.observer
 import spirite.base.imageData.MImageWorkspace
-import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
-import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
+import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.FakeAnimation
+import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationObserver
+import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.undo.NullAction
 
 
-interface IAnimationManager {
+// The Animation Management Service manages the CRUD on Animation Data
+interface IAnimationManagementSvc {
     val animations : List<Animation>
 
     val currentAnimationBind : IBindable<Animation?>
     var currentAnimation : Animation?
 
-    fun addAnimation( animation: Animation, select: Boolean = true)
+    fun addAnimation(animation: Animation, select: Boolean = true)
     fun removeAnimation( animation: Animation)
 
+    // Bindings
     interface AnimationObserver {
         fun animationCreated( animation: Animation)
         fun animationRemoved( animation: Animation)
@@ -37,7 +41,7 @@ interface IAnimationManager {
 }
 
 
-class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
+class AnimationManager(val workspace : MImageWorkspace) : IAnimationManagementSvc {
     private val _animations = mutableListOf<Animation>()
     override val animations: List<Animation> get() = _animations
 
@@ -63,7 +67,7 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
         })
     }
 
-    private fun _addAnimation( animation: Animation, select: Boolean) {
+    private fun _addAnimation(animation: Animation, select: Boolean) {
         _animations.add(animation)
         if( select || currentAnimation == null)
             currentAnimation = animation

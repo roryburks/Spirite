@@ -63,7 +63,7 @@ object ExportGifCommand : AnimationCommand() {
             file = File(file.absolutePath + ".gif")
         }
 
-        ExportToGif.exportAnim(animation,file, animation.state.speed)
+        ExportToGif.exportAnim(animation,file, animation.stateBind.speed)
         return true
     }
 

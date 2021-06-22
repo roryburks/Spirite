@@ -322,8 +322,8 @@ object LoadEngine {
             if( animation != null) {
                 context.animations.add(animation)
                 context.workspace.animationManager.addAnimation(animation)
-                animation.state.speed = speed
-                animation.state.zoom = zoom
+                animation.stateBind.speed = speed
+                animation.stateBind.zoom = zoom
             }
         }
     }

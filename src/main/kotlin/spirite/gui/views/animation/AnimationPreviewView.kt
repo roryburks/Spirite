@@ -1,6 +1,7 @@
 package spirite.gui.views.animation
 
 import rb.global.IContract
+import rb.glow.gle.IGLEngine
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.owl.observer
@@ -8,10 +9,10 @@ import rb.vectrix.mathUtil.*
 import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
+import sgui.core.components.IComponentProvider
 import sgui.swing.SwIcon
 import sgui.swing.components.SJPanel
 import sguiSwing.components.SwComponent
-import spirite.sguiHybrid.Hybrid
 import sgui.core.systems.ITimer
 import sgui.core.systems.ITimerEngine
 import sgui.swing.jcolor
@@ -19,16 +20,22 @@ import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.AnimationUtil
-import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
+import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
+import spirite.sguiHybrid.Hybrid
 import java.awt.Graphics
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.round
 
-class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
+class AnimationPreviewView(
+    val masterControl: IMasterControl,
+    private val _ui : IComponentProvider = Hybrid.ui,
+    private val _gle : IGLEngine = Hybrid.gle
+) : IOmniComponent
+{
     override val component: IComponent get() = imp
     override val icon: SwIcon? get() = SpiriteIcons.BigIcons.Frame_AnimationScheme
     override val name: String get() = "Animation Preview"
@@ -40,21 +47,21 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     var offsetY by offsetYBind
 
     private val viewPanel = AnimationViewPanel()
-    private val btnPrev = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.BigIcons.Anim_StepB) }
-    private val btnPlay = Hybrid.ui.ToggleButton().also { it.setOffIcon(SpiriteIcons.BigIcons.Anim_Play) }
-    private val btnNext = Hybrid.ui.Button().also { it.setIcon(SpiriteIcons.BigIcons.Anim_StepF) }
-    private val btnRecenter = Hybrid.ui.Button("Center")
-    private val ffFps = Hybrid.ui.FloatField()
-    private val sliderMet = Hybrid.ui.Slider(0,100,0).also { it.snapsToTick = false }
-    private val bgColorBox = Hybrid.ui.ColorSquare(Skin.Global.Bg.scolor).also { it.setBasicBorder(BEVELED_RAISED) }
-    private val ifZoom = Hybrid.ui.IntField(allowsNegative = true).also { it.valueBind.addObserver { _,_ -> viewPanel.redraw()} }
-    private val zoomP = Hybrid.ui.Button("+").also { it.action = {++ifZoom.value} }
-    private val zoomM = Hybrid.ui.Button("-").also { it.action = {--ifZoom.value} }
-    private val ifMet = Hybrid.ui.IntField(allowsNegative =  false)
+    private val btnPrev = _ui.Button().also { it.setIcon(SpiriteIcons.BigIcons.Anim_StepB) }
+    private val btnPlay = _ui.ToggleButton().also { it.setOffIcon(SpiriteIcons.BigIcons.Anim_Play) }
+    private val btnNext = _ui.Button().also { it.setIcon(SpiriteIcons.BigIcons.Anim_StepF) }
+    private val btnRecenter = _ui.Button("Center")
+    private val ffFps = _ui.FloatField()
+    private val sliderMet = _ui.Slider(0,100,0).also { it.snapsToTick = false }
+    private val bgColorBox = _ui.ColorSquare(Skin.Global.Bg.scolor).also { it.setBasicBorder(BEVELED_RAISED) }
+    private val ifZoom = _ui.IntField(allowsNegative = true).also { it.valueBind.addObserver { _,_ -> viewPanel.redraw()} }
+    private val zoomP = _ui.Button("+").also { it.action = {++ifZoom.value} }
+    private val zoomM = _ui.Button("-").also { it.action = {--ifZoom.value} }
+    private val ifMet = _ui.IntField(allowsNegative =  false)
 
     val bgColor by bgColorBox.colorBind
 
-    private val imp = Hybrid.ui.CrossPanel {
+    private val imp = _ui.CrossPanel {
         rows += {
             add( viewPanel, flex = 800f)
             flex = 800f
@@ -68,11 +75,11 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
             add(btnNext, width = 24, height = 24)
             addGap(5)
             add(ffFps, width = 128, height = 24)
-            add(Hybrid.ui.Label("FPS"))
+            add(_ui.Label("FPS"))
             addGap(3)
             add(bgColorBox, width = 24, height = 24)
             addGap(10)
-            add(Hybrid.ui.Label("Zoom:"))
+            add(_ui.Label("Zoom:"))
             add(ifZoom, height = 24, width = 28)
             this += {
                 add(zoomP, width = 12, height =  12)
@@ -91,7 +98,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
     // region Timer Stuff
     private val _timing : ITimerEngine get() = Hybrid.timing
-    private val _timer : ITimer = _timing.createTimer(15, true) {Hybrid.gle.runInGLContext { tick()}}
+    private val _timer : ITimer = _timing.createTimer(15, true) {_gle.runInGLContext { tick()}}
 
     private var _prevTime : Long? = null
     private fun tick() {
@@ -106,7 +113,7 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         // Uptick the animation using the actual ms passed, rather than relying it on being close to 15
         val now = _timing.currentMilli
         val actualMsElapsed = if( prevTime == null) 15 else now - prevTime
-        anim.state.met = anim.state.met + anim.state.speed/(1000f/actualMsElapsed)
+        anim.stateBind.met = anim.stateBind.met + anim.stateBind.speed/(1000f/actualMsElapsed)
         _prevTime = now
     }
     // endregion
@@ -163,11 +170,11 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
 
     private fun rebind(anim: Animation)
     {
-        _fpsK = ffFps.valueBind.bindTo(anim.state.speedBind)
-        _metK = metBind.bindTo(anim.state.metBind)
-        _zoomK = ifZoom.valueBind.bindTo(anim.state.zoomBind)
-        _offsetXK = offsetXBind.bindTo(anim.state.offsetXBind)
-        _offsetYK = offsetYBind.bindTo(anim.state.offsetYBind)
+        _fpsK = ffFps.valueBind.bindTo(anim.stateBind.speedBind)
+        _metK = metBind.bindTo(anim.stateBind.metBind)
+        _zoomK = ifZoom.valueBind.bindTo(anim.stateBind.zoomBind)
+        _offsetXK = offsetXBind.bindTo(anim.stateBind.offsetXBind)
+        _offsetYK = offsetYBind.bindTo(anim.stateBind.offsetYBind)
     }
     // endregion
 
@@ -185,8 +192,8 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         viewPanel.onMouseDrag += {
             val nowX = curX
             if( nowX != null && Hybrid.keypressSystem.holdingSpace) {
-                offsetX -= ((it.point.x - nowX) * (animation?.state?.zoomF ?: 1f)).round
-                offsetY -= ((it.point.y - curY) * (animation?.state?.zoomF ?: 1f)).round
+                offsetX -= ((it.point.x - nowX) * (animation?.stateBind?.zoomF ?: 1f)).round
+                offsetY -= ((it.point.y - curY) * (animation?.stateBind?.zoomF ?: 1f)).round
                 curX = it.point.x
                 curY = it.point.y
             }
@@ -229,8 +236,8 @@ class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
         buildFromAnim(masterControl.workspaceSet.currentWorkspace?.animationManager?.currentAnimation)
 
         bgColorBox.colorBind.addObserver { _, _ -> viewPanel.redraw() }
-        btnNext.action = {animation?.also {it.state.met = MathUtil.cycle(it.startFrame, it.endFrame, it.state.met + 1f)  }}
-        btnPrev.action = {animation?.also {it.state.met = MathUtil.cycle(it.startFrame, it.endFrame, it.state.met - 1f)  }}
+        btnNext.action = {animation?.also {it.stateBind.met = MathUtil.cycle(it.startFrame, it.endFrame, it.stateBind.met + 1f)  }}
+        btnPrev.action = {animation?.also {it.stateBind.met = MathUtil.cycle(it.startFrame, it.endFrame, it.stateBind.met - 1f)  }}
         btnRecenter.action = {
             (animation as? FixedFrameAnimation)?.run {
                 val drawBoundary = AnimationUtil.getAnimationBoundaries(this)
@@ -262,10 +269,10 @@ private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationView
             Hybrid.gle.runInGLContext {
                 val image = Hybrid.imageCreator.createImage(width, height)
                 val gc = image.graphics
-                gc.preScale(anim.state.zoomF.d, anim.state.zoomF.d)
-                gc.preTranslate(anim.state.offsetX.d, anim.state.offsetY.d)
+                gc.preScale(anim.stateBind.zoomF.d, anim.stateBind.zoomF.d)
+                gc.preTranslate(anim.stateBind.offsetX.d, anim.stateBind.offsetY.d)
 
-                anim.drawFrame(gc,anim.state.met)
+                anim.drawFrame(gc,anim.stateBind.met)
 
                 val bi = Hybrid.imageConverter.convert(image,ImageBI::class) as ImageBI
                 image.flush()

@@ -13,8 +13,8 @@ import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
-import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
+import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationObserver
+import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationStructureChangeObserver
 import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver

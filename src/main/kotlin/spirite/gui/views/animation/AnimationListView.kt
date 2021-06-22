@@ -14,7 +14,7 @@ import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.*
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
+import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.menus.MenuItem
