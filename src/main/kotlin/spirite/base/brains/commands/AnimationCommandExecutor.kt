@@ -57,7 +57,8 @@ object ExportGifCommand : AnimationCommand() {
     override val name: String get() = "exportAsGif"
 
     override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
-        val anim = animation as? FixedFrameAnimation ?: return false
+        if (animation !is FixedFrameAnimation)
+            return false
         var file = master.dialog.pickFile(GIF) ?: return false
         if( file.extension == "") {
             file = File(file.absolutePath + ".gif")

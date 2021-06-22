@@ -3,6 +3,7 @@ package spirite.gui.views.animation
 import rb.global.IContract
 import rb.glow.gle.IGLEngine
 import rb.owl.bindable.Bindable
+import rb.owl.bindable.PushPullBind
 import rb.owl.bindable.addObserver
 import rb.owl.observer
 import rb.vectrix.mathUtil.*
@@ -22,6 +23,7 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.AnimationUtil
 import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.base.imageData.animation.services.AnimationStateBind
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
 import spirite.sguiHybrid.Hybrid
@@ -40,11 +42,8 @@ class AnimationPreviewView(
     override val icon: SwIcon? get() = SpiriteIcons.BigIcons.Frame_AnimationScheme
     override val name: String get() = "Animation Preview"
 
+    private val _controller = AnimationPreviewViewController()
 
-    val offsetXBind = Bindable(0)
-    val offsetYBind = Bindable(0)
-    var offsetX by offsetXBind
-    var offsetY by offsetYBind
 
     private val viewPanel = AnimationViewPanel()
     private val btnPrev = _ui.Button().also { it.setIcon(SpiriteIcons.BigIcons.Anim_StepB) }
@@ -108,12 +107,11 @@ class AnimationPreviewView(
 
         // Return if not playing
         if( !btnPlay.checked) return
-        val anim = animation ?: return
 
         // Uptick the animation using the actual ms passed, rather than relying it on being close to 15
         val now = _timing.currentMilli
         val actualMsElapsed = if( prevTime == null) 15 else now - prevTime
-        anim.stateBind.met = anim.stateBind.met + anim.stateBind.speed/(1000f/actualMsElapsed)
+        _controller.advanceAnimation(actualMsElapsed)
         _prevTime = now
     }
     // endregion
@@ -121,8 +119,16 @@ class AnimationPreviewView(
 
     // region Bindings
     init {
-        offsetXBind.addObserver { _, _ -> viewPanel.redraw() }
-        offsetYBind.addObserver { _, _ -> viewPanel.redraw() }
+        _controller.animBind.offsetXBind.addObserver { _, _ -> viewPanel.redraw() }
+        _controller.animBind.offsetYBind.addObserver { _, _ -> viewPanel.redraw() }
+
+        _controller.animBind.metBind
+            .addObserver { new, _ ->
+                sliderMet.value = ((new % (_controller.animation?.endFrame ?: 0f)) * 100).floor
+                viewPanel.redraw()
+            }
+        _controller.animBind.metBind
+            .addObserver { new, _ ->ifMet.value = (new  % (_controller.animation?.endFrame ?: 0f)) .floor}
     }
 
     private val _curAnimK = masterControl.centralObservatory.currentAnimationBind.addObserver { new, _ ->
@@ -132,50 +138,20 @@ class AnimationPreviewView(
     private val _animStructObsK = masterControl.centralObservatory.trackingAnimationStateObserver.addObserver(
         object : AnimationStructureChangeObserver {
             override fun animationStructureChanged(animation: Animation) {
-                if( animation == this@AnimationPreviewView.animation) {
+                if( animation == this@AnimationPreviewView._controller.animation) {
                     updateSlider()
                 }
             }
         }.observer()
     )
-    var animation : Animation? = null
 
-    private val metBind = Bindable(0f)
-            .also { it.addObserver { new, _ ->
-                sliderMet.value = ((new % (animation?.endFrame ?: 0f)) * 100).floor
-                viewPanel.redraw()
-            } }
     init {
-        sliderMet.onMouseDrag += {  metBind.field = sliderMet.value / 100f }
-        sliderMet.onMouseRelease +=  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
-        btnPlay.checkBind.addObserver { new, _ -> if(!new) metBind.field = floor(metBind.field) }
-        metBind.addObserver { new, _ ->ifMet.value = (new  % (animation?.endFrame ?: 0f)) .floor}
-    }
-
-    private var _fpsK : IContract? = null
-    private var _zoomK : IContract? = null
-    private var _metK : IContract? = null
-    private var _offsetXK : IContract? = null
-    private var _offsetYK : IContract? = null
-
-    private fun unbind() {
-        _fpsK?.void()
-        _metK?.void()
-        _zoomK?.void()
-        _offsetXK?.void()
-        _offsetYK?.void()
+        sliderMet.onMouseDrag += {  _controller.animBind.met = sliderMet.value / 100f }
+        sliderMet.onMouseRelease +=  {it -> if( !btnPlay.checked) _controller.animBind.met = round(_controller.animBind.met) }
+        btnPlay.checkBind.addObserver { new, _ -> if(!new) _controller.animBind.met = floor(_controller.animBind.met) }
     }
 
     var i = 1.0f
-
-    private fun rebind(anim: Animation)
-    {
-        _fpsK = ffFps.valueBind.bindTo(anim.stateBind.speedBind)
-        _metK = metBind.bindTo(anim.stateBind.metBind)
-        _zoomK = ifZoom.valueBind.bindTo(anim.stateBind.zoomBind)
-        _offsetXK = offsetXBind.bindTo(anim.stateBind.offsetXBind)
-        _offsetYK = offsetYBind.bindTo(anim.stateBind.offsetYBind)
-    }
     // endregion
 
     // region Mouse Controls
@@ -192,8 +168,8 @@ class AnimationPreviewView(
         viewPanel.onMouseDrag += {
             val nowX = curX
             if( nowX != null && Hybrid.keypressSystem.holdingSpace) {
-                offsetX -= ((it.point.x - nowX) * (animation?.stateBind?.zoomF ?: 1f)).round
-                offsetY -= ((it.point.y - curY) * (animation?.stateBind?.zoomF ?: 1f)).round
+                _controller.animBind.offsetX -= ((it.point.x - nowX) * (_controller.animBind.zoomF ?: 1f)).round
+                _controller.animBind.offsetY -= ((it.point.y - curY) * (_controller.animBind.zoomF ?: 1f)).round
                 curX = it.point.x
                 curY = it.point.y
             }
@@ -204,16 +180,13 @@ class AnimationPreviewView(
     // endregion
 
     private fun buildFromAnim( anim: Animation?) {
-        animation = anim
-
-        unbind()
+        _controller.setAnimation(anim)
         updateSlider()
-        if( anim != null) rebind(anim)
     }
 
 
     private fun updateSlider() {
-        val anim = animation
+        val anim = _controller.animation
 
         if( anim != null) {
             sliderMet.min = (100 * anim.startFrame).floor
@@ -233,25 +206,68 @@ class AnimationPreviewView(
     init {
         imp.ref = this
         viewPanel.imp.context = this
+        viewPanel.imp.controller = _controller
         buildFromAnim(masterControl.workspaceSet.currentWorkspace?.animationManager?.currentAnimation)
 
         bgColorBox.colorBind.addObserver { _, _ -> viewPanel.redraw() }
-        btnNext.action = {animation?.also {it.stateBind.met = MathUtil.cycle(it.startFrame, it.endFrame, it.stateBind.met + 1f)  }}
-        btnPrev.action = {animation?.also {it.stateBind.met = MathUtil.cycle(it.startFrame, it.endFrame, it.stateBind.met - 1f)  }}
+        btnNext.action = {_controller.offsetAnimation(1f, true)}
+        btnPrev.action = {_controller.offsetAnimation(-1f, true)}
         btnRecenter.action = {
-            (animation as? FixedFrameAnimation)?.run {
+            (_controller.animation as? FixedFrameAnimation)?.run {
                 val drawBoundary = AnimationUtil.getAnimationBoundaries(this)
-                offsetX = -drawBoundary.x1i
-                offsetY = -drawBoundary.y1i
+                _controller.animBind.offsetX = -drawBoundary.x1i
+                _controller.animBind.offsetY = -drawBoundary.y1i
             }
         }
+        ffFps.valueBind.bindTo(_controller.animBind.speedBind)
     }
 
     override fun close() {
-        unbind()
+        _controller.setAnimation(null) // Unsets Binds
         _curAnimK.void()
         _animStructObsK.void()
         _timer.stop()
+    }
+}
+
+private class AnimationPreviewViewController {
+    var animation: Animation? = null ; private set
+    val animBind : AnimationStateBind = AnimationStateBind()
+    private var bindContracts : List<IContract> = emptyList()
+
+    fun setAnimation(anim: Animation?) {
+        if( anim == animation)
+            return
+
+        if( anim == null) {
+            bindContracts.forEach { it.void() }
+            bindContracts = emptyList()
+        }
+        else {
+            val stateBind = anim.workspace.animationStateSvc.getState(anim)
+            bindContracts = listOf(
+                PushPullBind(animBind.metBind, stateBind.metBind),
+                PushPullBind(animBind.zoomBind, stateBind.zoomBind),
+                PushPullBind(animBind.offsetXBind, stateBind.offsetXBind),
+                PushPullBind(animBind.offsetYBind, stateBind.offsetYBind),
+                PushPullBind(animBind.speedBind, stateBind.speedBind) )
+        }
+
+        animation = anim
+    }
+
+    fun offsetAnimation(offset: Float, round: Boolean = false ) {
+        val anim = animation ?: return
+        val state = anim.workspace.animationStateSvc.getState(anim)
+        val unrounded = MathUtil.cycle(anim.startFrame, anim.endFrame, state.met + offset)
+        state.met = if( round) round(unrounded) else unrounded
+    }
+
+    fun advanceAnimation(elapsedMs: Long) {
+        val anim = animation ?: return
+        val state = anim.workspace.animationStateSvc.getState(anim)
+        state.met = state.met + state.speed/(1000f/elapsedMs)
+        println(state.speed)
     }
 }
 
@@ -259,20 +275,24 @@ private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationView
 
     class AnimationViewPanelImp : SJPanel() {
         var context : AnimationPreviewView? = null
+        var controller: AnimationPreviewViewController? = null
 
         override fun paintComponent(g: Graphics) {
             val context = context ?: return
-            val anim = context.animation ?: return
+            val controller = controller?: return
+            val anim = controller.animation ?: return
+            val animState = anim.workspace.animationStateSvc.getState(anim)
+
             g.color = context.bgColor.jcolor
             g.fillRect(0,0,width, height)
 
             Hybrid.gle.runInGLContext {
                 val image = Hybrid.imageCreator.createImage(width, height)
                 val gc = image.graphics
-                gc.preScale(anim.stateBind.zoomF.d, anim.stateBind.zoomF.d)
-                gc.preTranslate(anim.stateBind.offsetX.d, anim.stateBind.offsetY.d)
+                gc.preScale(animState.zoomF.d, animState.zoomF.d)
+                gc.preTranslate(animState.offsetX.d, animState.offsetY.d)
 
-                anim.drawFrame(gc,anim.stateBind.met)
+                anim.drawFrame(gc,animState.met)
 
                 val bi = Hybrid.imageConverter.convert(image,ImageBI::class) as ImageBI
                 image.flush()

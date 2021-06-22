@@ -129,7 +129,7 @@ class ImageWorkspace(
     override val viewSystem: IViewSystem = ViewSystem(undoEngine)
     override val groupTree = PrimaryGroupTree(this) // Needs to be after ViewSystem, UndoEngine
     override val animationManager: IAnimationManagementSvc = AnimationManager(this)
-    override val animationStateSvc: IAnimationStateSvc = AnimationStateSvc()
+    override val animationStateSvc: IAnimationStateSvc = AnimationStateSvc(animationManager) // Needs to be after AnimManager
     override val selectionEngine: ISelectionEngine
     override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet = paletteManager.makePaletteSet()
