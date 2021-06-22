@@ -244,7 +244,6 @@ private class AnimationPreviewViewController {
             bindContracts = emptyList()
         }
         else {
-            println("Before: ${animBind.met}, ${animBind.speed}")
             val stateBind = anim.workspace.animationStateSvc.getState(anim)
             bindContracts = listOf(
                 PushPullBind(animBind.metBind, stateBind.metBind),
@@ -252,7 +251,6 @@ private class AnimationPreviewViewController {
                 PushPullBind(animBind.offsetXBind, stateBind.offsetXBind),
                 PushPullBind(animBind.offsetYBind, stateBind.offsetYBind),
                 PushPullBind(animBind.speedBind, stateBind.speedBind) )
-            println("After: ${animBind.met}, ${animBind.speed}")
         }
 
         animation = anim
