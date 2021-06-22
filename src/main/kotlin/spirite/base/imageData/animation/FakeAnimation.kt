@@ -9,9 +9,7 @@ import rb.vectrix.mathUtil.d
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.services.AnimationStateBind
 
-class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace,
-        AnimationStateBind(11.1f, 3, 5.53f)
-)
+class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace)
 {
 
     override val startFrame: Float

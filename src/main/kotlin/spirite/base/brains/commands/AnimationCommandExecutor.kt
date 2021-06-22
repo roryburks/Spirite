@@ -64,7 +64,8 @@ object ExportGifCommand : AnimationCommand() {
             file = File(file.absolutePath + ".gif")
         }
 
-        ExportToGif.exportAnim(animation,file, animation.stateBind.speed)
+        val stateBind = workspace.animationStateSvc.getState(animation)
+        ExportToGif.exportAnim(animation,file, stateBind.speed)
         return true
     }
 

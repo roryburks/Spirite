@@ -351,9 +351,10 @@ object SaveEngine {
 
                 when( anim) {
                     is FixedFrameAnimation -> {
+                        val state = anim.workspace.animationStateSvc.getState(anim)
                         ra.write(SaveLoadUtil.strToByteArrayUTF8(anim.name))    // [n] Anim name
-                        ra.writeFloat(anim.stateBind.speed)                         // [4] : Anim Speed
-                        ra.writeShort(anim.stateBind.zoom)                          // [2] : Anim Zoom
+                        ra.writeFloat(state.speed)                         // [4] : Anim Speed
+                        ra.writeShort(state.zoom)                          // [2] : Anim Zoom
                         ra.writeByte(SaveLoadUtil.ANIM_FFA)                     // [1] : Anim TypeId
 
                         if(anim.layers.size > MaxFFALayers) MDebug.handleWarning(UNSUPPORTED, "Too many Animation layers (num: ${anim.layers.size} max: $MaxFFALayers), taking only the first N")

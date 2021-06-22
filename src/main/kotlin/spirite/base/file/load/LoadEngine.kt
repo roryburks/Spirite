@@ -322,8 +322,9 @@ object LoadEngine {
             if( animation != null) {
                 context.animations.add(animation)
                 context.workspace.animationManager.addAnimation(animation)
-                animation.stateBind.speed = speed
-                animation.stateBind.zoom = zoom
+                val stateBind = context.workspace.animationStateSvc.getState(animation)
+                stateBind.speed = speed
+                stateBind.zoom = zoom
             }
         }
     }

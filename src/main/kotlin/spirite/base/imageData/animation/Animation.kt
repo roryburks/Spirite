@@ -6,11 +6,7 @@ import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.services.AnimationStateBind
 
-abstract class Animation(
-        name : String,
-        var workspace : IImageWorkspace,
-        val stateBind: AnimationStateBind
-)
+abstract class Animation( name : String, var workspace : IImageWorkspace )
 {
     val nameBind = Bindable(name)
     var name by nameBind
@@ -26,8 +22,8 @@ abstract class Animation(
     abstract fun dupe(): Animation
 }
 
-abstract class MediumBasedAnimation(name : String, workspace : IImageWorkspace, stateBind: AnimationStateBind = AnimationStateBind())
-    : Animation(name, workspace, stateBind)
+abstract class MediumBasedAnimation(name : String, workspace : IImageWorkspace)
+    : Animation(name, workspace)
 {
 
     abstract fun getDrawList( t: Float) : List<TransformedHandle>
