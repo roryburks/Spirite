@@ -2,6 +2,8 @@ package spirite.base.imageData.view
 
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.ffa.FfaLayerLexical
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.undo.IUndoEngine
@@ -9,6 +11,7 @@ import spirite.base.imageData.undo.IUndoEngine
 interface IAnimScrollViewModule {
     val selectedGroups : List<GroupNode>
     fun setGroup(group : GroupNode, on: Boolean)
+    fun toggle(anim: FixedFrameAnimation) : Boolean
 
     var toggleMode: Boolean
     fun step()
@@ -22,6 +25,7 @@ class AnimScrollViewModule(
     private val _undoEngine : IUndoEngine)
     : IAnimScrollViewModule
 {
+    private val _ffas : MutableSet<FixedFrameAnimation> = mutableSetOf()
     private val _selectedGroups : MutableSet<GroupNode> = mutableSetOf()
     private var _toggleAnchor: Int = -1
 
@@ -32,6 +36,17 @@ class AnimScrollViewModule(
             _selectedGroups.add(group)
         else
             _selectedGroups.remove(group)
+    }
+
+    override fun toggle(anim: FixedFrameAnimation): Boolean {
+        if( _ffas.contains(anim)){
+            _ffas.remove(anim)
+            return false
+        }
+        else {
+            _ffas.add(anim)
+            return true
+        }
     }
 
     override var toggleMode: Boolean
@@ -59,7 +74,6 @@ class AnimScrollViewModule(
         _undoEngine.doAsAggregateAction("AnimShift View by $offset") {
             for( group in _selectedGroups) {
                 val layerNodes = group.children.filterIsInstance<LayerNode>()
-                val m = layerNodes.filter { it.isVisible }
                 for (viewNum in (0 until _context.numActiveViews)) {
                     // Cycle Properties
                     val remap = (0 until numNodesInContext)
@@ -77,8 +91,30 @@ class AnimScrollViewModule(
                     }
                 }
 
-                val n = layerNodes.filter { it.isVisible }
-                println(n)
+                _ffas.forEach { ffa ->
+                    val lexLayers = ffa.layers
+                        .filterIsInstance<FfaLayerLexical>()
+                        .filter { it.groupLink == group  }
+
+                    val chars  = layerNodes
+                        .mapIndexed { index, layerNode ->
+                            val isTheGuy = (0 until _context.numActiveViews)
+                                .any {
+                                    val viewState = _context.get(layerNodes[layerNodes.lastIndex - index], it)
+                                    viewState.isVisible && viewState.alpha == 1f
+                                }
+                            if( !isTheGuy)
+                                null
+                            else
+                                ('A'.toInt() + index).toChar()
+                        }
+                        .filterNotNull()
+                    val lex = String(chars.toCharArray())
+
+                    lexLayers.forEach { it -> it.lexicon = lex }
+
+                }
+
             }
         }
 

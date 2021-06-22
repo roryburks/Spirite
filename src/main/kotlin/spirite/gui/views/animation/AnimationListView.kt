@@ -88,6 +88,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
                 if( animation is FixedFrameAnimation) {
                     menuItems.add(MenuItem("Export Animation To Aaf", ExportAafCommand))
                     menuItems.add(MenuItem("Export Animation To Gif", ExportGifCommand))
+                    menuItems.add(MenuItem("Toggle Assosciation", AssosaciateCommand))
                 }
 
                 master.contextMenus.LaunchContextMenu(evt.point, menuItems, animation)
