@@ -37,3 +37,11 @@ data class AnimationStateData(
     val offsetX : Int,
     val offsetY : Int,
     val speed: Float )
+
+fun AnimationStateData.duplicateInto(bind: AnimationStateBind) {
+    bind.met = met
+    bind.zoom = zoom
+    bind.offsetX = offsetX
+    bind.offsetY = offsetY
+    bind.speed = speed
+}
