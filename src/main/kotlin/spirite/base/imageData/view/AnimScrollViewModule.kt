@@ -74,7 +74,7 @@ class AnimScrollViewModule(
         _undoEngine.doAsAggregateAction("AnimShift View by $offset") {
             for( group in _selectedGroups) {
                 val layerNodes = group.children.filterIsInstance<LayerNode>().asReversed()
-                println(group.name + ":" + layerNodes.joinToString(",") { it.name })
+                //println(group.name + ":" + layerNodes.joinToString(",") { it.name })
 
                 for (viewNum in (0 until _context.numActiveViews)) {
                     // Cycle Properties
@@ -88,7 +88,7 @@ class AnimScrollViewModule(
                     val currentNodeIndex = if( cn == null) -1 else layerNodes.indexOf(cn)
                     if( currentNodeIndex != -1){
                         val indexOfSelected = MathUtil.cycle(0, numNodesInContext, currentNodeIndex + offset)
-                        println("view:$viewNum : $currentNodeIndex -> $indexOfSelected")
+                        //println("view:$viewNum : $currentNodeIndex -> $indexOfSelected")
                         _context.setCurrentNode(viewNum, layerNodes[indexOfSelected])
                     }
                 }
@@ -112,8 +112,6 @@ class AnimScrollViewModule(
                         }
                         .filterNotNull()
                     val lex = String(chars.toCharArray())
-                    println(lex)
-
                     lexLayers.forEach { it -> it.lexicon = lex }
 
                 }
