@@ -3,7 +3,9 @@ package spirite.base.imageData.layers.sprite.tools
 import rb.extendo.dataStructures.MutableSparseArray
 import rb.global.SuccessResponse
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 
 object SpriteLayerNormalizer {
@@ -19,16 +21,16 @@ object SpriteLayerNormalizer {
      *
      * normalizeLayersOnly : If true, will only re-map depths to be compatible.  If false, will add parts which are missing
      */
-    fun normalizeSpriteLayers( node: GroupTree.Node, workspace: IImageWorkspace, normalizeLayersOnly: Boolean): SuccessResponse {
-        val group = if( node is GroupTree.GroupNode) node else node.parent ?: return SuccessResponse.Error("No Group Found")
+    fun normalizeSpriteLayers(node: Node, workspace: IImageWorkspace, normalizeLayersOnly: Boolean): SuccessResponse {
+        val group = if( node is GroupNode) node else node.parent ?: return SuccessResponse.Error("No Group Found")
         val spriteLayers = group.children
-            .filterIsInstance<GroupTree.LayerNode>()
+            .filterIsInstance<LayerNode>()
             .map { it.layer }
             .filterIsInstance<SpriteLayer>()
 
         val prioritySpriteLayer = when (node) {
-            is GroupTree.GroupNode -> spriteLayers.firstOrNull()
-            is GroupTree.LayerNode -> node.layer as? SpriteLayer
+            is GroupNode -> spriteLayers.firstOrNull()
+            is LayerNode -> node.layer as? SpriteLayer
             else -> null
         } ?: return SuccessResponse.Error("Node does not have any Sprite Layer")
 

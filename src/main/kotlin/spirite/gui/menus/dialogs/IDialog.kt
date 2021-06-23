@@ -2,6 +2,7 @@ package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
 import rb.glow.SColor
+import sgui.core.systems.IKeypressSystem
 import sguiSwing.components.jcomponent
 import sgui.swing.jcolor
 import sgui.swing.scolor
@@ -17,6 +18,7 @@ import spirite.gui.menus.dialogs.IDialog.FilePickType
 import spirite.gui.menus.dialogs.IDialog.FilePickType.*
 import spirite.gui.menus.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
 import spirite.gui.resources.SpiriteIcons
+import spirite.sguiHybrid.SwHybrid
 import java.io.File
 import javax.swing.JColorChooser
 import javax.swing.JFileChooser
@@ -50,7 +52,6 @@ interface IDialog {
 
 class JDialog(private val master: IMasterControl) : IDialog
 {
-
     init {
         UIManager.put("OptionPane.background", Global.Bg.jcolor)
         UIManager.put("Panel.background", Global.Bg.jcolor)

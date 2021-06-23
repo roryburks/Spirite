@@ -18,11 +18,11 @@ import spirite.sguiHybrid.Hybrid
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
+import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animation.ffa.IFfaFrame
 import spirite.base.imageData.animation.ffa.IFfaLayer
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.Node
 import spirite.base.util.linear.Rect
 import spirite.gui.views.animation.structureView.ffa.FfaStructBuilderFactory
 import spirite.gui.views.animation.structureView.ffa.IAnimDragBehavior

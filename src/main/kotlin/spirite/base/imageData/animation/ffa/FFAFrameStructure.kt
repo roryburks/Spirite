@@ -1,11 +1,11 @@
 package spirite.base.imageData.animation.ffa
 
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.Node
 
 data class FfaFrameStructure(
-        val node: Node?,
-        val marker: Marker,
-        val length: Int
+    val node: Node?,
+    val marker: Marker,
+    val length: Int
 ) {
     enum class Marker {
         FRAME,

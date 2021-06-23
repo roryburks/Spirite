@@ -12,18 +12,18 @@ import sgui.swing.skin.Skin.AnimSchemePanel.ActiveNodeBg
 import spirite.base.brains.IMasterControl
 import spirite.base.graphics.isolation.IIsolationManager.IsolationState
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.gui.resources.SpiriteIcons.SmallIcons.*
 
 class SpriteLayerNodePanel
 private constructor(
-        val node: Node,
-        val sprite: SpriteLayer,
-        val master: IMasterControl,
-        private val imp: ICrossPanel) : IComponent by imp
+    val node: Node,
+    val sprite: SpriteLayer,
+    val master: IMasterControl,
+    private val imp: ICrossPanel) : IComponent by imp
 {
     constructor(node: Node, sprite: SpriteLayer, master: IMasterControl)
             : this(node, sprite, master,  Hybrid.ui.CrossPanel())

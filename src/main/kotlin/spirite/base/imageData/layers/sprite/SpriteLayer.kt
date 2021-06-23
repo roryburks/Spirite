@@ -26,7 +26,7 @@ import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.MultiMediumDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.traverse
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.ArrangedMediumData

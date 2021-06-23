@@ -22,7 +22,10 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.menus.NodeMenus
 import spirite.gui.resources.SpiriteIcons
@@ -131,7 +134,7 @@ private constructor(
         override fun makeTransferable(t: Node): ITransferObject {return Transferables.NodeTransferObject(t)}
 
         override fun canDrag(): Boolean = true
-        override fun dragOut( t: Node, up: Boolean, inArea: Boolean) {}
+        override fun dragOut(t: Node, up: Boolean, inArea: Boolean) {}
         override fun canImport(trans: ITransferObject) = trans.dataTypes.contains(Transferables.NodeTransferObject.Key)
         override fun interpretDrop(trans: ITransferObject, dropInto: ITreeNode<Node>, dropDirection: DropDirection) {
             val node = trans.getData(Transferables.NodeTransferObject.Key) as? Node ?: return
@@ -153,7 +156,7 @@ private constructor(
 
     private inner class SpriteLayerNodeAttributes: BaseNodeAttributes() {
         override fun makeComponent(t: Node) = TreeComponent(t)
-        private inner class TreeComponent(t:Node) : BaseNodeTreeComponent(t) {
+        private inner class TreeComponent(t: Node) : BaseNodeTreeComponent(t) {
             override val component = SpriteLayerNodePanel(t, (t as LayerNode).layer as SpriteLayer, master)
 
             override fun onRename() {component.editableLabel.startEditing()}
@@ -163,9 +166,9 @@ private constructor(
 
     private inner class NodeLayerPanel
     private constructor(
-            val node: Node,
-            master: IMasterControl,
-            private val imp: ICrossPanel) : IComponent by imp
+        val node: Node,
+        master: IMasterControl,
+        private val imp: ICrossPanel) : IComponent by imp
     {
         constructor(node: Node, master: IMasterControl)
                 : this(node,  master, Hybrid.ui.CrossPanel())
@@ -187,8 +190,16 @@ private constructor(
             //editableLabel.opaque = false
             editableLabel.textBind.addObserver { new, _ -> node.name = new }
             littleLabel.textSize = 8
-            if( (node as? GroupNode)?.flattened == true)
-                littleLabel.text = "FLAT"
+
+            if( node is GroupNode){
+                if( node.flattened)
+                    littleLabel.text = "FLAT"
+
+                val selected = workspace?.viewSystem?.animScrollViewModule?.selectedGroups ?: emptyList()
+                if( selected.contains(node))
+                    littleLabel.text = "A"
+
+            }
 
             imp.setLayout {
                 rows += {
@@ -232,21 +243,43 @@ private constructor(
             }
         })
 
+    init {
+            tree.onClickHandler = {evt, node ->
+            val ws = workspace
+            val altMode = evt.holdingAlt && !evt.holdingCtrl && !evt.holdingShift
+            if( evt.button == LEFT && node != null  && !altMode)
+                tree.selected = node.value
 
-    private val mouseHookK = Hybrid.mouseSystem.attachHook(object: IGlobalMouseHook {
-        override fun processMouseEvent(evt: MouseEvent) {
-            val point = evt.point.convert(tree)
+            if( node != null && ws != null) {
+                val spNode = node.value
+                if (evt.button == RIGHT && evt.type == RELEASED ) {
+                    println("A")
+                    master.contextMenus.LaunchContextMenu(evt.point, NodeMenus.schemeForNode(ws, spNode), spNode)
+                }
 
-            if( evt.button == RIGHT && evt.type == RELEASED) {
-                val ws = workspace ?: return
-                val node = tree.getNodeFromY(point.y)?.value
-                master.contextMenus.LaunchContextMenu(evt.point, NodeMenus.schemeForNode(ws, node), node)
-            }
-            else if(evt.button == LEFT && evt.type == RELEASED) {
-                val node = tree.getNodeFromY(point.y)?.value
-                tree.selected = node ?: tree.selected
+                if( altMode && spNode is GroupNode) {
+                    val on = evt.button == LEFT
+                    ws.viewSystem.animScrollViewModule.setGroup( spNode, on )
+                    rebuild()
+                }
             }
         }
-    }, tree)
+    }
+
+//    private val mouseHookK = Hybrid.mouseSystem.attachHook(object: IGlobalMouseHook {
+//        override fun processMouseEvent(evt: MouseEvent) {
+//            val point = evt.point.convert(tree)
+//
+//            if( evt.button == RIGHT && evt.type == RELEASED) {
+//                val ws = workspace ?: return
+//                val node = tree.getNodeFromY(point.y)?.value
+//                master.contextMenus.LaunchContextMenu(evt.point, NodeMenus.schemeForNode(ws, node), node)
+//            }
+//            else if(evt.button == LEFT && evt.type == RELEASED) {
+//                val node = tree.getNodeFromY(point.y)?.value
+//                tree.selected = node ?: tree.selected
+//            }
+//        }
+//    }, tree)
     // endregion
 }

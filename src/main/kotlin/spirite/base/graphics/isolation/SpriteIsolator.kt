@@ -3,13 +3,14 @@ package spirite.base.graphics.isolation
 import rb.extendo.extensions.then
 import rb.glow.gle.RenderRubric
 import spirite.base.graphics.isolation.IsolationManager.SpriteIsolationStruct
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 
 internal class SpriteIsolator(
-        private val map: HashMap<Pair<GroupNode,String?>, SpriteIsolationStruct>,
-        val node: Node) : ISpriteLayerIsolator
+    private val map: HashMap<Pair<GroupNode,String?>, SpriteIsolationStruct>,
+    val node: Node
+) : ISpriteLayerIsolator
 {
     override fun getIsolatorForNode(node: Node): IIsolator {
         return SpriteIsolator(map, node)

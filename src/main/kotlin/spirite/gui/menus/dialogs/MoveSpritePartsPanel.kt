@@ -4,7 +4,7 @@ import cwShared.dialogSystem.IDialogPanel
 import rb.owl.bindable.addObserver
 import sgui.core.components.crossContainer.ICrossPanel
 import spirite.sguiHybrid.Hybrid
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 

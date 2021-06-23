@@ -6,7 +6,7 @@ import rb.vectrix.shapes.RectI
 import spirite.sguiHybrid.Hybrid
 import spirite.base.file.readUTF8NT
 import spirite.base.graphics.DynamicImage
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.InsertTop
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure

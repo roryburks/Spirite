@@ -21,14 +21,19 @@ import spirite.base.graphics.isolation.IIsolationManager
 import spirite.base.graphics.isolation.IsolationManager
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
-import spirite.base.imageData.animation.AnimationManager
-import spirite.base.imageData.animation.IAnimationManager
+import spirite.base.imageData.animation.services.AnimationManager
+import spirite.base.imageData.animation.services.AnimationStateSvc
+import spirite.base.imageData.animation.services.IAnimationManagementSvc
+import spirite.base.imageData.animation.services.IAnimationStateSvc
 import spirite.base.imageData.animationSpaces.AnimationSpaceManager
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.MultiMediumDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
+import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediumGroups.IMediumGroupRepository
 import spirite.base.imageData.mediumGroups.MediumGroupRepository
@@ -63,7 +68,8 @@ interface IImageWorkspace {
 	// Sub-Components
     val groupTree: PrimaryGroupTree
     val mediumRepository : IMediumRepository
-    val animationManager : IAnimationManager
+    val animationManager : IAnimationManagementSvc
+    val animationStateSvc : IAnimationStateSvc
     val referenceManager : IReferenceManager
     val isolationManager: IIsolationManager
     val animationSpaceManager : IAnimationSpaceManager
@@ -122,7 +128,8 @@ class ImageWorkspace(
     override val imageObservatory: IImageObservatory = ImageObservatory()
     override val viewSystem: IViewSystem = ViewSystem(undoEngine)
     override val groupTree = PrimaryGroupTree(this) // Needs to be after ViewSystem, UndoEngine
-    override val animationManager: IAnimationManager = AnimationManager(this)
+    override val animationManager: IAnimationManagementSvc = AnimationManager(this)
+    override val animationStateSvc: IAnimationStateSvc = AnimationStateSvc(animationManager) // Needs to be after AnimManager
     override val selectionEngine: ISelectionEngine
     override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet = paletteManager.makePaletteSet()

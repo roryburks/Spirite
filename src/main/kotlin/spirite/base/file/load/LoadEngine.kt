@@ -10,8 +10,8 @@ import spirite.base.file.readUTF8NT
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.IMedium
@@ -322,8 +322,9 @@ object LoadEngine {
             if( animation != null) {
                 context.animations.add(animation)
                 context.workspace.animationManager.addAnimation(animation)
-                animation.state.speed = speed
-                animation.state.zoom = zoom
+                val stateBind = context.workspace.animationStateSvc.getState(animation)
+                stateBind.speed = speed
+                stateBind.zoom = zoom
             }
         }
     }

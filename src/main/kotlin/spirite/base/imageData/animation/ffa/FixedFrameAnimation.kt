@@ -7,8 +7,8 @@ import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.MediumBasedAnimation
 import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked.UnlinkedFrameCluster
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.undo.NullAction
 
 class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
@@ -88,17 +88,17 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     }
 
     fun addLinkedLayer(
-            group: GroupNode,
-            includeSubtrees: Boolean,
-            name : String = group.name,
-            frameMap: Map<Node, FfaFrameStructure>? = null,
-            unlinkedClusters: List<UnlinkedFrameCluster>? = null) : FfaLayerGroupLinked
+        group: GroupNode,
+        includeSubtrees: Boolean,
+        name : String = group.name,
+        frameMap: Map<Node, FfaFrameStructure>? = null,
+        unlinkedClusters: List<UnlinkedFrameCluster>? = null) : FfaLayerGroupLinked
     {
         return FfaLayerGroupLinked(this, group, includeSubtrees, name, frameMap, unlinkedClusters)
                 .also { addLayer(it)}
     }
 
-    fun addLexicalLayer(group: GroupNode, name : String = group.name, lexicon: String = "", map: Map<Char,Node>? = null) : FfaLayerLexical
+    fun addLexicalLayer(group: GroupNode, name : String = group.name, lexicon: String = "", map: Map<Char, Node>? = null) : FfaLayerLexical
     {
         val existingMap = _layers.asSequence()
                 .filterIsInstance<FfaLayerLexical>()
@@ -111,10 +111,10 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     }
 
     fun addCascadingLayer(
-            group: GroupNode,
-            name : String = group.name,
-            infoToImport: List<FfaCascadingSublayerContract>? = null,
-            lexicon: String? = null)
+        group: GroupNode,
+        name : String = group.name,
+        infoToImport: List<FfaCascadingSublayerContract>? = null,
+        lexicon: String? = null)
             : FfaLayerCascading
     {
         return FfaLayerCascading(this, group, name,infoToImport, lexicon)

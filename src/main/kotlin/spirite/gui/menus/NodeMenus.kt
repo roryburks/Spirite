@@ -3,7 +3,9 @@ package spirite.gui.menus
 import spirite.base.brains.commands.NodeCommands
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.magLev.MaglevMedium

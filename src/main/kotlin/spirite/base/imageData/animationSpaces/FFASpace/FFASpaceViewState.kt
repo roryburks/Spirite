@@ -6,7 +6,7 @@ import rb.owl.bindable.Bindable
 import rb.vectrix.linear.Vec2i
 import rbJvm.owl.addWeakObserver
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
+import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationPlayObserver

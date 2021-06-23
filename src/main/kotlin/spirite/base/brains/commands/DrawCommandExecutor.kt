@@ -11,8 +11,8 @@ import spirite.base.brains.commands.specific.LayerFixes.bakeOffset
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
-import spirite.base.imageData.groupTree.GroupTree
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.Node
+import spirite.base.imageData.groupTree.LayerNode
 
 class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: IToolsetManager) : ICommandExecutor
 {
@@ -66,7 +66,7 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
             SHIFT_LEFT.string -> if( !shift(-1,0, workspace)) return false
             SHIFT_RIGHT.string -> if( !shift(1,0, workspace)) return false
             SCALE3x.string -> {
-                bakeOffset(workspace, workspace.groupTree.selectedNode as? GroupTree.LayerNode ?: return false)
+                bakeOffset(workspace, workspace.groupTree.selectedNode as? LayerNode ?: return false)
                 //val transform = MutableTransformF.Scale(1.1f,1.1f)
                 //LayerFixes.ApplyTransformAccrossNode(workspace, workspace.groupTree.selectedNode ?: return false, transform)
             }

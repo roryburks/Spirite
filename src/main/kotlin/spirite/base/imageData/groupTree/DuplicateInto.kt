@@ -1,7 +1,6 @@
 package spirite.base.imageData.groupTree
 
 import rb.extendo.dataStructures.Deque
-import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.Bellow
 import spirite.base.util.StringUtil
 
@@ -30,7 +29,7 @@ fun MovableGroupTree.duplicateInto(toDupe: Node, context: Node = selectedNode ?:
         when (toDupe) {
             is LayerNode -> {
                 val dupedLayer = toDupe.layer.dupe(workspace)
-                val dupedNode = this.LayerNode(null, toDupe.name, dupedLayer)
+                val dupedNode = this.makeLayerNode(null, toDupe.name, dupedLayer)
                 insertAndDupeProperties(dupedNode, toDupe, context)
             }
             is GroupNode -> {
@@ -45,9 +44,9 @@ fun MovableGroupTree.duplicateInto(toDupe: Node, context: Node = selectedNode ?:
                     val next = dupeQ.popFront() ?: break
 
                     val toInsert = when (next.toDupe) {
-                        is GroupNode -> this.GroupNode(null, getNonduplicateName(next.toDupe.name))
+                        is GroupNode -> this.makeGroupNode(null, getNonduplicateName(next.toDupe.name))
                                 .apply { next.toDupe.children.forEach { dupeQ.addBack(NodeContext(it, this)) } }
-                        is LayerNode -> this.LayerNode(null, getNonduplicateName(next.toDupe.name), next.toDupe.layer.dupe(workspace))
+                        is LayerNode -> this.makeLayerNode(null, getNonduplicateName(next.toDupe.name), next.toDupe.layer.dupe(workspace))
                         else -> null
                     } ?: continue
 

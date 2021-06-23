@@ -14,7 +14,7 @@ import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.*
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
+import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.menus.MenuItem
@@ -88,6 +88,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
                 if( animation is FixedFrameAnimation) {
                     menuItems.add(MenuItem("Export Animation To Aaf", ExportAafCommand))
                     menuItems.add(MenuItem("Export Animation To Gif", ExportGifCommand))
+                    menuItems.add(MenuItem("Toggle Assosciation", AssosaciateCommand))
                 }
 
                 master.contextMenus.LaunchContextMenu(evt.point, menuItems, animation)

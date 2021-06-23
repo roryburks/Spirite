@@ -9,6 +9,7 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.menus.dialogs.IDialog.FilePickType.AAF
 import spirite.gui.menus.dialogs.IDialog.FilePickType.GIF
+import spirite.sguiHybrid.Hybrid
 import java.io.File
 
 class AnimationCommandExecutor (val master: IMasterControl)
@@ -57,13 +58,15 @@ object ExportGifCommand : AnimationCommand() {
     override val name: String get() = "exportAsGif"
 
     override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
-        val anim = animation as? FixedFrameAnimation ?: return false
+        if (animation !is FixedFrameAnimation)
+            return false
         var file = master.dialog.pickFile(GIF) ?: return false
         if( file.extension == "") {
             file = File(file.absolutePath + ".gif")
         }
 
-        ExportToGif.exportAnim(animation,file, animation.state.speed)
+        val stateBind = workspace.animationStateSvc.getState(animation)
+        ExportToGif.exportAnim(animation,file, stateBind.speed)
         return true
     }
 
@@ -90,4 +93,18 @@ object DuplicateAnimationCommand : AnimationCommand() {
         workspace.animationManager.addAnimation( animation?.dupe() ?: return false)
         return true
     }
+}
+
+object AssosaciateCommand : AnimationCommand() {
+    override val name: String get() = "anim-associate"
+
+    override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
+        if( animation !is FixedFrameAnimation)
+            return false
+        workspace.viewSystem.animScrollViewModule
+            .toggle(animation)
+        Hybrid.beep()
+        return true
+    }
+
 }

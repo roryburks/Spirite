@@ -1,13 +1,14 @@
 package spirite.base.graphics.isolation
 
 import rb.glow.gle.RenderRubric
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 
 class NodeIsolator(
-        val selectedNode: Node)  : IIsolator, ISpriteLayerIsolator
+        val selectedNode: Node
+)  : IIsolator, ISpriteLayerIsolator
 {
     val ancestors by lazy { selectedNode.ancestors.toHashSet() }
     val selectedPartName by lazy { ((selectedNode as? LayerNode)?.layer as? SpriteLayer)?.activePart?.partName }
@@ -29,7 +30,8 @@ class NodeIsolator(
 
 
 class SpritePartOnlyIsolator(
-        val selectedNode: Node)  : IIsolator, ISpriteLayerIsolator
+        val selectedNode: Node
+)  : IIsolator, ISpriteLayerIsolator
 {
     val ancestors by lazy { selectedNode.ancestors.toHashSet() }
     val selectedPartName by lazy { ((selectedNode as? LayerNode)?.layer as? SpriteLayer)?.activePart?.partName }

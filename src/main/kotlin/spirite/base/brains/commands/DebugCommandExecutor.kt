@@ -17,7 +17,7 @@ import spirite.base.exceptions.CommandNotValidException
 import spirite.base.file.aaf.export.AafExportConverter
 import spirite.base.imageData.IImageObservatory
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import java.io.File
 import java.io.RandomAccessFile
@@ -68,7 +68,7 @@ object DebugCommands
 
     val CycleSpriteParts = DebugCmd("cycle-sprite-parts") {master ->
         val ws = master.workspaceSet.currentMWorkspace ?: return@DebugCmd
-        val selectedNode = ws.groupTree.selectedNode as? GroupTree.LayerNode ?: return@DebugCmd
+        val selectedNode = ws.groupTree.selectedNode as? LayerNode ?: return@DebugCmd
         val groupNode = selectedNode.parent ?: return@DebugCmd
         val sprite = selectedNode.layer as? SpriteLayer ?: return@DebugCmd
         val selected = sprite.multiSelect ?: return@DebugCmd

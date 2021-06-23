@@ -5,7 +5,7 @@ import rb.vectrix.mathUtil.d
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.Layer
 
 data class LayerSource(val layer: Layer, override val workspace: IImageWorkspace) : IRenderSource {

@@ -41,13 +41,14 @@ private constructor(private val imp: Imp) : IComponent by SwComponent(imp)
         override fun paintComponent(g: Graphics) {
             val context = context?: return
             val anim = context.animation ?: return
+            val state = anim.workspace.animationStateSvc.getState(anim)
             g.color = context.bgColor.jcolor
             g.fillRect(0,0,width, height)
 
             Hybrid.gle.runInGLContext {
                 val image = Hybrid.imageCreator.createImage(width, height)
                 val gc = image.graphics
-                gc.preScale(anim.state.zoomF.d, anim.state.zoomF.d)
+                gc.preScale(state.zoomF.d, state.zoomF.d)
 
                 anim.drawFrame(gc,context.frame)
 

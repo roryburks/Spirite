@@ -2,7 +2,7 @@ package spirite.base.imageData.mediums
 
 import rb.glow.IGraphicsContext
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.Node
 
 
 interface ICompositeSource {
@@ -21,9 +21,9 @@ data class HandleCompositeSource(
 }
 
 data class NodeCompositeSource(
-        val node: Node,
-        override val drawsSource : Boolean = true,
-        override val drawer : (IGraphicsContext) -> Unit) : ICompositeSource
+    val node: Node,
+    override val drawsSource : Boolean = true,
+    override val drawer : (IGraphicsContext) -> Unit) : ICompositeSource
 {
     override fun appliedToNode(node: Node) = node == this.node
 }

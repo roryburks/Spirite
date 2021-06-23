@@ -15,6 +15,7 @@ import sgui.components.ITreeView
 import sgui.components.ITreeViewNonUI.*
 import sgui.components.ITreeViewNonUI.DropDirection.*
 import sgui.core.components.crossContainer.CrossColInitializer
+import sgui.core.components.events.MouseEvent
 import sgui.swing.*
 import sgui.swing.PrimaryIcon.*
 import sgui.swing.advancedComponents.CrossContainer.CrossLayout
@@ -65,13 +66,17 @@ private constructor(private val imp : SwTreeViewImp<T>,
             } }
     override var selectedNode: ITreeNode<T>? by selectedNodeBind
 
+    override var onClickHandler: (evt: MouseEvent, node: ITreeNode<T>?) -> Unit =
+        {_, node -> selectedNode = node ?: selectedNode }
+
     private val compToNodeMap = mutableMapOf<IComponent, TreeNode<T>>()
 
     init {
         onMousePress += {evt ->
-            selectedNode = getNodeFromY(evt.point.y) ?: selectedNode
+            onClickHandler.invoke(evt, getNodeFromY(evt.point.y))
             requestFocus()
         }
+        onMouseRelease += { evt -> onClickHandler.invoke(evt, getNodeFromY(evt.point.y))}
 
         imp.inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "rename")
         imp.actionMap.put("rename", object : AbstractAction(){
@@ -111,7 +116,6 @@ private constructor(private val imp : SwTreeViewImp<T>,
             //dnd.addDropSource(treeComponent.component.jcomponent)
 
             treeComponent.component.onMouseClick += {
-                selectedNode = node
                 this@SwTreeView.requestFocus()
             }
 
@@ -397,9 +401,9 @@ private constructor(private val imp : SwTreeViewImp<T>,
         init {
             background = JColor(0, 0, 0, 0)
             addMouseListener(SimpleMouseListener { evt ->
-                context?.apply {
-                    selectedNode = getNodeFromY(evt.y) ?: selectedNode
-                }
+//                context?.apply {
+//                    selectedNode = getNodeFromY(evt.y) ?: selectedNode
+//                }
 
                 this@SwTreeViewImp.requestFocus()
             })

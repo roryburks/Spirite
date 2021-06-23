@@ -13,20 +13,22 @@ import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.mediums.IComplexMedium
 
 class NodeRenderer(
-        val root: GroupNode,
-        val workspace: IImageWorkspace,
-        val settings: RenderSettings = RenderSettings(workspace.width, workspace.height, true),
-        val rootIsolator: IIsolator? = null)
+    val root: GroupNode,
+    val workspace: IImageWorkspace,
+    val settings: RenderSettings = RenderSettings(workspace.width, workspace.height, true),
+    val rootIsolator: IIsolator? = null)
 {
     private lateinit var buffer : Array<RawImage>
     private val neededImages : Int by lazy {
         root
                 .getAllNodesSuchThat(
-                    {it.isVisible && it !is GroupNode},
+                    {it.isVisible && it !is GroupNode },
                     {it.isVisible})
                 .map { it.getDepthFrom(root) }
                 .max() ?: 0
@@ -188,10 +190,10 @@ class NodeRenderer(
     }
 
     private inner class GroupDrawThing(
-            val n: Int,
-            val node: GroupNode,
-            val isolator: IIsolator?,
-            override val depth: Int = 0)
+        val n: Int,
+        val node: GroupNode,
+        val isolator: IIsolator?,
+        override val depth: Int = 0)
         : DrawThing()
     {
         override fun draw(gc: IGraphicsContext) {
@@ -205,9 +207,9 @@ class NodeRenderer(
     }
 
     private inner class TransformedDrawThing(
-            val node: Node,
-            val th : TransformedHandle,
-            val isolator: IIsolator?)
+        val node: Node,
+        val th : TransformedHandle,
+        val isolator: IIsolator?)
         : DrawThing()
     {
         override val depth: Int get() = th.drawDepth

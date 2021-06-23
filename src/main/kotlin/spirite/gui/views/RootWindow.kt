@@ -35,6 +35,7 @@ import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.KeyboardFocusManager
 import java.awt.event.KeyEvent
+import java.security.Key
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 
@@ -176,8 +177,15 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                     KeyEvent.KEY_PRESSED -> {
                         if (evt.keyCode == KeyEvent.VK_SPACE)
                             SwHybrid.keypressSystem.holdingSpace = true
+
+                        if( evt.isAltDown && ! evt.isControlDown && !evt.isShiftDown) {
+                            val asChar = vkToChar(evt.keyCode)
+                            if (asChar != null)
+                                SwHybrid.keypressSystem.lastAlphaNumPressed = asChar
+                        }
+
                         val key = evt.keyCode
-                        val modifier = evt.modifiersEx
+                        val modifier = evt.modifiersEx and 8191 // first 12 bits
 
                         val command = master.hotkeyManager.getCommand(Hotkey(key, modifier))
                         command?.apply { master.commandExecutor.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }
@@ -199,4 +207,13 @@ class RootWindow( val master: IMasterControl) : JFrame() {
             omni
         }
     }
+}
+
+fun vkToChar(vk: Int) : Char? {
+    if( vk >= KeyEvent.VK_0 && vk <= KeyEvent.VK_9)
+        return vk.toChar()
+    if( vk >= KeyEvent.VK_A && vk <= KeyEvent.VK_Z)
+        return vk.toChar()
+
+    return null
 }

@@ -4,7 +4,7 @@ import spirite.sguiHybrid.MDebug
 import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.UndoableChangeDelegate
 

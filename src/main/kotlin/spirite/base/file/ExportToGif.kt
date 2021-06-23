@@ -11,8 +11,8 @@ import rbJvm.glow.awt.ImageBI
 import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.animation.AnimationUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.SimpleLayer
 import java.awt.image.BufferedImage
 import java.io.File

@@ -18,7 +18,7 @@ import rb.vectrix.shapes.RectI
 import sgui.core.systems.IImageCreator
 import spirite.base.imageData.animation.ffa.FFALayer
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.mediums.IImageMedium
 
 data class AafFileMapping(
@@ -120,7 +120,7 @@ class AafExportConverter(
 
     fun getAllImages(animation: FixedFrameAnimation) : Sequence<IImage> {
         return animation.layers.asSequence()
-                .flatMap { it.frames.asSequence().filterIsInstance<FFALayer.FFAFrame>().map { it.node }.filterIsInstance<GroupTree.LayerNode>() }
+                .flatMap { it.frames.asSequence().filterIsInstance<FFALayer.FFAFrame>().map { it.node }.filterIsInstance<LayerNode>() }
                 .flatMap { it.getDrawList().asSequence() }
                 .map { it.handle.medium }
                 .filterIsInstance<IImageMedium>()

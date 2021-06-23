@@ -28,8 +28,8 @@ import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
-import spirite.base.imageData.groupTree.GroupTree
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.base.imageData.mutations.ImportInto
@@ -178,7 +178,7 @@ object GlobalCommands
     }
     val CopyAllLayer = GlobalCommand("almightyDebug") {master, workspaceSet ->
         val workspace = workspaceSet.currentMWorkspace ?: throw CommandNotValidException
-        val spriteLayer = ((workspace.groupTree.selectedNode as? GroupTree.LayerNode)?.layer as? SpriteLayer) ?: throw CommandNotValidException
+        val spriteLayer = ((workspace.groupTree.selectedNode as? LayerNode)?.layer as? SpriteLayer) ?: throw CommandNotValidException
         val partName = spriteLayer.activePart?.partName ?: throw CommandNotValidException
         val med = spriteLayer.activePart?.handle?.medium ?: throw CommandNotValidException
 
