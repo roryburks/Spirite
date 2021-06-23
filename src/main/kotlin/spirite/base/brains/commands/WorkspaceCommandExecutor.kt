@@ -71,10 +71,10 @@ object WorkspaceCommands {
     }
 
     val ViewScrollAnimViewUp = WorkspaceCommand("animViewMode-Up") { workspace, dialog ->
-        workspace.viewSystem.animScrollViewModule.shift(1)
+        workspace.viewSystem.animScrollViewModule.shift(-1)
     }
     val ViewScrollAnimViewDown = WorkspaceCommand("animViewMode-Down") { workspace, dialog ->
-        workspace.viewSystem.animScrollViewModule.shift(-1)
+        workspace.viewSystem.animScrollViewModule.shift(1)
     }
 
     val CycleAnimStateDomain = WorkspaceCommand("animSpace-domainUp") {workspace, dialog ->
