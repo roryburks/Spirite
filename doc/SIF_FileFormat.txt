@@ -201,6 +201,18 @@ Per State:
             [4, int] AnimationId of destination
             [4, int] Frame of destination
 
+----VIEW - View Data
+[1, byte] number of views
+Per View:
+    [4, int] : Selected Node
+    Per Node:
+    [1, byte] : Bitmap of properities 0th bit is "IsVisible"
+    [4, float] : Alpha
+    [1, enum] : Render Method Type
+    [4, int] : Render Value
+    [2, short] : OX
+    [2, short] : OY
+
 
 ===== Impossed sanity things that could be warned in-program: ====
 ::::Nodes

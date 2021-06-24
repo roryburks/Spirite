@@ -11,6 +11,7 @@
 0x000_000D: Added PLTT Chunk
 0x000_000E: Changed Indexing in MagLevFills in MagLev Mediums
 
+
 0x0001_0000:
     -NodeTypeID changed from Int (which it incorrectly was) to byte
     -Size of ImageData for Dynamic Images may be 0 indicating a null image
@@ -51,3 +52,7 @@
     - Added Palette Map saving / loading
 0x0001_000F:
     - Save / Load Node Flatness (non-breaking?)
+0x0001_0010:
+    -  Node Visibility Bit no longer used.
+    - Alpha, and X/Y offset no longer written on GroupTree (now part of the View System)
+    - New Chunk : VIEW

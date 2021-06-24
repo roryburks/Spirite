@@ -136,6 +136,15 @@ object LoadEngine {
                     }
                 }
 
+                // View Data (optional)
+                context.chunkInfo.singleOrNull { it.header == "VIEW" }?. apply {
+                    context.telemetry.runAction("Load VIEW") {
+                        ra.seek(startPointer)
+                        ViewChunkLoader.load(context)
+                        context.telemetry.mark("size", size.d)
+                    }
+                }
+
 
                 if (context.version <= 2) {
                     width = workspace.mediumRepository.dataList
@@ -252,9 +261,11 @@ object LoadEngine {
             val depth = ra.readUnsignedByte()
 
             if( context.version >= 1) {
-                alpha = ra.readFloat()
-                x = ra.readShort().i
-                y = ra.readShort().i
+                if( context.version < 0x0001_0010) {
+                    alpha = ra.readFloat()
+                    x = ra.readShort().i
+                    y = ra.readShort().i
+                }
                 bitmask = ra.readUnsignedByte()
             }
 
@@ -290,11 +301,14 @@ object LoadEngine {
 
             if( node != null) {
                 context.nodes.add(node)
-                node.alpha = alpha
                 node.expanded = expanded
-                node.visible = visble
-                node.x = x
-                node.y = y
+
+                if( context.version < 0x0001_0010) {
+                    node.alpha = alpha
+                    node.visible = visble
+                    node.x = x
+                    node.y = y
+                }
             }
         }
 

@@ -102,6 +102,7 @@ object SaveEngine {
             saveAnimationSpaceChunk(context)
         savePaletteData(context)
         PaletteMapSaver.savePaletteData(context)
+        ViewChunkSaver.saveViewChunk(context)
 
         ra.close()
     }
@@ -137,16 +138,9 @@ object SaveEngine {
                 // [1] : Depth of GroupNode in GroupTree
                 ra.writeByte(depth)
 
-                // [4] : alpha
-                ra.writeFloat( node.alpha)
-
-                // [2] : xi offset, [2] : yi offset
-                ra.writeShort(node.x)
-                ra.writeShort(node.y)
-
                 // [1] : bitmask
                 ra.writeByte(
-                        if( node.visible) SaveLoadUtil.VisibleMask else 0 or
+                        //if( node.visible) SaveLoadUtil.VisibleMask else 0 or
                         if( node.expanded) SaveLoadUtil.ExpandedMask else 0 or
                         if( node is GroupNode && node.flattened) SaveLoadUtil.FlattenedMask else 0)
 
