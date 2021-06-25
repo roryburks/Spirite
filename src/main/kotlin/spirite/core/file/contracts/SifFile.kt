@@ -4,9 +4,13 @@ data class SifFile(
     val width: Int,
     val height: Int,
     val version: Int, // Ignored on write
-    val chunks: List<SifFileChunk>)
-{
-}
+    val grptTrunk: SifGrptChunk,
+    val imgdChunk: SifImgdChunk,
+    val animChink: SifAnimChunk,
+    val plttChunk: SifPlttChunk,
+    val tpltChunk: SifTpltChunk,
+    val anspChunk: SifAnspChunk,
+    val viewChunk: SifViewChunk )
 
 data class SifFileChunk(
     val identifier: String,

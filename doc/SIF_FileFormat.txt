@@ -1,4 +1,4 @@
-Version 0x0001_000F
+Version 0x0001_0010
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -16,11 +16,8 @@ Header
  ---- GRPT - Group Tree Chunk ----
  Per Group:
  [1, byte]: Depth of the GroupTree
- [4, float] : alpha
- [2, short] : X offset
- [2, short] : Y offset
  [1, byte] : various single-bit settings
-    1st bit: Visibility
+    //1st bit: Visibility // no longer populated
     2nd bit: Expanded
     3rd bit: Flatness
  [n, UTF8 str] : Node name
@@ -40,6 +37,7 @@ Header
             [4, float] : rotation
             [4, int] : draw depth
             [4, int] : MediumId
+            [4, float] : Alpha
 	0x03 : Reference Layer
 		[4, int] : Node ID of node referred to
 	0x04 : Puppet Layer
