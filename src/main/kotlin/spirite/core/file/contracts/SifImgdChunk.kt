@@ -1,23 +1,29 @@
 package spirite.core.file.contracts
 
-class SifImgdChunk(val mediums: List<SifImgdMed>)
+import spirite.core.file.SifFileException
 
-sealed class SifImgdMed
+class SifImgdChunk(val mediums: List<SifImgdMedium>)
 
-class SifImgdMed_Plain(val rawImgData: ByteArray) : SifImgdMed()
+class SifImgdMedium(
+    val id: Int,
+    val data: SifImgdMediumData)
+
+sealed class SifImgdMediumData
+
+class SifImgdMed_Plain(val rawImgData: ByteArray) : SifImgdMediumData()
 class SifImgdMed_Dynamic(
     val offsetX: Short,
     val offsetY: Short,
-    val rawImgData: ByteArray) : SifImgdMed()
+    val rawImgData: ByteArray) : SifImgdMediumData()
 
-object SifImgdMed_Prismatic : SifImgdMed()
+object SifImgdMed_Prismatic : SifImgdMediumData()
 
 // Maglev
 class SifImgdMed_Maglev(
     val offsetX: Short,
     val offsetY: Short,
     val rawImgData: ByteArray,
-    val things: List<SifImgdMagThing>)
+    val things: List<SifImgdMagThing>) :SifImgdMediumData()
 
 sealed class SifImgdMagThing
 
@@ -25,14 +31,22 @@ class SifImgdMagThing_Stroke(
     val color: Int,
     val method: Byte,
     val width: Float,
+    val drawMode : Byte,
     val xs : FloatArray,
     val ys : FloatArray,
-    val ps : FloatArray)
+    val ws : FloatArray) :SifImgdMagThing()
+{
+    init {
+        if( xs.size != ys.size || xs.size != ws.size)
+            throw SifFileException("Mismatching thing size")
+    }
+}
+
 
 class SifImgdMagThing_Fill(
     val color: Int,
     val medhod: Byte,
-    val refPoints: List<RefPoint> )
+    val refPoints: List<RefPoint> ): SifImgdMagThing()
 {
     class RefPoint(
         val strokeRef: Int,

@@ -15,6 +15,7 @@ object SifFileWriter
         out.writeShort(file.height)
 
         writeChunk(out, "GRPT") { SifGrptWriter.write(it, file.grptTrunk)}
+        writeChunk(out, "IMGD") {SifImgdWriter.write(it, file.imgdChunk)}
     }
 
     fun writeChunk(out: IWriteStream, tag:String, writer: (IWriteStream)->Unit) {

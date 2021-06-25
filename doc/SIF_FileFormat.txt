@@ -83,6 +83,7 @@ Header
 				[4, int] : color
 				[1, byte] : Stroke Method
 				[4, float] : width of stroke
+				[1, byte] : Draw Mode
 				[4, int] : number of vertices
 				[4*n, float] : x array
 				[4*n, float] : y array
