@@ -16,6 +16,11 @@ object SifFileWriter
 
         writeChunk(out, "GRPT") { SifGrptWriter.write(it, file.grptChunk)}
         writeChunk(out, "IMGD") {SifImgdWriter.write(it, file.imgdChunk)}
+        // anim
+        //anim space
+        writeChunk(out, "PLTT") { SifPlttWriter.write(it, file.plttChunk)}
+        // palette map
+        // view
     }
 
     fun writeChunk(out: IWriteStream, tag:String, writer: (IWriteStream)->Unit) {

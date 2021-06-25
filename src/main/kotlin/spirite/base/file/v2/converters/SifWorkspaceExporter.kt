@@ -1,7 +1,12 @@
 package spirite.base.file.v2.converters
 
+import rb.vectrix.mathUtil.b
+import sgui.core.systems.IImageIO
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.save.MediumPreparer
+import spirite.base.file.save.PreparedDynamicMedium
+import spirite.base.file.save.PreparedFlatMedium
+import spirite.base.file.save.PreparedMaglevMedium
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.groupTree.GroupNode
@@ -9,15 +14,21 @@ import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.mediums.magLev.MaglevFill
+import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
 import spirite.core.file.contracts.*
+import kotlin.Exception
 
 interface ISifWorkspaceExporter {
     fun export( workspace: IImageWorkspace) : SifFile
 }
 
-class SifWorkspaceExporter : ISifWorkspaceExporter{
+class SifWorkspaceExporter(
+    private val _imgIo : IImageIO
+) : ISifWorkspaceExporter
+{
     class ExportContext(
         val workspace: IImageWorkspace )
     {
@@ -120,11 +131,81 @@ class SifWorkspaceExporter : ISifWorkspaceExporter{
         return SifGrptChunk(nodeList)
     }
 
-    fun exportImgd(context: ExportContext) : SifImgdChunk { TODO() }
+    fun exportImgd(context: ExportContext) : SifImgdChunk {
+        val mediums = context.floatingData.mapNotNull {  floatingMedium ->
+            val data : SifImgdMediumData = when( val prepared = floatingMedium.condensed) {
+                is PreparedFlatMedium -> {
+                    val raw = _imgIo.writePNG(prepared.image)
+                    SifImgdMed_Plain(raw)
+                }
+                is PreparedDynamicMedium -> {
+                    val raw = prepared.image?.run { _imgIo.writePNG(this) }
+                        ?: ByteArray(0)
+
+                    SifImgdMed_Dynamic(
+                        prepared.offsetX.toShort(),
+                        prepared.offsetY.toShort(),
+                        raw )
+                }
+                is PreparedMaglevMedium -> {
+                    val raw = prepared.image?.run { _imgIo.writePNG(this) }
+                        ?: ByteArray(0)
+
+                    val things : List<SifImgdMagThing> = prepared.things.map { thing -> when( thing) {
+                        is MaglevStroke -> {
+                            SifImgdMagThing_Stroke(
+                                thing.params.color.argb32,
+                                thing.params.method.fileId.toByte(),
+                                thing.params.width,
+                                thing.params.mode.fileId.b,
+                                thing.drawPoints.x,
+                                thing.drawPoints.y,
+                                thing.drawPoints.w )
+                        }
+                        is MaglevFill -> {
+                            SifImgdMagThing_Fill(
+                                thing.color.argb32,
+                                thing.mode.fileId.b,
+                                thing.segments.map { seg->
+                                    SifImgdMagThing_Fill.RefPoint(
+                                        seg.strokeId,
+                                        seg.start,
+                                        seg.end )
+                                } )
+                        }
+                        else -> throw Exception("Unrecognized maglev thing")
+                    } }
+
+                    SifImgdMed_Maglev(
+                        prepared.offsetX.toShort(),
+                        prepared.offsetY.toShort(),
+                        raw,
+                        things )
+                }
+
+                else -> return@mapNotNull null
+            }
+
+            SifImgdMedium(
+                floatingMedium.id,
+                data)
+        }
+
+        return SifImgdChunk(mediums)
+    }
 
     fun exportAnim(context: ExportContext): SifAnimChunk { TODO() }
 
-    fun exportPltt(context: ExportContext): SifPlttChunk { TODO()}
+    fun exportPltt(context: ExportContext): SifPlttChunk {
+        val palettes = context.workspace.paletteSet.palettes
+            .map { palette->
+                val raw = palette.compress()
+                SifPlttPalette(
+                    palette.name,
+                    raw )
+            }
+        return SifPlttChunk(palettes)
+    }
 
     fun exportTpltChunk(context: ExportContext) : SifTpltChunk { TODO()}
 
