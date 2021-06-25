@@ -14,7 +14,7 @@ object SifFileWriter
         out.writeShort(file.width)
         out.writeShort(file.height)
 
-        writeChunk(out, "GRPT") { SifGrptWriter.write(it, file.grptTrunk)}
+        writeChunk(out, "GRPT") { SifGrptWriter.write(it, file.grptChunk)}
         writeChunk(out, "IMGD") {SifImgdWriter.write(it, file.imgdChunk)}
     }
 

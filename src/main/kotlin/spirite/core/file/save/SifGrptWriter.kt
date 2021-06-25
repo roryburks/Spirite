@@ -6,7 +6,7 @@ import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
 import spirite.core.file.contracts.SifGrptChunk
 import spirite.core.file.contracts.SifGrptNode_Group
-import spirite.core.file.contracts.SifGrptNode_Layer
+import spirite.core.file.contracts.SifGrptNode_Sprite
 import spirite.core.file.contracts.SifGrptNode_Simple
 
 object SifGrptWriter {
@@ -22,7 +22,7 @@ object SifGrptWriter {
                     out.writeByte(SifConstants.NODE_SPRITE_LAYER)
                     out.writeInt(node.data.mediumId)
                 }
-                is SifGrptNode_Layer -> {
+                is SifGrptNode_Sprite -> {
                     out.writeByte(SifConstants.NODE_SPRITE_LAYER)
                     out.writeByte(node.data.layerType)
 

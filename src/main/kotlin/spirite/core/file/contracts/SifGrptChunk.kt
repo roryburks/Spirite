@@ -1,16 +1,16 @@
 package spirite.core.file.contracts
 
 data class SifGrptChunk(
-    val nodes: List<SifGrptNode<*>>)
+    val nodes: List<SifGrptNode>)
 
-data class SifGrptNode<T : SifGrptNodeData>(
+data class SifGrptNode(
     val settingsBitFlag: Byte,
     val name: String,
-    val data: T,
+    val data: SifGrptNodeData,
     val depth: Int,
-    val obs_alpha: Float,
-    val obs_xOffset: Int,
-    val obs_yOffset: Int)
+    val obs_alpha: Float? = null,
+    val obs_xOffset: Int? = null,
+    val obs_yOffset: Int? = null)
 
 sealed class SifGrptNodeData {}
 
@@ -19,7 +19,7 @@ object SifGrptNode_Group : SifGrptNodeData() {}
 data class SifGrptNode_Simple(
     val mediumId: Int ) : SifGrptNodeData()
 
-data class SifGrptNode_Layer(
+data class SifGrptNode_Sprite(
     val layerType: Int,
     val parts: List<Part>) : SifGrptNodeData()
 {
