@@ -1,5 +1,6 @@
 package spirite.base.file.v2.converters
 
+import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.b
 import sgui.core.systems.IImageIO
 import spirite.base.file.SaveLoadUtil
@@ -10,6 +11,7 @@ import spirite.base.file.save.PreparedMaglevMedium
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.*
+import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
@@ -39,6 +41,8 @@ class SifWorkspaceExporter(
         val root = workspace.groupTree.root
         val floatingData = workspace.mediumRepository.dataList
             .mapNotNull { workspace.mediumRepository.floatData(it) { medium -> MediumPreparer.prepare(medium) } }
+
+        fun getNodeId(node: Node) : Int = nodeMap[node] ?: -1
 
         init {
             buildNodeMap()
@@ -274,9 +278,62 @@ class SifWorkspaceExporter(
         return SifPlttChunk(palettes)
     }
 
-    fun exportTpltChunk(context: ExportContext) : SifTpltChunk { TODO()}
+    fun exportTpltChunk(context: ExportContext) : SifTpltChunk {
+        val nodeColors = context.workspace.paletteMediumMap.getNodeMappings().map { entry ->
+            val node = entry.key
+            val belt = entry.value
 
-    fun exportAnspChunk(context: ExportContext) : SifAnspChunk { TODO()}
+            SifTpltNodeMap(
+                context.getNodeId(node),
+                belt.map { it.argb32 } )
+        }
+
+        val spritePartColors = context.workspace.paletteMediumMap.getSpriteMappings().map { entry ->
+            val (node, spritePartName) = entry.key
+            val belt = entry.value
+
+            SifTpltSpritePartMap(
+                context.getNodeId(node),
+                spritePartName,
+                belt.map { it.argb32 } )
+        }
+
+        return SifTpltChunk(nodeColors, spritePartColors)
+    }
+
+    fun exportAnspChunk(context: ExportContext) : SifAnspChunk {
+        val animMap = context.animMap
+        val spaces = context.workspace.animationSpaceManager.animationSpaces.map { space ->
+            if( space !is FFAAnimationSpace)
+                throw SifFileException("Unsupported Animation Space")
+
+            val anims = space.animationStructs.map { struct ->
+                val onEndLink = struct.onEndLink?.run { animMap[first] } ?: -1
+                val logSpace = space.stateView.logicalSpace[struct.animation] ?: Vec2i.Zero
+                SifAnspAnim(
+                    animMap[struct.animation] ?: -1,
+                    onEndLink,
+                    struct.onEndLink?.second,
+                    logSpace.xi,
+                    logSpace.yi )
+            }
+
+            val links = space.links.map { link ->
+                SifAnspLink(
+                    animMap[link.origin] ?: -1,
+                    link.originFrame,
+                    animMap[link.destination] ?: -1,
+                    link.destinationFrame )
+            }
+
+            SifAnspSpace(
+                space.name,
+                anims,
+                links )
+        }
+
+        return SifAnspChunk(spaces)
+    }
 
     fun exportViewChunk(context: ExportContext) : SifViewChunk { TODO()}
 

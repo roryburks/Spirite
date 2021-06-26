@@ -18,11 +18,11 @@ object SifFileWriter
         writeChunk(out, "IMGD") {SifImgdWriter.write(it, file.imgdChunk)}
         if(file.animChunk.animations.any())
             writeChunk(out, "ANIM") {SifAnimWriter.write(it, file.animChunk)}
-        // anim
-        //anim space
+        if(file.anspChunk.spaces.any())
+            writeChunk(out, "ANSP") {SifAnspWriter.write(it, file.anspChunk)}
         writeChunk(out, "PLTT") { SifPlttWriter.write(it, file.plttChunk)}
-        // palette map
-        // view
+        writeChunk(out, "TPLT") {SifTpltWriter.write(it, file.tpltChunk)}
+        writeChunk(out, "VIEW") {SifViewWriter.write(it, file.viewChunk)}
     }
 
     fun writeChunk(out: IWriteStream, tag:String, writer: (IWriteStream)->Unit) {

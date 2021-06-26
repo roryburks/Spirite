@@ -1,6 +1,6 @@
 package spirite.core.file.contracts
 
-class SifViewChunk(val views: SifViewView)
+class SifViewChunk(val views: List<SifViewView>)
 
 class SifViewView(
     val selectedNodeId: Int,
