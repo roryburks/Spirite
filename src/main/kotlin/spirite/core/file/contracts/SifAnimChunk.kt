@@ -12,18 +12,18 @@ class SifAnimAnimation(
 sealed class SifAnimAnimData
 
 // FFA
-class SifAnimAnim_FixedFrame(
-) : SifAnimAnimData()
+class SifAnimAnim_FixedFrame( val layers: List<SifAnimFfaLayer> ) : SifAnimAnimData()
+
 class SifAnimFfaLayer(
     val partTypeName: String,
     val isAsync : Boolean,
-    val data : SifAnimFfaLayerData )
+    val data : SifAnimFfaLayerData ) :SifAnimAnimData()
 
 sealed class SifAnimFfaLayerData
 class SifAnimFfaLayer_Grouped(
     val groupNodeId: Int,
     val subgroupsLinked: Boolean,
-    val frames: List<Frames> )
+    val frames: List<Frames> )  : SifAnimFfaLayerData()
 {
     class Frames(
         val type : Byte,
@@ -33,11 +33,11 @@ class SifAnimFfaLayer_Grouped(
 class SifAnimFfaLayer_Lexical(
     val groupedNodeId: Int,
     val lexicon: String,
-    val explicitMapping: List<Pair<Char,Int>> )
+    val explicitMapping: List<Pair<Char,Int>> ) : SifAnimFfaLayerData()
 class SifAnimFfaLayer_Cascading(
     val groupedNodeId: Int,
     val lexicon: String,
-    val sublayers: List<SubLayer> )
+    val sublayers: List<SubLayer> ) : SifAnimFfaLayerData()
 {
     class SubLayer(
         val nodeId: Int,

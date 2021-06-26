@@ -16,6 +16,8 @@ object SifFileWriter
 
         writeChunk(out, "GRPT") { SifGrptWriter.write(it, file.grptChunk)}
         writeChunk(out, "IMGD") {SifImgdWriter.write(it, file.imgdChunk)}
+        if(file.animChunk.animations.any())
+            writeChunk(out, "ANIM") {SifAnimWriter.write(it, file.animChunk)}
         // anim
         //anim space
         writeChunk(out, "PLTT") { SifPlttWriter.write(it, file.plttChunk)}

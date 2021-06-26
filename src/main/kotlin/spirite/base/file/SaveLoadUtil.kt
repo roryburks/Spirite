@@ -42,6 +42,7 @@ object SaveLoadUtil {
     const val FFAFRAME_FRAME = 0x01
     const val FFAFRAME_STARTOFLOOP = 0x02
     const val FFAFRAME_GAP = 0x03
+    const val FFAFRAME_ENDOFLOOP = 0x04
 
     // :::: FFALayerType
     const val FFALAYER_GROUPLINKED = 0x01

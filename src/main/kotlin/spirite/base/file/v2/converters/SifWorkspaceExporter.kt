@@ -9,6 +9,7 @@ import spirite.base.file.save.PreparedFlatMedium
 import spirite.base.file.save.PreparedMaglevMedium
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
@@ -194,7 +195,73 @@ class SifWorkspaceExporter(
         return SifImgdChunk(mediums)
     }
 
-    fun exportAnim(context: ExportContext): SifAnimChunk { TODO() }
+    fun exportAnim(context: ExportContext): SifAnimChunk {
+        val nodeMap = context.nodeMap
+        val animations = context.workspace.animationManager.animations.map {  anim ->
+            val state = context.workspace.animationStateSvc.getState(anim)
+
+            val data : SifAnimAnimData = when( anim) {
+                is FixedFrameAnimation -> {
+                    val layers = anim.layers.map { layer ->
+                        val lData : SifAnimFfaLayerData = when( layer) {
+                            is FfaLayerGroupLinked -> {
+                                val frames = layer.frames.map { frame ->
+                                    SifAnimFfaLayer_Grouped.Frames(
+                                        (frame as FFALayer.FFAFrame).marker.fileId.toByte(),
+                                        nodeMap[frame.structure.node] ?: -1,
+                                        frame.length)
+                                }
+
+                                SifAnimFfaLayer_Grouped(
+                                    nodeMap[layer.groupLink] ?: -1,
+                                    layer.includeSubtrees,
+                                    frames )
+                            }
+                            is FfaLayerLexical -> {
+                                val explicitMappings = layer.sharedExplicitMap
+                                    .map { Pair(it.key, nodeMap[it.value] ?: -1) }
+
+                                SifAnimFfaLayer_Lexical(
+                                    nodeMap[layer.groupLink] ?: -1,
+                                    layer.lexicon,
+                                    explicitMappings )
+                            }
+                            is FfaLayerCascading ->{
+                                val subLayers = layer.sublayerInfo.map {
+                                    SifAnimFfaLayer_Cascading.SubLayer(
+                                        nodeMap[it.key] ?: -1,
+                                        it.value.primaryLen,
+                                        it.value.lexicalKey,
+                                        it.value.lexicon ?: "" )
+                                }
+                                SifAnimFfaLayer_Cascading(
+                                    nodeMap[layer.groupLink] ?: -1,
+                                    layer.lexicon ?: "",
+                                    subLayers )
+                            }
+                            else -> throw SifFileException("Unsupported FFA Layer Type")
+                        }
+
+                        SifAnimFfaLayer(
+                            layer.name,
+                            layer.asynchronous,
+                            lData)
+                    }
+
+                    SifAnimAnim_FixedFrame(layers)
+                }
+                else -> throw SifFileException("Unsupported Animation Type")
+            }
+
+            SifAnimAnimation(
+                anim.name,
+                state.speed,
+                state.zoom.toShort(),
+                data)
+        }
+
+        return SifAnimChunk(animations)
+    }
 
     fun exportPltt(context: ExportContext): SifPlttChunk {
         val palettes = context.workspace.paletteSet.palettes

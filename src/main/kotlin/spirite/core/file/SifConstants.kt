@@ -28,11 +28,6 @@ object SifConstants {
     // :::: AnimationSpaceType
     const val ANIMSPACE_FFA = 0x01
 
-    // :::: FFAFrameType
-    const val FFAFRAME_FRAME = 0x01
-    const val FFAFRAME_STARTOFLOOP = 0x02
-    const val FFAFRAME_GAP = 0x03
-
     // :::: FFALayerType
     const val FFALAYER_GROUPLINKED = 0x01
     const val FFALAYER_LEXICAL = 0x02

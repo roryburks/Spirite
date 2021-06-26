@@ -7,10 +7,10 @@ data class FfaFrameStructure(
     val marker: Marker,
     val length: Int
 ) {
-    enum class Marker {
-        FRAME,
-        START_LOCAL_LOOP,
-        END_LOCAL_LOOP,
-        GAP
+    enum class Marker constructor(val fileId: Int){
+        FRAME(1),
+        START_LOCAL_LOOP(2),
+        END_LOCAL_LOOP(4),
+        GAP(3)
     }
 }
