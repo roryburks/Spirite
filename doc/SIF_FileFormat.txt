@@ -207,7 +207,7 @@ Per View:
     Per Node:
     [1, byte] : Bitmap of properities 0th bit is "IsVisible"
     [4, float] : Alpha
-    [1, enum] : Render Method Type
+    [4, enum] : Render Method Type
     [4, int] : Render Value
     [2, short] : OX
     [2, short] : OY

@@ -19,7 +19,7 @@ object SifGrptWriter {
             when( node.data) {
                 is SifGrptNode_Group -> out.writeByte(SifConstants.NODE_GROUP)
                 is SifGrptNode_Simple -> {
-                    out.writeByte(SifConstants.NODE_SPRITE_LAYER)
+                    out.writeByte(SifConstants.NODE_SIMPLE_LAYER)
                     out.writeInt(node.data.mediumId)
                 }
                 is SifGrptNode_Sprite -> {

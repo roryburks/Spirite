@@ -54,7 +54,7 @@ object LoadEngine {
 
     fun loadWorkspace( file: File, master: IMasterControl) : MImageWorkspace{
         try {
-            if( !file.exists())
+            if (!file.exists())
                 throw BadSifFileException("File does not exist.")
 
             val ra = RandomAccessFile(file, "r")
@@ -137,7 +137,7 @@ object LoadEngine {
                 }
 
                 // View Data (optional)
-                context.chunkInfo.singleOrNull { it.header == "VIEW" }?. apply {
+                context.chunkInfo.singleOrNull { it.header == "VIEW" }?.apply {
                     context.telemetry.runAction("Load VIEW") {
                         ra.seek(startPointer)
                         ViewChunkLoader.load(context)
@@ -148,11 +148,11 @@ object LoadEngine {
 
                 if (context.version <= 2) {
                     width = workspace.mediumRepository.dataList
-                            .map { workspace.mediumRepository.getData(it)?.width ?: 0 }
-                            .max() ?: 100
+                        .map { workspace.mediumRepository.getData(it)?.width ?: 0 }
+                        .max() ?: 100
                     height = workspace.mediumRepository.dataList
-                            .map { workspace.mediumRepository.getData(it)?.height ?: 0 }
-                            .max() ?: 100
+                        .map { workspace.mediumRepository.getData(it)?.height ?: 0 }
+                        .max() ?: 100
                 }
 
                 workspace.width = width
@@ -169,12 +169,16 @@ object LoadEngine {
 
 
                 return workspace
-            }finally {
+            } finally {
                 ra.close()
             }
-        }catch( e: Exception) {
-            throw BadSifFileException("Error Reading File: ${e.message}\n${e.printStackTrace()}" )
+        }finally {
+
         }
+//        }catch( e: Exception) {
+//            throw
+//            //throw BadSifFileException("Error Reading File: ${e.message}\n${e.printStackTrace()}" )
+//        }
     }
 
     val adHocRecover = listOf(13,27,41,59,74,89,104,119,134,150,166,182,198,214,229,244,259,276,291,306,322,337,352)

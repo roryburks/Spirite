@@ -17,7 +17,7 @@ object SifViewWriter {
             for (nodeProperty in view.nodeProperties) {
                 out.writeByte(nodeProperty.bitmap.i)
                 out.writeFloat(nodeProperty.alpha)
-                out.writeByte(nodeProperty.renderMethod.i)
+                out.writeInt(nodeProperty.renderMethod.i)
                 out.writeInt(nodeProperty.renderValue)
                 out.writeShort(nodeProperty.ox)
                 out.writeShort(nodeProperty.oy)

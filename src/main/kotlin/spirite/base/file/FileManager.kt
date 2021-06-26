@@ -10,6 +10,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.file.load.BadSifFileException
 import spirite.base.file.load.LoadEngine
 import spirite.base.file.save.SaveEngine
+import spirite.base.file.v2.JvmSpiriteSaveLoad
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
@@ -61,7 +62,8 @@ class FileManager( val master: IMasterControl)  : IFileManager{
         workspace.paletteMediumMap.clearUnused()
 
         val lock = FileLock().apply { locks.add(this) }
-        SaveEngine.saveWorkspace(file, workspace)
+        //SaveEngine.saveWorkspace(file, workspace)
+        JvmSpiriteSaveLoad.write(file, workspace)
         workspace.fileSaved(file)
         locks.remove(lock)
     }

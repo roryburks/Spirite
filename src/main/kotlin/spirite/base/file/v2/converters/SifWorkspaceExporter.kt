@@ -42,7 +42,7 @@ class SifWorkspaceExporter(
         val floatingData = workspace.mediumRepository.dataList
             .mapNotNull { workspace.mediumRepository.floatData(it) { medium -> MediumPreparer.prepare(medium) } }
 
-        fun getNodeId(node: Node) : Int = nodeMap[node] ?: -1
+        fun getNodeId(node: Node?) : Int = nodeMap[node] ?: -1
 
         init {
             buildNodeMap()
@@ -335,6 +335,33 @@ class SifWorkspaceExporter(
         return SifAnspChunk(spaces)
     }
 
-    fun exportViewChunk(context: ExportContext) : SifViewChunk { TODO()}
+    fun exportViewChunk(context: ExportContext) : SifViewChunk {
+        val reverseNodeMap = context.nodeMap
+            .map { Pair(it.value, it.key) }
+            .sortedBy { it.first }
+            .toList()
+        val viewSystem = context.workspace.viewSystem
+
+        val views = (0 until viewSystem.numActiveViews).map { viewNum->
+            val selected = context.getNodeId(viewSystem.getCurrentNode(viewNum))
+
+            val nodeProps = reverseNodeMap.map { (_,node)->
+                val nodeProps = viewSystem.get(node, viewNum)
+                SifViewView.Properties(
+                    if(nodeProps.isVisible) 1 else 0,
+                    nodeProps.alpha,
+                    nodeProps.method.methodType.ordinal.toByte(),
+                    nodeProps.method.renderValue,
+                    nodeProps.ox,
+                    nodeProps.oy)
+            }
+
+            SifViewView(
+                selected,
+                nodeProps)
+        }
+
+        return SifViewChunk(views)
+    }
 
 }
