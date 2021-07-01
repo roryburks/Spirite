@@ -84,7 +84,8 @@ object FfaLexicalLayerLoader : IFfaLayerLoader {
         val ra = context.ra
         val nodes = context.nodes
 
-        val group = nodes.getOrNull(ra.readInt()) as? GroupNode
+        val groupId = ra.readInt()
+        val group = nodes.getOrNull(groupId) as? GroupNode
         val lexicon = ra.readUTF8NT()
 
         val explicitCount = ra.readUnsignedByte()

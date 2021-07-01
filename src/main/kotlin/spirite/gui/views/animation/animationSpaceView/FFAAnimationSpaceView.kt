@@ -16,6 +16,7 @@ import sgui.swing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SwComponent
 import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.DefaultAnimCharMap
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.SpacialLink
@@ -57,9 +58,8 @@ private constructor(
     }
     init /* input */ {
         btnAutoAssign.action = {
-            var char = 'A'
-            animationSpace.animations.forEach {
-                animationSpace.stateView.setCharBind(it, char++)
+            animationSpace.animations.forEachIndexed { index, ffa ->
+                animationSpace.stateView.setCharBind(ffa, DefaultAnimCharMap.getCharForIndex(index))
             }
         }
         rebuild()

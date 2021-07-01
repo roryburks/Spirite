@@ -56,7 +56,7 @@ object SifImgdWriter {
                             }
                         }
                     }
-                    out.writeShort(medium.data.rawImgData.size)
+                    out.writeInt(medium.data.rawImgData.size)
                     out.writeShort(medium.data.offsetX.i)
                     out.writeShort(medium.data.offsetY.i)
                     out.write(medium.data.rawImgData)

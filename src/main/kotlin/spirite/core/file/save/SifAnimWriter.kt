@@ -45,6 +45,7 @@ object SifAnimWriter {
                             }
                             is SifAnimFfaLayer_Lexical -> {
                                 out.writeByte(SifConstants.FFALAYER_LEXICAL)
+                                out.writeInt(layer.data.groupedNodeId)
                                 out.writeStringUft8Nt(layer.data.lexicon)
 
                                 val mappings = layer.data.explicitMapping.take(255)

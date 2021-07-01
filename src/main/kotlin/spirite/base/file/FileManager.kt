@@ -62,8 +62,8 @@ class FileManager( val master: IMasterControl)  : IFileManager{
         workspace.paletteMediumMap.clearUnused()
 
         val lock = FileLock().apply { locks.add(this) }
-        //SaveEngine.saveWorkspace(file, workspace)
-        JvmSpiriteSaveLoad.write(file, workspace)
+        SaveEngine.saveWorkspace(file, workspace)
+        //JvmSpiriteSaveLoad.write(file, workspace)
         workspace.fileSaved(file)
         locks.remove(lock)
     }

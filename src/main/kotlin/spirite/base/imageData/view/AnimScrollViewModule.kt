@@ -2,6 +2,7 @@ package spirite.base.imageData.view
 
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.DefaultAnimCharMap
 import spirite.base.imageData.animation.ffa.FfaLayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupNode
@@ -108,7 +109,7 @@ class AnimScrollViewModule(
                             if( !isTheGuy)
                                 null
                             else
-                                ('A'.toInt() + index).toChar()
+                                DefaultAnimCharMap.getCharForIndex(index) ?: ' '
                         }
                         .filterNotNull()
                     val lex = String(chars.toCharArray())

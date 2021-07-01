@@ -1,6 +1,7 @@
 package spirite.base.imageData.animation.ffa
 
 import rb.extendo.delegates.OnChangeDelegate
+import spirite.base.imageData.animation.DefaultAnimCharMap
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.FRAME
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.GAP
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
@@ -68,16 +69,14 @@ constructor(
         lexicalMap.clear()
 
         // Remap as best we can
-        val alphabetSansExplicit = (0..25)
-                .asSequence()
-                .map { 'A' + it }
-                .filter { !sharedExplicitMap.containsKey(it) }
+        val alphabetSansExplicit = DefaultAnimCharMap.getCharList().asSequence()
+            .filter { !sharedExplicitMap.containsKey(it) }
 
         groupLink.children.asReversed().asSequence()
                 .filterIsInstance<LayerNode>()
                 .zip(alphabetSansExplicit)
                 .forEach { lexicalMap[it.second] = it.first }
-        sharedExplicitMap.forEach { t, u -> lexicalMap[t] = u }
+        sharedExplicitMap.forEach { (t, u) -> lexicalMap[t] = u }
 
         // Remove any references to no-longer-extant layers
         val remainingNodes = groupLink.children.toHashSet()

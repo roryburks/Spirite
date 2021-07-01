@@ -3,6 +3,7 @@ package spirite.base.imageData.animation.ffa
 import rb.extendo.delegates.OnChangeDelegate
 import rb.extendo.extensions.toHashMap
 import rb.vectrix.mathUtil.MathUtil
+import spirite.base.imageData.animation.DefaultAnimCharMap
 import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupNode
@@ -78,7 +79,7 @@ class FfaLayerCascading(
         val oldSublayerInfo = sublayerInfo
         val newSublayerInfo = newGroupNodes
                 .mapIndexedNotNull { index, groupNode ->
-                    val key = 'A' + index
+                    val key = DefaultAnimCharMap.getCharForIndex(index) ?: ' '
                     val info = oldSublayerInfo[groupNode]?.copyUpdated(key)
                             ?: FfaCascadingSublayerInfo.FromGroup(groupNode, key)
                             ?: return@mapIndexedNotNull  null
@@ -96,7 +97,7 @@ class FfaLayerCascading(
         lexicon = oldLexicon?.asSequence()
                 ?.mapNotNull { if(it == ' ') ' ' else oldLexicalMap[it]?.run { newLexicalInvMap[this] } }
                 ?.joinToString("")
-        val newLexicon = lexicon ?: String(CharArray(newGroupNodes.size) {'A' + it})
+        val newLexicon = lexicon ?: String(CharArray(newGroupNodes.size) {DefaultAnimCharMap.getCharForIndex(it)?:' '})
 
         var met = 0
         val sublayers = newLexicon.mapNotNull {
@@ -187,7 +188,7 @@ constructor(
         lexicon == null -> layers.getOrNull(met)
         else -> when(val lex = lexicon.getOrNull(met)) {
             null -> null
-            else -> layers.getOrNull(lex - 'A')
+            else -> layers.getOrNull(DefaultAnimCharMap.getIndexFromChar(lex) ?: -1)
         }
     }
 
