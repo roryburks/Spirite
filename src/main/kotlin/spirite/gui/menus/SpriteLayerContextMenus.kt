@@ -12,6 +12,7 @@ object SpriteLayerContextMenus {
         menuItems.add(MenuItem("Select All", SpriteCommands.SelectAll))
         menuItems.add(MenuItem("Move parts to other Sprite", SpriteCommands.MoveParts))
         menuItems.add(MenuItem("Fill in to other Sprites", SpriteCommands.FillInLinked))
+        menuItems.add(MenuItem("Copy To Layer", SpriteCommands.CopySpriteParts))
         menuItems.add(MenuItem("DEBUG: Copy Across Direct", SpriteCommands.CopyAcrossMirrored))
 
         if( part.context.parts.any { it.handle.medium is MaglevMedium })

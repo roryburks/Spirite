@@ -415,6 +415,14 @@ class SpriteLayer : Layer {
 
     // endregion
 
+    // region Weird Commands
+    fun replaceMedium(partName: String, newMedium: MediumHandle) {
+        val existingPart = _parts.firstOrNull { it.partName == partName } ?: return
+
+        removePart(existingPart, false)
+        _addPart(existingPart.structure, newMedium)
+    }
+
     // region Depth Remapping
     fun remapDepth(newDepths: Map<SpritePart,Int>)
     {

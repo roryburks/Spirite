@@ -126,4 +126,18 @@ object SpriteCommands {
             }
         }
     }
+
+    val CopySpriteParts = SpriteCommand("copy-parts") { sprite, part, master ->
+        val multiGroup = sprite.multiSelect ?: part?.run { setOf(this) } ?: throw CommandNotValidException
+        val toLayer = master.dialog.invokeMoveSpriteParts(multiGroup.toList()) ?: throw CommandNotValidException
+        val ws = sprite.workspace
+
+        ws.undoEngine.doAsAggregateAction("Copy sprite Parts") {
+            for (spritePart in multiGroup) {
+                val newMedium = spritePart.handle.medium.dupe(ws)
+                val newHandle = ws.mediumRepository.addMedium(newMedium)
+                toLayer.replaceMedium(spritePart.partName, newHandle)
+            }
+        }
+    }
 }
