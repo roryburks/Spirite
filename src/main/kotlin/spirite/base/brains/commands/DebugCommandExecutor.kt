@@ -7,7 +7,7 @@ import rb.file.BufferedFileReader
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rbJvm.file.JvmInputStreamFileReader
-import rbJvm.file.writing.JvmRaWriter
+import rbJvm.file.writing.toBufferedWriteStream
 import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.DBGlobal
 import spirite.base.brains.IMasterControl
@@ -132,7 +132,7 @@ object DebugCommands
         file.createNewFile()
         val ra = RandomAccessFile(file, "rw")
         ra.use { ra ->
-            val writer = JvmRaWriter(ra)
+            val writer = ra.toBufferedWriteStream()
             val aafWriter = AafWriterFactory.makeWriter(4)
             aafWriter.write(writer, aaf1)
         }

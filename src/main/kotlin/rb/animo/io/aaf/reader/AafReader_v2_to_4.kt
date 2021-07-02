@@ -1,12 +1,12 @@
 package rb.animo.io.aaf.reader
 
 import rb.animo.io.aaf.*
-import rb.file.IFileReader
+import rb.file.IReadStream
 import rb.file.readUtf8
 import rb.vectrix.mathUtil.i
 
 class AafReader_v2_to_4( val version: Int) : IAafReader {
-    override fun read(reader: IFileReader): AafFile {
+    override fun read(reader: IReadStream): AafFile {
         val numAnims = reader.readUnsignedShort()
 
         val anims = List(numAnims) {

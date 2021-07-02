@@ -7,7 +7,7 @@ class BufferedFileReader(
         val stream: IBinaryReadStream,
         val bufferSize: Int = 1024,
         val mathLayer: IMathLayer = VectrixMathLayer.mathLayer)
-    : IFileReader
+    : IReadStream
 {
     var _buffer : ByteArray? = null
     var _bCarat : Int = 0

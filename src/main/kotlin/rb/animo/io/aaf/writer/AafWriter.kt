@@ -1,21 +1,20 @@
 package rb.animo.io.aaf.writer
 
 import rb.animo.io.aaf.AafFile
-import rb.file.IFileWriter
-import rb.file.writeUtf8
+import rb.file.IWriteStream
 import rb.vectrix.mathUtil.i
 
 interface IAafWriter {
-    fun write(writer: IFileWriter, aafFile: AafFile)
+    fun write(writer: IWriteStream, aafFile: AafFile)
 }
 
 class AafWriter_v2_to_v4(val version: Int) : IAafWriter{
-    override fun write(writer: IFileWriter, aafFile: AafFile) {
+    override fun write(writer: IWriteStream, aafFile: AafFile) {
         writer.writeInt(version)
 
         writer.writeShort(aafFile.animations.count()) // [2] : NumAnims
         for (anim in aafFile.animations) {
-            writer.writeUtf8(anim.name) // [n] Name
+            writer.writeStringUft8Nt(anim.name) // [n] Name
             if( version >= 3) {
                 writer.writeShort(anim.ox) // [2] OriginX
                 writer.writeShort(anim.oy) // [2] OriginY

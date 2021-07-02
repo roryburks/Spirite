@@ -1,10 +1,10 @@
 package rb.animo.io.aaf.writer
 
 import rb.animo.io.aaf.*
-import rb.file.IFileWriter
+import rb.file.IWriteStream
 
 object AafColisionWriter {
-    fun write(writer: IFileWriter, col: AafFCollisionKind) {
+    fun write(writer: IWriteStream, col: AafFCollisionKind) {
         when( col) {
             is AafFColPoint -> {
                 writer.writeByte(0) // [1] ColisionKind

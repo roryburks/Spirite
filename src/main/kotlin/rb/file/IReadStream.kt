@@ -6,7 +6,7 @@ import rb.vectrix.mathUtil.i
 import java.io.ByteArrayOutputStream
 import kotlin.math.min
 
-interface IFileReader {
+interface IReadStream {
     fun readShort() : Short
     fun readUnsignedShort() : Int
     fun readByte() : Byte
@@ -20,7 +20,7 @@ interface IFileReader {
     var filePointer: Long
 }
 
-fun IFileReader.readUtf8(): String {
+fun IReadStream.readUtf8(): String {
     val bos = ByteArrayOutputStream()
     var b = this.readByte()
     while( b != 0x00.toByte()) {
