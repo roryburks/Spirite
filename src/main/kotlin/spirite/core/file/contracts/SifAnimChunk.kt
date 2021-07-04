@@ -23,9 +23,9 @@ sealed class SifAnimFfaLayerData
 class SifAnimFfaLayer_Grouped(
     val groupNodeId: Int,
     val subgroupsLinked: Boolean,
-    val frames: List<Frames> )  : SifAnimFfaLayerData()
+    val frames: List<Frame> )  : SifAnimFfaLayerData()
 {
-    class Frames(
+    class Frame(
         val type : Byte,
         val nodeId: Int,
         val len: Int)

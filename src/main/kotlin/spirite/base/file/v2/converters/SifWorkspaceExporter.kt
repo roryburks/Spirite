@@ -210,7 +210,7 @@ class SifWorkspaceExporter(
                         val lData : SifAnimFfaLayerData = when( layer) {
                             is FfaLayerGroupLinked -> {
                                 val frames = layer.frames.map { frame ->
-                                    SifAnimFfaLayer_Grouped.Frames(
+                                    SifAnimFfaLayer_Grouped.Frame(
                                         (frame as FFALayer.FFAFrame).marker.fileId.toByte(),
                                         nodeMap[frame.structure.node] ?: -1,
                                         frame.length)
