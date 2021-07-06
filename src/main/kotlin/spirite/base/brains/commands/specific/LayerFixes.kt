@@ -4,11 +4,14 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
+import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.ArrangedMediumData
 
 object LayerFixes {
@@ -48,7 +51,20 @@ object LayerFixes {
     }
 
 
-    fun MoveSpritePart(part: SpriteLayer.SpritePart, newLayer: SpriteLayer?) {
+    fun copyUnusedMediumsIntoSprite(workspace: MImageWorkspace) {
+        val used = workspace.groupTree.root.imageDependencies
+            .map { it.id }
+            .toHashSet()
 
+        val toRevive = workspace.mediumRepository.dataList
+            .filter { !used.contains(it) }
+            .mapIndexed { index, i ->
+                Pair(MediumHandle(workspace, i), SpritePartStructure(index, "imp_$index"))
+            }
+
+        if( toRevive.any()) {
+            val spriteLayer = SpriteLayer(workspace, toRevive)
+            workspace.groupTree.importLayer(workspace.groupTree.root, "UnusedMediums", spriteLayer)
+        }
     }
 }

@@ -104,7 +104,9 @@ class RootWindow( val master: IMasterControl) : JFrame() {
             MenuItem(".Brk", DebugCommands.Breakpoint),
             MenuItem(".Cycle Sprite", DebugCommands.CycleSpriteParts),
             MenuItem(".Color Change Context", DebugCommands.MaglevTotalColorChange),
-            MenuItem(".Anim Filter Set", DebugCommands.ChangeFilterSet)
+            MenuItem(".Anim Filter Set", DebugCommands.ChangeFilterSet),
+            MenuItem(".Import Unused Mediums Into Sprite", GlobalCommands.ImportUnused)
+
 
 
         )

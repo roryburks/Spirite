@@ -98,7 +98,7 @@ class AnimationPreviewView(
     }
 
     // region Timer Stuff
-    private val _timer : ITimer = _timing.createTimer(15, true) {_gle.runInGLContext { tick()}}
+    private val _timer : ITimer = _timing.createTimer(15, true) {tick()}
 
     private var _prevTime : Long? = null
     private fun tick() {
@@ -117,7 +117,7 @@ class AnimationPreviewView(
     }
     // endregion
 
-    // region Bindings
+    // region Bind UI to Controller Binds
     init {
         _controller.animBind.offsetXBind.addObserver { _, _ -> viewPanel.redraw() }
         _controller.animBind.offsetYBind.addObserver { _, _ -> viewPanel.redraw() }
@@ -125,10 +125,9 @@ class AnimationPreviewView(
         _controller.animBind.metBind
             .addObserver { new, _ ->
                 sliderMet.value = ((new % (_controller.animation?.endFrame ?: 0f)) * 100).floor
+                ifMet.value = (new  % (_controller.animation?.endFrame ?: 0f)) .floor
                 viewPanel.redraw()
             }
-        _controller.animBind.metBind
-            .addObserver { new, _ ->ifMet.value = (new  % (_controller.animation?.endFrame ?: 0f)) .floor}
 
         ifZoom.valueBind.bindTo(_controller.animBind.zoomBind)
         bgColorBox.colorBind.bindTo(_controller.colorBind)
@@ -155,7 +154,7 @@ class AnimationPreviewView(
     }
     // endregion
 
-    //  Mouse Controls
+    //  region Controls
     init /* Mouse Controls */ {
         var curX : Int? = null
         var curY = 0
@@ -180,7 +179,6 @@ class AnimationPreviewView(
     }
 
     init /* Action Bindings */{
-
         bgColorBox.colorBind.addObserver { _, _ -> viewPanel.redraw() }
         btnNext.action = {_controller.offsetAnimation(1f, true)}
         btnPrev.action = {_controller.offsetAnimation(-1f, true)}

@@ -20,6 +20,7 @@ import spirite.sguiHybrid.transferables.INodeBuilder
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
+import spirite.base.brains.commands.specific.LayerFixes
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.file.aaf.AafImporter
 import spirite.base.file.workspaceFromImage
@@ -187,6 +188,11 @@ object GlobalCommands
                 .flatMap { it.parts.asSequence().filter { it.partName == partName } }
                 .filter { it.handle.medium != med }
                 .forEach { workspace.mediumRepository.replaceMediumDirect(it.handle, med.dupe(workspace)) }
+    }
+
+    val ImportUnused = GlobalCommand("importUnused") { master: IMasterControl, workspaceSet: MWorkspaceSet ->
+        val workspace = workspaceSet.currentMWorkspace ?: throw CommandNotValidException
+        LayerFixes.copyUnusedMediumsIntoSprite(workspace)
     }
 
 
