@@ -38,12 +38,10 @@ object SimpleLayerLoader : ILayerLoader
     override fun loadLayer(context : LoadContext, name: String): Layer? {
         val mediumId = context.ra.readInt()
 
-        try {
-            return SimpleLayer(MediumHandle(context.workspace, context.reindex(mediumId)))
-        }
-        catch (e: Exception)
-        {
-            return null
+        return try {
+            SimpleLayer(MediumHandle(context.workspace, context.reindex(mediumId)))
+        } catch (e: Exception) {
+            null
         }
     }
 }
