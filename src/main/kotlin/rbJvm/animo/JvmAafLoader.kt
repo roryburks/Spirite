@@ -7,7 +7,7 @@ import rb.animo.io.AafScope
 import rb.animo.io.IAafScope
 import rb.animo.io.ILoader
 import rb.animo.io.aaf.reader.AafReaderFactory
-import rb.file.BufferedFileReader
+import rb.file.BufferedReadStream
 import rb.glow.gle.IGLEngine
 import rbJvm.file.JvmInputStreamFileReader
 import rbJvm.glow.awt.ImageBI
@@ -26,7 +26,7 @@ class JvmAafLoader(private val _gle: IGLEngine) : ILoader<IAafScope> {
             }
 
             loader.getResource(aafFile).openStream().use { inputStream ->
-                val reader = BufferedFileReader(JvmInputStreamFileReader(inputStream))
+                val reader = BufferedReadStream(JvmInputStreamFileReader(inputStream))
 
                 val aafReader = AafReaderFactory.readVersionAndGetReader(reader)
                 val aaf = aafReader.read(reader)

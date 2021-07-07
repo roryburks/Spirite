@@ -3,7 +3,7 @@ package spirite.base.brains.commands
 import rb.animo.io.aaf.reader.AafReaderFactory
 import rb.animo.io.aaf.util.AafUtil
 import rb.animo.io.aaf.writer.AafWriterFactory
-import rb.file.BufferedFileReader
+import rb.file.BufferedReadStream
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rbJvm.file.JvmInputStreamFileReader
@@ -139,7 +139,7 @@ object DebugCommands
 
         // Load Aaf
         val dis = file.inputStream()
-        val reader = BufferedFileReader(JvmInputStreamFileReader(dis))
+        val reader = BufferedReadStream(JvmInputStreamFileReader(dis))
         val aafReader = AafReaderFactory.readVersionAndGetReader(reader)
         val aaf2 = aafReader.read(reader)
 

@@ -1,6 +1,6 @@
 package spirite.base.file.load
 
-import rb.file.BufferedFileReader
+import rb.file.BufferedReadStream
 import rb.glow.ColorARGB32Normal
 import rb.glow.toColor
 import rb.vectrix.interpolation.CubicSplineInterpolator2D
@@ -114,7 +114,7 @@ object MagneticMediumLoader_V2 : IMediumLoader
 {
     override fun loadMedium(context: LoadContext): IMedium? {
         //val ra = context.ra
-        val ra = BufferedFileReader(JvmRandomAccessFileBinaryReadStream(context.ra))
+        val ra = BufferedReadStream(JvmRandomAccessFileBinaryReadStream(context.ra))
 
         context.tel2.start("MegMediumLoad1")
         val numThings = ra.readUnsignedShort()

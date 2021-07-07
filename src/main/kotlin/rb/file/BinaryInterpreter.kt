@@ -24,7 +24,7 @@ class ByteArrayInter(val n : Int) : IBinaryInterpreter<ByteArray> {
     override fun convert(t: ByteArray): ByteArray = t
 }
 
-object LittleEndian {
+object BigEndian {
     // God, Kotlin's bitwise capabilities are /*inexcusable*/ really bad but at least better
     object IntInter : IBinaryInterpreter<Int> {
         override val len: Int get() = 4

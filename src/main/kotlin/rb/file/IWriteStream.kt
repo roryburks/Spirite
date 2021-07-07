@@ -29,11 +29,11 @@ class BigEndianWriteStream(val underlying: IRawWriteStream) :IWriteStream {
         write(ba)
     }
 
-    override fun writeInt(i: Int) = write(i, LittleEndian.IntInter)
+    override fun writeInt(i: Int) = write(i, BigEndian.IntInter)
     override fun writeByte(b: Int) = write(b.b, ByteInter)
-    override fun writeFloat(f: Float) = write(f, LittleEndian.FloatInter)
-    override fun writeShort(s: Int) = write(s.toShort(), LittleEndian.ShortInter)
-    override fun writeFloatArray(fa: FloatArray) = write(fa, LittleEndian.FloatArrayInter(fa.size))
+    override fun writeFloat(f: Float) = write(f, BigEndian.FloatInter)
+    override fun writeShort(s: Int) = write(s.toShort(), BigEndian.ShortInter)
+    override fun writeFloatArray(fa: FloatArray) = write(fa, BigEndian.FloatArrayInter(fa.size))
     override fun writeStringUft8Nt(str: String) {
         val b = (str + 0.toChar()).toByteArray(Charset.forName("UTF-8"))
 
