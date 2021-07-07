@@ -6,6 +6,8 @@ import rb.file.ByteArrayReadStream
 import rb.vectrix.mathUtil.b
 import rbJvm.vectrix.SetupVectrixForJvm
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 object BufferedReaderTests {
     @Test fun testReadInt() {
@@ -40,6 +42,21 @@ object BufferedReaderTests {
             assertEquals(-i, x)
 
         }
+    }
+
+    @Test fun eof() {
+        val bytes = convertToByteBigEndian ((0..100).toList().toIntArray())
+        val stream = ByteArrayReadStream(bytes)
+        val bufferedReader = BufferedReadStream(stream, 55) // intentionally nonsensical size
+
+        repeat(101) {
+            assertFalse(bufferedReader.eof)
+            bufferedReader.readInt()
+        }
+
+        assertTrue(bufferedReader.underlying.eof)
+        assertTrue(bufferedReader.eof)
+
     }
 
     private fun convertToByteBigEndian(intArray: IntArray) : ByteArray {

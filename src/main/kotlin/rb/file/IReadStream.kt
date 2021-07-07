@@ -3,6 +3,7 @@ package rb.file
 import rb.vectrix.IMathLayer
 import rb.vectrix.VectrixMathLayer
 import rb.vectrix.mathUtil.i
+import rb.vectrix.mathUtil.l
 import java.io.ByteArrayOutputStream
 import kotlin.math.min
 
@@ -18,6 +19,7 @@ interface IReadStream {
     fun readByteArray( size: Int) : ByteArray
 
     var filePointer: Long
+    val eof: Boolean
 }
 
 fun IReadStream.readUtf8(): String {
@@ -32,28 +34,24 @@ fun IReadStream.readUtf8(): String {
 }
 
 interface IBinaryReadStream {
-    fun readBytes( size: Int) : ByteArray
-    fun readInto( byteArray: ByteArray, offset: Int, length: Int)
+    fun readInto( byteArray: ByteArray, offset: Int = 0, length: Int = byteArray.size) : Int
     var filePointer : Long
+    val eof: Boolean
 }
 
 class ByteArrayReadStream(
         val data: ByteArray,
-        val mathLayer: IMathLayer = VectrixMathLayer.mathLayer
+        private val _mathLayer: IMathLayer = VectrixMathLayer.mathLayer
 ) : IBinaryReadStream
 {
-    override fun readBytes(size: Int): ByteArray {
-        val array = ByteArray(size)
-        readInto(array, 0, array.size)
-        return array
-    }
-
-    override fun readInto(byteArray: ByteArray, offset: Int, length: Int) {
+    override fun readInto(byteArray: ByteArray, offset: Int, length: Int) : Int {
         val aLen = min(data.size - filePointer.i, length)
-        mathLayer.arraycopy(data, filePointer.i, byteArray, offset, aLen)
+        _mathLayer.arraycopy(data, filePointer.i, byteArray, offset, aLen)
         filePointer += aLen
+        return aLen
     }
 
     override var filePointer: Long = 0
     val len: Int get() = data.size
+    override val eof: Boolean get() = (filePointer == len.l)
 }

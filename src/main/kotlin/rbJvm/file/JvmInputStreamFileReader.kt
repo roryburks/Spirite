@@ -6,16 +6,10 @@ import java.io.InputStream
 class JvmInputStreamFileReader(val i: InputStream) : IBinaryReadStream {
     private var caret = 0L
 
-    override fun readBytes(size: Int): ByteArray {
-        caret += size
-        val ba = ByteArray(size)
-        i.read(ba)
-        return ba
-    }
-
-    override fun readInto(byteArray: ByteArray, offset: Int, length: Int) {
-        caret += length
-        i.read(byteArray, offset, length)
+    override fun readInto(byteArray: ByteArray, offset: Int, length: Int): Int {
+        val readLen = i.read(byteArray, offset, length)
+        caret += readLen
+        return readLen
     }
 
     override var filePointer: Long
@@ -31,4 +25,7 @@ class JvmInputStreamFileReader(val i: InputStream) : IBinaryReadStream {
                 caret = value
             }
         }
+
+    // from Java Docs, InputStream available() should return "0 when it reaches the end of the input stream"
+    override val eof: Boolean get() = (i.available() == 0)
 }
