@@ -20,8 +20,9 @@ object SifImgdWriter {
                     out.writeByte(SifConstants.MEDIUM_DYNAMIC)
                     out.writeShort(medium.data.offsetX.i)
                     out.writeShort(medium.data.offsetY.i)
-                    out.writeInt(medium.data.rawImgData.size)
-                    out.write(medium.data.rawImgData)
+                    out.writeInt(medium.data.rawImgData?.size ?: 0)
+                    if( medium.data.rawImgData != null)
+                        out.write(medium.data.rawImgData)
                 }
                 is SifImgdMed_Maglev -> {
                     out.writeByte(SifConstants.MEDIUM_MAGLEV)

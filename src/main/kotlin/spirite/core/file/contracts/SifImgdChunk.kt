@@ -14,7 +14,7 @@ class SifImgdMed_Plain(val rawImgData: ByteArray) : SifImgdMediumData()
 class SifImgdMed_Dynamic(
     val offsetX: Short,
     val offsetY: Short,
-    val rawImgData: ByteArray) : SifImgdMediumData()
+    val rawImgData: ByteArray?) : SifImgdMediumData()
 
 object SifImgdMed_Prismatic : SifImgdMediumData()
 
@@ -34,7 +34,8 @@ class SifImgdMagThing_Stroke(
     val drawMode : Byte,
     val xs : FloatArray,
     val ys : FloatArray,
-    val ws : FloatArray) :SifImgdMagThing()
+    val ws : FloatArray,
+    val preInterpolated: Boolean = true) :SifImgdMagThing()
 {
     init {
         if( xs.size != ys.size || xs.size != ws.size)
