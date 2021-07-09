@@ -48,7 +48,7 @@ object MagneticMediumLoader : IMediumLoader
                         val color = ra.readInt().toColor()
                         val strokeMethod = Method.fromFileId(ra.readByte().i) ?: BASIC
                         val strokeWidth = ra.readFloat()
-                        val mode = PenDrawMode.fromFileId(ra.readUnsignedByte())
+                        val mode = PenDrawMode.fromFileId(ra.readUnsignedByte()) ?: PenDrawMode.NORMAL
 
                         val numVertices = ra.readInt()
 
@@ -127,7 +127,7 @@ object MagneticMediumLoader_V2 : IMediumLoader
                     val color = ra.readInt().toColor()
                     val strokeMethod = Method.fromFileId(ra.readByte().i) ?: BASIC
                     val strokeWidth = ra.readFloat()
-                    val mode = PenDrawMode.fromFileId(ra.readUnsignedByte())
+                    val mode = PenDrawMode.fromFileId(ra.readUnsignedByte()) ?: PenDrawMode.NORMAL
 
                     val numVertices = ra.readInt()
 
@@ -211,7 +211,7 @@ object Legacy_1_0006_MagneticMediumPartialLoader : IMediumLoader
                     val strokeWidth = ra.readFloat()
                     val mode =
                             if( context.version < 0x1_0006) PenDrawMode.NORMAL
-                            else PenDrawMode.fromFileId(ra.readUnsignedByte())
+                            else PenDrawMode.fromFileId(ra.readUnsignedByte()) ?: PenDrawMode.NORMAL
 
                     val numVertices = ra.readUnsignedShort()
 

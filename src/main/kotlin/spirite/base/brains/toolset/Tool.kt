@@ -65,7 +65,7 @@ enum class PenDrawMode(
             1 -> NORMAL
             2 -> KEEP_ALPHA
             3 -> BEHIND
-            else -> throw IllegalArgumentException("BadFileId")
+            else -> null
         }
     }
 }
