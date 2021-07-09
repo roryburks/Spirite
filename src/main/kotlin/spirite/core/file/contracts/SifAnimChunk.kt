@@ -17,7 +17,7 @@ class SifAnimAnim_FixedFrame( val layers: List<SifAnimFfaLayer> ) : SifAnimAnimD
 class SifAnimFfaLayer(
     val partTypeName: String,
     val isAsync : Boolean,
-    val data : SifAnimFfaLayerData ) :SifAnimAnimData()
+    val data : SifAnimFfaLayerData )
 
 sealed class SifAnimFfaLayerData
 class SifAnimFfaLayer_Grouped(

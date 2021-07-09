@@ -11,6 +11,8 @@ import spirite.base.brains.toolset.PenDrawMode
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.SimpleLayer
@@ -40,6 +42,7 @@ class SifWorkspaceImporter(
     class ImportContext(val sif:SifFile){
         lateinit var mediumReindexingMap : Map<Int,Int>
         val nodes: MutableList<Node> = mutableListOf()
+        val animations: MutableList<Animation> = mutableListOf()
 
         fun reindex( index : Int) = mediumReindexingMap[index] ?: throw SifFileException("Medium Id $index does not correspond to any Medium Data")
     }
@@ -53,6 +56,11 @@ class SifWorkspaceImporter(
 
         importImgd(workspace, file.imgdChunk, context)
         importGrpt(workspace, file.grptChunk, context)
+        importAnim(workspace, file.animChunk, context)
+        // animspace
+        // palette
+        //tplt
+        // view
 
         return workspace
     }
@@ -131,7 +139,7 @@ class SifWorkspaceImporter(
             // !!!! Kind of hack-yi that it's even saved, but only the root node should be
             //	depth 0 and there should only be one (and it's already created)
             if( fNode.depth == 0)
-                context
+                continue
             val bitFlag = fNode.settingsBitFlag.i
 
             val node = when( val data = fNode.data) {
@@ -174,5 +182,86 @@ class SifWorkspaceImporter(
             }
         }
 
+    }
+
+    fun importAnim(workspace: MImageWorkspace, anim: SifAnimChunk, context: ImportContext) {
+        for (animation in anim.animations) {
+            val data = animation.data
+            if(data !is SifAnimAnim_FixedFrame) {
+                _logger.logWarning("Only Fixed Frame Animations supported; skipping animation ${animation.name}")
+                continue
+            }
+
+            // FFA Specific Stuff
+            val ffa = FixedFrameAnimation(animation.name, workspace)
+
+            fun loadGroupedLayer( lData: SifAnimFfaLayer_Grouped, layer: SifAnimFfaLayer) : IFfaLayer?{
+                val groupNode = context.nodes.getOrNull(lData.groupNodeId) as? GroupNode ?: return null
+                val frameMap = mutableMapOf<Node, FfaFrameStructure>()
+                val unlinkedFrameClusters = mutableListOf<FfaLayerGroupLinked.UnlinkedFrameCluster>()
+
+                var workingNode : Node? = null
+                var workingUnlinkedFrames = mutableListOf<FfaFrameStructure>()
+
+                for (frame in lData.frames) {
+                    val frameNode = context.nodes.getOrNull(frame.nodeId)
+
+                    val marker = FfaFrameStructure.Marker.values()
+                        .firstOrNull { it.fileId == frame.type.i }
+                        ?: FfaFrameStructure.Marker.GAP
+
+                    if( frameNode == null)
+                        workingUnlinkedFrames.add(FfaFrameStructure(null, marker, frame.len))
+                    else {
+                        frameMap[frameNode] = FfaFrameStructure(frameNode, marker, frame.len)
+                        if( workingUnlinkedFrames.any())
+                            unlinkedFrameClusters.add(FfaLayerGroupLinked.UnlinkedFrameCluster(workingNode, workingUnlinkedFrames))
+                        workingUnlinkedFrames = mutableListOf()
+                        workingNode = frameNode
+                    }
+                }
+                return ffa.addLinkedLayer(groupNode, lData.subgroupsLinked, layer.partTypeName, frameMap, unlinkedFrameClusters)
+            }
+
+            fun loadLexicalLayer( lData: SifAnimFfaLayer_Lexical, layer: SifAnimFfaLayer) : IFfaLayer? {
+                val groupNode = context.nodes.getOrNull(lData.groupedNodeId) as? GroupNode ?: return null
+                val converted = lData.explicitMapping
+                    .mapNotNull {
+                        val node = context.nodes.getOrNull(it.second) ?: return@mapNotNull null
+                        Pair( it.first, node)
+                    }
+                val map = if( converted.isEmpty()) null else converted.toMap()
+
+                return ffa.addLexicalLayer(groupNode, layer.partTypeName, lData.lexicon, map)
+            }
+
+            fun loadCascadingLayer( lData: SifAnimFfaLayer_Cascading, layer: SifAnimFfaLayer) : IFfaLayer? {
+                val groupNode = context.nodes.getOrNull(lData.groupedNodeId) as? GroupNode ?: return null
+
+                val subContracts = lData.sublayers.mapNotNull {
+                    val infoGroup = context.nodes.getOrNull(it.nodeId)  as? GroupNode ?: return@mapNotNull null
+                    FfaCascadingSublayerContract(infoGroup, it.lexicalKey, it.primaryLen, it.lexicon)
+                }
+
+                return ffa.addCascadingLayer(groupNode, layer.partTypeName, subContracts, lData.lexicon)
+            }
+
+            for (fLayer in data.layers) {
+                val layer = when( val lData = fLayer.data) {
+                    is SifAnimFfaLayer_Grouped -> loadGroupedLayer(lData, fLayer)
+                    is SifAnimFfaLayer_Lexical -> loadLexicalLayer(lData, fLayer)
+                    is SifAnimFfaLayer_Cascading -> loadCascadingLayer(lData, fLayer)
+                } ?: continue
+
+                layer.asynchronous = fLayer.isAsync
+            }
+
+            // Add
+            context.animations.add(ffa)
+            workspace.animationManager.addAnimation(ffa)
+            val stateBind = workspace.animationStateSvc.getState(ffa)
+            stateBind.speed = animation.speed
+            stateBind.zoom = animation.zoom.i
+        }
     }
 }
