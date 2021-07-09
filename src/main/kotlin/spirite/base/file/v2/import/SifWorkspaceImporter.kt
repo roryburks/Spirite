@@ -2,7 +2,10 @@ package spirite.base.file.v2.import
 
 import rb.global.ILogger
 import rb.glow.ColorARGB32Normal
+import rb.glow.gle.RenderMethod
+import rb.glow.gle.RenderMethodType
 import rb.vectrix.interpolation.CubicSplineInterpolator2D
+import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.i
 import sgui.core.systems.IImageIO
 import spirite.base.brains.IMasterControl
@@ -13,6 +16,7 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.*
+import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.SimpleLayer
@@ -26,6 +30,7 @@ import spirite.base.imageData.mediums.magLev.IMaglevThing
 import spirite.base.imageData.mediums.magLev.MaglevFill
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.mediums.magLev.MaglevStroke
+import spirite.base.imageData.view.NodeViewProperties
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.BasicDynamics
 import spirite.base.pen.stroke.DrawPoints
@@ -57,10 +62,10 @@ class SifWorkspaceImporter(
         importImgd(workspace, file.imgdChunk, context)
         importGrpt(workspace, file.grptChunk, context)
         importAnim(workspace, file.animChunk, context)
-        // animspace
-        // palette
-        //tplt
-        // view
+        importAnsp(workspace, file.anspChunk, context)
+        importPltt(workspace, file.plttChunk, context)
+        importTplt(workspace, file.tpltChunk, context)
+        importView(workspace, file.viewChunk, context)
 
         return workspace
     }
@@ -262,6 +267,80 @@ class SifWorkspaceImporter(
             val stateBind = workspace.animationStateSvc.getState(ffa)
             stateBind.speed = animation.speed
             stateBind.zoom = animation.zoom.i
+        }
+    }
+
+    fun importAnsp(workspace: MImageWorkspace, ansp: SifAnspChunk, context: ImportContext) {
+        fun getFfa( animId: Int) =
+            context.animations.getOrNull(animId) as? FixedFrameAnimation
+
+        for (fSpace in ansp.spaces) {
+            val space = FFAAnimationSpace(fSpace.name, workspace)
+
+            for (fAnim in fSpace.anims) {
+                val anim = getFfa(fAnim.animId) ?: continue
+                space.addAnimation(anim)
+                val endLinkAnim = getFfa(fAnim.endLinkAnimId)
+                if( endLinkAnim != null)
+                    space.setOnEndBehavior(anim, Pair( endLinkAnim, fAnim.onEndFrame ?: 0))
+
+                space.stateView.setLogicalSpace(anim, Vec2i(fAnim.logicalX, fAnim.logicalY))
+            }
+
+            for (fLink in fSpace.links) {
+                val orig = getFfa(fLink.origAnimId) ?: continue
+                val dest = getFfa(fLink.destAnimId) ?: continue
+                space.addLink(FFAAnimationSpace.SpacialLink(orig, fLink.origFrame, dest, fLink.destFrame))
+            }
+
+            workspace.animationSpaceManager.addAnimationSpace(space, true)
+        }
+    }
+
+    fun importPltt(workspace: MImageWorkspace, pltt: SifPlttChunk, context: ImportContext) {
+        for (palette in pltt.palettes)
+            workspace.paletteSet.addPalette(palette.name, false, palette.raw)
+
+        // Remove Default Palette (only if any loaded exist)
+        if( pltt.palettes.any())
+            workspace.paletteSet.removePalette(0)
+    }
+
+    fun importTplt(workspace: MImageWorkspace, tplt: SifTpltChunk, context: ImportContext) {
+        val nodeMap = tplt.nodeMaps.mapNotNull { entry->
+            val node = context.nodes.getOrNull(entry.nodeId) ?: return@mapNotNull null
+            val colors = entry.belt.map { ColorARGB32Normal(it) }
+            Pair(node, colors)
+        }.toMap()
+
+        val spriteMap = tplt.spritePartMaps.mapNotNull { entry ->
+            val group = context.nodes.getOrNull(entry.groupNodeId) as? GroupNode ?: return@mapNotNull null
+            val colors = entry.belt.map { ColorARGB32Normal(it) }
+            Pair(Pair(group, entry.partName), colors)
+        }.toMap()
+
+        workspace.paletteMediumMap.import(nodeMap, spriteMap)
+    }
+
+    fun importView(workspace: MImageWorkspace, viewChunk: SifViewChunk, context: ImportContext) {
+        workspace.viewSystem.numActiveViews = viewChunk.views.count()
+
+        viewChunk.views.forEachIndexed { viewId, fView ->
+            val selected = context.nodes.getOrNull(fView.selectedNodeId)
+            workspace.viewSystem.setCurrentNode(viewId, selected)
+
+            fView.nodeProperties.forEachIndexed { index, properties ->
+                val node = context.nodes[index]
+
+                val visible = (properties.bitmap.i == 1)
+
+                val render = RenderMethod(
+                    RenderMethodType.values()[properties.renderMethod],
+                    properties.renderValue )
+                val props = properties.run { NodeViewProperties(ox, oy, visible, alpha, render )}
+
+                workspace.viewSystem.set(node, props, viewId)
+            }
         }
     }
 }
