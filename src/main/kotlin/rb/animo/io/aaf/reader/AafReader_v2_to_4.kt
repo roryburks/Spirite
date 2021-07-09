@@ -2,7 +2,7 @@ package rb.animo.io.aaf.reader
 
 import rb.animo.io.aaf.*
 import rb.file.IReadStream
-import rb.file.readUtf8
+import rb.file.readStringUtf8
 import rb.vectrix.mathUtil.i
 
 class AafReader_v2_to_4( val version: Int) : IAafReader {
@@ -10,7 +10,7 @@ class AafReader_v2_to_4( val version: Int) : IAafReader {
         val numAnims = reader.readUnsignedShort()
 
         val anims = List(numAnims) {
-            val animName = reader.readUtf8()
+            val animName = reader.readStringUtf8()
 
             // Read Offset
             val ox: Int

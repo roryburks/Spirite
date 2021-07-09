@@ -4,11 +4,14 @@ import rb.extendo.extensions.toLookup
 import rb.file.IReadStream
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
-import spirite.core.file.contracts.SifFile
-import spirite.core.file.contracts.SifGrptChunk
+import spirite.core.file.contracts.*
 import spirite.core.file.load.anim.SifAnimReader
+import spirite.core.file.load.ansp.SifAnspReader
 import spirite.core.file.load.grpt.ModernSifGrptReader
 import spirite.core.file.load.imgd.SifImgdReader
+import spirite.core.file.load.pltt.SifPlttReader
+import spirite.core.file.load.tplt.SifTpltReader
+import spirite.core.file.load.view.SifViewReader
 import java.nio.charset.Charset
 
 
@@ -37,19 +40,23 @@ object SifFileReader {
         }
 
         val imgd = runOnChunk("IMGD"){ SifImgdReader(version).read(read, it.endPointer)}
+            ?: SifImgdChunk(listOf())
         val grpt = runOnChunk("GRPT"){ ModernSifGrptReader(version).read(read, it.endPointer)}
+            ?: SifGrptChunk(listOf())
         val anim = runOnChunk("ANIM"){ SifAnimReader(version).read(read, it.endPointer ) }
-        // anim space
-        // Plt data
-        // plt map data
-        // view data
+            ?: SifAnimChunk(listOf())
+        val ansp = runOnChunk("ANSP"){SifAnspReader(version).read(read, it.endPointer)}
+            ?: SifAnspChunk(listOf())
+        val pltt = runOnChunk("PLTT"){SifPlttReader(version).read(read, it.endPointer)}
+            ?: SifPlttChunk(listOf())
+        val tplt = runOnChunk("TPLT"){SifTpltReader(version).read(read, it.endPointer)}
+            ?: SifTpltChunk(listOf(), listOf())
+        val view = runOnChunk("VIEW"){SifViewReader(version).read(read, it.endPointer, grpt)}
+            ?: SifViewChunk(listOf())
 
-        TODO()
-//        return  SifFile(
-//            width, height, version,
-//            grptChunk = grpt ?: SifGrptChunk(listOf()),
-//            imgdChunk = TODO()
-//        )
+        return SifFile(
+            width, height, version,
+            grpt, imgd, anim, pltt, tplt, ansp, view )
     }
 
     data class ChunkInfo(

@@ -1,7 +1,7 @@
 package spirite.core.file.load.grpt
 
 import rb.file.IReadStream
-import rb.file.readUtf8
+import rb.file.readStringUtf8
 import rb.vectrix.mathUtil.i
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
@@ -31,7 +31,7 @@ class ModernSifGrptReader(val version: Int) : ISifGrptReader {
             }
 
             val bitFlag = read.readByte()
-            val name = read.readUtf8()
+            val name = read.readStringUtf8()
             val type = read.readByte().i
 
             val data : SifGrptNodeData = when( type) {

@@ -22,7 +22,7 @@ interface IReadStream {
     val eof: Boolean
 }
 
-fun IReadStream.readUtf8(): String {
+fun IReadStream.readStringUtf8(): String {
     val bos = ByteArrayOutputStream()
     var b = this.readByte()
     while( b != 0x00.toByte()) {

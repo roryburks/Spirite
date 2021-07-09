@@ -350,7 +350,7 @@ class SifWorkspaceExporter(
                 SifViewView.Properties(
                     if(nodeProps.isVisible) 1 else 0,
                     nodeProps.alpha,
-                    nodeProps.method.methodType.ordinal.toByte(),
+                    nodeProps.method.methodType.ordinal,
                     nodeProps.method.renderValue,
                     nodeProps.ox,
                     nodeProps.oy)

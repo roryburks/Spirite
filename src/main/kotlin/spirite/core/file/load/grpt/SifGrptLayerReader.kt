@@ -1,9 +1,8 @@
 package spirite.core.file.load.grpt
 
 import rb.file.IReadStream
-import rb.file.readUtf8
+import rb.file.readStringUtf8
 import rb.vectrix.mathUtil.i
-import spirite.base.file.load.BadSifFileException
 import spirite.base.imageData.mediums.MediumType
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
@@ -11,7 +10,6 @@ import spirite.core.file.contracts.SifGrptNodeData
 import spirite.core.file.contracts.SifGrptNode_Reference
 import spirite.core.file.contracts.SifGrptNode_Simple
 import spirite.core.file.contracts.SifGrptNode_Sprite
-import javax.script.SimpleScriptContext
 
 interface ISifGrptLayerReader {
     fun readLayer(read: IReadStream) : SifGrptNodeData
@@ -42,7 +40,7 @@ class LegacySpriteLayerReader(val version: Int) : ISifGrptLayerReader {
     override fun readLayer(read: IReadStream): SifGrptNodeData {
         val numParts = read.readUnsignedByte()
         val parts = List<SifGrptNode_Sprite.Part>(numParts) {
-            val partName = read.readUtf8()
+            val partName = read.readStringUtf8()
             val transX = read.readShort().toFloat()
             val transY = read.readShort().toFloat()
             val drawDepth = read.readInt()
@@ -72,7 +70,7 @@ class SpriteLayerReader(val version: Int) : ISifGrptLayerReader {
             else MediumType.DYNAMIC.permanentCode
         val numParts = read.readUnsignedByte()
         val parts = List(numParts){
-            val name = read.readUtf8()
+            val name = read.readStringUtf8()
             val transX = read.readFloat()
             val transY = read.readFloat()
             val scaleX = read.readFloat()
