@@ -1,4 +1,4 @@
-package spirite.base.file.v2.import
+package spirite.base.file.sif.v2.import
 
 import rb.global.ILogger
 import rb.glow.ColorARGB32Normal

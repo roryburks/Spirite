@@ -1,8 +1,8 @@
-package spirite.base.file.load
+package spirite.base.file.sif.v1.load
 
 import spirite.sguiHybrid.MDebug
 import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
-import spirite.base.file.SaveLoadUtil
+import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.imageData.animation.Animation
 
 interface IAnimationLoader

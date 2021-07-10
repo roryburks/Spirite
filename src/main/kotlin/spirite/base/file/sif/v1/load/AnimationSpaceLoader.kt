@@ -1,7 +1,7 @@
-package spirite.base.file.load
+package spirite.base.file.sif.v1.load
 
 import rb.vectrix.linear.Vec2i
-import spirite.base.file.SaveLoadUtil
+import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace

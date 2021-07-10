@@ -1,6 +1,4 @@
-package spirite.base.file.save
-
-import rb.glow.gle.RenderMethodType
+package spirite.base.file.sif.v1.save
 
 object ViewChunkSaver {
     fun saveViewChunk(context: SaveContext) {

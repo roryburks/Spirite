@@ -1,10 +1,9 @@
-package spirite.base.file.load
+package spirite.base.file.sif.v1.load
 
 import rb.glow.gle.RenderMethod
 import rb.glow.gle.RenderMethodType
 import rb.vectrix.mathUtil.i
 import spirite.base.imageData.view.NodeViewProperties
-import spirite.gui.views.groupView.NodeProperties
 
 object ViewChunkLoader {
     fun load(context: LoadContext) {

@@ -1,4 +1,4 @@
-package spirite.base.file.save
+package spirite.base.file.sif.v1.save
 
 import spirite.base.file.writeUFT8NT
 import kotlin.math.min

@@ -1,13 +1,12 @@
-package spirite.base.file.v2.converters
+package spirite.base.file.sif.v2.converters
 
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.b
 import sgui.core.systems.IImageIO
-import spirite.base.file.SaveLoadUtil
-import spirite.base.file.save.MediumPreparer
-import spirite.base.file.save.PreparedDynamicMedium
-import spirite.base.file.save.PreparedFlatMedium
-import spirite.base.file.save.PreparedMaglevMedium
+import spirite.base.file.sif.v1.save.MediumPreparer
+import spirite.base.file.sif.v1.save.PreparedDynamicMedium
+import spirite.base.file.sif.v1.save.PreparedFlatMedium
+import spirite.base.file.sif.v1.save.PreparedMaglevMedium
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.*
@@ -116,8 +115,8 @@ class SifWorkspaceExporter(
             }
 
             val bitFlags = //if( node.visible) SaveLoadUtil.VisibleMask else 0 or
-                        if( node.expanded) SaveLoadUtil.ExpandedMask else 0 or
-                        if( node is GroupNode && node.flattened) SaveLoadUtil.FlattenedMask else 0
+                        if( node.expanded) SifConstants.ExpandedMask else 0 or
+                        if( node is GroupNode && node.flattened) SifConstants.FlattenedMask else 0
             nodeList.add(SifGrptNode(
                 settingsBitFlag = bitFlags.toByte(),
                 name = node.name,

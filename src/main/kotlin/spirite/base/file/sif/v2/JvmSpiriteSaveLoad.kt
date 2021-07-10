@@ -1,10 +1,9 @@
-package spirite.base.file.v2
+package spirite.base.file.sif.v2
 
 import rb.file.BigEndianWriteStream
-import rb.file.BufferedWriteStream
 import rbJvm.file.writing.JvmRaRawWriteStream
 import sgui.core.systems.IImageIO
-import spirite.base.file.v2.converters.SifWorkspaceExporter
+import spirite.base.file.sif.v2.converters.SifWorkspaceExporter
 import spirite.base.imageData.IImageWorkspace
 import spirite.core.file.save.SifFileWriter
 import spirite.sguiHybrid.Hybrid

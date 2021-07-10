@@ -1,10 +1,10 @@
-package spirite.base.file.load
+package spirite.base.file.sif.v1.load
 
 import rb.vectrix.mathUtil.i
 import spirite.sguiHybrid.Hybrid
 import spirite.sguiHybrid.MDebug
 import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
-import spirite.base.file.SaveLoadUtil
+import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium

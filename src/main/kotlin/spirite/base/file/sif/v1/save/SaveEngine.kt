@@ -1,4 +1,4 @@
-package spirite.base.file.save
+package spirite.base.file.sif.v1.save
 
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
@@ -7,10 +7,10 @@ import spirite.sguiHybrid.MDebug
 import spirite.sguiHybrid.MDebug.ErrorType
 import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
-import spirite.base.file.SaveLoadUtil
-import spirite.base.file.SaveLoadUtil.FFALAYER_CASCADING
-import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
-import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
+import spirite.base.file.sif.SaveLoadUtil
+import spirite.base.file.sif.SaveLoadUtil.FFALAYER_CASCADING
+import spirite.base.file.sif.SaveLoadUtil.FFALAYER_GROUPLINKED
+import spirite.base.file.sif.SaveLoadUtil.FFALAYER_LEXICAL
 import spirite.base.file.writeFloatArray
 import spirite.base.file.writeUFT8NT
 import spirite.base.imageData.IImageWorkspace

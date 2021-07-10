@@ -3,7 +3,7 @@ package spirite.core.file.load.anim
 import rb.file.IReadStream
 import rb.file.readStringUtf8
 import rb.vectrix.mathUtil.i
-import spirite.base.file.load.BadSifFileException
+import spirite.base.file.sif.v1.load.BadSifFileException
 import spirite.base.imageData.animation.ffa.FfaFrameStructure
 import spirite.core.file.SifConstants
 import spirite.core.file.contracts.*

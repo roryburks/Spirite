@@ -1,4 +1,4 @@
-package spirite.base.file.load
+package spirite.base.file.sif.v1.load
 
 import rb.file.BufferedReadStream
 import rb.glow.ColorARGB32Normal
@@ -14,7 +14,7 @@ import spirite.sguiHybrid.MDebug.ErrorType.FILE
 import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.PenDrawMode
-import spirite.base.file.SaveLoadUtil
+import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.file.readFloatArray
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.mediums.IMedium

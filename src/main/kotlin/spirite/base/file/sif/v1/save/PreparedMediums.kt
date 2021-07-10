@@ -1,4 +1,4 @@
-package spirite.base.file.save
+package spirite.base.file.sif.v1.save
 
 import rbJvm.glow.awt.ImageBI
 import spirite.sguiHybrid.Hybrid
