@@ -44,11 +44,30 @@ class FfaReader(val version: Int): ISifAnimAnimationReader {
     }
 
     fun loadLexicalLayer( read: IReadStream) : SifAnimFfaLayer_Lexical {
-        TODO()
+        val groupId = read.readInt()
+        val lexicon = read.readStringUtf8()
+        val explicitMappingCount = read.readUnsignedByte()
+        val explicitMapping = List(explicitMappingCount) {
+            val char = read.readByte().toChar()
+            val nodeId = read.readInt()
+            Pair( char, nodeId)
+        }
+        return SifAnimFfaLayer_Lexical(groupId, lexicon, explicitMapping)
     }
 
     fun loadCascadingLayer( read: IReadStream) : SifAnimFfaLayer_Cascading {
-        TODO()
+        val groupId = read.readInt()
+        val lexicon = read.readStringUtf8()
+        val subLayerCount = read.readUnsignedByte()
+        val subLayers = List(subLayerCount) {
+            val nodeId = read.readInt()
+            val plen = read.readUnsignedShort()
+            val key = read.readByte(). toChar()
+            val subLex = if( version < 0x1_000D) "" else read.readStringUtf8()
+
+            SifAnimFfaLayer_Cascading.SubLayer(nodeId, plen, key, subLex)
+        }
+        return SifAnimFfaLayer_Cascading(groupId, lexicon, subLayers)
     }
 }
 

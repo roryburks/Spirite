@@ -137,7 +137,7 @@ class SifWorkspaceImporter(
         // Create an array that keeps track of the active layers of group nodes
         //  (all the nested nodes leading up to the current node)
         val nodeLayer = Array<GroupNode?>(256) {null}
-        context.nodes[0] = workspace.groupTree.root
+        context.nodes.add( workspace.groupTree.root)
         nodeLayer[0] = workspace.groupTree.root
 
         for (fNode in grpt.nodes) {
@@ -177,6 +177,9 @@ class SifWorkspaceImporter(
                     null
                 }
             } ?: continue
+
+            context.nodes.add(node)
+            node.expanded = (bitFlag and SifConstants.ExpandedMask) != 0
 
             if( context.sif.version < 0x1_0010){
                 // In newer versions, this is part of the view system

@@ -76,6 +76,7 @@ object SifFileReader {
             val startPointer = read.filePointer
 
             chunks.add(ChunkInfo(header, startPointer, size))
+            read.filePointer = read.filePointer + size
         }
         return  chunks
     }

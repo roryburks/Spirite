@@ -22,7 +22,7 @@ import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
 
-private const val v2Load: Boolean = false
+private const val v2Load: Boolean = true
 
 fun IMasterControl.workspaceFromImage(img: IImage) {
     val workspace = createWorkspace(img.width,img.height)

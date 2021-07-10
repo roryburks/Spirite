@@ -10,7 +10,7 @@ class SifViewReader(val version: Int) {
     fun read(read:IReadStream, endPtr: Long, grptChunk: SifGrptChunk) : SifViewChunk {
         val numNodes = grptChunk.nodes.size
 
-        val numViews = read.readInt()
+        val numViews = read.readUnsignedByte()
         val views = List(numViews) {
             val selectedId = read.readInt()
             val nodeProps = List(numNodes){
