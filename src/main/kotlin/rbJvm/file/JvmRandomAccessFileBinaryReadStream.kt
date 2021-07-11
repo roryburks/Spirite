@@ -15,4 +15,6 @@ class JvmRandomAccessFileBinaryReadStream (val ba: RandomAccessFile) : IBinaryRe
     val len: Long get() = ba.length()
 
     override val eof: Boolean get() = len == ba.filePointer
+
+    override fun close() { ba.close() }
 }

@@ -20,7 +20,7 @@ class BufferedReadStream(
     override var filePointer: Long
         get() = when(val buffer = _buffer ){
             null -> underlying.filePointer
-            else -> underlying.filePointer - buffer.size + _bCarat
+            else -> underlying.filePointer - _bufferValidSize + _bCarat
         }
         set(value) {
             // For simplicity sake, don't do inter-buffer navigation
@@ -91,4 +91,5 @@ class BufferedReadStream(
     override fun readByteArray(size: Int) = read(ByteArrayInter(size))
 
 
+    override fun close() { underlying.close() }
 }

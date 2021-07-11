@@ -2,6 +2,7 @@ package spirite.core.file.load
 
 import rb.extendo.extensions.toLookup
 import rb.file.IReadStream
+import rb.vectrix.mathUtil.l
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
 import spirite.core.file.contracts.*
@@ -76,7 +77,7 @@ object SifFileReader {
             val startPointer = read.filePointer
 
             chunks.add(ChunkInfo(header, startPointer, size))
-            read.filePointer = read.filePointer + size
+            read.filePointer = read.filePointer + size.l
         }
         return  chunks
     }

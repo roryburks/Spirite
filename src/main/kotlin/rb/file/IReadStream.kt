@@ -20,6 +20,7 @@ interface IReadStream {
 
     var filePointer: Long
     val eof: Boolean
+    fun close()
 }
 
 fun IReadStream.readStringUtf8(): String {
@@ -37,6 +38,8 @@ interface IBinaryReadStream {
     fun readInto( byteArray: ByteArray, offset: Int = 0, length: Int = byteArray.size) : Int
     var filePointer : Long
     val eof: Boolean
+
+    fun close()
 }
 
 class ByteArrayReadStream(
@@ -54,4 +57,6 @@ class ByteArrayReadStream(
     override var filePointer: Long = 0
     val len: Int get() = data.size
     override val eof: Boolean get() = (filePointer == len.l)
+
+    override fun close() {}
 }

@@ -28,4 +28,6 @@ class JvmInputStreamFileReader(val i: InputStream) : IBinaryReadStream {
 
     // from Java Docs, InputStream available() should return "0 when it reaches the end of the input stream"
     override val eof: Boolean get() = (i.available() == 0)
+
+    override fun close() { i.close() }
 }

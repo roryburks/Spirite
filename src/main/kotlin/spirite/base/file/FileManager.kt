@@ -17,12 +17,13 @@ import spirite.base.file.sif.v2.import.SifWorkspaceImporter
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
+import spirite.core.file.contracts.SifFile
 import spirite.core.file.load.SifFileReader
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
 
-private const val v2Load: Boolean = true
+private const val v2Load: Boolean = false
 
 fun IMasterControl.workspaceFromImage(img: IImage) {
     val workspace = createWorkspace(img.width,img.height)
@@ -113,8 +114,13 @@ class FileManager( val master: IMasterControl)  : IFileManager{
             val workspace = if( v2Load) {
                 val ra = RandomAccessFile(file, "r")
                 val read = BufferedReadStream(JvmRandomAccessFileBinaryReadStream(ra))
-                val sif = SifFileReader.read(read)
-                _sifImporter.import(sif,master)
+                val sif : SifFile
+                try {
+                    sif = SifFileReader.read(read)
+                } finally {
+                    ra.close()
+                }
+                _sifImporter.import(sif, master)
             } else
                 LoadEngine.loadWorkspace(file, master)
             workspace.fileSaved(file)

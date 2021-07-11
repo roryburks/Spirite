@@ -1,6 +1,7 @@
 package spirite.base.file.sif.v2
 
 import rb.file.BigEndianWriteStream
+import rb.file.BufferedWriteStream
 import rbJvm.file.writing.JvmRaRawWriteStream
 import sgui.core.systems.IImageIO
 import spirite.base.file.sif.v2.converters.SifWorkspaceExporter
@@ -16,10 +17,9 @@ object JvmSpiriteSaveLoad {
     fun write(file : File, workspace: IImageWorkspace) {
         val converted = SifWorkspaceExporter(_imageIo).export(workspace)
 
-        if( file.exists())
-        {
-            val backup = File(file.absolutePath+"~")
-            if( backup.exists())
+        if (file.exists()) {
+            val backup = File(file.absolutePath + "~")
+            if (backup.exists())
                 backup.delete()
             val canWrite = file.canWrite()
             val x = file.renameTo(backup)
@@ -30,9 +30,14 @@ object JvmSpiriteSaveLoad {
 
         val ra = RandomAccessFile(file, "rw")
         val raw = JvmRaRawWriteStream(ra)
-        //val buffered = BufferedWriteStream(raw)
-        val out = BigEndianWriteStream(raw)
-        SifFileWriter.write(out, converted)
-        ra.close()
+        val buffered = BufferedWriteStream(raw)
+
+        try {
+            val out = BigEndianWriteStream(raw)
+            SifFileWriter.write(out, converted)
+        }finally {
+            buffered.close()
+            ra.close()
+        }
     }
 }
