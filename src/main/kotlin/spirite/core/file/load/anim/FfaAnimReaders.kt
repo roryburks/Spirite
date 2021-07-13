@@ -31,7 +31,7 @@ class FfaReader(val version: Int): ISifAnimAnimationReader {
 
     fun loadGroupLinkedLayer(read: IReadStream) : SifAnimFfaLayer_Grouped {
         val groupNodeId = read.readInt()
-        val includeSubtrees = (read.readUnsignedByte() == 0)
+        val includeSubtrees = (read.readUnsignedByte() != 0)
         val numFrames = read.readUnsignedShort()
         val frames = List(numFrames) {
             val frameType =read.readByte()
@@ -105,7 +105,7 @@ object LegacyFFAReader_8_TO_1_0000 : ISifAnimAnimationReader {
         val layerCount = read.readUnsignedShort()
         val layers = List(layerCount) {
             val groupNodeId = read.readInt()
-            val includeSubtrees = read.readByte().i == 0
+            val includeSubtrees = read.readByte().i != 0
 
             val numFrames = read.readUnsignedShort()
             val frames = mutableListOf<SifAnimFfaLayer_Grouped.Frame>()

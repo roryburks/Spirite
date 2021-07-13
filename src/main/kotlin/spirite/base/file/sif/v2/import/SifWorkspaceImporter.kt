@@ -67,6 +67,11 @@ class SifWorkspaceImporter(
         importTplt(workspace, file.tpltChunk, context)
         importView(workspace, file.viewChunk, context)
 
+        workspace.finishBuilding()
+        workspace.mediumRepository.clearUnusedCache(emptySet())
+
+        workspace.paletteManager.drivePalette = paletteDriving
+
         return workspace
     }
 

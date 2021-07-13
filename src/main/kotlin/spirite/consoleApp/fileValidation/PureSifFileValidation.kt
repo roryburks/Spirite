@@ -11,17 +11,20 @@ import java.io.File
 import java.io.RandomAccessFile
 import java.lang.Exception
 
+// This suite does validation by reading into Sif Files and writing to Sif Files, recording any inability to read and
+// recording any deviations between output files.  Never touches the ImageWorkspace and never turns raw data into images.
 object PureSifFileValidation {
     var bufferFileLocation : File = File("E:\\Bucket\\sif")
 
-    fun runSubFolderValidation(folder: File, outputFile: File, includeSubdirectories: Boolean) {
+    fun runSubFolderValidation(folder: File, outputFile: File) {
         if( outputFile.exists())
             outputFile.delete()
         outputFile.createNewFile()
         val sb = StringBuilder()
 
         fun runOnFile(file: File) {
-            if( file.isDirectory) {
+            println(file.absolutePath)
+            if( file.isDirectory ) {
                 for (listFile in file.listFiles())
                     runOnFile(listFile)
             }
@@ -32,6 +35,11 @@ object PureSifFileValidation {
                 }
             }
         }
+
+        runOnFile(folder)
+
+
+        outputFile.writeText(sb.toString())
     }
 
     fun validateFile(file: File, sb: StringBuilder) {

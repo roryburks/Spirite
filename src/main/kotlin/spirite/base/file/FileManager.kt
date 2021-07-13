@@ -13,6 +13,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.file.sif.v1.load.BadSifFileException
 import spirite.base.file.sif.v1.load.LoadEngine
 import spirite.base.file.sif.v1.save.SaveEngine
+import spirite.base.file.sif.v2.JvmSpiriteSaveLoad
 import spirite.base.file.sif.v2.import.SifWorkspaceImporter
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
@@ -23,7 +24,6 @@ import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
 
-private const val v2Load: Boolean = false
 
 fun IMasterControl.workspaceFromImage(img: IImage) {
     val workspace = createWorkspace(img.width,img.height)
@@ -48,6 +48,11 @@ interface IFileManager {
 }
 
 class FileManager( val master: IMasterControl)  : IFileManager{
+    companion object {
+        var v2Load: Boolean = false
+        var v2Save: Boolean = false
+    }
+
     private val _sifImporter = SifWorkspaceImporter(Hybrid.imageIO,ConsoleLogger)
 
     override fun triggerAutosave(workspace: IImageWorkspace, interval: Int, undoCount: Int) {
@@ -70,8 +75,11 @@ class FileManager( val master: IMasterControl)  : IFileManager{
         workspace.paletteMediumMap.clearUnused()
 
         val lock = FileLock().apply { locks.add(this) }
-        SaveEngine.saveWorkspace(file, workspace)
-        //JvmSpiriteSaveLoad.write(file, workspace)
+
+        if( v2Save)
+            JvmSpiriteSaveLoad.write(file, workspace)
+        else
+            SaveEngine.saveWorkspace(file, workspace)
         workspace.fileSaved(file)
         locks.remove(lock)
     }

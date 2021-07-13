@@ -1,6 +1,8 @@
 package spirite.core.file
 
 object SifConstants {
+    val chunks = setOf("IMGD","GRPT","ANIM","ANSP","PLTT","TPLT", "VIEW")
+
     val header : ByteArray get() = byteArrayOf(0x53, 0x49, 0x46, 0x46) // "SIFF"
     const val latestVersion = 0x0001_0010
 
