@@ -43,30 +43,36 @@ class WorkspaceBackedFileValidation {
     }
 
     private fun doTest(file: File, sb: StringBuilder) {
-        println(file.canonicalPath)
-        sb.appendln(file.canonicalPath)
+            println(file.canonicalPath)
+            sb.appendln(file.canonicalPath)
 
-        val oldFile = File(PureSifFileValidation.bufferFileLocation.canonicalPath + "\\" + "fileValidationTest-old.sif")
-        val newFile = File(PureSifFileValidation.bufferFileLocation.canonicalPath + "\\" + "fileValidationTest-new.sif")
+            val oldFile =
+                File(PureSifFileValidation.bufferFileLocation.canonicalPath + "\\" + "fileValidationTest-old.sif")
+            val newFile =
+                File(PureSifFileValidation.bufferFileLocation.canonicalPath + "\\" + "fileValidationTest-new.sif")
 
-        SwingUtilities.invokeAndWait {
-            Hybrid.gle.runInGLContext {
-                loadThenSave(file, oldFile, false)
-                loadThenSave(file, newFile, true)
+            SwingUtilities.invokeAndWait {
+                Hybrid.gle.runInGLContext {
+                    loadThenSave(file, oldFile, false, sb)
+                    loadThenSave(file, newFile, true, sb)
+                }
             }
-        }
 
-        PureSifFileValidation.binCompare(oldFile, newFile, sb)
+            PureSifFileValidation.binCompare(oldFile, newFile, sb)
     }
 
-    private fun loadThenSave(inFile: File, outFile: File, new: Boolean) {
-        FileManager.v2Load = new
-        FileManager.v2Save = new
+    private fun loadThenSave(inFile: File, outFile: File, new: Boolean, sb: StringBuilder) {
+        try {
+            FileManager.v2Load = new
+            FileManager.v2Save = new
 
-        context.master.fileManager.openFile(inFile)
-        val ws = context.master.workspaceSet.currentMWorkspace!!
-        context.master.fileManager.saveWorkspace(ws!!, outFile)
-        context.master.workspaceSet.removeWorkspace(ws)
+            context.master.fileManager.openFile(inFile)
+            val ws = context.master.workspaceSet.currentMWorkspace!!
+            context.master.fileManager.saveWorkspace(ws!!, outFile)
+            context.master.workspaceSet.removeWorkspace(ws)
+        }catch (e: Throwable) {
+            sb.appendln("Failed on New = $new for reason: ${e.message}")
+        }
     }
 
 }

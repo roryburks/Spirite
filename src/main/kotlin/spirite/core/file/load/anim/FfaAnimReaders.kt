@@ -12,7 +12,7 @@ class FfaReader(val version: Int): ISifAnimAnimationReader {
     override fun read(read: IReadStream): SifAnimAnimData {
         val numLayers = read.readUnsignedShort()
         val layers = List(numLayers) {
-            val layerName = if( version <= 0x1_000A) "Layer$it" else read.readStringUtf8()
+            val layerName = if( version <= 0x1_000A) "FFA Layer" else read.readStringUtf8()
             val async = if( version <= 0x1_000A) false else (read.readByte().i == 1)
             val layerType = if( version <= 0x1_0003)  SifConstants.FFALAYER_GROUPLINKED else read.readUnsignedByte()
 

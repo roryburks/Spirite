@@ -331,6 +331,11 @@ class SifWorkspaceImporter(
     }
 
     fun importView(workspace: MImageWorkspace, viewChunk: SifViewChunk, context: ImportContext) {
+        if( viewChunk.views.isEmpty()) {
+            workspace.viewSystem.numActiveViews = 3
+            return
+        }
+
         workspace.viewSystem.numActiveViews = viewChunk.views.count()
 
         viewChunk.views.forEachIndexed { viewId, fView ->

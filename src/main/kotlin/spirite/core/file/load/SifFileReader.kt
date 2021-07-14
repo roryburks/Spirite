@@ -74,7 +74,8 @@ object SifFileReader {
             val headerRaw = read.readByteArray(4)
             val header = headerRaw.toString(Charset.forName("UTF-8"))
             if(!SifConstants.chunks.contains(header))
-                throw SifFileException("Failed to parse chunks.  Unrecognized Chunk: $header")
+                return chunks
+                //throw SifFileException("Failed to parse chunks.  Unrecognized Chunk: $header")
             val size = read.readInt()
             val startPointer = read.filePointer
 

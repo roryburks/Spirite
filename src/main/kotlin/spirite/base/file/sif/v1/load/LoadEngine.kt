@@ -351,14 +351,18 @@ object LoadEngine {
     {
         val ra = context.ra
         val endPointer = ra.filePointer + chunkSize
+        var added = false
 
         while( ra.filePointer < endPointer) {
             val name = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
             val size = ra.readUnsignedShort()
             val data = ByteArray(size).also { ra.read(it) }
             context.workspace.paletteSet.addPalette(name, false, data)
-            context.workspace.paletteSet.removePalette(0)
+            added = true
         }
+
+        if( added)
+            context.workspace.paletteSet.removePalette(0)
     }
 
     private fun parsePaletteMapData(context: LoadContext, chunkSize: Int)

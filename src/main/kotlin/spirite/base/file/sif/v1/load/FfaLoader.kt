@@ -106,7 +106,7 @@ object FfaFixedGroupLayerLoader : IFfaLayerLoader {
         val ra = context.ra
         val nodes = context.nodes
         val node = nodes.getOrNull(ra.readInt())
-        val includeSubtrees = (ra.readByte().i == 0)
+        val includeSubtrees = (ra.readByte().i != 0)
 
         val numFrames = ra.readUnsignedShort()
 
