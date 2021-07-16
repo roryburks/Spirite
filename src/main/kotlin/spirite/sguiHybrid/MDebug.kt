@@ -62,7 +62,7 @@ object MDebug {
 
     fun handleError( type: ErrorType, message: String, origin: Exception? = null) {
         origin?.printStackTrace() ?: Thread.dumpStack()
-        JOptionPane.showMessageDialog( null, "Error: $message")
+        //JOptionPane.showMessageDialog( null, "Error: $message")
         pushLog("Error: $message")
     }
 

@@ -196,7 +196,7 @@ object LegacyFFALoader_8_TO_1_0000 : IAnimationLoader {
         val numLayers = ra.readUnsignedShort()
         repeat(numLayers){_->
             val node = nodes[ra.readInt()]
-            val includeSubtrees = (ra.readByte().i == 0)
+            val includeSubtrees = (ra.readByte().i != 0)
 
             val numFrames = ra.readUnsignedShort()
 

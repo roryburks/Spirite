@@ -13,7 +13,7 @@ class BufferedReadStream(
     // If _buffer is not null, it means the buffer has been read from, so pointer = underlying.pointer - _buffer.size + _bCaret
     var _buffer : ByteArray? = null // non-private for hacky reasons that should be resolved with IO refactor.  7-1-2021
     var _bCarat : Int = 0 // ditto
-    private var _bufferValidSize = 0 // If _buffer is non-null this should be bufferSize or we're reaching eof
+    var _bufferValidSize = 0 // If _buffer is non-null this should be bufferSize or we're reaching eof
 
     override val eof: Boolean get() = _buffer == null && underlying.eof
 

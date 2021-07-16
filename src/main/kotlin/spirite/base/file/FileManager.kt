@@ -49,7 +49,7 @@ interface IFileManager {
 
 class FileManager( val master: IMasterControl)  : IFileManager{
     companion object {
-        var v2Load: Boolean = false
+        var v2Load: Boolean = true
         var v2Save: Boolean = false
     }
 
@@ -137,6 +137,7 @@ class FileManager( val master: IMasterControl)  : IFileManager{
             return
         } catch (e: BadSifFileException){
             MDebug.handleError(FILE, e.message ?: "Failed to Load SIF", e)
+            throw e
         }
         if( !attempted) {
             try {

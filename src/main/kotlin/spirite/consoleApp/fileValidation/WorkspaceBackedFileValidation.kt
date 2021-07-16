@@ -22,16 +22,24 @@ class WorkspaceBackedFileValidation {
         outputFile.createNewFile()
         val sb = StringBuilder()
 
+        var i = 0
+        val skip = 0
+        val take = 9999999
+
         fun runOnFile(file: File) {
-            println(file.absolutePath)
             if( file.isDirectory ) {
                 for (listFile in file.listFiles())
                     runOnFile(listFile)
             }
             else {
                 if( file.extension.toLowerCase() in setOf("sif", "sif~")) {
-                    doTest(file, sb)
-                    sb.appendln()
+                    println(file.absolutePath)
+                    if( ++i > skip+take)
+                        return
+                    if( i > skip) {
+                        doTest(file, sb)
+                        sb.appendln()
+                    }
                 }
             }
         }

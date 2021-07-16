@@ -11,7 +11,7 @@ class SifAnimReader(val version: Int) {
         val animations = mutableListOf<SifAnimAnimation>()
 
         while( read.filePointer < endpointer) {
-            val name = if( version == 0x1_0000) "anim" else read.readStringUtf8()
+            val name = if( version == 0x1_0000 ) "anim" else read.readStringUtf8()
             val speed = if( version < 0x1_0005) 8f else read.readFloat()
             val zoom = if( version <0x1_000C) 1 else read.readShort()
             val type = read.readByte().i

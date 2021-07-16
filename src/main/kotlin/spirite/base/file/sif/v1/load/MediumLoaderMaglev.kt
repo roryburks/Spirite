@@ -187,7 +187,7 @@ object MagneticMediumLoader_V2 : IMediumLoader
         val ret = MaglevMedium(context.workspace, thingMap, DynamicImage(img, xoffset, yoffset), (thingMap.keys.max() ?: 0)+1)
         context.tel2.end("MegMediumLoad2")
         if( ra._buffer != null) {
-            val rollback = (ra.bufferSize - ra._bCarat)
+            val rollback = (ra._bufferValidSize - ra._bCarat)
             context.ra.seek(context.ra.filePointer - rollback)
         }
         return ret

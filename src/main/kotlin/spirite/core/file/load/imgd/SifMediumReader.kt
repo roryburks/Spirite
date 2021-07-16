@@ -15,13 +15,13 @@ interface ISifMediumReader {
 
 object SifMediumReaderFactory {
     fun getMediumReader(version: Int, typeId: Int) : ISifMediumReader = when(typeId){
-        SifConstants.MEDIUM_PLAIN -> SifMedReader_Flat
-        SifConstants.MEDIUM_DYNAMIC -> SifMedReader_Dynamic
-        SifConstants.MEDIUM_PRISMATIC -> SifMedReader_Prismatic
+        SifConstants.MEDIUM_PLAIN -> SifMedReader_Flat//.also { println("Plain") }
+        SifConstants.MEDIUM_DYNAMIC -> SifMedReader_Dynamic//.also { println("Dynamic") }
+        SifConstants.MEDIUM_PRISMATIC -> SifMedReader_Prismatic//.also { println("Prismatic") }
         SifConstants.MEDIUM_MAGLEV -> when {
-            version < 0x1_0000 -> SifMaglevMediumReader_Legacy_Pre_1_0000(version)
-            version <= 0x1_0006 -> SifMaglevMediumReader_Legacy_1_0000_To_1_0006(version)
-            else -> SifMaglevMediumReader(version)
+            version < 0x1_0000 -> SifMaglevMediumReader_Legacy_Pre_1_0000(version)//.also { println("LegLeg") }
+            version <= 0x1_0006 -> SifMaglevMediumReader_Legacy_1_0000_To_1_0006(version)//.also { println("Leg") }
+            else -> SifMaglevMediumReader(version)//.also { println("new") }
         }
         else -> throw SifFileException("Unrecognized Medium Type Id: $typeId.  Trying to load a newer SIF version in an older program version or corrupt file.")
     }

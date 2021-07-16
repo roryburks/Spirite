@@ -218,24 +218,31 @@ object LoadEngine {
         }
     }
 
+    var i = 0
     private fun parseImageDataSection(context: LoadContext, chunkSize: Int) {
         val dataMap = mutableMapOf<Int,IMedium>()
         val ra = context.ra
         val endPointer = ra.filePointer + chunkSize
 
-        while( ra.filePointer < endPointer) {
+        while (ra.filePointer < endPointer) {
             //if( ra.filePointer > 340000)
-              //  println("A")
+            //  println("A")
             val id = ra.readInt()
             //if( id == 38)
-              //  continue
-            val typeId = if( context.version<4) 0 else ra.readByte().toInt()
+            //  continue
+            val typeId = if (context.version < 4) 0 else ra.readByte().toInt()
 
-            val medium = MediumLoaderFactory
+//                if( i++ == 38) {
+//                    println(i)
+//
+//                }
+
+            val medium =
+                MediumLoaderFactory
                     .getMediumLoader(context.version, typeId)
                     .loadMedium(context)
 
-            if( medium != null)
+            if (medium != null)
                 dataMap[id] = medium
         }
 

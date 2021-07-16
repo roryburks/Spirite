@@ -12,8 +12,15 @@ interface ISifAnimAnimationReader {
 object SifAnimAnimationReaderFactory {
     fun getReader( typeId: Int, version: Int) : ISifAnimAnimationReader {
         return when(typeId){
-            SifConstants.ANIM_FFA -> FfaReader(version)
-            else -> throw SifFileException("Unrecognized Animation Type: $typeId")
+            SifConstants.ANIM_FFA -> when {
+                version < 8 -> LegacyFfaReader_X_to_7
+                version < 0x1_0000 -> LegacyFFAReader_8_TO_1_0000
+                else -> FfaReader(version)
+            }
+            else -> {
+                println("A")
+                throw SifFileException("Unrecognized Animation Type: $typeId")
+            }
         }
     }
 

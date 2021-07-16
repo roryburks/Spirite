@@ -198,6 +198,7 @@ class SifWorkspaceImporter(
     }
 
     fun importAnim(workspace: MImageWorkspace, anim: SifAnimChunk, context: ImportContext) {
+        val version = context.sif.version
         for (animation in anim.animations) {
             val data = animation.data
             if(data !is SifAnimAnim_FixedFrame) {
@@ -205,11 +206,13 @@ class SifWorkspaceImporter(
                 continue
             }
 
+
             // FFA Specific Stuff
             val ffa = FixedFrameAnimation(animation.name, workspace)
 
             fun loadGroupedLayer( lData: SifAnimFfaLayer_Grouped, layer: SifAnimFfaLayer) : IFfaLayer?{
                 val groupNode = context.nodes.getOrNull(lData.groupNodeId) as? GroupNode ?: return null
+                val name = if( version < 1_0000) groupNode.name else layer.partTypeName
                 val frameMap = mutableMapOf<Node, FfaFrameStructure>()
                 val unlinkedFrameClusters = mutableListOf<FfaLayerGroupLinked.UnlinkedFrameCluster>()
 
@@ -219,7 +222,10 @@ class SifWorkspaceImporter(
                 for (frame in lData.frames) {
                     val frameNode = context.nodes.getOrNull(frame.nodeId)
 
-                    val marker = FfaFrameStructure.Marker.values()
+                    val marker = if( version < 1_0000) {
+                        if( frameNode is GroupNode) FfaFrameStructure.Marker.START_LOCAL_LOOP
+                        else FfaFrameStructure.Marker.FRAME
+                    } else FfaFrameStructure.Marker.values()
                         .firstOrNull { it.fileId == frame.type.i }
                         ?: FfaFrameStructure.Marker.GAP
 
@@ -233,7 +239,7 @@ class SifWorkspaceImporter(
                         workingNode = frameNode
                     }
                 }
-                return ffa.addLinkedLayer(groupNode, lData.subgroupsLinked, layer.partTypeName, frameMap, unlinkedFrameClusters)
+                return ffa.addLinkedLayer(groupNode, lData.subgroupsLinked, name, frameMap, unlinkedFrameClusters)
             }
 
             fun loadLexicalLayer( lData: SifAnimFfaLayer_Lexical, layer: SifAnimFfaLayer) : IFfaLayer? {

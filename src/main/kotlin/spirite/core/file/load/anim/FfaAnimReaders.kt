@@ -34,9 +34,10 @@ class FfaReader(val version: Int): ISifAnimAnimationReader {
         val includeSubtrees = (read.readUnsignedByte() != 0)
         val numFrames = read.readUnsignedShort()
         val frames = List(numFrames) {
-            val frameType =read.readByte()
+            val frameType = read.readByte()
             val nodeId = read.readInt()
             val length = read.readUnsignedShort()
+
 
             SifAnimFfaLayer_Grouped.Frame(frameType, nodeId, length)
         }

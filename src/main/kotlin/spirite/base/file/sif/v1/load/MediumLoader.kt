@@ -27,7 +27,7 @@ object MediumLoaderFactory
             version <= 0x1_0006 -> Legacy_1_0006_MagneticMediumPartialLoader
             else -> MagneticMediumLoader_V2
         }
-        else -> throw BadSifFileException("Unrecognized Medium Type Id: $typeId.  Trying to load a newer SIF version in an older program version or corrupt file.")
+        else -> { throw BadSifFileException("Unrecognized Medium Type Id: $typeId.  Trying to load a newer SIF version in an older program version or corrupt file.") }
     }
 }
 
