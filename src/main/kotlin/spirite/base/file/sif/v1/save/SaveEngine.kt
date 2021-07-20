@@ -374,8 +374,8 @@ object SaveEngine {
                                             GAP -> SaveLoadUtil.FFAFRAME_GAP
                                             START_LOCAL_LOOP -> SaveLoadUtil.FFAFRAME_STARTOFLOOP
                                             FRAME -> SaveLoadUtil.FFAFRAME_FRAME
-                                            END_LOCAL_LOOP -> null
-                                        } ?: continue
+                                            END_LOCAL_LOOP -> SaveLoadUtil.FFAFRAME_ENDOFLOOP
+                                        }
                                         ra.writeByte(type)
                                         ra.writeInt(context.nodeMap[frame.structure.node] ?: -1 ) // [4] : NodeId
                                         ra.writeShort(frame.length)    // [2]: Length

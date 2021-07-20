@@ -14,7 +14,7 @@ object SifAnimAnimationReaderFactory {
         return when(typeId){
             SifConstants.ANIM_FFA -> when {
                 version < 8 -> LegacyFfaReader_X_to_7
-                version < 0x1_0000 -> LegacyFFAReader_8_TO_1_0000
+                version <= 0x1_0000 -> LegacyFFAReader_8_TO_1_0000
                 else -> FfaReader(version)
             }
             else -> {

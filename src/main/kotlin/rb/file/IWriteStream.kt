@@ -25,6 +25,10 @@ class BigEndianWriteStream(val underlying: IRawWriteStream) :IWriteStream {
 
     // Int
     fun <T> write(t: T, inter: IBinaryInterpreter<T>) {
+//        if( pointer == 0x116eb4L)
+//        {
+//            println("brkpthere")
+//        }
         val ba = inter.convert(t)
         write(ba)
     }
@@ -38,9 +42,9 @@ class BigEndianWriteStream(val underlying: IRawWriteStream) :IWriteStream {
         val b = (str + 0.toChar()).toByteArray(Charset.forName("UTF-8"))
 
         // Convert non-terminating null characters to whitespace
-        val nil : Byte = 0
-        for( i in 0 until b.size-1) {
-            if( b[i] == nil)
+        val nil: Byte = 0
+        for (i in 0 until b.size - 1) {
+            if (b[i] == nil)
                 b[i] = 0x20
         }
         write(b)

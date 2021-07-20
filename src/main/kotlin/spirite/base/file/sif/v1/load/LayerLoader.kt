@@ -52,9 +52,12 @@ object LegacySpriteLayerLoader_0_4 : ILayerLoader
         val ra = context.ra
         val workspace = context.workspace
 
+        val names = HashSet<String>()
         val partSize = ra.readUnsignedByte()
         val parts = List(partSize) {
-            val partName = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
+            val origName = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
+            val partName = StringUtil.getNonDuplicateName(names, origName)
+            names.add(partName)
             val transX = ra.readShort().toFloat()
             val transY = ra.readShort().toFloat()
             val drawDepth = ra.readInt()

@@ -15,37 +15,47 @@ class WorkspaceBackedFileValidation {
         context.init()
     }
 
-    fun run( folder: File, outputFile: File) {
+    fun getSifFiles(folder: File, skip: Int = 0, take: Int? = null, includeSubdirectories: Boolean = true) : List<File>{
+        val list = mutableListOf<File>()
+        var i = 0
+
+
+        fun sub(file: File, root:Boolean = false) {
+            if( file.isDirectory && (root || includeSubdirectories)) {
+                for (listFile in file.listFiles())
+                    sub(listFile)
+            }
+            else {
+                if( file.extension.toLowerCase() in setOf("sif", "sif~")) {
+                    ++i
+                    if( take != null &&  i > skip+take)
+                        return
+                    if( i > skip) {
+                        list.add(file)
+                    }
+                }
+
+            }
+        }
+
+        sub(folder, true)
+
+        return list
+    }
+
+    fun run( folder: File, outputFile: File, skip: Int = 0, take: Int? = null, includeSubdirectories: Boolean = true) {
+        val files = getSifFiles(folder, skip, take, includeSubdirectories)
 
         if( outputFile.exists())
             outputFile.delete()
         outputFile.createNewFile()
         val sb = StringBuilder()
 
-        var i = 0
-        val skip = 0
-        val take = 9999999
-
-        fun runOnFile(file: File) {
-            if( file.isDirectory ) {
-                for (listFile in file.listFiles())
-                    runOnFile(listFile)
-            }
-            else {
-                if( file.extension.toLowerCase() in setOf("sif", "sif~")) {
-                    println(file.absolutePath)
-                    if( ++i > skip+take)
-                        return
-                    if( i > skip) {
-                        doTest(file, sb)
-                        sb.appendln()
-                    }
-                }
-            }
+        for (file in files) {
+            println(file.absolutePath)
+            doTest(file, sb)
+            sb.appendln()
         }
-
-        runOnFile(folder)
-
 
         outputFile.writeText(sb.toString())
     }

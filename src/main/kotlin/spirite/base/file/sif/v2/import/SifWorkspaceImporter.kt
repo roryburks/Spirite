@@ -4,6 +4,7 @@ import rb.global.ILogger
 import rb.glow.ColorARGB32Normal
 import rb.glow.gle.RenderMethod
 import rb.glow.gle.RenderMethodType
+import rb.glow.toColor
 import rb.vectrix.interpolation.CubicSplineInterpolator2D
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.i
@@ -36,6 +37,7 @@ import spirite.base.pen.stroke.BasicDynamics
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.DrawPointsBuilder
 import spirite.base.pen.stroke.StrokeParams
+import spirite.base.util.StringUtil
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
 import spirite.core.file.contracts.*
@@ -49,7 +51,7 @@ class SifWorkspaceImporter(
         val nodes: MutableList<Node> = mutableListOf()
         val animations: MutableList<Animation> = mutableListOf()
 
-        fun reindex( index : Int) = mediumReindexingMap[index] ?: throw SifFileException("Medium Id $index does not correspond to any Medium Data")
+        fun reindex( index : Int) = mediumReindexingMap[index]
     }
 
     fun import(file: SifFile, master: IMasterControl) : MImageWorkspace{
@@ -96,7 +98,7 @@ class SifWorkspaceImporter(
                     val things = data.things.map<SifImgdMagThing,IMaglevThing> { thing -> when( thing )  {
                         is SifImgdMagThing_Stroke -> {
                             val params = StrokeParams(
-                                color = ColorARGB32Normal(thing.color),
+                                color = thing.color.toColor(),
                                 method = StrokeParams.Method.fromFileId(thing.method.i) ?: StrokeParams.Method.BASIC.also { _logger.logWarning("Mis-Mapped Method, defaulting to BASIC.  ${thing.method}") },
                                 mode = PenDrawMode.fromFileId(thing.drawMode.i) ?: PenDrawMode.NORMAL.also { _logger.logWarning("Mis-Mapped Draw Mode, defaulting to NORMAL.  ${thing.drawMode}") },
                                 width = thing.width )
@@ -161,16 +163,23 @@ class SifWorkspaceImporter(
                 }
                 is SifGrptNode_Simple -> {
                     val index = context.reindex(data.mediumId)
-                    val layer = SimpleLayer(MediumHandle(workspace, index))
-                    workspace.groupTree.importLayer(nodeLayer[fNode.depth - 1], fNode.name, layer, true)
+                    if( index != null) {
+                        val layer = SimpleLayer(MediumHandle(workspace, index))
+                        workspace.groupTree.importLayer(nodeLayer[fNode.depth - 1], fNode.name, layer, true)
+                    } else null
                 }
                 is SifGrptNode_Sprite -> {
                     val type = MediumType.fromCode(data.layerType) ?: MediumType.DYNAMIC.also { _logger.logWarning("Layer Type mis-mapping.  Defaulting to DYNAMIC. ${data.layerType}") }
-                    val parts = data.parts.map {  fPart ->
+                    val names = HashSet<String>()
+                    val parts = data.parts.mapNotNull {  fPart ->
                         val partStruct = fPart.run {
-                            SpritePartStructure(drawDepth, partTypeName, true, alpha, transX, transY, scaleX, scaleY, rotation)
+                            // TODO: Once there is a better "sprite part reconciliation" process, probably remove this.
+                            val newName = StringUtil.getNonDuplicateName(names,partTypeName)
+                            names.add(newName)
+                            SpritePartStructure(drawDepth, newName, true, alpha, transX, transY, scaleX, scaleY, rotation)
                         }
-                        val medium = MediumHandle(workspace, context.reindex( fPart.mediumId))
+                        val index =context.reindex( fPart.mediumId ) ?: return@mapNotNull null
+                        val medium = MediumHandle(workspace, index)
                         Pair(medium, partStruct)
                     }
 
@@ -212,7 +221,7 @@ class SifWorkspaceImporter(
 
             fun loadGroupedLayer( lData: SifAnimFfaLayer_Grouped, layer: SifAnimFfaLayer) : IFfaLayer?{
                 val groupNode = context.nodes.getOrNull(lData.groupNodeId) as? GroupNode ?: return null
-                val name = if( version < 1_0000) groupNode.name else layer.partTypeName
+                val name = if( version <= 0x1_0000) groupNode.name else layer.partTypeName
                 val frameMap = mutableMapOf<Node, FfaFrameStructure>()
                 val unlinkedFrameClusters = mutableListOf<FfaLayerGroupLinked.UnlinkedFrameCluster>()
 
@@ -222,7 +231,7 @@ class SifWorkspaceImporter(
                 for (frame in lData.frames) {
                     val frameNode = context.nodes.getOrNull(frame.nodeId)
 
-                    val marker = if( version < 1_0000) {
+                    val marker = if( version <= 0x1_0000) {
                         if( frameNode is GroupNode) FfaFrameStructure.Marker.START_LOCAL_LOOP
                         else FfaFrameStructure.Marker.FRAME
                     } else FfaFrameStructure.Marker.values()
