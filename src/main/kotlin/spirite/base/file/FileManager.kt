@@ -50,7 +50,7 @@ interface IFileManager {
 class FileManager( val master: IMasterControl)  : IFileManager{
     companion object {
         var v2Load: Boolean = true
-        var v2Save: Boolean = false
+        var v2Save: Boolean = true
     }
 
     private val _sifImporter = SifWorkspaceImporter(Hybrid.imageIO,ConsoleLogger)
