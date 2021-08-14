@@ -3,9 +3,8 @@ package spirite.core.file.load.anim
 import rb.file.IReadStream
 import rb.file.readStringUtf8
 import rb.vectrix.mathUtil.i
-import spirite.base.file.sif.v1.load.BadSifFileException
-import spirite.base.imageData.animation.ffa.FfaFrameStructure
 import spirite.core.file.SifConstants
+import spirite.core.file.SifFileException
 import spirite.core.file.contracts.*
 
 class FfaReader(val version: Int): ISifAnimAnimationReader {
@@ -20,7 +19,7 @@ class FfaReader(val version: Int): ISifAnimAnimationReader {
                 SifConstants.FFALAYER_GROUPLINKED -> loadGroupLinkedLayer(read)
                 SifConstants.FFALAYER_LEXICAL -> loadLexicalLayer(read)
                 SifConstants.FFALAYER_CASCADING -> loadCascadingLayer(read)
-                else -> throw BadSifFileException("Unrecognized FFA Layer TypeId: ${layerType}")
+                else -> throw SifFileException("Unrecognized FFA Layer TypeId: $layerType")
             }
 
             SifAnimFfaLayer(layerName, async, layerData)
@@ -86,9 +85,9 @@ object LegacyFfaReader_X_to_7 : ISifAnimAnimationReader {
                 when(marker) {
                     0 -> {
                         val nodeLink = read.readInt()
-                        SifAnimFfaLayer_Grouped.Frame(FfaFrameStructure.Marker.FRAME.fileId.toByte(), nodeLink, length)
+                        SifAnimFfaLayer_Grouped.Frame(SifConstants.FfaFrameMarker_Frame.toByte(), nodeLink, length)
                     }
-                    else -> SifAnimFfaLayer_Grouped.Frame(FfaFrameStructure.Marker.GAP.fileId.toByte(), -1, length)
+                    else -> SifAnimFfaLayer_Grouped.Frame(SifConstants.FfaFrameMarker_Gap.toByte(), -1, length)
                 }
             }
 
@@ -117,12 +116,12 @@ object LegacyFFAReader_8_TO_1_0000 : ISifAnimAnimationReader {
                 val gapAfter = read.readUnsignedShort()
 
                 if( gapBefore > 0)
-                    frames.add(SifAnimFfaLayer_Grouped.Frame(FfaFrameStructure.Marker.GAP.fileId.toByte(), -1, gapBefore))
+                    frames.add(SifAnimFfaLayer_Grouped.Frame(SifConstants.FfaFrameMarker_Gap.toByte(), -1, gapBefore))
 
-                frames.add(SifAnimFfaLayer_Grouped.Frame(FfaFrameStructure.Marker.FRAME.fileId.toByte(), frameNodeId, innerLength))
+                frames.add(SifAnimFfaLayer_Grouped.Frame(SifConstants.FfaFrameMarker_Frame.toByte(), frameNodeId, innerLength))
 
                 if( gapAfter > 0)
-                    frames.add(SifAnimFfaLayer_Grouped.Frame(FfaFrameStructure.Marker.GAP.fileId.toByte(), -1, gapAfter))
+                    frames.add(SifAnimFfaLayer_Grouped.Frame(SifConstants.FfaFrameMarker_Gap.toByte(), -1, gapAfter))
             }
 
             val data = SifAnimFfaLayer_Grouped(groupNodeId, includeSubtrees, frames)

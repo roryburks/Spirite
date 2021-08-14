@@ -3,7 +3,6 @@ package spirite.core.file.load.imgd
 import rb.file.IReadStream
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.round
-import spirite.base.brains.toolset.PenDrawMode
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
 import spirite.core.file.contracts.*
@@ -64,7 +63,7 @@ class SifMaglevMediumReader_Legacy_1_0000_To_1_0006(val version: Int) : ISifMedi
                     val method = read.readByte()
                     val width = read.readFloat()
                     val mode =
-                        if( version < 0x1_0006) PenDrawMode.NORMAL.fileId.toByte()
+                        if( version < 0x1_0006) SifConstants.PenMode_Normal.toByte()
                         else read.readByte()
 
                     // xywxywxyw rather than xxxxxxxyyyyyyyywwwwww
@@ -118,7 +117,7 @@ class SifMaglevMediumReader_Legacy_Pre_1_0000(val version: Int) : ISifMediumRead
                     }
                     strokeLengths[thingId] = numVerts
 
-                    val drawMode = PenDrawMode.NORMAL.fileId.toByte()
+                    val drawMode = SifConstants.PenMode_Normal.toByte()
                     SifImgdMagThing_Stroke(color, method, width, drawMode, x, y, w , false)
                 }
                 SifConstants.MAGLEV_THING_FILL -> {

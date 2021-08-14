@@ -1,7 +1,6 @@
 package spirite.core.file.save
 
 import rb.file.IWriteStream
-import spirite.core.file.contracts.SifFile
 import spirite.core.file.contracts.SifTpltChunk
 
 object SifTpltWriter {

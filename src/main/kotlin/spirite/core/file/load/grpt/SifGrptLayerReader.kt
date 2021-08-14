@@ -3,7 +3,6 @@ package spirite.core.file.load.grpt
 import rb.file.IReadStream
 import rb.file.readStringUtf8
 import rb.vectrix.mathUtil.i
-import spirite.base.imageData.mediums.MediumType
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
 import spirite.core.file.contracts.SifGrptNodeData
@@ -59,7 +58,7 @@ class LegacySpriteLayerReader(val version: Int) : ISifGrptLayerReader {
         }
 
         return SifGrptNode_Sprite(
-            MediumType.DYNAMIC.permanentCode,
+            SifConstants.MEDIUM_DYNAMIC,
             parts)
     }
 }
@@ -67,7 +66,7 @@ class LegacySpriteLayerReader(val version: Int) : ISifGrptLayerReader {
 class SpriteLayerReader(val version: Int) : ISifGrptLayerReader {
     override fun readLayer(read: IReadStream): SifGrptNodeData {
         val type = if(version >= 0x1_000A) read.readByte().i
-            else MediumType.DYNAMIC.permanentCode
+            else SifConstants.MEDIUM_DYNAMIC
         val numParts = read.readUnsignedByte()
         val parts = List(numParts){
             val name = read.readStringUtf8()

@@ -250,7 +250,8 @@ class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : Transfor
     private val _link2 = tool.translationBind.addObserver { _, _ -> onChange()}
     private val _link3 = tool.rotationBind.addObserver { _, _ -> onChange()}
     private val _link4 = penner.workspace?.selectionEngine?.selectionChangeObserver?.addObserver({ it: SelectionChangeEvent ->
-        end()
+        if(penner.workspace?.selectionEngine?.selection == null)
+            end()
     }.observer())
     private val _link5 = tool.applyTransformBind.addObserver { _, _ -> tryStart() }
 

@@ -35,8 +35,17 @@ object SifConstants {
     const val FFALAYER_LEXICAL = 0x02
     const val FFALAYER_CASCADING = 0x03
 
+    const val FfaFrameMarker_Frame = 1
+    const val FfaFrameMarker_StartLocalLoop = 2
+    const val FfaFrameMarker_EndLocalLoop = 4
+    const val FfaFrameMarker_Gap = 3
+
     // GroupNode Attribute Masks
     const val VisibleMask = 0b1
     const val ExpandedMask = 0b10
     const val FlattenedMask = 0b100
+
+    const val PenMode_Normal = 1
+    const val PenMode_KeepAlpha = 2
+    const val PenMode_Behind = 3
 }
