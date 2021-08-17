@@ -10,7 +10,7 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.*
 import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.drawer.NillImageDrawer
+import spirite.base.graphics.drawer.NillImageDrawer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.mediums.magLev.MaglevStroke

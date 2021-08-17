@@ -2,7 +2,7 @@ package spirite.base.pen.behaviors
 
 import rb.glow.Color
 import spirite.base.brains.toolset.IToolsetManager
-import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
+import spirite.base.graphics.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.Penner
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.InterpolationMethod.NONE

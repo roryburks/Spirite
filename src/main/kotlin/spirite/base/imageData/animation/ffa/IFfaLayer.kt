@@ -1,6 +1,6 @@
 package spirite.base.imageData.animation.ffa
 
-import spirite.base.graphics.rendering.TransformedHandle
+import spirite.base.imageData.TransformedHandle
 
 interface IFfaFrame {
     val layer: IFfaLayer

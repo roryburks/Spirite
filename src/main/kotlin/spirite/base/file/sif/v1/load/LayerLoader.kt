@@ -10,7 +10,7 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.MediumType
-import spirite.base.util.StringUtil
+import spirite.core.util.StringUtil
 
 interface ILayerLoader
 {

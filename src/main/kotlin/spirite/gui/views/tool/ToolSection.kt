@@ -13,7 +13,7 @@ import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.Tool
-import spirite.base.imageData.drawer.NillImageDrawer
+import spirite.base.graphics.drawer.NillImageDrawer
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.ToolIcons
 import java.awt.Color

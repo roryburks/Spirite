@@ -2,9 +2,8 @@ package spirite.base.imageData.animation
 
 import rb.glow.IGraphicsContext
 import rb.owl.bindable.Bindable
-import spirite.base.graphics.rendering.TransformedHandle
+import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.animation.services.AnimationStateBind
 
 abstract class Animation( name : String, var workspace : IImageWorkspace )
 {

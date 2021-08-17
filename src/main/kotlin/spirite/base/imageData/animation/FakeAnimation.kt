@@ -7,7 +7,6 @@ import rb.glow.drawer
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.animation.services.AnimationStateBind
 
 class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace)
 {

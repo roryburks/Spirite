@@ -2,7 +2,7 @@ package spirite.base.imageData.groupTree
 
 import rb.extendo.dataStructures.Deque
 import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.Bellow
-import spirite.base.util.StringUtil
+import spirite.core.util.StringUtil
 
 fun MovableGroupTree.duplicateInto(toDupe: Node, context: Node = selectedNode ?: root) {
     undoEngine?.doAsAggregateAction("Duplicate Node Into") {

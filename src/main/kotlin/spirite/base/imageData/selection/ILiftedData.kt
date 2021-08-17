@@ -3,7 +3,7 @@ package spirite.base.imageData.selection
 import rb.glow.IGraphicsContext
 import rb.vectrix.linear.ITransformF
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer
 
 interface ILiftedData {
     fun draw( gc: IGraphicsContext)

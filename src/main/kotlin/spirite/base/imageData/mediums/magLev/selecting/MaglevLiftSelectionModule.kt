@@ -2,7 +2,7 @@ package spirite.base.imageData.mediums.magLev.selecting
 
 import rb.vectrix.linear.ITransformF
 import spirite.base.exceptions.CannotDoException
-import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.selection.ILiftedData

@@ -15,8 +15,8 @@ import spirite.base.brains.toolset.ColorChangeMode.AUTO
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.imageData.deformation.IDeformation
-import spirite.base.imageData.drawer.IImageDrawer
-import spirite.base.imageData.drawer.IImageDrawer.*
+import spirite.base.graphics.drawer.IImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer.*
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.HandleCompositeSource

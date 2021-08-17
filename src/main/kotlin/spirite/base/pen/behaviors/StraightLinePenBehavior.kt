@@ -3,7 +3,7 @@ package spirite.base.pen.behaviors
 import rb.vectrix.mathUtil.f
 import rb.glow.SColor
 import spirite.base.brains.toolset.IToolsetManager
-import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.pen.PenState
 import spirite.base.pen.Penner
 import spirite.base.pen.stroke.StrokeParams

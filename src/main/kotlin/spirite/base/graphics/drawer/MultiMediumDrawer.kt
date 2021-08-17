@@ -1,8 +1,8 @@
-package spirite.base.imageData.drawer
+package spirite.base.graphics.drawer
 
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
+import spirite.base.graphics.drawer.IImageDrawer.ITransformModule
 
 class MultiMediumDrawer(
         val subDrawers: List<IImageDrawer>,

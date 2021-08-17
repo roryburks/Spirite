@@ -9,7 +9,7 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.glow.SColor
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
-import spirite.base.imageData.drawer.DefaultImageDrawer
+import spirite.base.graphics.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.MediumType.FLAT
 

@@ -1,7 +1,6 @@
 package spirite.base.imageData.animation.services
 
 import rb.extendo.extensions.atlasOf
-import rb.extendo.extensions.removeToList
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.animation.Animation
 

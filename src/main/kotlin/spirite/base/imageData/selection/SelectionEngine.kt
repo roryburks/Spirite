@@ -11,9 +11,9 @@ import rb.vectrix.mathUtil.f
 import rbJvm.owl.addWeakObserver
 import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.drawer.IImageDrawer
-import spirite.base.imageData.drawer.IImageDrawer.IAnchorLiftModule
-import spirite.base.imageData.drawer.IImageDrawer.ILiftSelectionModule
+import spirite.base.graphics.drawer.IImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer.IAnchorLiftModule
+import spirite.base.graphics.drawer.IImageDrawer.ILiftSelectionModule
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.undo.NullAction

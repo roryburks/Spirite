@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import rb.glow.Colors
 import spirite.sguiHybrid.Hybrid
 import spirite.base.graphics.rendering.NodeRenderer
-import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
+import spirite.base.graphics.drawer.IImageDrawer.IStrokeModule
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium

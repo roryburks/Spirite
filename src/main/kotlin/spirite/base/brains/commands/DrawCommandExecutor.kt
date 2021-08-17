@@ -10,7 +10,7 @@ import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand.*
 import spirite.base.brains.commands.specific.LayerFixes.bakeOffset
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.drawer.IImageDrawer.*
+import spirite.base.graphics.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.groupTree.LayerNode
 

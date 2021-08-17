@@ -13,7 +13,7 @@ import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
 import spirite.base.graphics.rendering.IRenderEngine
-import spirite.base.imageData.drawer.IImageDrawer.*
+import spirite.base.graphics.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*

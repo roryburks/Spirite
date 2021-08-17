@@ -1,4 +1,4 @@
-package spirite.base.util
+package spirite.core.util
 
 // TODO: Determine where this really belongs and what it really should be called (maybe interfaced as a name-deduping service?)
 object StringUtil {

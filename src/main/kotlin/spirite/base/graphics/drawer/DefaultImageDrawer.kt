@@ -1,4 +1,4 @@
-package spirite.base.imageData.drawer
+package spirite.base.graphics.drawer
 
 import rb.glow.Color
 import rb.glow.ColorUtil
@@ -18,7 +18,7 @@ import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.MagneticFillMode.BEHIND
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.drawer.IImageDrawer.*
+import spirite.base.graphics.drawer.IImageDrawer.*
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.HandleCompositeSource

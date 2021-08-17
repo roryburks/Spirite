@@ -1,10 +1,10 @@
 package spirite.base.imageData.layers
 
 import spirite.base.graphics.isolation.IIsolator
-import spirite.base.graphics.rendering.TransformedHandle
+import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.imageData.mediums.ArrangedMediumData
 
 interface Layer {

@@ -1,6 +1,5 @@
 package spirite.base.imageData.animation.services
 
-import rb.global.IContract
 import rb.owl.bindable.Bindable
 import rb.vectrix.mathUtil.f
 

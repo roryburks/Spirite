@@ -28,7 +28,7 @@ import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.drawer.IImageDrawer.IClearModule
+import spirite.base.graphics.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer

@@ -1,4 +1,4 @@
-package spirite.base.imageData.drawer
+package spirite.base.graphics.drawer
 
 import rb.glow.Color
 import rb.glow.Composite.DST_IN
@@ -10,7 +10,7 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.drawer.IImageDrawer.*
+import spirite.base.graphics.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil

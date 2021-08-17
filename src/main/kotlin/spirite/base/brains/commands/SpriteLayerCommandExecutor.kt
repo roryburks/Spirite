@@ -7,7 +7,7 @@ import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
-import spirite.base.util.StringUtil
+import spirite.core.util.StringUtil
 
 
 class SpriteLayerCommandExecutor (

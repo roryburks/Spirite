@@ -13,6 +13,7 @@ import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node

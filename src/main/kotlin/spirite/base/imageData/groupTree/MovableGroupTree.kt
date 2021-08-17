@@ -1,7 +1,5 @@
 package spirite.base.imageData.groupTree
 
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior
 import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.*
@@ -31,7 +29,9 @@ open class MovableGroupTree(
 
         val newParent = nodeAbove.parent
         if( newParent == null ) {
-            MDebug.handleWarning(STRUCTURAL, "Attempted to move a node after a root or detatched node")
+            println("Attempted to move a node after a root or detatched node")
+            // TODO: Better Debug
+            //MDebug.handleWarning(STRUCTURAL, "Attempted to move a node after a root or detatched node")
             return
         }
         moveNode(nodeToMove, newParent, nodeAbove)
@@ -42,7 +42,9 @@ open class MovableGroupTree(
 
         val newParent = nodeUnder.parent
         if( newParent == null) {
-            MDebug.handleWarning(STRUCTURAL, "Attempted to move a node before a root or detatched node")
+            println("Attempted to move a node before a root or detatched node")
+            // TODO: Better Debug
+            //MDebug.handleWarning(STRUCTURAL, "Attempted to move a node before a root or detatched node")
             return
         }
         moveNode(nodeToMove, newParent, nodeUnder.nextNode)
@@ -87,7 +89,9 @@ open class MovableGroupTree(
         if( newParent == nodeToMove) return
         if( newParent.ancestors.contains(nodeToMove)) return
         if( parent == null) {
-            MDebug.handleWarning(STRUCTURAL, "Attempted to move a node that isn't in the tree")
+            println("Attempted to move a node that isn't in the tree")
+            // TODO: Better Debug
+            //MDebug.handleWarning(STRUCTURAL, "Attempted to move a node that isn't in the tree")
             return
         }
 

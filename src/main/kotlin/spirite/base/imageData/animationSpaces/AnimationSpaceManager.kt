@@ -4,8 +4,6 @@ import rb.owl.IObservable
 import rb.owl.Observable
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSpaceObserver
 import spirite.base.imageData.undo.NullAction
@@ -40,13 +38,17 @@ class AnimationSpaceManager(override val workspace: IImageWorkspace) : IAnimatio
                     currentAnimationSpaceBind.field = value
                 }
                 else {
-                    MDebug.handleWarning(UNSUPPORTED, "Cannot Chose an animation space outside of the AnimationSpaceManager")
+                    println("Cannot Chose an animation space outside of the AnimationSpaceManager")
+                    // TODO: Beter Debug
+                    //MDebug.handleWarning(UNSUPPORTED, "Cannot Chose an animation space outside of the AnimationSpaceManager")
                 }
             }
 
     override fun addAnimationSpace(space: AnimationSpace, select: Boolean) {
         if( space.workspace != workspace){
-            MDebug.handleWarning(UNSUPPORTED, "Cannot Import AnimationSpace into a different Workspace")
+            println("Cannot Import AnimationSpace into a different Workspace")
+            // TODO: Beter Debug
+            //MDebug.handleWarning(UNSUPPORTED, "Cannot Import AnimationSpace into a different Workspace")
             return
         }
 

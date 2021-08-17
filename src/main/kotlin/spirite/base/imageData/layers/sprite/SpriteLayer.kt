@@ -18,14 +18,14 @@ import spirite.sguiHybrid.MDebug.WarningType
 import spirite.base.brains.DBGlobal
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.graphics.isolation.ISpriteLayerIsolator
-import spirite.base.graphics.rendering.TransformedHandle
+import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.drawer.DefaultImageDrawer
-import spirite.base.imageData.drawer.IImageDrawer
-import spirite.base.imageData.drawer.MultiMediumDrawer
-import spirite.base.imageData.drawer.NillImageDrawer
+import spirite.base.graphics.drawer.DefaultImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer
+import spirite.base.graphics.drawer.MultiMediumDrawer
+import spirite.base.graphics.drawer.NillImageDrawer
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.traverse
 import spirite.base.imageData.layers.Layer
@@ -38,7 +38,7 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.imageData.undo.UndoableDelegate
-import spirite.base.util.StringUtil
+import spirite.core.util.StringUtil
 
 /**
  *  A SpriteLayer is a collection of Dynamic Mediums with various offsets, transforms, and

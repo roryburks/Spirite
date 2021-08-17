@@ -1,4 +1,4 @@
-package spirite.base.imageData.drawer
+package spirite.base.graphics.drawer
 
 import rb.glow.Color
 import rb.vectrix.linear.ITransformF

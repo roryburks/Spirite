@@ -7,7 +7,7 @@
 //import rb.glow.gle.RenderMethod
 //import rb.glow.gle.RenderMethodType.*
 //import rb.glow.gle.RenderRubric
-//import spirite.base.graphics.rendering.TransformedHandle
+//import spirite.base.imageData.TransformedHandle
 //import spirite.base.imageData.MediumHandle
 //import rb.glow.Colors
 //import spirite.hybrid.Hybrid

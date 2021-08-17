@@ -27,9 +27,9 @@ import spirite.base.imageData.animation.services.IAnimationManagementSvc
 import spirite.base.imageData.animation.services.IAnimationStateSvc
 import spirite.base.imageData.animationSpaces.AnimationSpaceManager
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager
-import spirite.base.imageData.drawer.IImageDrawer
-import spirite.base.imageData.drawer.MultiMediumDrawer
-import spirite.base.imageData.drawer.NillImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer
+import spirite.base.graphics.drawer.MultiMediumDrawer
+import spirite.base.graphics.drawer.NillImageDrawer
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.LayerNode

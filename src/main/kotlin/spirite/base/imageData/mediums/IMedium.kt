@@ -12,7 +12,7 @@ import spirite.base.imageData.IFloatingMedium
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.imageData.mediums.MediumType.FLAT
 
 

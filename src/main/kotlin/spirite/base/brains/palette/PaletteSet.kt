@@ -5,7 +5,7 @@ import spirite.sguiHybrid.MDebug
 import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.brains.palette.IPaletteManager.PaletteChangeEvent
 import spirite.base.brains.palette.IPaletteManager.PaletteSetChangeEvent
-import spirite.base.util.StringUtil
+import spirite.core.util.StringUtil
 
 abstract class PaletteSet {
     abstract val onPaletteSetChangeTrigger: (PaletteSetChangeEvent) -> Unit

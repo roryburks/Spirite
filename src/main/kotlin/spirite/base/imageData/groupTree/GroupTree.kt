@@ -3,8 +3,6 @@ package spirite.base.imageData.groupTree
 import rb.extendo.dataStructures.Deque
 import rb.owl.IObservable
 import rb.owl.Observable
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.view.IViewSystem
@@ -30,7 +28,11 @@ open class GroupTree(
         set(value) {
             when {
                 value == null -> selectedNodeBind.field = null
-                value.tree != this -> MDebug.handleError(STRUCTURAL, "Tried to splice a node into a new tree")
+                value.tree != this -> {
+                    println("Tried to splice a node into a new tree")
+                    // TODO: Better Debug
+                    //MDebug.handleError(STRUCTURAL, "Tried to splice a node into a new tree")
+                }
                 else -> selectedNodeBind.field = value
             }
         }

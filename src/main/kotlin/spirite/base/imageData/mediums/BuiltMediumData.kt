@@ -4,8 +4,6 @@ import rb.glow.IGraphicsContext
 import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.imageData.MMediumRepository
 
 abstract class BuiltMediumData(
@@ -31,7 +29,9 @@ abstract class BuiltMediumData(
     private var doing = false
     fun drawOnComposite(drawer: (IGraphicsContext) -> Unit) {
         if( doing) {
-            MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
+            println("Tried to recursively check-out Medium.")
+            // TODO: Better Debug
+            //MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
             return
         }
         mediumRepo.changeMedium(arranged.handle.id) {
@@ -44,7 +44,9 @@ abstract class BuiltMediumData(
 
     fun rawAccessComposite(doer: (RawImage) -> Unit) {
         if( doing) {
-            MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
+            println("Tried to recursively check-out Medium.")
+            // TODO: Better Debug
+            //MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
             return
         }
         mediumRepo.changeMedium(arranged.handle.id) {

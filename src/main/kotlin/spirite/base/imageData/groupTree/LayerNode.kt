@@ -1,6 +1,6 @@
 package spirite.base.imageData.groupTree
 
-import spirite.base.graphics.rendering.TransformedHandle
+import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine

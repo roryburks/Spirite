@@ -5,7 +5,7 @@ import rb.glow.IGraphicsContext
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.glow.SColor
-import spirite.base.imageData.drawer.IImageDrawer.IMagneticFillModule
+import spirite.base.graphics.drawer.IImageDrawer.IMagneticFillModule
 import spirite.base.pen.Penner
 import spirite.gui.views.work.WorkSectionView
 import kotlin.math.min

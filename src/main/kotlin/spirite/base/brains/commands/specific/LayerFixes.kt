@@ -6,7 +6,7 @@ import rb.vectrix.mathUtil.f
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node

@@ -7,7 +7,6 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.view.IViewSystem
-import spirite.sguiHybrid.MDebug
 import kotlin.reflect.KProperty
 
 abstract class Node(
@@ -169,7 +168,9 @@ abstract class Node(
         val i = children.indexOf( this)
 
         if( i == -1) {
-            MDebug.handleError(MDebug.ErrorType.STRUCTURAL, "Group Tree malformation (Not child of own parent).")
+            println("Group Tree malformation (Not child of own parent).")
+            // TODO: Better Debug
+            //MDebug.handleError(MDebug.ErrorType.STRUCTURAL, "Group Tree malformation (Not child of own parent).")
             return null
         }
 
@@ -182,7 +183,9 @@ abstract class Node(
         val i = children.indexOf( this)
 
         if( i == -1) {
-            MDebug.handleError(MDebug.ErrorType.STRUCTURAL, "Group Tree malformation (Not child of own parent).")
+            println("Group Tree malformation (Not child of own parent).")
+            // TODO: Better Debug
+            //MDebug.handleError(MDebug.ErrorType.STRUCTURAL, "Group Tree malformation (Not child of own parent).")
             return null
         }
 
@@ -193,10 +196,12 @@ abstract class Node(
     fun delete() {
         val p = parent
         if( p == null) {
-            MDebug.handleError(
-                MDebug.ErrorType.STRUCTURAL,
-                "Tried to Delete GroupNode that has no parent (root node or floating node)."
-            )
+            println("Tried to Delete GroupNode that has no parent (root node or floating node).")
+            // TODO: Better Debug
+//            MDebug.handleError(
+//                MDebug.ErrorType.STRUCTURAL,
+//                "Tried to Delete GroupNode that has no parent (root node or floating node)."
+//            )
             return
         }
         p.remove(this)

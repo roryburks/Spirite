@@ -1,8 +1,8 @@
 package spirite.base.brains.toolset
 
-import spirite.base.imageData.drawer.IImageDrawer
-import spirite.base.imageData.drawer.MultiMediumDrawer
-import spirite.base.imageData.drawer.NillImageDrawer
+import spirite.base.graphics.drawer.IImageDrawer
+import spirite.base.graphics.drawer.MultiMediumDrawer
+import spirite.base.graphics.drawer.NillImageDrawer
 import spirite.base.imageData.mediums.magLev.MaglevImageDrawer
 
 /** A Toolset is a complete set of every tool */

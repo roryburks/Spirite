@@ -10,7 +10,7 @@ import sgui.core.components.events.MouseEvent.MouseButton
 import sgui.core.components.events.MouseEvent.MouseButton.*
 import spirite.base.imageData.deformation.StrokeDeformationPiece
 import spirite.base.imageData.deformation.StrokeDeformationV2
-import spirite.base.imageData.drawer.IImageDrawer.IDeformDrawer
+import spirite.base.graphics.drawer.IImageDrawer.IDeformDrawer
 import spirite.base.pen.Penner
 import spirite.gui.views.work.WorkSectionView
 
