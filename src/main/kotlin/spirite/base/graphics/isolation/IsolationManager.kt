@@ -3,7 +3,6 @@ package spirite.base.graphics.isolation
 import rb.global.IContract
 import rb.glow.gle.RenderRubric
 import rb.owl.bindable.addObserver
-import rbJvm.owl.addWeakObserver
 import spirite.base.graphics.isolation.IIsolationManager.IsolationState
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageWorkspace
@@ -89,7 +88,8 @@ class IsolationManager(
 
     init {
         // No reason this would need to be weak, right?
-        workspace.groupTree.selectedNodeBind.addWeakObserver { new, _ ->
+        //workspace.groupTree.selectedNodeBind.addWeakObserver { new, _ ->
+        workspace.groupTree.selectedNodeBind.addObserver { new, _ ->
             if( isolationIsActive && isolateCurrentNode && new != null)
                 triggerIsolationChange()
         }

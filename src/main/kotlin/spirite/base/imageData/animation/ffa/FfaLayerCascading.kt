@@ -4,7 +4,6 @@ import rb.extendo.delegates.OnChangeDelegate
 import rb.extendo.extensions.toHashMap
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.animation.DefaultAnimCharMap
-import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
@@ -56,7 +55,9 @@ class FfaLayerCascading(
                         .filter { it.key != info.group }
                         .any { it.value.lexicalKey == info.lexicalKey })
         {
-            Hybrid.beep()
+            println("Issue in setSublaterInfo")
+            //Hybrid.beep()
+            // TODO: Better Debug
         }
 
         val mapped = FfaCascadingSublayerInfo.FromGroup(

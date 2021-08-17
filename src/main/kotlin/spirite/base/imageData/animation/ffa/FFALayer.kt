@@ -1,7 +1,5 @@
 package spirite.base.imageData.animation.ffa
 
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.LayerNode
@@ -65,7 +63,12 @@ abstract class FFALayer(
                         GAP -> frame
                         START_LOCAL_LOOP -> _sub(index, offset - caret)
                         FRAME -> frame
-                        END_LOCAL_LOOP -> {MDebug.handleWarning(STRUCTURAL, "Malformed Animation (END_LOCAL_LOOP with length > 0)"); null}
+                        END_LOCAL_LOOP -> {
+                            //MDebug.handleWarning(STRUCTURAL, "Malformed Animation (END_LOCAL_LOOP with length > 0)")
+                            // TODO: Debug Better
+                            println("Malformed Animation (END_LOCAL_LOOP with length > 0)")
+                            null
+                        }
                     }
                 }
                 if( frame.marker == START_LOCAL_LOOP) {
