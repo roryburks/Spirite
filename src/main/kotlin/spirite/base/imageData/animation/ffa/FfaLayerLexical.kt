@@ -4,7 +4,6 @@ import rb.extendo.delegates.OnChangeDelegate
 import spirite.base.imageData.animation.DefaultAnimCharMap
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.FRAME
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.GAP
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node

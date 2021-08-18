@@ -1,10 +1,11 @@
 package spirite.base.imageData.animation.ffa
 
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.undo.IUndoEngineFeed
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.UndoableChangeDelegate
+import spirite.base.imageData.undo.performAndStore
 
 
 interface IFFALayerLinked {
@@ -14,11 +15,10 @@ interface IFFALayerLinked {
 
 abstract class FFALayer(
         override val anim : FixedFrameAnimation,
+        private val _undoEngine : IUndoEngineFeed? = null,
         asynchronous: Boolean = false)
     :IFfaLayer
 {
-    private val undoEngine get() = anim.workspace.undoEngine
-
     override val start = 0
     override val end : Int get() {
         var caret = 0
@@ -40,7 +40,7 @@ abstract class FFALayer(
 
     override var asynchronous by UndoableChangeDelegate(
             asynchronous,
-            anim.workspace.undoEngine,
+            _undoEngine,
             "Toggled Frame Layer Asynchronousness") {anim.triggerFFAChange(this)}
 
     protected val _frames = mutableListOf<FFAFrame>()
@@ -135,17 +135,17 @@ abstract class FFALayer(
         val node get() = structure.node
         val marker get() = structure.marker
         override var length get() = structure.length
-            set(value) { undoEngine.performAndStore(FFAStructureChangeAction(structure.copy(length = value),"Changed Frame Length"))}
+            set(value) { _undoEngine.performAndStore(FFAStructureChangeAction(structure.copy(length = value),"Changed Frame Length"))}
 
         private inner class FFAStructureChangeAction(
                 val newStructure: FfaFrameStructure,
                 override val description: String)
             : NullAction()
         {
-            val oldStucture = structure
+            val oldStructure = structure
 
             override fun performAction() {structure = newStructure ; anim.triggerFFAChange(this@FFALayer)}
-            override fun undoAction() {structure = oldStucture ; anim.triggerFFAChange(this@FFALayer)}
+            override fun undoAction() {structure = oldStructure ; anim.triggerFFAChange(this@FFALayer)}
         }
         // endregion
 

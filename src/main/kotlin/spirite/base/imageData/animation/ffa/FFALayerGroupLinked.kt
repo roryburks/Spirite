@@ -2,10 +2,10 @@ package spirite.base.imageData.animation.ffa
 
 import rb.extendo.delegates.OnChangeDelegate
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
+import spirite.base.imageData.undo.IUndoEngineFeed
 import spirite.base.imageData.undo.UndoableChangeDelegate
 
 
@@ -14,10 +14,11 @@ class FfaLayerGroupLinked(
     val groupLink : GroupNode,
     includeSubtrees: Boolean,
     name: String = groupLink.name,
+    private val _undoFeed : IUndoEngineFeed? = null,
     frameMap : Map<Node,FfaFrameStructure>? = null,
     unlinkedClusters: List<UnlinkedFrameCluster>? = null,
     asynchronous: Boolean = false)
-    : FFALayer(context, asynchronous), IFFALayerLinked
+    : FFALayer(context, _undoFeed, asynchronous), IFFALayerLinked
 {
     // TODO: Make Undoable?
     override var name by OnChangeDelegate(name) { anim.triggerFFAChange(this)}
@@ -28,7 +29,7 @@ class FfaLayerGroupLinked(
 
     var includeSubtrees by UndoableChangeDelegate(
             includeSubtrees,
-            context.workspace.undoEngine,
+            _undoFeed,
             "Change Animation Layer's IncludeSubtrees Structure")
     { groupLinkUpdated() }
 
@@ -36,15 +37,15 @@ class FfaLayerGroupLinked(
         groupLinkImported(frameMap, unlinkedClusters)
     }
 
-    fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {
-        val tree = anim.workspace.groupTree
-        val nodeToMove = frameToMove.node ?: return
-        when {
-            frameRelativeTo == null ->  tree.moveInto(nodeToMove, groupLink, true)
-            above -> frameRelativeTo.node?.also { tree.moveAbove( nodeToMove, it)}
-            else -> frameRelativeTo.node?.also { tree.moveBelow( nodeToMove, it)}
-        }
-    }
+//    fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {
+//        val tree = anim.workspace.groupTree
+//        val nodeToMove = frameToMove.node ?: return
+//        when {
+//            frameRelativeTo == null ->  tree.moveInto(nodeToMove, groupLink, true)
+//            above -> frameRelativeTo.node?.also { tree.moveAbove( nodeToMove, it)}
+//            else -> frameRelativeTo.node?.also { tree.moveBelow( nodeToMove, it)}
+//        }
+//    }
 
     fun addGapFrameAfter(frameBefore: IFfaFrame?, gapLength: Int) {
         val index = if( frameBefore == null) 0 else (_frames.indexOf(frameBefore) + 1)
@@ -184,6 +185,7 @@ class FfaLayerGroupLinked(
             groupLink,
             includeSubtrees,
             name,
+            _undoFeed,
             _frames.mapNotNull { when( val node = it.node) {
                 null -> null
                 else -> Pair(node, it.structure)

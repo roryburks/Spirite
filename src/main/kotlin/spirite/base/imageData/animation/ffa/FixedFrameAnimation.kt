@@ -11,9 +11,15 @@ import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.undo.NullAction
 
+class FFAUpdateContract(val changedNodes: Set<Node>)
+{
+    val ancestors by lazy {changedNodes.flatMap { it.ancestors}.union(changedNodes)}
+}
+
 class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     : MediumBasedAnimation(name, workspace)
 {
+
     constructor(name: String, workspace: IImageWorkspace, node : GroupNode) : this(name, workspace){
         addLinkedLayer(node, true)
     }
@@ -21,9 +27,11 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         _layers.addAll(layerBuilders.map { it(this) })
     }
 
+    // Model
     private val _layers = mutableListOf<IFfaLayer>()
-    val layers : List<IFfaLayer> get() = _layers
+    //
 
+    val layers : List<IFfaLayer> get() = _layers
     val start : Int get() = _layers.map { it.start }.min() ?: 0
     val end : Int get() = _layers.map { it.end }.max() ?: 0
     override val startFrame: Float get() = start.f
@@ -41,10 +49,6 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
                 }
     }
 
-    class FFAUpdateContract(val changedNodes: Set<Node>)
-    {
-        val ancestors by lazy {changedNodes.flatMap { it.ancestors}.union(changedNodes)}
-    }
     fun treeChanged( changedNodes : Set<Node>) {
         // Remove All Layers referencing nonexistent Groups
 //        val toRemove = _layers.asSequence()
@@ -94,7 +98,7 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         frameMap: Map<Node, FfaFrameStructure>? = null,
         unlinkedClusters: List<UnlinkedFrameCluster>? = null) : FfaLayerGroupLinked
     {
-        return FfaLayerGroupLinked(this, group, includeSubtrees, name, frameMap, unlinkedClusters)
+        return FfaLayerGroupLinked(this, group, includeSubtrees, name,  frameMap, unlinkedClusters)
                 .also { addLayer(it)}
     }
 

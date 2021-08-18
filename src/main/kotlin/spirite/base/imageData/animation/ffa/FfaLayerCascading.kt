@@ -4,7 +4,6 @@ import rb.extendo.delegates.OnChangeDelegate
 import rb.extendo.extensions.toHashMap
 import rb.vectrix.mathUtil.MathUtil
 import spirite.base.imageData.animation.DefaultAnimCharMap
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import kotlin.math.min

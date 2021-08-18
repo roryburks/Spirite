@@ -8,7 +8,7 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
 import spirite.base.imageData.IImageWorkspace
 
-class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace)
+class FakeAnimation() : Animation("Fake")
 {
 
     override val startFrame: Float
@@ -24,5 +24,5 @@ class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace)
         gc.drawer.drawLine(100.0 - t, 0.0, t.d, 100.0)
     }
 
-    override fun dupe()= FakeAnimation(workspace)
+    override fun dupe()= FakeAnimation()
 }

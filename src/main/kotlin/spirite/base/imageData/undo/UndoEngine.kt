@@ -9,7 +9,8 @@ import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 
-interface IUndoEngine {
+
+interface IUndoEngine : IUndoEngineFeed{
     /** Cleans the slate, removing all undoable actions and reinitializing the base contexts*/
     fun reset()
 
@@ -27,9 +28,6 @@ interface IUndoEngine {
     val isAtSaveSpot: Boolean
 
     val undoHistory: List<UndoIndex>
-
-    fun performAndStore( action: UndoableAction)
-    fun doAsAggregateAction( description: String, stackable: Boolean = false, runner: () -> Unit)
 
     fun undo() : Boolean
     fun redo() : Boolean
