@@ -9,8 +9,10 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.d
 import rbJvm.glow.util.ContentBoundsFinder
+import sgui.core.systems.IImageCreator
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 
 
@@ -40,9 +42,10 @@ class DynamicImage(
     fun drawToImage(compositionWidth: Int,
                     compositionHeight: Int,
                     tImageToComposition: ITransformF = ImmutableTransformF.Identity,
+                    imageCreator: IImageCreator = DiSet_Hybrid.imageCreator,
                     drawer: (RawImage) -> Unit)
     {
-        val checkoutContext = checkoutRaw(compositionWidth, compositionHeight, tImageToComposition)
+        val checkoutContext = checkoutRaw(compositionWidth, compositionHeight, tImageToComposition, imageCreator)
         drawer.invoke(checkoutContext.buffer)
         checkin(checkoutContext)
     }
@@ -51,13 +54,19 @@ class DynamicImage(
     private inner class CompositionContext(
             val tImageToComposite: ITransformF,
             val compositionWidth : Int,
-            val compositionHeight : Int)
+            val compositionHeight : Int,
+            val imageCreator: IImageCreator)
     {
-        val buffer = Hybrid.imageCreator.createImage(compositionWidth, compositionHeight)
+        val buffer = imageCreator.createImage(compositionWidth, compositionHeight)
     }
 
-    private fun checkoutRaw(compositionWidth: Int, compositionHeight: Int, tImageToComposition: ITransformF) : CompositionContext {
-        val newContext = CompositionContext(tImageToComposition, compositionWidth, compositionHeight)
+    private fun checkoutRaw(
+        compositionWidth: Int,
+        compositionHeight: Int,
+        tImageToComposition: ITransformF,
+        imageCreator: IImageCreator) : CompositionContext
+    {
+        val newContext = CompositionContext(tImageToComposition, compositionWidth, compositionHeight, imageCreator)
 
         val gc = newContext.buffer.graphics
         gc.transform(tImageToComposition)
@@ -75,7 +84,7 @@ class DynamicImage(
         val combiningBounds = RectangleUtil.circumscribeTrans(Rect(0,0, context.compositionWidth, context.compositionHeight), tCompositeToImage)
                 .union( Rect(xOffset, yOffset, base?.width ?: 0, base?.height ?: 0))
 
-        using(Hybrid.imageCreator.createImage(combiningBounds.width, combiningBounds.height)) { combiningImage ->
+        using(context.imageCreator.createImage(combiningBounds.width, combiningBounds.height)) { combiningImage ->
             val gc = combiningImage.graphics
 
             base?.with {
@@ -92,7 +101,7 @@ class DynamicImage(
                 val contentBounds = ContentBoundsFinder.findContentBounds(combiningImage, 0, true)
                 val newBase = when {
                     contentBounds.w <= 0 || contentBounds.h <= 0 -> null
-                    else -> Hybrid.imageCreator.createImage(contentBounds.wi, contentBounds.hi)
+                    else -> context.imageCreator.createImage(contentBounds.wi, contentBounds.hi)
                 }
                 //println("${contentBounds.width} , ${contentBounds.height}")
                 newBase?.graphics?.renderImage(combiningImage, -contentBounds.x1, -contentBounds.y1)

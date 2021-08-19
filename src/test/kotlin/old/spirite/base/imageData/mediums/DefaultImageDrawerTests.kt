@@ -16,6 +16,7 @@ import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import spirite.specialRendering.stroke.GLStrokeDrawerV2
 import kotlin.test.assertEquals
@@ -41,7 +42,7 @@ class DefaultImageDrawerTests {
         drawer.stepStroke(PenState(45f, 20f, 0.75f))
         drawer.stepStroke(PenState(20f, 45f, 0.25f))
 
-        val wsImage = Hybrid.imageCreator.createImage(100,100)
+        val wsImage = DiSet_Hybrid.imageCreator.createImage(100,100)
         NodeRenderer(workspace.groupTree.root, workspace).render(wsImage.graphics)
 
         // Save
@@ -164,7 +165,7 @@ class DefaultImageDrawerTests {
         drawer.stepStroke(PenState(50f, 70f, 0.5f))
 
         // Save
-        val wsImage = Hybrid.imageCreator.createImage(workspace.width,workspace.height)
+        val wsImage = DiSet_Hybrid.imageCreator.createImage(workspace.width,workspace.height)
         NodeRenderer(workspace.groupTree.root, workspace).render(wsImage.graphics)
         TestConfig.trySave(wsImage, "defaultImageDrawer_dynamicComposite")
     }

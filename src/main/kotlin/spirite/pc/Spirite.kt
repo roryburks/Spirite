@@ -5,6 +5,7 @@ import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.core.hybrid.DebugProvider
 import spirite.core.hybrid.IDebug.ErrorType.FATAL
+import spirite.pc.di.SetupHybrid
 import spirite.sguiHybrid.EngineLaunchpoint
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
@@ -24,6 +25,7 @@ class Spirite {
         try {
             SetupVectrixForJvm()
             setupSwGuiStuff()
+            SetupHybrid()
 
             UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName())
             SwingUtilities.invokeAndWait {
@@ -31,6 +33,7 @@ class Spirite {
                 master = MasterControl()
 
                 master.frameManager.initUi()}
+
 
             SwingUtilities.invokeLater {
                 val ws1 = master.createWorkspace(640,480)

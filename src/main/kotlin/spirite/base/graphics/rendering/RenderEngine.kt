@@ -4,6 +4,7 @@ import rb.glow.IFlushable
 import rb.glow.img.IImage
 import rb.glow.img.RawImage
 import rb.owl.observer
+import sgui.core.systems.IImageCreator
 import spirite.base.brains.ICentralObservatory
 import spirite.base.graphics.IResourceUseTracker
 import spirite.base.graphics.rendering.sources.GroupNodeSource
@@ -11,6 +12,7 @@ import spirite.base.graphics.rendering.sources.IRenderSource
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 
 /**
@@ -50,7 +52,8 @@ class CachedImage(  image: RawImage) : IFlushable {
 
 class RenderEngine(
         val resourceUseTracker: IResourceUseTracker,
-        centralObservatory: ICentralObservatory)
+        centralObservatory: ICentralObservatory,
+        private val _imageCreator: IImageCreator = DiSet_Hybrid.imageCreator)
     : IRenderEngine, ImageObserver
 {
 
@@ -67,7 +70,7 @@ class RenderEngine(
         // Render Image
 
         // Lifecycle passed to whatever called this
-        val image = Hybrid.imageCreator.createImage(target.renderSettings.width, target.renderSettings.height)
+        val image = _imageCreator.createImage(target.renderSettings.width, target.renderSettings.height)
         target.renderSource.render( target.renderSettings, image.graphics)
 
         return image
@@ -82,7 +85,7 @@ class RenderEngine(
         // Render Image
 
         // Lifecycle handled by the RenderEngine
-        val image = Hybrid.imageCreator.createImage(target.renderSettings.width, target.renderSettings.height)
+        val image = _imageCreator.createImage(target.renderSettings.width, target.renderSettings.height)
         target.renderSource.render( target.renderSettings, image.graphics)
 
         // Save to Cache

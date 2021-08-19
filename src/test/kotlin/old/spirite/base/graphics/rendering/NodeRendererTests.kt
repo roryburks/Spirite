@@ -15,6 +15,7 @@ import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
@@ -47,7 +48,7 @@ class NodeRendererTests {
         gc.color = Colors.GREEN
         gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
 
-        val renderLayer = Hybrid.imageCreator.createImage(100,100)
+        val renderLayer = DiSet_Hybrid.imageCreator.createImage(100,100)
         NodeRenderer(group, workspace).render(renderLayer.graphics)
 
         if( TestConfig.save) {
@@ -92,7 +93,7 @@ class NodeRendererTests {
         gc.color = Colors.BLUE
         gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
 
-        val renderLayer = Hybrid.imageCreator.createImage(100,100)
+        val renderLayer = DiSet_Hybrid.imageCreator.createImage(100,100)
         NodeRenderer(group, workspace).render(renderLayer.graphics)
 
         if( TestConfig.save) {
@@ -137,7 +138,7 @@ class NodeRendererTests {
         gc.color = Colors.BLUE
         gc.drawer.fillRect( 0.0, 0.0, 50.0, 50.0)
 
-        val renderLayer = Hybrid.imageCreator.createImage(25,25)
+        val renderLayer = DiSet_Hybrid.imageCreator.createImage(25,25)
         NodeRenderer(group, workspace, RenderSettings(25, 25)).render(renderLayer.graphics)
 
         if( TestConfig.save) {

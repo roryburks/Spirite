@@ -18,6 +18,7 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.debug.SpiriteException
 import spirite.base.util.linear.Rect
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import kotlin.math.min
 
@@ -55,7 +56,7 @@ class SimpleStrokeMaglevLiftedData(
 //        val dw = 1000
 //        val dh = 1000
 
-        val img = Hybrid.imageCreator.createImage(dw, dh)
+        val img = DiSet_Hybrid.imageCreator.createImage(dw, dh)
         val gc = img.graphics
 
         gc.translate(-dx.d, -dy.d)

@@ -7,6 +7,7 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.d
+import sgui.core.systems.IImageCreator
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -16,16 +17,17 @@ import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.mediums.IComplexMedium
 import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.core.hybrid.IDebug
 import spirite.core.hybrid.IDebug.ErrorType.STRUCTURAL
-import spirite.sguiHybrid.Hybrid
 
 class NodeRenderer(
     val root: GroupNode,
     val workspace: IImageWorkspace,
     val settings: RenderSettings = RenderSettings(workspace.width, workspace.height, true),
     val rootIsolator: IIsolator? = null,
-    private val _debug : IDebug = DebugProvider.debug)
+    private val _debug : IDebug = DebugProvider.debug,
+    private val _imageCreator: IImageCreator = DiSet_Hybrid.imageCreator)
 {
     private lateinit var buffer : Array<RawImage>
     private val neededImages : Int by lazy {
@@ -51,7 +53,7 @@ class NodeRenderer(
             if( neededImages == 0) return
 
             try {
-                buffer = Array(neededImages) { Hybrid.imageCreator.createImage(settings.width, settings.height) }
+                buffer = Array(neededImages) { _imageCreator.createImage(settings.width, settings.height) }
                 buffer.forEach { it.graphics.clear() }
 
                 // Step 2: Recursively Draw the image
@@ -131,7 +133,7 @@ class NodeRenderer(
             val built = medium.build(active)
 
             // Should be killed by NodeRenderer at the end of render
-            val compositeImage = Hybrid.imageCreator.createImage(
+            val compositeImage = _imageCreator.createImage(
                     (built.width*ratioW).ceil,
                     (built.height*ratioH).ceil)
             val gc = compositeImage.graphics

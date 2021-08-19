@@ -18,6 +18,7 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.tools.SpriteLayerFixes
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import java.io.File
 import java.io.RandomAccessFile
@@ -122,7 +123,7 @@ object DebugCommands
             ?.animationManager
             ?.currentAnimation as? FixedFrameAnimation ?: return@DebugCmd
 
-        val converter = AafExportConverter(Hybrid.imageCreator, ModifiedSleatorAlgorithm)
+        val converter = AafExportConverter(DiSet_Hybrid.imageCreator, ModifiedSleatorAlgorithm)
         val (aaf1, img) = converter.convert2(anim)
 
         // Save Aaf

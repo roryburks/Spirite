@@ -13,6 +13,7 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
+import sgui.core.systems.IImageCreator
 import spirite.base.brains.IDialog.FilePickType
 import spirite.base.brains.IDialog.FilePickType.AAF
 import spirite.base.brains.IDialog.FilePickType.SAVE_SIF
@@ -78,6 +79,8 @@ internal constructor(
 
 object GlobalCommands
 {
+    private val _imageCreator : IImageCreator get() = DiSet_Hybrid.imageCreator
+
     val NewWorkspace  = GlobalCommand("newWorkspace") { master, workspaceSet ->
         val result = master.dialog.invokeWorkspaceSizeDialog("New Workspace") ?: throw CommandNotValidException
         val newWorkspace = master.createWorkspace(result.width, result.height)
@@ -242,7 +245,7 @@ object GlobalCommands
                                     val transform = ImmutableTransformF.Translation(-x.f, -y.f) * (selection.transform?.invert()
                                             ?: ImmutableTransformF.Identity)
 
-                                    val img2 = Hybrid.imageCreator.createImage(selection.mask.width, selection.mask.height)
+                                    val img2 = _imageCreator.createImage(selection.mask.width, selection.mask.height)
                                     val gc = img2.graphics
                                     gc.color = Colors.WHITE
                                     gc.transform = transform
@@ -264,7 +267,7 @@ object GlobalCommands
                             }
                             else -> {
                                 // Flushed by the end of the function
-                                val img = Hybrid.imageCreator.createImage(liftedData.width, liftedData.height)
+                                val img = _imageCreator.createImage(liftedData.width, liftedData.height)
                                         .also { liftedData.draw(it.graphics) }
 
                                 if (cut)

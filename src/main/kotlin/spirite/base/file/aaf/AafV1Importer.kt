@@ -3,6 +3,7 @@ package spirite.base.file.aaf
 import rb.glow.img.IImage
 import rb.glow.img.RawImage
 import rb.vectrix.shapes.RectI
+import sgui.core.systems.IImageCreator
 import spirite.base.file.readUTF8NT
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.groupTree.GroupNode
@@ -10,6 +11,7 @@ import spirite.base.imageData.groupTree.PrimaryGroupTree.InsertBehavior.InsertTo
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.DynamicMedium
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 
 class AafV1Anim(
@@ -24,7 +26,11 @@ class AafV1Frame(
         val offsetX: Int,
         val offsetY: Int)
 
-class AafV1Importer(val version: Int) : IAafImporter {
+class AafV1Importer(
+    val version: Int,
+    private val _imageCreator: IImageCreator = DiSet_Hybrid.imageCreator) : IAafImporter
+{
+
     override fun importIntoWorkspace(context: AafLoadContext) {
         val ra = context.ra
         val ws = context.workspace
@@ -87,7 +93,7 @@ class AafV1Importer(val version: Int) : IAafImporter {
     }
 
     fun imageFromFrame( frame: RectI, image: IImage) : RawImage {
-        val output = Hybrid.imageCreator.createImage(frame.wi,frame.hi)
+        val output = _imageCreator.createImage(frame.wi,frame.hi)
         output.graphics.renderImage(image, -frame.x1, -frame.y1)
         return output
     }

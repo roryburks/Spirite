@@ -8,8 +8,10 @@ object DiSet_Hybrid {
 
 
     // These are defined in sgui.core, so might not belong here or maybe this could reference a DiSet in sguiCore
-    lateinit var imageCreator: IImageCreator
+    val imageCreator : IImageCreator get() = imageCreatorLazy.value
+    lateinit var imageCreatorLazy: Lazy<IImageCreator>
 
     // These are defined in rbGlow, so might not belong here or maybe this could reference a DiSet in sguiCore
-    lateinit var imageConverter : IImageConverter
+    val imageConverter : IImageConverter get() = imageConverterLazy.value
+    lateinit var imageConverterLazy : Lazy<IImageConverter>
 }

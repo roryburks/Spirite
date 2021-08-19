@@ -32,6 +32,7 @@ import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import spirite.specialRendering.SpecialDrawerFactory
 import kotlin.math.min
@@ -101,7 +102,7 @@ class DefaultImageDrawer(
             }
         }
 
-        return LiftedImageData(lifted ?: Hybrid.imageCreator.createImage(1,1))
+        return LiftedImageData(lifted ?: DiSet_Hybrid.imageCreator.createImage(1,1))
     }
     // endregion
 
@@ -192,7 +193,7 @@ class DefaultImageDrawer(
 
                 override fun performImageAction(built: BuiltMediumData) {
                     built.rawAccessComposite {
-                        val buffer = Hybrid.imageCreator.createImage(it.width, it.height)
+                        val buffer = DiSet_Hybrid.imageCreator.createImage(it.width, it.height)
                         val bgc = buffer.graphics
                         bgc.transform(effectiveTrans)
                         bgc.renderImage(it,0.0,0.0)

@@ -20,7 +20,6 @@ import spirite.sguiHybrid.transferables.SwClipboard
  * OpenGL implementations, etc).  It wraps them such that they can code can be as portable as possible.
  */
 interface IHybrid {
-    val imageCreator : IImageCreator
     val imageConverter : IImageConverter
     val timing : ITimerEngine
     val ui : IComponentProvider
@@ -45,7 +44,6 @@ object SwHybrid : IHybrid {
     override val gle: IGLEngine = EngineLaunchpoint.gle
     override val gl: IGL get() = JOGLProvider.gl
     override val imageConverter: AwtImageConverter get() = AwtImageConverter{EngineLaunchpoint.gle}
-    override val imageCreator: IImageCreator by lazy { SwImageCreator(gle)}
     override val imageIO: IImageIO get() = JImageIO(imageConverter)
     override val clipboard: IClipboard get() = SwClipboard
 

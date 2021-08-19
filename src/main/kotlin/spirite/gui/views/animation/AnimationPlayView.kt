@@ -10,6 +10,7 @@ import sgui.swing.skin.Skin.Global.Bg
 import sguiSwing.components.SwComponent
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import java.awt.Graphics
 import javax.swing.JPanel
@@ -46,13 +47,13 @@ private constructor(private val imp: Imp) : IComponent by SwComponent(imp)
             g.fillRect(0,0,width, height)
 
             Hybrid.gle.runInGLContext {
-                val image = Hybrid.imageCreator.createImage(width, height)
+                val image = DiSet_Hybrid.imageCreator.createImage(width, height)
                 val gc = image.graphics
                 gc.preScale(state.zoomF.d, state.zoomF.d)
 
                 anim.drawFrame(gc,context.frame)
 
-                val bi = Hybrid.imageConverter.convert(image,ImageBI::class) as ImageBI
+                val bi = DiSet_Hybrid.imageConverter.convert(image,ImageBI::class) as ImageBI
                 image.flush()
                 g.drawImage(bi.bi, 0, 0, null)
                 bi.flush()

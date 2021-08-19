@@ -3,9 +3,11 @@ package spirite.base.file
 import rb.file.BufferedReadStream
 import rb.global.ConsoleLogger
 import rb.glow.Colors
+import rb.glow.IImageConverter
 import rb.glow.img.IImage
 import rb.glow.using
 import rbJvm.file.JvmRandomAccessFileBinaryReadStream
+import sgui.core.systems.IImageCreator
 import spirite.base.brains.IMasterControl
 import spirite.base.file.sif.v1.load.BadSifFileException
 import spirite.base.file.sif.v1.load.LoadEngine
@@ -18,6 +20,7 @@ import spirite.base.imageData.mediums.FlatMedium
 import spirite.core.file.contracts.SifFile
 import spirite.core.file.load.SifFileReader
 import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.core.hybrid.IDebug
 import spirite.core.hybrid.IDebug.ErrorType.FILE
 import spirite.sguiHybrid.Hybrid
@@ -50,7 +53,9 @@ interface IFileManager {
 
 class FileManager(
     val master: IMasterControl,
-    private val _debug : IDebug = DebugProvider.debug)  : IFileManager
+    private val _debug : IDebug = DebugProvider.debug,
+    private val _imageCreator : IImageCreator = DiSet_Hybrid.imageCreator)
+    : IFileManager
 {
     companion object {
         var v2Load: Boolean = true
@@ -95,7 +100,7 @@ class FileManager(
             "jpg", "jpeg" -> {
                 // Remove Alpha Layer of JPG so that it works correctly with encoding
                 val wsImage = master.renderEngine.renderWorkspace(workspace)
-                using(Hybrid.imageCreator.createImage(wsImage.width, wsImage.height)) { img ->
+                using(_imageCreator.createImage(wsImage.width, wsImage.height)) { img ->
                     val gc = img.graphics
                     gc.clear(Colors.WHITE)
                     gc.renderImage(wsImage, 0.0, 0.0)

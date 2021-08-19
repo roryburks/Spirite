@@ -9,6 +9,7 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rbJvm.owl.addWeakObserver
+import sgui.core.systems.IImageCreator
 import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.graphics.drawer.IImageDrawer.IAnchorLiftModule
 import spirite.base.graphics.drawer.IImageDrawer.ILiftSelectionModule
@@ -54,7 +55,8 @@ interface ISelectionEngine {
 
 
 class SelectionEngine(
-        val workspace: IImageWorkspace
+        val workspace: IImageWorkspace,
+        private val _imageCreator: IImageCreator = DiSet_Hybrid.imageCreator
 ) : ISelectionEngine {
 
     private val selectionDerived = DerivedLazy { selectionMask?.let { Selection(it, selectionTransform) } }
@@ -181,7 +183,7 @@ class SelectionEngine(
         val baked = liftedData.bake(transform)
 
         val bakedArea = RectangleUtil.circumscribeTrans(Rect(selectionMask.width, selectionMask.height),transform)
-        val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
+        val newImage = _imageCreator.createImage(bakedArea.width, bakedArea.height)
         val gc = newImage.graphics
         gc.transform = transform
         gc.preTranslate(-bakedArea.x.d, -bakedArea.y.d)

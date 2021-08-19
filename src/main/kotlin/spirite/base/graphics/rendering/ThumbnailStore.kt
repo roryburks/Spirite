@@ -4,6 +4,7 @@ import rb.glow.img.IImage
 import rb.glow.img.RawImage
 import rb.owl.observer
 import rbJvm.glow.awt.NativeImage
+import sgui.core.systems.IImageCreator
 import spirite.base.brains.ICentralObservatory
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.settings.ISettingsManager
@@ -22,6 +23,7 @@ import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.core.hybrid.IDebug
 import spirite.core.hybrid.IDebug.WarningType.STRUCTURAL
 import spirite.sguiHybrid.Hybrid
@@ -140,7 +142,8 @@ class ThumbnailStore(
         settings: ISettingsManager,
         centralObservatory: ICentralObservatory,
         private val workspaceSet: IWorkspaceSet,
-        private val _debug : IDebug = DebugProvider.debug) : IThumbnailStore<IImage>
+        private val _debug : IDebug = DebugProvider.debug,
+        private val _imageCreator : IImageCreator = DiSet_Hybrid.imageCreator) : IThumbnailStore<IImage>
 {
     internal sealed class ReferenceObject {
         abstract val workspace : IImageWorkspace
@@ -272,7 +275,7 @@ class ThumbnailStore(
         val existing = thumbnailCache[ref]
 
         val thumbnail = when( existing) {
-            null -> Thumbnail(Hybrid.imageCreator.createImage(32,32)).also { thumbnailCache[ref] = it }
+            null -> Thumbnail(_imageCreator.createImage(32,32)).also { thumbnailCache[ref] = it }
             else -> existing.also { it.made = Hybrid.timing.currentMilli; it.changed = false }
         }
 

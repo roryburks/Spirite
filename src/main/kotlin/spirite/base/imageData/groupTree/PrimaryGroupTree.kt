@@ -1,6 +1,7 @@
 package spirite.base.imageData.groupTree
 
 import rb.glow.img.IImage
+import sgui.core.systems.IImageCreator
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.Layer
@@ -12,10 +13,14 @@ import spirite.base.imageData.mediums.MediumType
 import spirite.base.imageData.mediums.MediumType.*
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.util.debug.SpiriteException
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.core.util.StringUtil
-import spirite.sguiHybrid.Hybrid
 
-class PrimaryGroupTree(workspace: MImageWorkspace) : MovableGroupTree( workspace) {
+class PrimaryGroupTree(
+    workspace: MImageWorkspace,
+    private val _imageCreator: IImageCreator = DiSet_Hybrid.imageCreator)
+    : MovableGroupTree( workspace)
+{
     enum class InsertBehavior {
         Above,
         Bellow,
@@ -28,7 +33,7 @@ class PrimaryGroupTree(workspace: MImageWorkspace) : MovableGroupTree( workspace
     fun addNewSimpleLayer(contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null, select: Boolean = true) : LayerNode {
         val medium = when( type) {
             DYNAMIC -> DynamicMedium(workspace, DynamicImage())
-            FLAT -> FlatMedium( Hybrid.imageCreator.createImage( width ?: workspace.width, height ?: workspace.height), workspace.mediumRepository)
+            FLAT -> FlatMedium( _imageCreator.createImage( width ?: workspace.width, height ?: workspace.height), workspace.mediumRepository)
             MAGLEV -> MaglevMedium( workspace)
             else -> throw SpiriteException("Attempted to create unsupported MediumType: $type")
         }

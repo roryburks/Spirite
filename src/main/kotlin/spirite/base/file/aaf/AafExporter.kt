@@ -11,6 +11,7 @@ import sgui.core.systems.IImageIO
 import spirite.base.file.aaf.export.AafExportConverter
 import spirite.base.file.aaf.export.IAafExportConverter
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import java.io.File
 import java.io.RandomAccessFile
@@ -20,7 +21,7 @@ interface IAafExporter {
 }
 
 val defaultAafExporter : IAafExporter by lazy {
-    AafExporter(Hybrid.imageCreator,
+    AafExporter(DiSet_Hybrid.imageCreator,
             Hybrid.imageIO,
             CyclicRedundancyChecker())
 }

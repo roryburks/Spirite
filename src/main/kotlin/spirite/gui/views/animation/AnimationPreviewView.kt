@@ -26,6 +26,7 @@ import spirite.base.imageData.animation.AnimationUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animation.services.AnimationStateBind
 import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationStructureChangeObserver
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
 import spirite.sguiHybrid.Hybrid
@@ -280,14 +281,14 @@ private class AnimationViewPanel( val controller: AnimationPreviewController ) :
         g.fillRect(0,0,width, height)
 
         Hybrid.gle.runInGLContext {
-            val image = Hybrid.imageCreator.createImage(width, height)
+            val image = DiSet_Hybrid.imageCreator.createImage(width, height)
             val gc = image.graphics
             gc.preScale(animState.zoomF.d, animState.zoomF.d)
             gc.preTranslate(animState.offsetX.d, animState.offsetY.d)
 
             anim.drawFrame(gc,animState.met)
 
-            val bi = Hybrid.imageConverter.convert(image,ImageBI::class) as ImageBI
+            val bi = DiSet_Hybrid.imageConverter.convert(image,ImageBI::class) as ImageBI
             image.flush()
             g.drawImage(bi.bi, 0, 0, null)
             bi.flush()
