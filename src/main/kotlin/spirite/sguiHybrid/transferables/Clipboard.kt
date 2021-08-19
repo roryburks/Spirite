@@ -4,6 +4,7 @@ import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.layers.Layer
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings
 import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings.Image
@@ -49,11 +50,11 @@ object SwClipboard : IClipboard
             if( clip.isDataFlavorAvailable( DataFlavor.imageFlavor)) {
                 val image = (clip.getData(DataFlavor.imageFlavor) as java.awt.Image)
                 return if( image is BufferedImage)
-                    Hybrid.imageConverter.convertToInternal(ImageBI(image))
+                    DiSet_Hybrid.imageConverter.convertToInternal(ImageBI(image))
                 else {
                     val bi = BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB)
                     bi.graphics.drawImage(image, 0, 0, null)
-                    Hybrid.imageConverter.convertToInternal(ImageBI(bi))
+                    DiSet_Hybrid.imageConverter.convertToInternal(ImageBI(bi))
                 }
             }
         }

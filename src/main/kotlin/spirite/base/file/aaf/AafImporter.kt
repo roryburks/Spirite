@@ -3,6 +3,7 @@ package spirite.base.file.aaf
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
 import spirite.base.imageData.MImageWorkspace
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import java.io.File
 import java.io.RandomAccessFile
@@ -28,7 +29,7 @@ object AafImporter {
                 if (!pngFile.exists())
                     throw BadAaaFileException("Couldn't find image file for AAF")
 
-                val image = Hybrid.imageConverter.convertToInternal(ImageBI(ImageIO.read(pngFile)))
+                val image = DiSet_Hybrid.imageConverter.convertToInternal(ImageBI(ImageIO.read(pngFile)))
 
                 RandomAccessFile(file, "r").use { ra ->
                     val versionNumber = ra.readInt()

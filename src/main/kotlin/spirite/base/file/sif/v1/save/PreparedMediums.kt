@@ -7,6 +7,7 @@ import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.magLev.IMaglevThing
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.base.imageData.mediums.magLev.actions.MaglevThingFlattener
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 
 /**
@@ -36,16 +37,16 @@ object MediumPreparer
 {
     fun prepare( medium: IMedium) : IPreparedMedium? {
         return when( medium) {
-            is FlatMedium -> PreparedFlatMedium(Hybrid.imageConverter.convert(medium.image, ImageBI::class) as ImageBI)
+            is FlatMedium -> PreparedFlatMedium(DiSet_Hybrid.imageConverter.convert(medium.image, ImageBI::class) as ImageBI)
             is DynamicMedium -> PreparedDynamicMedium(
-                    medium.image.base?.run { Hybrid.imageConverter.convert(this, ImageBI::class) as ImageBI },
+                    medium.image.base?.run { DiSet_Hybrid.imageConverter.convert(this, ImageBI::class) as ImageBI },
                     medium.image.xOffset,
                     medium.image.yOffset)
             is MaglevMedium -> PreparedMaglevMedium(
                     MaglevThingFlattener.flattenMaglevMedium(medium),
                     medium.builtImage.xOffset,
                     medium.builtImage.yOffset,
-                    medium.builtImage.base?.run { Hybrid.imageConverter.convert(this, ImageBI::class) as ImageBI })
+                    medium.builtImage.base?.run { DiSet_Hybrid.imageConverter.convert(this, ImageBI::class) as ImageBI })
             else -> null
         }
     }

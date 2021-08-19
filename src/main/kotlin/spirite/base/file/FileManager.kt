@@ -31,7 +31,7 @@ import java.io.RandomAccessFile
 
 fun IMasterControl.workspaceFromImage(img: IImage) {
     val workspace = createWorkspace(img.width,img.height)
-    val medium = FlatMedium(Hybrid.imageConverter.convertToInternal(img), workspace.mediumRepository)
+    val medium = FlatMedium(DiSet_Hybrid.imageConverter.convertToInternal(img), workspace.mediumRepository)
     val layer = SimpleLayer( workspace.mediumRepository.addMedium(medium))
     workspace.groupTree.importLayer(null, "base", layer)
     workspace.finishBuilding()

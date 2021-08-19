@@ -105,7 +105,7 @@ class DerivedNativeThumbnailStore(private val rootThumbnailStore: ThumbnailStore
                     contractSet.internalContract.release()
                 }
                 else {
-                    val native = Hybrid.imageConverter .convert(img, NativeImage::class) as NativeImage
+                    val native = DiSet_Hybrid.imageConverter .convert(img, NativeImage::class) as NativeImage
                     cache[ref] = native
                     contractSet.externalContracts.forEach {
                         val contract = it.get()

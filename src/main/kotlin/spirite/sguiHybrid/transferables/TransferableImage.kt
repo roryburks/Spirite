@@ -2,6 +2,7 @@ package spirite.sguiHybrid.transferables
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -12,7 +13,7 @@ val IImageDataFlavor = DataFlavor(IImage::class.java, "SpiriteInternalImage")
 
 class TransferableImage(image: IImage) : Transferable {
     val image = image.deepCopy()
-    val bImage = (Hybrid.imageConverter.convert(this.image,ImageBI::class) as ImageBI).bi
+    val bImage = (DiSet_Hybrid.imageConverter.convert(this.image,ImageBI::class) as ImageBI).bi
 
     override fun getTransferData(flavor: DataFlavor?): Any {
         return when( flavor) {

@@ -13,6 +13,7 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.SimpleLayer
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import java.awt.image.BufferedImage
 import java.io.File
@@ -74,7 +75,7 @@ object ExportToGif {
 
                     gl
                 }
-                .map { Hybrid.imageConverter.convert(it, ImageBI::class) as ImageBI }
+                .map { DiSet_Hybrid.imageConverter.convert(it, ImageBI::class) as ImageBI }
                 .map { it.bi }
 
         biList.forEach {
