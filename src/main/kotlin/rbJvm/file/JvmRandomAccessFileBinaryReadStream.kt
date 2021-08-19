@@ -1,7 +1,6 @@
 package rbJvm.file
 
 import rb.file.IBinaryReadStream
-import rb.vectrix.mathUtil.i
 import java.io.RandomAccessFile
 
 class JvmRandomAccessFileBinaryReadStream (val ba: RandomAccessFile) : IBinaryReadStream {

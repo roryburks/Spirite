@@ -1,20 +1,20 @@
 package sguiSwing.components
 
 import rb.glow.SColor
-import sgui.core.UIPoint
 import sgui.components.IComponent
 import sgui.components.IComponent.*
 import sgui.components.IComponent.BasicBorder.*
 import sgui.components.Invokable
+import sgui.core.UIPoint
 import sgui.core.components.events.MouseEvent
 import sgui.core.components.events.MouseEvent.MouseEventType.*
 import sgui.core.components.events.MouseWheelEvent
 import sgui.core.systems.IGlobalMouseHook
 import sgui.swing.SUIPoint
 import sgui.swing.jcolor
-import sgui.swing.systems.mouseSystem.SwMouseSystem
 import sgui.swing.scolor
 import sgui.swing.skin.Skin
+import sgui.swing.systems.mouseSystem.SwMouseSystem
 import java.awt.Component
 import java.awt.Cursor
 import java.awt.event.*

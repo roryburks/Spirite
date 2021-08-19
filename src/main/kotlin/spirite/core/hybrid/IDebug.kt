@@ -1,10 +1,22 @@
-package spirite.sguiHybrid
+package spirite.core.hybrid
 
 import rb.owl.IObservable
 import rb.owl.Observable
-import javax.swing.JOptionPane
 
-object MDebug {
+interface IDebug {
+    fun beep()
+
+    fun handleWarning( priority: WarningType, message: String, origin: Exception? = null)
+    fun handleError( type: ErrorType, message: String, origin: Exception? = null)
+
+    fun note( str: String)
+    fun log( str: String)
+
+    fun clearDebugLog()
+    val debugLog : List<String>
+
+    val debugObservable: IObservable<DebugObserver>
+
     enum class ErrorType {
         FILE,
         // Something being made that is either too big or too small
@@ -54,37 +66,45 @@ object MDebug {
         UNSPECIFIED
     }
 
-    fun handleWarning( priority: WarningType, message: String, origin: Exception? = null) {
-        Hybrid.beep()
+    interface  DebugObserver {
+        fun logChanged()
+    }
+}
+class MDebug(private val _beep : ()->Unit) : IDebug {
+    override fun beep() = _beep.invoke()
+
+    override fun handleWarning(priority: IDebug.WarningType, message: String, origin: Exception?) {
+        _beep.invoke()
         println("Warning: $message")
         pushLog("Warning: $message")
     }
 
-    fun handleError( type: ErrorType, message: String, origin: Exception? = null) {
+    override fun handleError(type: IDebug.ErrorType, message: String, origin: Exception?) {
         origin?.printStackTrace() ?: Thread.dumpStack()
         //JOptionPane.showMessageDialog( null, "Error: $message")
         pushLog("Error: $message")
     }
 
-    fun note( str: String) = pushLog("Note: $str")
-    fun log( str: String) = pushLog( "Log: $str")
+    override fun note( str: String) = pushLog("Note: $str")
+    override fun log( str: String) = pushLog( "Log: $str")
 
-    fun clearDebugLog() {
+    override fun clearDebugLog() {
         _debugLog.clear()
         trigger()
     }
 
-    val debugLog : List<String> get() = _debugLog
+    override val debugLog : List<String> get() = _debugLog
     private val _debugLog = mutableListOf<String>()
     private fun pushLog( str: String) {
         _debugLog.add(str)
         trigger()
     }
 
-    interface  DebugObserver {
-        fun logChanged()
-    }
-    val debugObservable: IObservable<DebugObserver> get() = _debugObservable
-    private val _debugObservable = Observable<DebugObserver>()
+    override val debugObservable: IObservable<IDebug.DebugObserver> get() = _debugObservable
+    private val _debugObservable = Observable<IDebug.DebugObserver>()
     private fun trigger() = _debugObservable.trigger { it.logChanged() }
+}
+
+object DebugProvider {
+    val debug by lazy { MDebug(DiSet_Hybrid.beep) }
 }

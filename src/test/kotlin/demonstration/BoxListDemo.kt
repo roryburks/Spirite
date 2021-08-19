@@ -6,7 +6,8 @@ import sgui.swing.components.ResizeContainerPanel
 import sgui.swing.components.SJPanel
 import sgui.swing.components.SwBoxList
 import sgui.swing.components.SwLabel
-import sguiSwing.components.*
+import sguiSwing.components.SwComponent
+import sguiSwing.components.jcomponent
 import java.awt.Color
 import java.awt.GridLayout
 import javax.swing.BorderFactory

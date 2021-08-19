@@ -9,7 +9,6 @@ import rb.glow.gl.GLImage
 import rb.vectrix.shapes.RectI
 import rbJvm.glow.util.ContentBoundsFinder
 import spirite.sguiHybrid.Hybrid
-import spirite.base.util.linear.Rect
 import kotlin.test.assertEquals
 
 class ContentBoundsFinderTest {

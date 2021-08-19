@@ -3,8 +3,8 @@ package spirite.pc
 import sgui.swing.PrimaryIcon.*
 import sgui.swing.SwPrimaryIconSet
 import sgui.swing.SwProvider
-import spirite.sguiHybrid.EngineLaunchpoint
 import spirite.gui.resources.SpiriteIcons
+import spirite.sguiHybrid.EngineLaunchpoint
 
 fun setupSwGuiStuff() {
     SwProvider.converter = EngineLaunchpoint.converter

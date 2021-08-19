@@ -1,15 +1,16 @@
 package spirite.base.brains.commands
 
+import spirite.base.brains.IDialog
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.MImageWorkspace
-import spirite.gui.menus.dialogs.IDialog
 import spirite.sguiHybrid.SwHybrid
 
 class WorkspaceCommandExecutor (
         val workspaceSet: MWorkspaceSet,
-        val dialog: IDialog)
+        val dialog: IDialog
+)
     :ICommandExecutor
 {
     override val validCommands: List<String> get() = commands.values.map { it.commandString }

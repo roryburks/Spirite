@@ -1,9 +1,10 @@
 package spirite.base.imageData
 
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.imageData.mediums.IMedium
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
+import spirite.core.hybrid.IDebug.ErrorType.STRUCTURAL
+import spirite.sguiHybrid.Hybrid
 
 /**
  *  The MediumRepository is responsible for storing the direct medium data.
@@ -47,7 +48,9 @@ private class MediumRepoEntry(val medium: IMedium) {
     var floating = false
 }
 
-class MediumRepository(private val imageWorkspace: IImageWorkspace)
+class MediumRepository(
+    private val imageWorkspace: IImageWorkspace,
+    private val _debug : IDebug = DebugProvider.debug)
     : MMediumRepository
 {
     private val mediumData = mutableMapOf<Int,MediumRepoEntry>()
@@ -96,9 +99,9 @@ class MediumRepository(private val imageWorkspace: IImageWorkspace)
 
         // Make sure all used entries are tracked
         if( layerImages.any { it.workspace != imageWorkspace || mediumData[it.id] == null })
-            MDebug.handleError(STRUCTURAL, "Untracked Image Data found when cleaning ImageWorkspace")
+            _debug.handleError(STRUCTURAL, "Untracked Image Data found when cleaning ImageWorkspace")
         if( externalDataUsed.any { it.workspace != imageWorkspace || mediumData[it.id] == null })
-            MDebug.handleError(STRUCTURAL, "Untracked Image Data found from UndoEngine")
+            _debug.handleError(STRUCTURAL, "Untracked Image Data found from UndoEngine")
 
         // Remove Unused Entries
         unused.forEach {unusedIndex ->

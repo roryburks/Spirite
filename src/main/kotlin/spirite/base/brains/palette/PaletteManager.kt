@@ -7,10 +7,10 @@ import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import spirite.base.brains.ICentralObservatory
+import spirite.base.brains.IDialog
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.settings.ISettingsManager
-import spirite.gui.menus.dialogs.IDialog
 
 interface IPaletteManager {
     val activeBelt : PaletteBelt
@@ -36,10 +36,10 @@ interface IPaletteManager {
 }
 
 class PaletteManager(
-        private val _workspaceSet: IWorkspaceSet,
-        private val _settings: ISettingsManager,
-        private val _dialog: IDialog,
-        private val _centralObservatory: ICentralObservatory) : IPaletteManager
+    private val _workspaceSet: IWorkspaceSet,
+    private val _settings: ISettingsManager,
+    private val _dialog: IDialog,
+    private val _centralObservatory: ICentralObservatory) : IPaletteManager
 {
 
     override val activeBelt: PaletteBelt = PaletteBelt()

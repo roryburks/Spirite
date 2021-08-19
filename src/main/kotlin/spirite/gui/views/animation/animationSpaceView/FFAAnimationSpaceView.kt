@@ -7,14 +7,13 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import rb.vectrix.mathUtil.round
 import rbJvm.owl.addWeakObserver
-import sgui.core.UIPoint
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BASIC
+import sgui.core.UIPoint
 import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.swing.advancedComponents.CrossContainer.CrossLayout
 import sguiSwing.components.SwComponent
-import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.DefaultAnimCharMap
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -23,6 +22,7 @@ import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.Spacial
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationPlayObserver
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
 import spirite.base.util.linear.Rect
+import spirite.sguiHybrid.Hybrid
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics

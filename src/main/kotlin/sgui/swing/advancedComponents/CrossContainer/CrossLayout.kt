@@ -1,9 +1,9 @@
 package sgui.swing.advancedComponents.CrossContainer
 
 import rb.vectrix.mathUtil.floor
+import sgui.components.IComponent
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.Orientation.VERTICAL
-import sgui.components.IComponent
 import sgui.core.components.crossContainer.CSE_Component
 import sgui.core.components.crossContainer.CSE_Gap
 import sgui.core.components.crossContainer.CSE_Group

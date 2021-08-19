@@ -2,11 +2,11 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
-import spirite.base.imageData.layers.sprite.tools.SpriteLayerFixes
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
+import spirite.base.imageData.layers.sprite.tools.SpriteLayerFixes
 import spirite.core.util.StringUtil
 
 

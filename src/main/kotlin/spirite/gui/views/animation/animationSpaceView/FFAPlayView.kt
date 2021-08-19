@@ -3,17 +3,17 @@ package spirite.gui.views.animation.animationSpaceView
 import rb.glow.Colors
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
-import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
+import sgui.core.Orientation.VERTICAL
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.swing.components.ResizeContainerPanel
-import spirite.sguiHybrid.Hybrid
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.views.animation.AnimationPlayView
+import spirite.sguiHybrid.Hybrid
 
 class  FFAPlayView(
         val master: IMasterControl,

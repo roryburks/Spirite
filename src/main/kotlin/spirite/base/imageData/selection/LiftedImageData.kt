@@ -4,12 +4,12 @@ import rb.glow.IGraphicsContext
 import rb.glow.img.IImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.mathUtil.d
-import spirite.sguiHybrid.Hybrid
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.graphics.drawer.LiftedImageDrawer
+import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
+import spirite.sguiHybrid.Hybrid
 
 class LiftedImageData(val image: IImage): ILiftedData {
     override fun draw(gc: IGraphicsContext) {

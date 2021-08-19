@@ -1,6 +1,7 @@
 package spirite.base.imageData.mediums.magLev
 
 import rb.glow.Color
+import rb.glow.SColor
 import rb.hydra.anyTiamatGrindSync
 import rb.hydra.miniTiamatGrindSync
 import rb.vectrix.linear.ITransformF
@@ -9,14 +10,13 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.linear.Vec3f
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
-import rb.glow.SColor
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.ColorChangeMode.AUTO
 import spirite.base.brains.toolset.ColorChangeMode.IGNORE_ALPHA
 import spirite.base.brains.toolset.MagneticFillMode
-import spirite.base.imageData.deformation.IDeformation
 import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.graphics.drawer.IImageDrawer.*
+import spirite.base.imageData.deformation.IDeformation
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.HandleCompositeSource

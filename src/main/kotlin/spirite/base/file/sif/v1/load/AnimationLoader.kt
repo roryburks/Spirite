@@ -1,9 +1,9 @@
 package spirite.base.file.sif.v1.load
 
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.imageData.animation.Animation
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.WarningType.UNSUPPORTED
 
 interface IAnimationLoader
 {
@@ -31,7 +31,7 @@ object RigAnimationIgnorer : IAnimationLoader
     override fun loadAnimation(context: LoadContext, name: String): Animation? {
         val ra = context.ra
 
-        MDebug.handleWarning(UNSUPPORTED, "Rig Animations are currently not supported by Spirite v2, ignoring.")
+        DebugProvider.debug.handleWarning(UNSUPPORTED, "Rig Animations are currently not supported by Spirite v2, ignoring.")
         val numSprites = ra.readUnsignedShort()
         repeat(numSprites) {
             val nodeId = ra.readInt()

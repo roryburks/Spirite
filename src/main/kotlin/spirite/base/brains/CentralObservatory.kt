@@ -16,8 +16,8 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationObserver
 import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationStructureChangeObserver
 import spirite.base.imageData.animationSpaces.AnimationSpace
-import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
+import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 
 /** The CentralObservatory is a place where things (primarily GUI components) which need to watch for certain changes

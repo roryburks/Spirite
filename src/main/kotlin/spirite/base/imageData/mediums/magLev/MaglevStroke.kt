@@ -1,8 +1,8 @@
 package spirite.base.imageData.mediums.magLev
 
 import rb.glow.IGraphicsContext
-import rb.vectrix.linear.Vec3f
 import rb.glow.SColor
+import rb.vectrix.linear.Vec3f
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawerProvider

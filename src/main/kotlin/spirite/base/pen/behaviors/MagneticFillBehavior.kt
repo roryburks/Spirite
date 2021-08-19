@@ -2,9 +2,9 @@ package spirite.base.pen.behaviors
 
 import rb.glow.ColorARGB32Normal
 import rb.glow.IGraphicsContext
+import rb.glow.SColor
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
-import rb.glow.SColor
 import spirite.base.graphics.drawer.IImageDrawer.IMagneticFillModule
 import spirite.base.pen.Penner
 import spirite.gui.views.work.WorkSectionView

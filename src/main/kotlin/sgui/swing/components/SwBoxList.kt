@@ -1,7 +1,7 @@
 package sgui.swing.components
 
-import sgui.core.components.BoxList
 import sgui.components.IComponent
+import sgui.core.components.BoxList
 import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.swing.SwUtil

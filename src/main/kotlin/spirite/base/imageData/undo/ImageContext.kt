@@ -1,14 +1,15 @@
 package spirite.base.imageData.undo
 
 import rb.extendo.dataStructures.SinglySet
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL
-import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL_MINOR
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.DynamicMedium
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
+import spirite.core.hybrid.IDebug.ErrorType.STRUCTURAL
+import spirite.core.hybrid.IDebug.ErrorType.STRUCTURAL_MINOR
 import spirite.pc.TestConfig
 
 val MAX_TICKS_PER_KEY = 10
@@ -21,7 +22,8 @@ val MAX_TICKS_PER_KEY = 10
 class ImageContext
 constructor(
         override val medium: MediumHandle,
-        private val workspace: MImageWorkspace) : UndoContext<ImageAction>
+        private val workspace: MImageWorkspace,
+        private val _debug : IDebug = DebugProvider.debug) : UndoContext<ImageAction>
 {
     private val actions = mutableListOf<ImageAction>()
     private var pointer = 0     // The poisition on the actionsList
@@ -61,7 +63,7 @@ constructor(
         --pointer
         --met
         if( pointer < 0 )
-            MDebug.handleError(STRUCTURAL, "Internal Undo attempted before start of workspace.")
+            _debug.handleError(STRUCTURAL, "Internal Undo attempted before start of workspace.")
 
         // Find the previous KeyframeAction
         if( met < 0) {
@@ -86,7 +88,7 @@ constructor(
         pointer++
         met++
         if( pointer >= actions.size || pointer == 0) {
-            MDebug.handleError(STRUCTURAL, "Undo Outer queue desynced with inner queue.")
+            _debug.handleError(STRUCTURAL, "Undo Outer queue desynced with inner queue.")
             return
         }
         if(actions[pointer] is KeyframeAction)
@@ -102,7 +104,7 @@ constructor(
 
     override fun clipTail() {
         if( vstart == pointer)
-            MDebug.handleError(STRUCTURAL_MINOR, "Tried to clip more than exists in ImageContext")
+            _debug.handleError(STRUCTURAL_MINOR, "Tried to clip more than exists in ImageContext")
 
         vstart++
         if( actions[vstart] is KeyframeAction) {

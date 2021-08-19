@@ -1,12 +1,13 @@
 package sgui.core.components
 
 import rb.glow.Colors
-import rb.glow.img.IImage
 import rb.glow.SColor
-import sgui.components.*
+import rb.glow.img.IImage
+import sgui.components.IComponent
+import sgui.components.ITreeView
+import sgui.core.Orientation
 import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.crossContainer.ICrossPanel
-import sgui.core.Orientation
 
 interface IComponentProvider {
     fun Button(str: String? = null) : IButton

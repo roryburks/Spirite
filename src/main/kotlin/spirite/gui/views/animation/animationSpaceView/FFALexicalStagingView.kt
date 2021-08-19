@@ -2,15 +2,15 @@ package spirite.gui.views.animation.animationSpaceView
 
 import sgui.components.IComponent
 import sgui.core.components.crossContainer.ICrossPanel
-import spirite.sguiHybrid.Hybrid
+import spirite.base.brains.IDialog
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFALexicalPlayback
-import spirite.gui.menus.dialogs.IDialog
+import spirite.sguiHybrid.Hybrid
 
 class FFALexicalStagingView(
-        val dialog: IDialog,
-        val space: FFAAnimationSpace,
-        val imp: ICrossPanel = Hybrid.ui.CrossPanel())
+    val dialog: IDialog,
+    val space: FFAAnimationSpace,
+    val imp: ICrossPanel = Hybrid.ui.CrossPanel())
     : IComponent by imp
 {
     val tfLexicon = Hybrid.ui.TextArea()

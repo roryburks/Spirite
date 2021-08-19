@@ -8,15 +8,14 @@ import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.f
 import rbJvm.file.util.GifSequenceWriter
 import rbJvm.glow.awt.ImageBI
-import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.animation.AnimationUtil
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.SimpleLayer
+import spirite.sguiHybrid.Hybrid
 import java.awt.image.BufferedImage
 import java.io.File
-import java.util.*
 import javax.imageio.stream.FileImageOutputStream
 import javax.imageio.stream.ImageOutputStream
 

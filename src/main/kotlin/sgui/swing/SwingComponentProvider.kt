@@ -1,12 +1,13 @@
 package sgui.swing
 
-import rb.glow.img.IImage
 import rb.glow.SColor
-import sgui.components.*
-import sgui.core.components.crossContainer.CrossInitializer
-import sgui.core.components.crossContainer.ICrossPanel
+import rb.glow.img.IImage
+import sgui.components.IComponent
+import sgui.components.ITreeView
 import sgui.core.Orientation
 import sgui.core.components.*
+import sgui.core.components.crossContainer.CrossInitializer
+import sgui.core.components.crossContainer.ICrossPanel
 import sgui.swing.advancedComponents.SwTreeView
 import sgui.swing.components.*
 

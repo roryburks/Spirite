@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test
 import rb.glow.drawer
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.awt.ImageBI
-import spirite.sguiHybrid.Hybrid
 import spirite.base.graphics.DynamicImage
+import spirite.sguiHybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.test.assertEquals

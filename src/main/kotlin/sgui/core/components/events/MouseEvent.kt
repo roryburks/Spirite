@@ -1,7 +1,7 @@
 package sgui.core.components.events
 
-import sgui.core.UIPoint
 import sgui.components.IComponent
+import sgui.core.UIPoint
 
 data class MouseEvent
 constructor(

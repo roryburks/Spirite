@@ -2,11 +2,13 @@ package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
 import rb.glow.SColor
-import sgui.core.systems.IKeypressSystem
-import sguiSwing.components.jcomponent
 import sgui.swing.jcolor
 import sgui.swing.scolor
 import sgui.swing.skin.Skin.Global
+import sguiSwing.components.jcomponent
+import spirite.base.brains.IDialog
+import spirite.base.brains.IDialog.FilePickType
+import spirite.base.brains.IDialog.FilePickType.*
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
@@ -14,41 +16,13 @@ import spirite.base.imageData.animation.ffa.FfaLayerCascading
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.gui.menus.dialogs.DisplayOptionsPanel.DisplayOptions
-import spirite.gui.menus.dialogs.IDialog.FilePickType
-import spirite.gui.menus.dialogs.IDialog.FilePickType.*
-import spirite.gui.menus.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
 import spirite.gui.resources.SpiriteIcons
-import spirite.sguiHybrid.SwHybrid
 import java.io.File
 import javax.swing.JColorChooser
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
 import javax.swing.UIManager
 import javax.swing.filechooser.FileNameExtensionFilter
-
-interface IDialog {
-    fun invokeNewSimpleLayer( workspace: IImageWorkspace) : NewSimpleLayerReturn?
-    fun invokeWorkspaceSizeDialog(description: String): WorkspaceSizeReturn?
-    fun invokeNewFfaCascadingLayerDetails(defaultInfo: FfaCascadingSublayerContract) : FfaCascadingSublayerContract?
-    fun invokeNewFfaJsonImport(layer: FfaLayerCascading) : List<FfaCascadingSublayerContract>?
-    fun invokeMoveSpriteParts(parts: List<SpritePart>) : SpriteLayer?
-
-    fun invokeDisplayOptions(title: String = "Display Options", default: DisplayOptions? = null) : DisplayOptions?
-
-    fun promptForString( message: String, default: String = "") : String?
-    fun promptVerify(message: String) : Boolean
-    fun promptMessage(message: String)
-
-    enum class FilePickType {
-        OPEN,
-        SAVE_SIF,
-        EXPORT,
-        AAF,
-        GIF
-    }
-    fun pickFile( type: FilePickType) : File?
-    fun pickColor( defaultColor: SColor) : SColor?
-}
 
 class JDialog(private val master: IMasterControl) : IDialog
 {

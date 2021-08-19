@@ -8,10 +8,11 @@ import rb.owl.observer
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.FakeAnimation
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationObserver
 import spirite.base.imageData.animation.services.IAnimationManagementSvc.AnimationStructureChangeObserver
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupTree.TreeChangeEvent
+import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.undo.NullAction
 

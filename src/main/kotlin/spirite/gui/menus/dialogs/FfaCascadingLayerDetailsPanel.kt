@@ -2,8 +2,8 @@ package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
 import sgui.core.components.crossContainer.ICrossPanel
-import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
+import spirite.sguiHybrid.Hybrid
 
 
 class FfaCascadingLayerDetailsPanel(val defaultInfo: FfaCascadingSublayerContract)

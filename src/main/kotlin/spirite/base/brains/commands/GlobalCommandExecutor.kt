@@ -13,10 +13,9 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings.Image
-import spirite.sguiHybrid.transferables.ILayerBuilder
-import spirite.sguiHybrid.transferables.INodeBuilder
+import spirite.base.brains.IDialog.FilePickType
+import spirite.base.brains.IDialog.FilePickType.AAF
+import spirite.base.brains.IDialog.FilePickType.SAVE_SIF
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
@@ -24,11 +23,11 @@ import spirite.base.brains.commands.specific.LayerFixes
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.file.aaf.AafImporter
 import spirite.base.file.workspaceFromImage
+import spirite.base.graphics.drawer.IImageDrawer.IClearModule
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.graphics.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
@@ -37,9 +36,10 @@ import spirite.base.imageData.mutations.ImportInto
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Rect
-import spirite.gui.menus.dialogs.IDialog.FilePickType
-import spirite.gui.menus.dialogs.IDialog.FilePickType.AAF
-import spirite.gui.menus.dialogs.IDialog.FilePickType.SAVE_SIF
+import spirite.sguiHybrid.Hybrid
+import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings.Image
+import spirite.sguiHybrid.transferables.ILayerBuilder
+import spirite.sguiHybrid.transferables.INodeBuilder
 
 class GlobalCommandExecutor(
         val master: IMasterControl,

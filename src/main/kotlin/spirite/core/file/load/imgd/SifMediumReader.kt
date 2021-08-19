@@ -1,7 +1,6 @@
 package spirite.core.file.load.imgd
 
 import rb.file.IReadStream
-import rb.vectrix.mathUtil.i
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
 import spirite.core.file.contracts.SifImgdMed_Dynamic

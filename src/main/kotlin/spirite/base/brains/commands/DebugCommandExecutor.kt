@@ -8,17 +8,17 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rbJvm.file.JvmInputStreamFileReader
 import rbJvm.file.writing.toBufferedWriteStream
-import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.DBGlobal
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
-import spirite.base.imageData.layers.sprite.tools.SpriteLayerFixes
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.file.aaf.export.AafExportConverter
 import spirite.base.imageData.IImageObservatory
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.layers.sprite.tools.SpriteLayerFixes
+import spirite.sguiHybrid.Hybrid
 import java.io.File
 import java.io.RandomAccessFile
 

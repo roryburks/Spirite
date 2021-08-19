@@ -6,9 +6,8 @@ import old.TestConfig
 import old.TestHelper
 import org.junit.jupiter.api.Test
 import rb.glow.Colors
-import spirite.sguiHybrid.Hybrid
-import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.drawer.IImageDrawer.IStrokeModule
+import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
@@ -17,6 +16,7 @@ import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams
+import spirite.sguiHybrid.Hybrid
 import spirite.specialRendering.stroke.GLStrokeDrawerV2
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

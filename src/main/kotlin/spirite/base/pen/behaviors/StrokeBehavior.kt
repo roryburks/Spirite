@@ -1,10 +1,10 @@
 package spirite.base.pen.behaviors
 
-import spirite.sguiHybrid.Hybrid
 import spirite.base.graphics.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.PenState
 import spirite.base.pen.Penner
 import spirite.base.pen.stroke.StrokeParams
+import spirite.sguiHybrid.Hybrid
 import kotlin.math.abs
 
 abstract class StrokeBehavior(penner: Penner, val drawer : IStrokeModule) : PennerBehavior(penner)

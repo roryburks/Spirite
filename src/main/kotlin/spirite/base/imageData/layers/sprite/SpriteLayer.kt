@@ -13,19 +13,17 @@ import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType
 import spirite.base.brains.DBGlobal
-import spirite.base.graphics.isolation.IIsolator
-import spirite.base.graphics.isolation.ISpriteLayerIsolator
-import spirite.base.imageData.TransformedHandle
-import spirite.base.imageData.IImageObservatory.ImageChangeEvent
-import spirite.base.imageData.MImageWorkspace
-import spirite.base.imageData.MediumHandle
 import spirite.base.graphics.drawer.DefaultImageDrawer
 import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.graphics.drawer.MultiMediumDrawer
 import spirite.base.graphics.drawer.NillImageDrawer
+import spirite.base.graphics.isolation.IIsolator
+import spirite.base.graphics.isolation.ISpriteLayerIsolator
+import spirite.base.imageData.IImageObservatory.ImageChangeEvent
+import spirite.base.imageData.MImageWorkspace
+import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.traverse
 import spirite.base.imageData.layers.Layer
@@ -38,6 +36,8 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.imageData.undo.UndoableDelegate
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.WarningType
 import spirite.core.util.StringUtil
 
 /**
@@ -383,7 +383,7 @@ class SpriteLayer : Layer {
     private fun _addPart( structure: SpritePartStructure, handle: MediumHandle) {
         if( _parts.size >= 255) {
             // Primarily for save/load simplicity
-            MDebug.handleWarning(WarningType.UNSUPPORTED, "Only 255 parts per rig currently supported.")
+            DebugProvider.debug.handleWarning(WarningType.UNSUPPORTED, "Only 255 parts per rig currently supported.")
             return
         }
 

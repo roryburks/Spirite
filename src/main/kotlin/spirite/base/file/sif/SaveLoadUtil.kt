@@ -3,7 +3,6 @@ package spirite.base.file.sif
 import rb.vectrix.mathUtil.i
 import java.io.ByteArrayOutputStream
 import java.io.RandomAccessFile
-import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 object SaveLoadUtil {

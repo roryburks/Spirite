@@ -3,10 +3,10 @@ package spirite.base.imageData.mediums.magLev
 import rb.extendo.dataStructures.SinglyList
 import rb.glow.Colors
 import rb.glow.IGraphicsContext
+import rb.glow.SColor
 import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import rb.glow.SColor
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle

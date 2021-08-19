@@ -2,11 +2,12 @@ package spirite.base.brains.commands
 
 import rb.extendo.dataStructures.Deque
 import rb.extendo.extensions.toHashMap
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.MDebug
+import spirite.base.brains.IDialog
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MWorkspaceSet
-import spirite.gui.menus.dialogs.IDialog
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
+import spirite.sguiHybrid.Hybrid
 
 interface ICentralCommandExecutor {
     val commandDomains : List<String>
@@ -18,10 +19,11 @@ interface ICentralCommandExecutor {
 }
 
 class CentralCommandExecutor(
-        val master: IMasterControl,
-        val workspaceSet: MWorkspaceSet,
-        val dialog: IDialog,
-        private val _maxHistorySize : Int? = 3000)
+    val master: IMasterControl,
+    val workspaceSet: MWorkspaceSet,
+    val dialog: IDialog,
+    private val _maxHistorySize : Int? = 3000,
+    private val _debug : IDebug = DebugProvider.debug)
     : ICentralCommandExecutor
 {
     private val commandExecutors = listOf(
@@ -64,7 +66,7 @@ class CentralCommandExecutor(
             }
 
             if (!attempted) {
-                MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command domain: $space")
+                _debug.handleWarning(IDebug.WarningType.REFERENCE, "Unrecognized command domain: $space")
             }
         }
         return executed

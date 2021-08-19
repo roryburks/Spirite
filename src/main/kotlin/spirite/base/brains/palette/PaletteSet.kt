@@ -1,10 +1,10 @@
 package spirite.base.brains.palette
 
 import rb.owl.bindable.Bindable
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.brains.palette.IPaletteManager.PaletteChangeEvent
 import spirite.base.brains.palette.IPaletteManager.PaletteSetChangeEvent
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.WarningType.STRUCTURAL
 import spirite.core.util.StringUtil
 
 abstract class PaletteSet {
@@ -45,7 +45,7 @@ abstract class PaletteSet {
 
     fun removePalette( index: Int) {
         if( index < 0 || index >= _palettes.size) {
-            MDebug.handleWarning(STRUCTURAL, "Attempt to remove Palette Out of Bounds ($index not in [0,${_palettes.size})")
+            DebugProvider.debug.handleWarning(STRUCTURAL, "Attempt to remove Palette Out of Bounds ($index not in [0,${_palettes.size})")
             return
         }
 

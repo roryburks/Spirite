@@ -1,16 +1,16 @@
 package spirite.gui.views.animation
 
 import rb.extendo.delegates.OnChangeDelegate
-import rb.vectrix.mathUtil.d
 import rb.glow.SColor
+import rb.vectrix.mathUtil.d
 import rbJvm.glow.awt.ImageBI
 import sgui.components.IComponent
-import sguiSwing.components.SwComponent
-import spirite.sguiHybrid.Hybrid
 import sgui.swing.jcolor
 import sgui.swing.skin.Skin.Global.Bg
+import sguiSwing.components.SwComponent
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.sguiHybrid.Hybrid
 import java.awt.Graphics
 import javax.swing.JPanel
 import kotlin.math.floor

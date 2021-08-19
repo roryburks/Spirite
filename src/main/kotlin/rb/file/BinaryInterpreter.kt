@@ -3,8 +3,6 @@ package rb.file
 import rb.vectrix.mathUtil.b
 import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.ui
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 interface IBinaryInterpreter<T> {
     val len: Int

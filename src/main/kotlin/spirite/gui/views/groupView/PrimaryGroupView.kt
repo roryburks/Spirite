@@ -5,11 +5,11 @@ import rb.glow.Colors
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
-import sgui.core.components.IToggleButton
 import sgui.components.ITreeElementConstructor
 import sgui.components.ITreeView
 import sgui.components.ITreeViewNonUI.*
 import sgui.components.ITreeViewNonUI.DropDirection.*
+import sgui.core.components.IToggleButton
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.components.events.MouseEvent
 import sgui.core.components.events.MouseEvent.MouseButton.LEFT
@@ -17,19 +17,20 @@ import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.core.components.events.MouseEvent.MouseEventType.RELEASED
 import sgui.core.systems.IGlobalMouseHook
 import sgui.core.transfer.ITransferObject
-import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupTree.TreeChangeEvent
+import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.menus.NodeMenus
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables
+import spirite.sguiHybrid.Hybrid
 
 class PrimaryGroupView
 private constructor(

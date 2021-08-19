@@ -2,9 +2,9 @@ package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
 import sgui.core.components.crossContainer.ICrossPanel
-import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.base.imageData.animation.ffa.FfaLayerCascading
+import spirite.sguiHybrid.Hybrid
 
 
 data class FfaCascadingJsonContract(

@@ -1,8 +1,8 @@
 package sjunit.rb.file
 
 import org.junit.jupiter.api.Test
-import rb.file.ByteInter
 import rb.file.BigEndian
+import rb.file.ByteInter
 import rb.vectrix.mathUtil.i
 import kotlin.test.assertEquals
 

@@ -9,7 +9,6 @@ import spirite.core.file.load.SifFileReader
 import spirite.core.file.save.SifFileWriter
 import java.io.File
 import java.io.RandomAccessFile
-import java.lang.Exception
 
 // This suite does validation by reading into Sif Files and writing to Sif Files, recording any inability to read and
 // recording any deviations between output files.  Never touches the ImageWorkspace and never turns raw data into images.

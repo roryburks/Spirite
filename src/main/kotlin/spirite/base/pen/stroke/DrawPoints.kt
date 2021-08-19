@@ -1,8 +1,8 @@
 package spirite.base.pen.stroke
 
 import rb.vectrix.calculate.nearestBinarySearch
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.WarningType.STRUCTURAL
 
 // Made as a class instead of parameters for extendability
 open class DrawPoints(val x: FloatArray, val y: FloatArray, val w: FloatArray) {
@@ -10,7 +10,7 @@ open class DrawPoints(val x: FloatArray, val y: FloatArray, val w: FloatArray) {
 
     init {
         if (x.size != y.size || x.size != w.size)
-            MDebug.handleWarning(STRUCTURAL, "Miss-matched xi/yi/wf array lengths.")
+            DebugProvider.debug.handleWarning(STRUCTURAL, "Miss-matched xi/yi/wf array lengths.")
     }
 
     open fun dupe() = DrawPoints(x.clone(), y.clone(), w.clone())
@@ -20,7 +20,7 @@ class IndexedDrawPoints(x: FloatArray, y: FloatArray, w: FloatArray, val t: Floa
 
     init {
         if (x.size != t.size)
-            MDebug.handleWarning(STRUCTURAL, "Miss-matched xi/yi/wf/t array lengths.")
+            DebugProvider.debug.handleWarning(STRUCTURAL, "Miss-matched xi/yi/wf/t array lengths.")
     }
 
     /**

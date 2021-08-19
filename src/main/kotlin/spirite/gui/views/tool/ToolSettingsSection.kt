@@ -9,17 +9,17 @@ import rb.owl.interprettedBindings.bindToY
 import rb.vectrix.functions.InvertibleFunction
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
-import sgui.core.components.IComboBox
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
+import sgui.core.components.IComboBox
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.swing.SwIcon
-import spirite.sguiHybrid.Hybrid
 import sgui.swing.skin.Skin
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
+import spirite.sguiHybrid.Hybrid
 
 
 fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {

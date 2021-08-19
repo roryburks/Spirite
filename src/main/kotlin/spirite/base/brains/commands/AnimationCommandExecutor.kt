@@ -1,5 +1,7 @@
 package spirite.base.brains.commands
 
+import spirite.base.brains.IDialog.FilePickType.AAF
+import spirite.base.brains.IDialog.FilePickType.GIF
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.file.ExportToGif
@@ -7,8 +9,6 @@ import spirite.base.file.aaf.defaultAafExporter
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.gui.menus.dialogs.IDialog.FilePickType.AAF
-import spirite.gui.menus.dialogs.IDialog.FilePickType.GIF
 import spirite.sguiHybrid.Hybrid
 import java.io.File
 

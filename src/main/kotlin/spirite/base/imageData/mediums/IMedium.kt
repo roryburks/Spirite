@@ -3,16 +3,16 @@ package spirite.base.imageData.mediums
 import rb.glow.Colors
 import rb.glow.IFlushable
 import rb.glow.IGraphicsContext
+import rb.glow.SColor
 import rb.glow.gle.RenderRubric
 import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import rb.glow.SColor
+import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.imageData.IFloatingMedium
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
-import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.imageData.mediums.MediumType.FLAT
 
 

@@ -37,9 +37,9 @@ import spirite.base.pen.stroke.BasicDynamics
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.DrawPointsBuilder
 import spirite.base.pen.stroke.StrokeParams
-import spirite.core.util.StringUtil
 import spirite.core.file.SifConstants
 import spirite.core.file.contracts.*
+import spirite.core.util.StringUtil
 
 class SifWorkspaceImporter(
     private val _imageIo : IImageIO,

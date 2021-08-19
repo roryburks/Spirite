@@ -2,29 +2,29 @@ package spirite.gui.views.animation.structureView.ffa
 
 import rb.owl.bindable.addObserver
 import rbJvm.glow.awt.ImageBI
-import sgui.core.UIPoint
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_LOWERED
+import sgui.core.Direction
+import sgui.core.UIPoint
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.components.events.MouseEvent
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
 import sgui.core.components.events.MouseEvent.MouseEventType.RELEASED
-import sgui.core.Direction
-import sguiSwing.components.SwComponent
-import spirite.sguiHybrid.Hybrid
 import sgui.swing.customGui.ArrowPanel
 import sgui.swing.customGui.DashedOutPanel
 import sgui.swing.skin.Skin.FFAAnimation.Arrow
 import sgui.swing.skin.Skin.Global.Bg
 import sgui.swing.skin.Skin.Global.Fg
+import sguiSwing.components.SwComponent
+import spirite.base.brains.IDialog
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.MenuItem
-import spirite.gui.menus.dialogs.IDialog
 import spirite.gui.views.animation.structureView.AnimFFAStructPanel
+import spirite.sguiHybrid.Hybrid
 import java.awt.image.BufferedImage
 import java.io.InvalidClassException
 
@@ -79,10 +79,10 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
 
     // region Menu Components
     private class NameView(
-            val layer: FFALayer,
-            val contextMenu: IContextMenus,
-            val dialog: IDialog,
-            private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
+        val layer: FFALayer,
+        val contextMenu: IContextMenus,
+        val dialog: IDialog,
+        private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         :IFFAStructView
     {
         override val component get() = imp
@@ -109,10 +109,10 @@ class FFAFlatLayerBuilder(private val _master: IMasterControl) : IFfaStructViewB
     }
 
     private class LexicalNameView(
-            val layer: FfaLayerLexical,
-            val contextMenu: IContextMenus,
-            val dialog: IDialog,
-            private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
+        val layer: FfaLayerLexical,
+        val contextMenu: IContextMenus,
+        val dialog: IDialog,
+        private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         : IFFAStructView
     {
         override val component: IComponent get() = imp

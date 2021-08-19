@@ -3,13 +3,13 @@ package spirite.base.imageData.mediums
 import rb.extendo.dataStructures.SinglyList
 import rb.glow.Colors
 import rb.glow.IGraphicsContext
+import rb.glow.SColor
 import rb.glow.img.RawImage
 import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
-import rb.glow.SColor
+import spirite.base.graphics.drawer.DefaultImageDrawer
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
-import spirite.base.graphics.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.MediumType.FLAT
 

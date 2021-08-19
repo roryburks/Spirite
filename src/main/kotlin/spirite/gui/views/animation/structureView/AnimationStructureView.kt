@@ -3,11 +3,11 @@ package spirite.gui.views.animation.structureView
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
 import sgui.swing.SwIcon
-import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
+import spirite.sguiHybrid.Hybrid
 
 class AnimationStructureView(val master: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp

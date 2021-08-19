@@ -5,9 +5,9 @@ import rb.glow.IGraphicsContext
 import rb.vectrix.compaction.IntCompactor
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
-import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
+import spirite.sguiHybrid.Hybrid
 
 class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(workspace) {
     private val xCompactor = IntCompactor()

@@ -2,11 +2,11 @@ package sgui.swing.components
 
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import sgui.core.components.ICheckBox
 import sgui.components.IComponent
+import sgui.core.components.ICheckBox
 import sgui.core.components.IRadioButton
-import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin
+import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sguiSwing.components.SwComponent
 import javax.swing.JCheckBox
 import javax.swing.JRadioButton

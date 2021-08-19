@@ -13,9 +13,9 @@ import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.round
 import rbJvm.glow.util.ContentBoundsFinder
-import spirite.sguiHybrid.Hybrid
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
+import spirite.sguiHybrid.Hybrid
 import kotlin.math.max
 
 /**

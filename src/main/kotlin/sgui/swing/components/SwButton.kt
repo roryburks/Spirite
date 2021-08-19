@@ -4,8 +4,8 @@ import sgui.core.IIcon
 import sgui.core.components.IButton
 import sgui.core.components.IButton.ButtonActionEvent
 import sgui.swing.SwIcon
-import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin
+import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent
 import java.awt.event.MouseEvent

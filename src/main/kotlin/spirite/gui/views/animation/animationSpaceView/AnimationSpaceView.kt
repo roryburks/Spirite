@@ -4,14 +4,11 @@ import rb.global.IContract
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import rbJvm.owl.bindWeaklyTo
-import sgui.core.Orientation.HORIZONTAL
 import sgui.components.IComponent
+import sgui.core.Orientation.HORIZONTAL
 import sgui.swing.SwIcon
 import sgui.swing.components.ResizeContainerPanel
 import sguiSwing.components.jcomponent
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
@@ -19,15 +16,22 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSpaceObserver
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
+import spirite.core.hybrid.IDebug.WarningType.UNSUPPORTED
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
 import spirite.gui.resources.Transferables.AnimationTransferable
+import spirite.sguiHybrid.Hybrid
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetDragEvent
 import java.awt.dnd.DropTargetDropEvent
 
-class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
+class AnimationSpaceView(
+    private val master: IMasterControl,
+    private val _debug : IDebug = DebugProvider.debug) : IOmniComponent
+{
     override val component: IComponent get() = imp
     override val icon: SwIcon? get() = null
     override val name: String get() = "Animation Space View"
@@ -139,7 +143,7 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
 
                 if( droppedAnimation.workspace != workspace)
                 {
-                    MDebug.handleWarning(UNSUPPORTED, "Cannot import animation into different Workspace")
+                    _debug.handleWarning(UNSUPPORTED, "Cannot import animation into different Workspace")
                     return
                 }
 

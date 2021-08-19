@@ -6,14 +6,13 @@ import rb.owl.Observer
 import rb.owl.bindable.Bindable
 import rbJvm.glow.awt.NativeImage
 import rbJvm.owl.addWeakObserver
-import sgui.core.components.IBoxList.IBoxComponent
-import sgui.core.components.IBoxList.IMovementContract
 import sgui.components.IComponent
 import sgui.components.IComponent.BasicBorder.BEVELED_RAISED
+import sgui.core.components.IBoxList.IBoxComponent
+import sgui.core.components.IBoxList.IMovementContract
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.components.events.MouseEvent
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
-import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.graphics.rendering.IThumbnailStore
@@ -22,6 +21,7 @@ import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.SpriteLayerContextMenus
 import spirite.gui.resources.SpiriteIcons
+import spirite.sguiHybrid.Hybrid
 
 class SpriteLayerPanel(
         workspaceSet: IWorkspaceSet,

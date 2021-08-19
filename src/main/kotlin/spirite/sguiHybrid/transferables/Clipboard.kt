@@ -2,11 +2,11 @@ package spirite.sguiHybrid.transferables
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
+import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.layers.Layer
 import spirite.sguiHybrid.Hybrid
 import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings
 import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings.Image
-import spirite.base.imageData.groupTree.GroupNode
-import spirite.base.imageData.layers.Layer
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.image.BufferedImage

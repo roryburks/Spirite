@@ -4,9 +4,6 @@ import rb.glow.img.IImage
 import rb.glow.img.RawImage
 import rb.owl.observer
 import rbJvm.glow.awt.NativeImage
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
 import spirite.base.brains.ICentralObservatory
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.settings.ISettingsManager
@@ -24,6 +21,10 @@ import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
+import spirite.core.hybrid.IDebug.WarningType.STRUCTURAL
+import spirite.sguiHybrid.Hybrid
 import java.lang.ref.WeakReference
 
 interface IThumbnailStore<T>
@@ -138,7 +139,8 @@ class DerivedNativeThumbnailStore(private val rootThumbnailStore: ThumbnailStore
 class ThumbnailStore(
         settings: ISettingsManager,
         centralObservatory: ICentralObservatory,
-        private val workspaceSet: IWorkspaceSet) : IThumbnailStore<IImage>
+        private val workspaceSet: IWorkspaceSet,
+        private val _debug : IDebug = DebugProvider.debug) : IThumbnailStore<IImage>
 {
     internal sealed class ReferenceObject {
         abstract val workspace : IImageWorkspace
@@ -260,7 +262,7 @@ class ThumbnailStore(
             is NodeReference -> when(ref.node) {
                 is GroupNode -> GroupNodeSource(ref.node, ref.workspace)
                 is LayerNode -> {
-                    MDebug.handleWarning(STRUCTURAL, "Shouldn't be able to have a NodeReference that is a LayerNode (it should get short-circuited into a LayerReference")
+                    _debug.handleWarning(STRUCTURAL, "Shouldn't be able to have a NodeReference that is a LayerNode (it should get short-circuited into a LayerReference")
                     LayerSource(ref.node.layer, ref.workspace)
                 }
                 else -> throw Exception("Unrenderable node")

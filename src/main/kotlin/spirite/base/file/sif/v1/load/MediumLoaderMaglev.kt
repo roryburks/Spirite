@@ -8,14 +8,10 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.i
 import rb.vectrix.mathUtil.round
 import rbJvm.file.JvmRandomAccessFileBinaryReadStream
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.FILE
-import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.brains.toolset.MagneticFillMode
 import spirite.base.brains.toolset.PenDrawMode
-import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.file.readFloatArray
+import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.magLev.IMaglevThing
@@ -30,6 +26,10 @@ import spirite.base.pen.stroke.DrawPointsBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.ErrorType.FILE
+import spirite.core.hybrid.IDebug.WarningType.UNSUPPORTED
+import spirite.sguiHybrid.Hybrid
 
 
 object MagneticMediumLoader : IMediumLoader
@@ -82,7 +82,7 @@ object MagneticMediumLoader : IMediumLoader
                         fill
                     }
                     else -> {
-                        MDebug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
+                        DebugProvider.debug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
                         null
                     }
 
@@ -161,7 +161,7 @@ object MagneticMediumLoader_V2 : IMediumLoader
                     fill
                 }
                 else -> {
-                    MDebug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
+                    DebugProvider.debug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
                     null
                 }
 
@@ -230,7 +230,7 @@ object Legacy_1_0006_MagneticMediumPartialLoader : IMediumLoader
                             DrawPoints(x,y,w))
                 }
                 SaveLoadUtil.MAGLEV_THING_FILL -> {
-                    MDebug.handleWarning(UNSUPPORTED, "Maglev Fills should not show up in version x1_0000 - x1_0007.  Do not know how to interpret (trying to ignore in old style)")
+                    DebugProvider.debug.handleWarning(UNSUPPORTED, "Maglev Fills should not show up in version x1_0000 - x1_0007.  Do not know how to interpret (trying to ignore in old style)")
                     ra.readInt()
                     ra.readByte()
                     val numReferences = ra.readUnsignedShort()
@@ -242,7 +242,7 @@ object Legacy_1_0006_MagneticMediumPartialLoader : IMediumLoader
                     null
                 }
                 else -> {
-                    MDebug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
+                    DebugProvider.debug.handleError(FILE, "Unrecognized MaglevThing Type: ${thingType.i}")
                     null
                 }
 
@@ -314,7 +314,7 @@ object Legacy_pre_1_000_MagneticMediumIgnorer : IMediumLoader
 {
     override fun loadMedium(context: LoadContext): IMedium? {
         val ra = context.ra
-        MDebug.handleWarning(UNSUPPORTED, "Maglev Mediums are currently not supported by Spirite v2, ignoring.")
+        DebugProvider.debug.handleWarning(UNSUPPORTED, "Maglev Mediums are currently not supported by Spirite v2, ignoring.")
         val numThings = ra.readUnsignedShort()
         repeat(numThings) {
             val thingType = ra.readByte()

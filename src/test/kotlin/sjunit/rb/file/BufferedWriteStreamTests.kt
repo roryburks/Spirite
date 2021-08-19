@@ -6,7 +6,6 @@ import rb.file.BufferedWriteStream
 import rb.file.ByteListWriteStream
 import rb.vectrix.mathUtil.b
 import rbJvm.vectrix.SetupVectrixForJvm
-import java.io.FileOutputStream
 import kotlin.test.assertEquals
 
 class BufferedWriteStreamTests {

@@ -7,7 +7,6 @@ import sgui.components.IComponent.BasicBorder.BASIC
 import sgui.core.components.IToggleButton
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
-import spirite.sguiHybrid.Hybrid
 import sgui.swing.skin.Skin.AnimSchemePanel.ActiveNodeBg
 import spirite.base.brains.IMasterControl
 import spirite.base.graphics.isolation.IIsolationManager.IsolationState
@@ -17,6 +16,7 @@ import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.gui.resources.SpiriteIcons.SmallIcons.*
+import spirite.sguiHybrid.Hybrid
 
 class SpriteLayerNodePanel
 private constructor(

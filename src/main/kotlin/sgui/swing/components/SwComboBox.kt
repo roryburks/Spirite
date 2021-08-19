@@ -1,8 +1,8 @@
 package sgui.swing.components
 
 import rb.owl.bindable.addObserver
-import sgui.core.components.ComboBox
 import sgui.components.IComponent
+import sgui.core.components.ComboBox
 import sgui.swing.skin.Skin.Global.Fg
 import sgui.swing.skin.Skin.Global.TextDark
 import sguiSwing.components.ISwComponent

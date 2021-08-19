@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
-import rb.vectrix.mathUtil.f
 import rb.glow.SColor
+import rb.vectrix.mathUtil.f
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.graphics.drawer.IImageDrawer
 import spirite.base.pen.PenState

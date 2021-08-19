@@ -1,8 +1,8 @@
 package spirite.pc.shaders
 
 import rb.glow.resources.IScriptService
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.RESOURCE
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.ErrorType.RESOURCE
 import java.io.IOException
 import java.util.*
 
@@ -22,7 +22,7 @@ class JClassScriptService : IScriptService {
             }
             return ret
         }catch( e: IOException) {
-            MDebug.handleError(RESOURCE, "Couldn't load shader script file: [$scriptName]", e)
+            DebugProvider.debug.handleError(RESOURCE, "Couldn't load shader script file: [$scriptName]", e)
             return ""
         }
     }

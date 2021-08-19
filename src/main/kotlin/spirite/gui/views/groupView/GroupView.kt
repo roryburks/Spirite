@@ -8,9 +8,9 @@ import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.swing.SwIcon
-import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
+import spirite.sguiHybrid.Hybrid
 
 class GroupView
 private constructor(

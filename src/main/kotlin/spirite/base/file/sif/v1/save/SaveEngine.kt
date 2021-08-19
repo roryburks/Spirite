@@ -2,11 +2,6 @@ package spirite.base.file.sif.v1.save
 
 import rb.vectrix.linear.Vec2i
 import rb.vectrix.mathUtil.d
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType
-import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
-import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.file.sif.SaveLoadUtil.FFALAYER_CASCADING
 import spirite.base.file.sif.SaveLoadUtil.FFALAYER_GROUPLINKED
@@ -30,6 +25,11 @@ import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.magLev.MaglevFill
 import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.base.telemetry.TelemetryEvent
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.ErrorType
+import spirite.core.hybrid.IDebug.WarningType.STRUCTURAL
+import spirite.core.hybrid.IDebug.WarningType.UNSUPPORTED
+import spirite.sguiHybrid.Hybrid
 import java.io.File
 import java.io.RandomAccessFile
 import kotlin.math.min
@@ -51,7 +51,7 @@ class SaveContext(
         telemetry.runAction("Write Chunk: $tag") {
             if (tag.length != 4) {
                 // Perhaps overkill, but this really should be a hard truth
-                MDebug.handleError(ErrorType.FATAL, "Chunk types must be 4-length")
+                DebugProvider.debug.handleError(ErrorType.FATAL, "Chunk types must be 4-length")
             }
 
             // [4] : Chunk Tag
@@ -66,7 +66,7 @@ class SaveContext(
             val end = ra.filePointer
             ra.seek(start)
             if (end - start > Integer.MAX_VALUE)
-                MDebug.handleError(ErrorType.OUT_OF_BOUNDS, "Image Data Too Big (>2GB).")
+                DebugProvider.debug.handleError(ErrorType.OUT_OF_BOUNDS, "Image Data Too Big (>2GB).")
             ra.writeInt((end - start - 4).toInt())
             ra.seek(end)
 
@@ -154,7 +154,7 @@ object SaveEngine {
 
                         // Go through each of the Group GroupNode's children recursively and save them
                         when( depth) {
-                            0xFF -> if( node.children.any()) MDebug.handleWarning(STRUCTURAL, "Too many nested groups (255 limit), some nodes ignored.")
+                            0xFF -> if( node.children.any()) DebugProvider.debug.handleWarning(STRUCTURAL, "Too many nested groups (255 limit), some nodes ignored.")
                             else -> node.children.forEach { writeNode(it, depth+1) }
                         }
                     }
@@ -325,7 +325,7 @@ object SaveEngine {
                     }
                     else -> {
                         ra.writeByte(0)
-                        MDebug.handleWarning(UNSUPPORTED, "Do not know how to save Animation Space: $space.  Skipping it")
+                        DebugProvider.debug.handleWarning(UNSUPPORTED, "Do not know how to save Animation Space: $space.  Skipping it")
                     }
                 }
             }
@@ -351,7 +351,7 @@ object SaveEngine {
                         ra.writeShort(state.zoom)                          // [2] : Anim Zoom
                         ra.writeByte(SaveLoadUtil.ANIM_FFA)                     // [1] : Anim TypeId
 
-                        if(anim.layers.size > MaxFFALayers) MDebug.handleWarning(UNSUPPORTED, "Too many Animation layers (num: ${anim.layers.size} max: $MaxFFALayers), taking only the first N")
+                        if(anim.layers.size > MaxFFALayers) DebugProvider.debug.handleWarning(UNSUPPORTED, "Too many Animation layers (num: ${anim.layers.size} max: $MaxFFALayers), taking only the first N")
 
                         val writtenExplicits = hashSetOf<Node>()
 
@@ -366,7 +366,7 @@ object SaveEngine {
                                     ra.writeInt(context.nodeMap[layer.groupLink] ?: -1)    // [4] : NodeId of GroupNode Bount
                                     ra.writeByte(if(layer.includeSubtrees) 1 else 0)    // [1] : 0 bit : whether or not subgroups are linked
 
-                                    if( layer.frames.size > MaxFFALayerFrames) MDebug.handleWarning(UNSUPPORTED, "Too many Frames in a layer (max: ${Short.MAX_VALUE}, only writing first N)")
+                                    if( layer.frames.size > MaxFFALayerFrames) DebugProvider.debug.handleWarning(UNSUPPORTED, "Too many Frames in a layer (max: ${Short.MAX_VALUE}, only writing first N)")
 
                                     ra.writeShort(min(layer.frames.size, MaxFFALayerFrames)) // [2] : Number of Frames
                                     for( frame in layer.frames.asSequence().take(MaxFFALayerFrames)) {
@@ -415,7 +415,7 @@ object SaveEngine {
 
                         }
                     }
-                    else -> MDebug.handleWarning(UNSUPPORTED, "Do not know how to save Animation: $anim.  Skipping it")
+                    else -> DebugProvider.debug.handleWarning(UNSUPPORTED, "Do not know how to save Animation: $anim.  Skipping it")
                 }
             }
         }

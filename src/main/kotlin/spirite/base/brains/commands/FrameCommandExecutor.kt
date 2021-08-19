@@ -1,13 +1,16 @@
 package spirite.base.brains.commands
 
-import spirite.sguiHybrid.MDebug
 import spirite.base.brains.IFrameManager
 import spirite.base.brains.IFrameManager.Views.*
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.FrameCommandExecutor.FrameCommand.*
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
 
 
-class FrameCommandExecutor(val frameManager: IFrameManager) : ICommandExecutor
+class FrameCommandExecutor(
+    val frameManager: IFrameManager,
+    private val _debug : IDebug = DebugProvider.debug) : ICommandExecutor
 {
 
     enum class FrameCommand(val string: String) : ICommand {
@@ -32,7 +35,7 @@ class FrameCommandExecutor(val frameManager: IFrameManager) : ICommandExecutor
             ANIMATION.string -> frameManager.launchView(ANIMATION_VIEW)
             ANIMATION_STATE.string -> frameManager.launchView(ANIMATION_SPACE_VIEW)
 
-            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: frame.$string")
+            else -> _debug.handleWarning(IDebug.WarningType.REFERENCE, "Unrecognized command: frame.$string")
         }
 
         return true

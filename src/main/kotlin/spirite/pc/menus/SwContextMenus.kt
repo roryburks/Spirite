@@ -2,15 +2,19 @@ package spirite.pc.menus
 
 import sgui.core.UIPoint
 import sgui.swing.SUIPoint
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType
 import spirite.base.brains.commands.ICentralCommandExecutor
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
+import spirite.core.hybrid.IDebug.WarningType
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.MenuItem
+import spirite.sguiHybrid.Hybrid
 import javax.swing.*
 
-class SwContextMenus(private val _commandExecuter: ICentralCommandExecutor) : IContextMenus {
+class SwContextMenus(
+    private val _commandExecuter: ICentralCommandExecutor,
+    private val _debug : IDebug = DebugProvider.debug) : IContextMenus
+{
     val cmenu = JPopupMenu()
 
     override fun LaunchContextMenu(point: UIPoint, scheme: List<MenuItem>, extra: Any?) {
@@ -37,7 +41,7 @@ class SwContextMenus(private val _commandExecuter: ICentralCommandExecutor) : IC
             var lexiocon = item.lexicon.substring(depth)
 
             if( depth > activeDepth) {
-                MDebug.handleWarning(WarningType.INITIALIZATION, "Bad Menu Scheme.")
+                _debug.handleWarning(WarningType.INITIALIZATION, "Bad Menu Scheme.")
                 depth = activeDepth
             }
             activeDepth = depth+1

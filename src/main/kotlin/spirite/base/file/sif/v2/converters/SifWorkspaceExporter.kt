@@ -21,7 +21,6 @@ import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
 import spirite.core.file.contracts.*
-import kotlin.Exception
 
 interface ISifWorkspaceExporter {
     fun export( workspace: IImageWorkspace) : SifFile

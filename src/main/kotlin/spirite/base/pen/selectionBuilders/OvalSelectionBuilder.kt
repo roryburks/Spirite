@@ -3,9 +3,9 @@ package spirite.base.pen.selectionBuilders
 import rb.glow.IGraphicsContext
 import rb.glow.drawer
 import rb.vectrix.mathUtil.d
-import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
+import spirite.sguiHybrid.Hybrid
 
 
 class OvalSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( workspace) {

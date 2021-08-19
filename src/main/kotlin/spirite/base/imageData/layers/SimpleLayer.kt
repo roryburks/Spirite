@@ -2,9 +2,9 @@ package spirite.base.imageData.layers
 
 import rb.extendo.dataStructures.SinglyList
 import spirite.base.graphics.isolation.IIsolator
-import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 
 class SimpleLayer(val medium: MediumHandle) : Layer {

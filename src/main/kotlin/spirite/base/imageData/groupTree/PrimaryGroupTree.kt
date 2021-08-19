@@ -1,7 +1,6 @@
 package spirite.base.imageData.groupTree
 
 import rb.glow.img.IImage
-import spirite.sguiHybrid.Hybrid
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.Layer
@@ -12,8 +11,9 @@ import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType
 import spirite.base.imageData.mediums.MediumType.*
 import spirite.base.imageData.mediums.magLev.MaglevMedium
-import spirite.core.util.StringUtil
 import spirite.base.util.debug.SpiriteException
+import spirite.core.util.StringUtil
+import spirite.sguiHybrid.Hybrid
 
 class PrimaryGroupTree(workspace: MImageWorkspace) : MovableGroupTree( workspace) {
     enum class InsertBehavior {

@@ -1,7 +1,7 @@
 package demonstration
 
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.FATAL
+import spirite.core.hybrid.IDebug.ErrorType.FATAL
+import spirite.core.hybrid.MDebug
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import javax.swing.UIManager

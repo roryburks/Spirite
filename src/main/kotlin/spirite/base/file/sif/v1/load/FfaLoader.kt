@@ -1,11 +1,8 @@
 package spirite.base.file.sif.v1.load
 
 import rb.vectrix.mathUtil.i
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.STRUCTURAL
-import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
-import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.file.readUTF8NT
+import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.imageData.animation.ffa.FfaCascadingSublayerContract
 import spirite.base.imageData.animation.ffa.FfaFrameStructure
 import spirite.base.imageData.animation.ffa.FfaFrameStructure.Marker.*
@@ -15,6 +12,9 @@ import spirite.base.imageData.animation.ffa.IFfaLayer
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.WarningType.STRUCTURAL
+import spirite.core.hybrid.IDebug.WarningType.UNSUPPORTED
 
 
 object FfaLoader : IAnimationLoader {
@@ -41,7 +41,8 @@ object FfaLoader : IAnimationLoader {
                 SaveLoadUtil.FFALAYER_CASCADING -> FfaCascadingLayerLoader
                 else -> null
             }
-            if( layerLoader == null) MDebug.handleWarning( UNSUPPORTED,"Unknown FFA Layer Type: $layerType.  Attempting to skip, but likely Corrupting")
+            if( layerLoader == null)
+                DebugProvider.debug.handleWarning( UNSUPPORTED,"Unknown FFA Layer Type: $layerType.  Attempting to skip, but likely Corrupting")
 
             else layerLoader.load(context, ffa, layerName)?.
                     also {  it.asynchronous = asynchronous }
@@ -126,7 +127,7 @@ object FfaFixedGroupLayerLoader : IFfaLayerLoader {
                 SaveLoadUtil.FFAFRAME_FRAME -> FRAME
                 SaveLoadUtil.FFAFRAME_GAP -> GAP
                 else -> {
-                    MDebug.handleWarning(STRUCTURAL, "Unrecognized FFAFrame Type: $frameType")
+                    DebugProvider.debug.handleWarning(STRUCTURAL, "Unrecognized FFAFrame Type: $frameType")
                     GAP
                 }
             }
@@ -145,7 +146,7 @@ object FfaFixedGroupLayerLoader : IFfaLayerLoader {
 
         return when(val groupNode = node as? GroupNode) {
             null -> {
-                MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group GroupNode marked as its Link")
+                DebugProvider.debug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group GroupNode marked as its Link")
                 null
             }
             else -> ffa.addLinkedLayer(groupNode, includeSubtrees, name, frameMap, unlinkedFrameClusters)
@@ -231,7 +232,7 @@ object LegacyFFALoader_8_TO_1_0000 : IAnimationLoader {
 
 
             when(val groupNode = node as? GroupNode) {
-                null -> MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group GroupNode marked as its Link")
+                null -> DebugProvider.debug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group GroupNode marked as its Link")
                 else -> ffa.addLinkedLayer(groupNode, includeSubtrees, frameMap = frameMap, unlinkedClusters = unlinkedFrameClusters)
             }
         }

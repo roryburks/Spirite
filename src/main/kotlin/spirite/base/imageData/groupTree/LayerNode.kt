@@ -1,7 +1,7 @@
 package spirite.base.imageData.groupTree
 
-import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.view.IViewSystem

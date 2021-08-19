@@ -1,9 +1,10 @@
 package spirite.base.imageData.undo
 
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL_MINOR
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
+import spirite.core.hybrid.IDebug.ErrorType.STRUCTURAL_MINOR
 
 /**
  * The CompositeContext is a special Context which can store multiple actions
@@ -13,7 +14,8 @@ import spirite.base.imageData.MediumHandle
 class CompositeContext(
         private val nullContext: NullContext,
         private val imageContexts: MutableList<ImageContext>,
-        private val workspace: MImageWorkspace
+        private val workspace: MImageWorkspace,
+        private val _debug : IDebug = DebugProvider.debug
 ) : UndoContext<CompositeAction> {
     override val medium: MediumHandle? = null
     private val actions = mutableListOf<CompositeAction>()
@@ -42,7 +44,7 @@ class CompositeContext(
                     contexts.add(imageContext)
                     imageContext.addAction( innerAction)
                 }
-                else -> MDebug.handleError(STRUCTURAL_MINOR, "Other type got mixed into compositeAction: ${innerAction::class}")
+                else -> _debug.handleError(STRUCTURAL_MINOR, "Other type got mixed into compositeAction: ${innerAction::class}")
             }
         }
         action.contexts = contexts
@@ -52,7 +54,7 @@ class CompositeContext(
 
     // region Duplicate Code From NullContext
     override fun undo() {
-        if( pointer == 0) MDebug.handleError(STRUCTURAL_MINOR, "Undo Queue Desync: tried to undo Null Context before beginning")
+        if( pointer == 0) _debug.handleError(STRUCTURAL_MINOR, "Undo Queue Desync: tried to undo Null Context before beginning")
         else {
             pointer--
             actions[pointer].contexts.forEach { it.undo() }
@@ -60,7 +62,7 @@ class CompositeContext(
     }
 
     override fun redo() {
-        if( pointer == actions.size) MDebug.handleError(STRUCTURAL_MINOR, "Undo Queue Desync: tried to redo Null Context after end")
+        if( pointer == actions.size) _debug.handleError(STRUCTURAL_MINOR, "Undo Queue Desync: tried to redo Null Context after end")
         else {
             actions[pointer].contexts.forEach { it.redo() }
             pointer++
@@ -103,7 +105,7 @@ class CompositeContext(
             when( action) {
                 is NullAction -> nullContext.iterateNext()
                 is ImageAction -> imageContexts.find { action.arranged.handle == it.medium }?.iterateNext()
-                else -> MDebug.handleError(STRUCTURAL_MINOR, "Other type got mixed into compositeAction: ${action::class}")
+                else -> _debug.handleError(STRUCTURAL_MINOR, "Other type got mixed into compositeAction: ${action::class}")
             }
         }
         return composite

@@ -1,13 +1,13 @@
 package sgui.swing.components
 
 import rb.owl.bindable.addObserver
+import sgui.components.IComponent
+import sgui.core.Orientation
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.Orientation.VERTICAL
-import sgui.components.IComponent
 import sgui.core.components.IScrollBar
 import sgui.core.components.IScrollBarNonUIImp
 import sgui.core.components.ScrollBarNonUI
-import sgui.core.Orientation
 import sgui.swing.components.SScrollPane.ModernScrollBarUI
 import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sguiSwing.components.ISwComponent

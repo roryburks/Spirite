@@ -2,8 +2,8 @@ package spirite.base.file.aaf
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.ImageBI
-import spirite.sguiHybrid.Hybrid
 import spirite.base.imageData.MImageWorkspace
+import spirite.sguiHybrid.Hybrid
 import java.io.File
 import java.io.RandomAccessFile
 import javax.imageio.ImageIO

@@ -1,8 +1,8 @@
 package sgui.swing.components
 
+import rb.glow.SColor
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
-import rb.glow.SColor
 import sgui.components.IComponent
 import sgui.core.components.IEditableLabel
 import sgui.core.systems.KeypressSystem

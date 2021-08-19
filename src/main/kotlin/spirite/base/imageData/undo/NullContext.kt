@@ -1,8 +1,8 @@
 package spirite.base.imageData.undo
 
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL_MINOR
 import spirite.base.imageData.MediumHandle
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.ErrorType.STRUCTURAL_MINOR
 
 /***
  * NullContext is a special workspace that is not associated with any ImageData
@@ -28,7 +28,7 @@ class NullContext : UndoContext<NullAction> {
     }
 
     override fun undo() {
-        if( pointer == 0) MDebug.handleError(STRUCTURAL_MINOR, "Undo Queue Desync: tried to undo Null Context before beginning")
+        if( pointer == 0) DebugProvider.debug.handleError(STRUCTURAL_MINOR, "Undo Queue Desync: tried to undo Null Context before beginning")
         else {
             pointer--
             actions[pointer].undoAction()
@@ -36,7 +36,7 @@ class NullContext : UndoContext<NullAction> {
     }
 
     override fun redo() {
-        if( pointer == actions.size) MDebug.handleError(STRUCTURAL_MINOR, "Undo Queue Desync: tried to redo Null Context after end")
+        if( pointer == actions.size) DebugProvider.debug.handleError(STRUCTURAL_MINOR, "Undo Queue Desync: tried to redo Null Context after end")
         else {
             actions[pointer].performAction()
             pointer++

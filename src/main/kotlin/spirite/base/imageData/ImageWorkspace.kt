@@ -17,6 +17,9 @@ import spirite.base.brains.palette.paletteSwapDriver.IPaletteMediumMap
 import spirite.base.brains.palette.paletteSwapDriver.PaletteMediumMap
 import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.toolset.Toolset
+import spirite.base.graphics.drawer.IImageDrawer
+import spirite.base.graphics.drawer.MultiMediumDrawer
+import spirite.base.graphics.drawer.NillImageDrawer
 import spirite.base.graphics.isolation.IIsolationManager
 import spirite.base.graphics.isolation.IsolationManager
 import spirite.base.graphics.rendering.IRenderEngine
@@ -27,11 +30,9 @@ import spirite.base.imageData.animation.services.IAnimationManagementSvc
 import spirite.base.imageData.animation.services.IAnimationStateSvc
 import spirite.base.imageData.animationSpaces.AnimationSpaceManager
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager
-import spirite.base.graphics.drawer.IImageDrawer
-import spirite.base.graphics.drawer.MultiMediumDrawer
-import spirite.base.graphics.drawer.NillImageDrawer
 import spirite.base.imageData.groupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupTree.TreeChangeEvent
+import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.groupTree.PrimaryGroupTree

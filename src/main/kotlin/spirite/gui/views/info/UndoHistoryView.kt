@@ -5,12 +5,12 @@ import sgui.components.IComponent
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
 import sgui.components.ITreeViewNonUI.SimpleTreeComponent
 import sgui.swing.SwIcon
-import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import spirite.base.imageData.undo.UndoIndex
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.resources.SpiriteIcons
+import spirite.sguiHybrid.Hybrid
 
 class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
     override val component: IComponent

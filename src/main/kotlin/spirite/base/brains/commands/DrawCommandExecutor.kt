@@ -3,18 +3,22 @@ package spirite.base.brains.commands
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.linear.Vec2f
 import rb.vectrix.mathUtil.f
-import spirite.sguiHybrid.MDebug
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand.*
 import spirite.base.brains.commands.specific.LayerFixes.bakeOffset
 import spirite.base.brains.toolset.IToolsetManager
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.graphics.drawer.IImageDrawer.*
-import spirite.base.imageData.groupTree.Node
+import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.LayerNode
+import spirite.base.imageData.groupTree.Node
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
 
-class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: IToolsetManager) : ICommandExecutor
+class DrawCommandExecutor(
+    val workspaceSet: IWorkspaceSet,
+    val toolsetManager: IToolsetManager,
+    private val _debug : IDebug = DebugProvider.debug) : ICommandExecutor
 {
 
     enum class DrawCommand(val string: String) : ICommand {
@@ -71,7 +75,7 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
                 //LayerFixes.ApplyTransformAccrossNode(workspace, workspace.groupTree.selectedNode ?: return false, transform)
             }
 
-            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: draw.$string")
+            else -> _debug.handleWarning(IDebug.WarningType.REFERENCE, "Unrecognized command: draw.$string")
         }
 
         return true

@@ -1,11 +1,14 @@
 package spirite.base.brains.commands
 
-import spirite.sguiHybrid.MDebug
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.WorkViewCommandExecutor.WorkViewCommand.*
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
 
-class WorkViewCommandExecutor(val master: IMasterControl) : ICommandExecutor
+class WorkViewCommandExecutor(
+    val master: IMasterControl,
+    private val _debug : IDebug = DebugProvider.debug) : ICommandExecutor
 {
     val view get() = master.frameManager.workView
 
@@ -32,7 +35,7 @@ class WorkViewCommandExecutor(val master: IMasterControl) : ICommandExecutor
             ZOOM_OUT_SLOW.string -> view?.zoomLevel = (view?.zoomLevel ?: 0) - 1
             ZOOM_0.string -> view?.zoomLevel = 0
 
-            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: view.$string")
+            else -> _debug.handleWarning(IDebug.WarningType.REFERENCE, "Unrecognized command: view.$string")
         }
         return true
     }

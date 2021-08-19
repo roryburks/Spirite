@@ -1,7 +1,7 @@
 package sgui.swing.components
 
-import sgui.core.components.ISeparator
 import sgui.core.Orientation
+import sgui.core.components.ISeparator
 import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent

@@ -7,9 +7,6 @@ import rb.vectrix.linear.ITransformF
 import rb.vectrix.linear.ImmutableTransformF
 import rb.vectrix.mathUtil.ceil
 import rb.vectrix.mathUtil.d
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.graphics.isolation.IIsolator
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -18,12 +15,17 @@ import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
 import spirite.base.imageData.mediums.IComplexMedium
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
+import spirite.core.hybrid.IDebug.ErrorType.STRUCTURAL
+import spirite.sguiHybrid.Hybrid
 
 class NodeRenderer(
     val root: GroupNode,
     val workspace: IImageWorkspace,
     val settings: RenderSettings = RenderSettings(workspace.width, workspace.height, true),
-    val rootIsolator: IIsolator? = null)
+    val rootIsolator: IIsolator? = null,
+    private val _debug : IDebug = DebugProvider.debug)
 {
     private lateinit var buffer : Array<RawImage>
     private val neededImages : Int by lazy {
@@ -67,7 +69,7 @@ class NodeRenderer(
         // Note: though it doesn't seem recursive at first glance, _getDrawListUnsorted can either be recursive itself
         //  or might add GroupDrawThing's which call _renderRec.
         if( depth < 0 || depth >= buffer.size) {
-            MDebug.handleError(STRUCTURAL, "NodeRenderer out of expected layers count.  Expected: [${0},${buffer.size}), Actual: $depth")
+            _debug.handleError(STRUCTURAL, "NodeRenderer out of expected layers count.  Expected: [${0},${buffer.size}), Actual: $depth")
             return
         }
 
@@ -80,7 +82,7 @@ class NodeRenderer(
 
     private fun _getDrawListUnsorted(node: GroupNode, depth: Int, isolator: IIsolator?, flat: Boolean = false ) : List<DrawThing>{
         if( depth < 0 || depth >= buffer.size) {
-            MDebug.handleError(STRUCTURAL, "NodeRenderer out of expected layers count.  Expected: [${0},${buffer.size}), Actual: $depth")
+            _debug.handleError(STRUCTURAL, "NodeRenderer out of expected layers count.  Expected: [${0},${buffer.size}), Actual: $depth")
             return emptyList()
         }
 

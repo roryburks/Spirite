@@ -6,9 +6,6 @@ import rb.glow.Colors
 import rb.glow.img.IImage
 import rb.glow.using
 import rbJvm.file.JvmRandomAccessFileBinaryReadStream
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.FILE
 import spirite.base.brains.IMasterControl
 import spirite.base.file.sif.v1.load.BadSifFileException
 import spirite.base.file.sif.v1.load.LoadEngine
@@ -20,6 +17,10 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.core.file.contracts.SifFile
 import spirite.core.file.load.SifFileReader
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
+import spirite.core.hybrid.IDebug.ErrorType.FILE
+import spirite.sguiHybrid.Hybrid
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -47,7 +48,10 @@ interface IFileManager {
     fun openFile( file: File)
 }
 
-class FileManager( val master: IMasterControl)  : IFileManager{
+class FileManager(
+    val master: IMasterControl,
+    private val _debug : IDebug = DebugProvider.debug)  : IFileManager
+{
     companion object {
         var v2Load: Boolean = true
         var v2Save: Boolean = true
@@ -136,7 +140,7 @@ class FileManager( val master: IMasterControl)  : IFileManager{
             // TODO: Trigger autosave
             return
         } catch (e: BadSifFileException){
-            MDebug.handleError(FILE, e.message ?: "Failed to Load SIF", e)
+            _debug.handleError(FILE, e.message ?: "Failed to Load SIF", e)
             throw e
         }
         if( !attempted) {

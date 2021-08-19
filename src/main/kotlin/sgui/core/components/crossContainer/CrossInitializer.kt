@@ -1,9 +1,9 @@
 package sgui.core.components.crossContainer
 
-import sgui.core.Orientation.HORIZONTAL
-import sgui.core.Orientation.VERTICAL
 import sgui.components.IComponent
 import sgui.core.Orientation
+import sgui.core.Orientation.HORIZONTAL
+import sgui.core.Orientation.VERTICAL
 
 class CrossInitializer {
     val rows

@@ -5,8 +5,8 @@ import rb.glow.ColorARGB32Normal
 import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.i
 import spirite.base.brains.IMasterControl
-import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.file.readUTF8NT
+import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation

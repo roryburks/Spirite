@@ -8,18 +8,18 @@ import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import sgui.core.components.events.MouseEvent.MouseButton
 import sgui.core.components.events.MouseEvent.MouseButton.LEFT
-import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
-import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.graphics.drawer.IImageDrawer.*
+import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
 import spirite.gui.views.work.WorkSection
 import spirite.gui.views.work.WorkSectionView
+import spirite.sguiHybrid.Hybrid
 
 interface IPenner {
 //    val holdingShift : Boolean

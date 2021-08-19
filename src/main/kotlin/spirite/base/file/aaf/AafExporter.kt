@@ -6,12 +6,12 @@ import rb.vectrix.mathUtil.CyclicRedundancyChecker
 import rb.vectrix.mathUtil.IDataStreamHasher
 import rb.vectrix.rectanglePacking.ModifiedSleatorAlgorithm
 import rbJvm.file.writing.toBufferedWriteStream
-import spirite.sguiHybrid.Hybrid
 import sgui.core.systems.IImageCreator
 import sgui.core.systems.IImageIO
 import spirite.base.file.aaf.export.AafExportConverter
 import spirite.base.file.aaf.export.IAafExportConverter
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.sguiHybrid.Hybrid
 import java.io.File
 import java.io.RandomAccessFile
 

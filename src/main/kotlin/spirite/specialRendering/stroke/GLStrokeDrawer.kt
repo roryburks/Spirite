@@ -9,8 +9,6 @@ import rb.glow.gle.IGLEngine
 import rb.glow.using
 import rb.vectrix.linear.ITransform
 import rb.vectrix.linear.ITransformF
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.STRUCTURAL
 import spirite.base.brains.toolset.PenDrawMode.BEHIND
 import spirite.base.brains.toolset.PenDrawMode.KEEP_ALPHA
 import spirite.base.pen.stroke.DrawPoints
@@ -18,6 +16,8 @@ import spirite.base.pen.stroke.IStrokeDrawer
 import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.ErrorType.STRUCTURAL
 import spirite.specialRendering.StrokeApplyCall
 import spirite.specialRendering.StrokeV2ApplyCall.IntensifyMethod
 
@@ -49,7 +49,7 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
 
     override fun step() = when( val ctx = context) {
         null -> {
-            MDebug.handleError(STRUCTURAL, "Tried to continue Stroke that isn't started.")
+            DebugProvider.debug.handleError(STRUCTURAL, "Tried to continue Stroke that isn't started.")
             false
         }
         else -> {

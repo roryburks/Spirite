@@ -10,12 +10,12 @@ import rb.glow.gle.RenderMethodType.MULTIPLY
 import rb.glow.img.RawImage
 import rbJvm.glow.awt.AwtImageConverter
 import rbJvm.glow.awt.ImageBI
-import spirite.sguiHybrid.Hybrid
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.MediumType.FLAT
+import spirite.sguiHybrid.Hybrid
 import java.io.File
 import javax.imageio.ImageIO
 

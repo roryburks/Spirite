@@ -2,7 +2,6 @@ package spirite.base.brains
 
 import rb.glow.img.IImage
 import rbJvm.glow.awt.NativeImage
-import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.commands.CentralCommandExecutor
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.base.brains.palette.IPaletteManager
@@ -22,9 +21,9 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.gui.implementations.topLevelFeedback.SwTopLevelFeedbackSystem
 import spirite.gui.menus.IContextMenus
-import spirite.gui.menus.dialogs.IDialog
 import spirite.gui.menus.dialogs.JDialog
 import spirite.pc.menus.SwContextMenus
+import spirite.sguiHybrid.Hybrid
 import spirite.specialRendering.stroke.GLStrokeDrawerProvider
 
 /** MasterControl is a top-level container for all the global-level components.  From a dependency-injection perspective

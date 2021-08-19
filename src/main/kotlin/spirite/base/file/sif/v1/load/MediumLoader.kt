@@ -1,14 +1,14 @@
 package spirite.base.file.sif.v1.load
 
 import rb.vectrix.mathUtil.i
-import spirite.sguiHybrid.Hybrid
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.WarningType.UNSUPPORTED
+import spirite.sguiHybrid.Hybrid
 
 interface IMediumLoader
 {
@@ -65,7 +65,7 @@ object PrismaticMediumIgnorer :IMediumLoader
     override fun loadMedium(context: LoadContext): IMedium? {
         val ra = context.ra
 
-        MDebug.handleWarning(UNSUPPORTED, "Prismatic Mediums are currently not supported by Spirite v2, ignoring.")
+        DebugProvider.debug.handleWarning(UNSUPPORTED, "Prismatic Mediums are currently not supported by Spirite v2, ignoring.")
         val numlayers = ra.readUnsignedShort()
         repeat(numlayers) {
             ra.readInt()

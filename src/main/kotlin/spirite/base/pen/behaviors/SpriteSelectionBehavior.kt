@@ -7,8 +7,8 @@ import rb.vectrix.linear.invertN
 import rb.vectrix.mathUtil.floor
 import spirite.base.brains.toolset.WorkspaceScope
 import spirite.base.brains.toolset.WorkspaceScope.*
-import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.groupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.traverse
 import spirite.base.imageData.layers.sprite.SpriteLayer

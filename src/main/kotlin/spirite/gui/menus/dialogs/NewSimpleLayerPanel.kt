@@ -6,12 +6,12 @@ import rb.glow.Colors
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.Orientation.VERTICAL
 import sgui.core.components.crossContainer.ICrossPanel
-import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.MediumType
 import spirite.base.imageData.mediums.MediumType.FLAT
 import spirite.gui.menus.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
+import spirite.sguiHybrid.Hybrid
 
 class NewSimpleLayerPanel(
         private val master: IMasterControl,

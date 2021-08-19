@@ -1,6 +1,5 @@
 package sjunit.rb.extendo.dataStructures
 
-import io.mockk.InternalPlatformDsl.toArray
 import org.junit.jupiter.api.Test
 import rb.extendo.dataStructures.MutableSparseArray
 import rb.extendo.extensions.fillToList

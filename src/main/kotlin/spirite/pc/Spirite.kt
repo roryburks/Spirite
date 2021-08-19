@@ -1,11 +1,11 @@
 package spirite.pc
 
 import rbJvm.vectrix.SetupVectrixForJvm
-import spirite.sguiHybrid.EngineLaunchpoint
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.ErrorType.FATAL
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.ErrorType.FATAL
+import spirite.sguiHybrid.EngineLaunchpoint
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
@@ -41,7 +41,7 @@ class Spirite {
             }
         }catch (e : Exception) {
             e.printStackTrace()
-            MDebug.handleError(FATAL, e.message ?: "Root-level exception caught.", e)
+            DebugProvider.debug.handleError(FATAL, e.message ?: "Root-level exception caught.", e)
         }
     }
 }

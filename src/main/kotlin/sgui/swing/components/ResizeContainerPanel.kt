@@ -4,22 +4,22 @@ import rb.extendo.extensions.then
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.addObserver
 import rb.vectrix.mathUtil.MathUtil
+import sgui.components.IComponent
+import sgui.core.Orientation
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.Orientation.VERTICAL
-import sgui.components.IComponent
 import sgui.core.components.IResizeContainerPanel
 import sgui.core.components.IResizeContainerPanel.IResizeBar
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.components.events.MouseEvent
 import sgui.core.components.events.MouseEvent.MouseEventType.DRAGGED
 import sgui.core.components.events.MouseEvent.MouseEventType.PRESSED
-import sgui.core.Orientation
 import sgui.core.systems.IGlobalMouseHook
 import sgui.swing.PrimaryIcon.*
 import sgui.swing.SwPrimaryIconSet
 import sgui.swing.SwingComponentProvider
-import sgui.swing.systems.mouseSystem.SwMouseSystem
 import sgui.swing.skin.Skin.ResizePanel.BarLineColor
+import sgui.swing.systems.mouseSystem.SwMouseSystem
 import kotlin.reflect.KProperty
 
 open class ResizeContainerPanel

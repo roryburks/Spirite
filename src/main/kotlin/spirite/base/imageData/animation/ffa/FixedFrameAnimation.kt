@@ -3,8 +3,8 @@ package spirite.base.imageData.animation.ffa
 import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
-import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.TransformedHandle
 import spirite.base.imageData.animation.MediumBasedAnimation
 import spirite.base.imageData.animation.ffa.FfaLayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.groupTree.GroupNode

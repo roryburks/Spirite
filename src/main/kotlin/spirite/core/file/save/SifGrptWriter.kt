@@ -6,8 +6,8 @@ import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
 import spirite.core.file.contracts.SifGrptChunk
 import spirite.core.file.contracts.SifGrptNode_Group
-import spirite.core.file.contracts.SifGrptNode_Sprite
 import spirite.core.file.contracts.SifGrptNode_Simple
+import spirite.core.file.contracts.SifGrptNode_Sprite
 
 object SifGrptWriter {
     fun write(out: IWriteStream, data: SifGrptChunk) {

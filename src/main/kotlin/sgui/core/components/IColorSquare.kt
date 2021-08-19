@@ -1,7 +1,7 @@
 package sgui.core.components
 
-import rb.owl.bindable.Bindable
 import rb.glow.SColor
+import rb.owl.bindable.Bindable
 import sgui.components.IComponent
 
 interface IColorSquareNonUI {

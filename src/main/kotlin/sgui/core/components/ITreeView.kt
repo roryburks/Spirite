@@ -1,10 +1,10 @@
 package sgui.components
 
+import rb.glow.SColor
 import rb.glow.img.IImage
 import rb.glow.img.NillImage
 import rb.owl.bindable.Bindable
 import rb.owl.bindable.IBindable
-import rb.glow.SColor
 import sgui.components.ITreeViewNonUI.ITreeNode
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
 import sgui.core.components.IComponentProvider

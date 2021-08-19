@@ -5,7 +5,10 @@ import rb.vectrix.mathUtil.MathUtil
 import rb.vectrix.mathUtil.round
 import spirite.core.file.SifConstants
 import spirite.core.file.SifFileException
-import spirite.core.file.contracts.*
+import spirite.core.file.contracts.SifImgdMagThing_Fill
+import spirite.core.file.contracts.SifImgdMagThing_Stroke
+import spirite.core.file.contracts.SifImgdMed_Maglev
+import spirite.core.file.contracts.SifImgdMediumData
 
 class SifMaglevMediumReader(val version: Int) : ISifMediumReader {
     override fun read(read: IReadStream): SifImgdMediumData {

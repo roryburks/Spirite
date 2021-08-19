@@ -1,14 +1,17 @@
 package spirite.base.brains.commands
 
-import spirite.sguiHybrid.MDebug
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.ToolsetCommandExecutor.ToolCommand.*
 import spirite.base.brains.toolset.DropDownProperty
 import spirite.base.brains.toolset.IToolsetManager
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class ToolsetCommandExecutor(val toolsetManager: IToolsetManager) : ICommandExecutor
+class ToolsetCommandExecutor(
+    val toolsetManager: IToolsetManager,
+    private val _debug : IDebug = DebugProvider.debug) : ICommandExecutor
 {
     enum class ToolCommand(val string: String) : ICommand {
         Pen( "Pen"),
@@ -106,7 +109,7 @@ class ToolsetCommandExecutor(val toolsetManager: IToolsetManager) : ICommandExec
                 }
             }
 
-            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: tool.$string")
+            else -> _debug.handleWarning(IDebug.WarningType.REFERENCE, "Unrecognized command: tool.$string")
         }
         return true
     }

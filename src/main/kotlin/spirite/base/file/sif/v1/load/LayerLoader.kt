@@ -1,8 +1,6 @@
 package spirite.base.file.sif.v1.load
 
 import rb.vectrix.mathUtil.i
-import spirite.sguiHybrid.MDebug
-import spirite.sguiHybrid.MDebug.WarningType.UNSUPPORTED
 import spirite.base.file.sif.SaveLoadUtil
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
@@ -10,6 +8,8 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.MediumType
+import spirite.core.hybrid.DebugProvider
+import spirite.core.hybrid.IDebug.WarningType.UNSUPPORTED
 import spirite.core.util.StringUtil
 
 interface ILayerLoader
@@ -103,7 +103,7 @@ object SpriteLayerLoader : ILayerLoader
 object ReferenceLayerIgnorer : ILayerLoader
 {
     override fun loadLayer(context: LoadContext, name: String): Layer? {
-        MDebug.handleWarning(UNSUPPORTED, "Reference Layers are currently not supported by Spirite v2, ignoring Refernce Layer")
+        DebugProvider.debug.handleWarning(UNSUPPORTED, "Reference Layers are currently not supported by Spirite v2, ignoring Refernce Layer")
         context.ra.readInt()    // [4] : NodeID
         return null
     }
@@ -114,7 +114,7 @@ object PuppetLayerIgnorer : ILayerLoader
     override fun loadLayer(context: LoadContext, name: String): Layer? {
         val ra = context.ra
 
-        MDebug.handleWarning(UNSUPPORTED, "Puppet Layers are currently not supported by Spirite v2, ignoring Puppet Layer")
+        DebugProvider.debug.handleWarning(UNSUPPORTED, "Puppet Layers are currently not supported by Spirite v2, ignoring Puppet Layer")
         val byte = ra.readByte()   // [1] : Whether or not is derived
         if( byte.i == 0) {
             val numParts = ra.readUnsignedShort() // [2] : Number of parts

@@ -2,11 +2,9 @@ package spirite.base.brains.commands
 
 import rb.global.SuccessKind
 import rb.glow.gle.RenderMethod
-import spirite.sguiHybrid.Hybrid
+import spirite.base.brains.IDialog
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
-import spirite.base.imageData.layers.sprite.tools.SpriteLayerFixes
-import spirite.base.imageData.layers.sprite.tools.SpriteLayerNormalizer
 import spirite.base.exceptions.CommandNotValidException
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -14,16 +12,19 @@ import spirite.base.imageData.groupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
+import spirite.base.imageData.layers.sprite.tools.SpriteLayerFixes
+import spirite.base.imageData.layers.sprite.tools.SpriteLayerNormalizer
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.core.util.StringUtil
-import spirite.gui.menus.dialogs.IDialog
+import spirite.sguiHybrid.Hybrid
 
 class NodeContextCommand(
         val workspaceSet: MWorkspaceSet,
-        val dialogs: IDialog)
+        val dialogs: IDialog
+)
     : ICommandExecutor
 {
     override fun executeCommand(string: String, extra: Any?) : Boolean{

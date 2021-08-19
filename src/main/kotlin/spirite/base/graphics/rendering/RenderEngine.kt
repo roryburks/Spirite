@@ -4,7 +4,6 @@ import rb.glow.IFlushable
 import rb.glow.img.IImage
 import rb.glow.img.RawImage
 import rb.owl.observer
-import spirite.sguiHybrid.Hybrid
 import spirite.base.brains.ICentralObservatory
 import spirite.base.graphics.IResourceUseTracker
 import spirite.base.graphics.rendering.sources.GroupNodeSource
@@ -12,6 +11,7 @@ import spirite.base.graphics.rendering.sources.IRenderSource
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
+import spirite.sguiHybrid.Hybrid
 
 /**
  * The Render Engine has two primary jobs:

@@ -4,8 +4,8 @@ import sgui.components.IComponent
 import sgui.core.components.crossContainer.CrossInitializer
 import sgui.core.components.crossContainer.ICrossPanel
 import sgui.swing.advancedComponents.CrossContainer.CrossLayout
-import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sgui.swing.skin.Skin.Global.Bg
+import sgui.swing.systems.mouseSystem.adaptMouseSystem
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent
 import java.awt.Graphics
