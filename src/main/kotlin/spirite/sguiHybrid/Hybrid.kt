@@ -34,7 +34,6 @@ interface IHybrid {
     val gle : IGLEngine
 
     fun LockFrom( o: Any) : ILock
-    fun beep()
 }
 
 val Hybrid : IHybrid get() = SwHybrid
@@ -54,7 +53,4 @@ object SwHybrid : IHybrid {
     override val keypressSystem: MKeypressSystem = KeypressSystem
 
     override fun LockFrom(o: Any): ILock = JLock(o)
-    override fun beep() {
-        java.awt.Toolkit.getDefaultToolkit().beep()
-    }
 }

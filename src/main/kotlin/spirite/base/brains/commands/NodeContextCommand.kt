@@ -18,6 +18,7 @@ import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.MediumType.MAGLEV
 import spirite.base.imageData.mediums.magLev.MaglevMedium
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.core.util.StringUtil
 import spirite.sguiHybrid.Hybrid
 
@@ -234,7 +235,7 @@ object NodeCommands {
         node ?: throw CommandNotValidException
         val response = SpriteLayerNormalizer.normalizeSpriteLayers(node, workspace, false)
         when(response.kind()) {
-            SuccessKind.Failure -> Hybrid.beep()
+            SuccessKind.Failure -> DiSet_Hybrid.beep()
         }
     }
 
@@ -242,7 +243,7 @@ object NodeCommands {
         node ?: throw CommandNotValidException
         val response = SpriteLayerNormalizer.normalizeSpriteLayers(node, workspace,true)
         when(response.kind()) {
-            SuccessKind.Failure -> Hybrid.beep()
+            SuccessKind.Failure -> DiSet_Hybrid.beep()
         }
     }
     //endregion

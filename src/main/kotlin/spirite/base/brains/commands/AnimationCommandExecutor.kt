@@ -9,6 +9,7 @@ import spirite.base.file.aaf.defaultAafExporter
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import java.io.File
 
@@ -103,7 +104,7 @@ object AssosaciateCommand : AnimationCommand() {
             return false
         workspace.viewSystem.animScrollViewModule
             .toggle(animation)
-        Hybrid.beep()
+        DiSet_Hybrid.beep()
         return true
     }
 

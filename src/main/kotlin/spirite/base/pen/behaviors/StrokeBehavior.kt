@@ -21,7 +21,7 @@ abstract class StrokeBehavior(penner: Penner, val drawer : IStrokeModule) : Penn
         if( !drawer.canDoStroke(stroke.method) || !drawer.startStroke(stroke, PenState( penner.xf, penner.yf, penner.pressure)) )
         {
             end()
-            Hybrid.beep()
+            penner.beeper.invoke()
         }
     }
 

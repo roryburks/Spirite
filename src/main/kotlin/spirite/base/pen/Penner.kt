@@ -17,6 +17,7 @@ import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.gui.views.work.WorkSection
 import spirite.gui.views.work.WorkSectionView
 import spirite.sguiHybrid.Hybrid
@@ -45,7 +46,9 @@ class Penner(
         val context: WorkSection,
         val toolsetManager: IToolsetManager,
         val renderEngine: IRenderEngine,
-        val paletteManager: IPaletteManager)
+        val paletteManager: IPaletteManager,
+        val beeper: ()->Unit = DiSet_Hybrid.beep
+)
     : IPenner
 {
     var intContext: Int = 0
@@ -137,19 +140,19 @@ class Penner(
                             if( holdingShift) behavior = StraightLinePenBehavior.FromSettings(this, drawer, toolsetManager, color)
                             else behavior = PenBehavior.Stroke(this, drawer, color)
                         }
-                        else -> Hybrid.beep()
+                        else -> beeper.invoke()
                     }
                     tool is Pixel -> when {
                         holdingCtrl -> behavior = PickBehavior( this, button == LEFT)
                         drawer is IStrokeModule -> behavior = PixelBehavior.Stroke( this, drawer, color)
-                        else -> Hybrid.beep()
+                        else -> beeper.invoke()
                     }
                     tool is Eraser ->
                         if( drawer is IStrokeModule) behavior = EraserBehavior.Stroke( this, drawer, color)
-                        else Hybrid.beep()
+                        else beeper.invoke()
                     tool is Fill ->
                         if( drawer is IFillModule) drawer.fill(x, y, if(holdingCtrl) Colors.TRANSPARENT else color)
-                        else Hybrid.beep()
+                        else beeper.invoke()
                     tool is Move -> {
                         val selected = workspace.groupTree.selectedNode
                         when {
@@ -178,29 +181,29 @@ class Penner(
                     }
                     tool is ColorChanger ->
                         if( drawer is IColorChangeModule) drawer.changeColor( color, offColor, toolsetManager.toolset.ColorChanger.mode)
-                        else Hybrid.beep()
+                        else beeper.invoke()
                     tool is Flip -> when {
-                        drawer !is IFlipModule -> Hybrid.beep()
+                        drawer !is IFlipModule -> beeper.invoke()
                         tool.flipMode == HORIZONTAL -> drawer.flip(true)
                         tool.flipMode == VERTICAL -> drawer.flip(false)
                         tool.flipMode == BY_MOVEMENT -> behavior = FlippingBehavior(this, drawer)
                     }
                     tool is Reshaper ->
                         if( drawer is ITransformModule) behavior = ReshapingBehavior(this, drawer)
-                        else Hybrid.beep()
+                        else beeper.invoke()
                     tool is ColorPicker ->
                         behavior = PickBehavior( this, button == LEFT)
                     tool is Rigger ->
                         behavior = SpriteSelectionBehavior(this, toolsetManager.toolset.Rigger.scope)
                     tool is MagneticFillTool ->
                         if( drawer is IMagneticFillModule) behavior = MagneticFillBehavior(this, drawer, color)
-                        else Hybrid.beep()
+                        else beeper.invoke()
                     tool is DeformTool ->
                         if( drawer is IDeformDrawer) behavior = StrokeDeformComposingBehavior(this, drawer)
-                        else Hybrid.beep()
+                        else beeper.invoke()
                     tool is MagEraser ->
                         if( drawer is IMagneticEraseModule) behavior = MagneticEraseBehavior(this, drawer)
-                        else Hybrid.beep()
+                        else beeper.invoke()
                 }
             }
         }

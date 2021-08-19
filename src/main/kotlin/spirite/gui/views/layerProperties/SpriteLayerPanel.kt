@@ -18,6 +18,7 @@ import spirite.base.brains.IWorkspaceSet
 import spirite.base.graphics.rendering.IThumbnailStore
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.gui.menus.IContextMenus
 import spirite.gui.menus.SpriteLayerContextMenus
 import spirite.gui.resources.SpiriteIcons
@@ -133,7 +134,7 @@ class SpriteLayerPanel(
         btnRemovePart.action = { evt ->
             activePart?.also { activePart ->
                 val ran = linkedSprite?.removePart(activePart, evt.pressingShift) ?: false
-                if(!ran) Hybrid.beep()
+                if(!ran) DiSet_Hybrid.beep()
             }
         }
 

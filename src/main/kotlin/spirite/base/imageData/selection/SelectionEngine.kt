@@ -20,6 +20,7 @@ import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.RectangleUtil
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 
 interface ISelectionEngine {
@@ -201,7 +202,7 @@ class SelectionEngine(
         val drawer = workspace.anchorDrawer
 
         if( drawer !is IAnchorLiftModule || drawer.acceptsLifted(liftedData))
-            Hybrid.beep()
+            DiSet_Hybrid.beep()
         else
             drawer.anchorLifted(liftedData, selectionTransform)
     }
@@ -225,7 +226,7 @@ class SelectionEngine(
         if( drawer is ILiftSelectionModule)
             liftData(drawer, selection)
         else
-            Hybrid.beep()
+            DiSet_Hybrid.beep()
     }
 
     private fun liftData( drawer: ILiftSelectionModule, selection: Selection) {

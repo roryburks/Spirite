@@ -36,6 +36,7 @@ import spirite.base.imageData.mutations.ImportInto
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Rect
+import spirite.core.hybrid.DiSet_Hybrid
 import spirite.sguiHybrid.Hybrid
 import spirite.sguiHybrid.transferables.IClipboard.ClipboardThings.Image
 import spirite.sguiHybrid.transferables.ILayerBuilder
@@ -214,7 +215,7 @@ object GlobalCommands
                 val selection = selectionEngine.selection
                 when (selection) {
                     null -> {
-                        if (cut) (workspace.activeDrawer as? IClearModule)?.clear() ?: Hybrid.beep()
+                        if (cut) (workspace.activeDrawer as? IClearModule)?.clear() ?: DiSet_Hybrid.beep()
                         master.renderEngine.pullImage(RenderTarget(getRenderSourceForNode(node, workspace)))
                     }
                     else -> {
@@ -257,7 +258,7 @@ object GlobalCommands
                                     img2
                                 }
 
-                                if (cut) (workspace.activeDrawer as? IClearModule)?.clear() ?: Hybrid.beep()
+                                if (cut) (workspace.activeDrawer as? IClearModule)?.clear() ?: DiSet_Hybrid.beep()
 
                                 img2
                             }
