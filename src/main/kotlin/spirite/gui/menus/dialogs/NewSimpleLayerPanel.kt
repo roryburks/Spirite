@@ -1,7 +1,6 @@
 package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
-import rb.glow.Color
 import rb.glow.Colors
 import sgui.core.Orientation.HORIZONTAL
 import sgui.core.Orientation.VERTICAL
@@ -10,19 +9,13 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.MediumType
 import spirite.base.imageData.mediums.MediumType.FLAT
-import spirite.gui.menus.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
+import spirite.base.brains.dialog.NewSimpleLayerReturn
 import spirite.sguiHybrid.Hybrid
 
 class NewSimpleLayerPanel(
         private val master: IMasterControl,
         workspace: IImageWorkspace) : ICrossPanel by Hybrid.ui.CrossPanel(), IDialogPanel<NewSimpleLayerReturn>
 {
-    data class NewSimpleLayerReturn(
-            val width: Int,
-            val height: Int,
-            val color: Color,
-            val name: String,
-            val mediumType: MediumType)
 
     private val MAX_DIM get() = master.settingsManager.MaxDimension
 
@@ -121,7 +114,8 @@ class NewSimpleLayerPanel(
         }
     }
 
-    override val result : NewSimpleLayerReturn get() =
+    override val result : NewSimpleLayerReturn
+        get() =
         NewSimpleLayerReturn(
                 widthField.value,
                 heightField.value,

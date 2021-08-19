@@ -7,7 +7,7 @@ import rb.owl.bindable.IBindable
 import rb.owl.bindable.addObserver
 import rbJvm.owl.addWeakObserver
 import spirite.base.brains.ICentralObservatory
-import spirite.base.brains.IDialog
+import spirite.base.brains.dialog.IDialog
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.settings.ISettingsManager

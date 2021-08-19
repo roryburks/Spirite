@@ -2,7 +2,7 @@ package spirite.base.brains.commands
 
 import rb.extendo.dataStructures.Deque
 import rb.extendo.extensions.toHashMap
-import spirite.base.brains.IDialog
+import spirite.base.brains.dialog.IDialog
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MWorkspaceSet
 import spirite.core.hybrid.DebugProvider

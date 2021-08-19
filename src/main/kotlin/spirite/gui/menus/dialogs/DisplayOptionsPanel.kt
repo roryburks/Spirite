@@ -2,7 +2,7 @@ package spirite.gui.menus.dialogs
 
 import cwShared.dialogSystem.IDialogPanel
 import sgui.core.components.crossContainer.ICrossPanel
-import spirite.gui.menus.dialogs.DisplayOptionsPanel.DisplayOptions
+import spirite.base.brains.dialog.DisplayOptions
 import spirite.gui.resources.SpiriteIcons
 import spirite.sguiHybrid.Hybrid
 
@@ -12,9 +12,6 @@ class DisplayOptionsPanel(
 )
     : ICrossPanel by Hybrid.ui.CrossPanel(), IDialogPanel<DisplayOptions>
 {
-    data class DisplayOptions(
-            val alpha: Float,
-            val isVisible: Boolean)
 
     private val btnVisible = Hybrid.ui.ToggleButton(defaultOptions?.isVisible ?: true)
     private val sliderAlpha = Hybrid.ui.GradientSlider(0f, 1f, "Alpha")

@@ -2,7 +2,7 @@ package spirite.base.brains.commands
 
 import rb.global.SuccessKind
 import rb.glow.gle.RenderMethod
-import spirite.base.brains.IDialog
+import spirite.base.brains.dialog.IDialog
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.exceptions.CommandNotValidException

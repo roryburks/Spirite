@@ -14,9 +14,9 @@ import rb.vectrix.mathUtil.d
 import rb.vectrix.mathUtil.f
 import rb.vectrix.mathUtil.floor
 import sgui.core.systems.IImageCreator
-import spirite.base.brains.IDialog.FilePickType
-import spirite.base.brains.IDialog.FilePickType.AAF
-import spirite.base.brains.IDialog.FilePickType.SAVE_SIF
+import spirite.base.brains.dialog.IDialog.FilePickType
+import spirite.base.brains.dialog.IDialog.FilePickType.AAF
+import spirite.base.brains.dialog.IDialog.FilePickType.SAVE_SIF
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet

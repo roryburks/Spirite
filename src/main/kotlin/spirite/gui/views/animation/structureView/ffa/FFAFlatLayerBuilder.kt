@@ -16,7 +16,7 @@ import sgui.swing.skin.Skin.FFAAnimation.Arrow
 import sgui.swing.skin.Skin.Global.Bg
 import sgui.swing.skin.Skin.Global.Fg
 import sguiSwing.components.SwComponent
-import spirite.base.brains.IDialog
+import spirite.base.brains.dialog.IDialog
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.*
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame

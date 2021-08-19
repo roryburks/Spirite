@@ -4,6 +4,7 @@ import rb.glow.img.IImage
 import rbJvm.glow.awt.NativeImage
 import spirite.base.brains.commands.CentralCommandExecutor
 import spirite.base.brains.commands.ICentralCommandExecutor
+import spirite.base.brains.dialog.IDialog
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteManager
 import spirite.base.brains.settings.ISettingsManager

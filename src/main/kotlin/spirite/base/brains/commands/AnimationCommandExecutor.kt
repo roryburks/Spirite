@@ -1,7 +1,7 @@
 package spirite.base.brains.commands
 
-import spirite.base.brains.IDialog.FilePickType.AAF
-import spirite.base.brains.IDialog.FilePickType.GIF
+import spirite.base.brains.dialog.IDialog.FilePickType.AAF
+import spirite.base.brains.dialog.IDialog.FilePickType.GIF
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.file.ExportToGif
@@ -10,7 +10,6 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.core.hybrid.DiSet_Hybrid
-import spirite.sguiHybrid.Hybrid
 import java.io.File
 
 class AnimationCommandExecutor (val master: IMasterControl)
