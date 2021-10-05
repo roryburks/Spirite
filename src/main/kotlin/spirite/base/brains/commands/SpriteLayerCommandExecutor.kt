@@ -7,7 +7,11 @@ import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.imageData.layers.sprite.tools.SpriteLayerFixes
+import spirite.base.imageData.mediums.magLev.MaglevFill
+import spirite.base.imageData.mediums.magLev.MaglevMedium
+import spirite.base.imageData.mediums.magLev.MaglevStroke
 import spirite.core.util.StringUtil
+import spirite.sguiHybrid.Hybrid
 
 
 class SpriteLayerCommandExecutor (
@@ -153,6 +157,29 @@ object SpriteCommands {
                     layer.replaceMedium(spritePart.partName, newHandle)
                 }
             }
+        }
+    }
+
+    object Debug {
+        val DescribeMaglevThings = SpriteCommand("dbg-describe-maglev-things") { sprite, part, master ->
+            part ?: throw CommandNotValidException
+            val maglevMed = part.handle.medium as? MaglevMedium ?: throw CommandNotValidException
+            val described = maglevMed.thingsMap.map { (id,thing) ->
+                val thingText = when( thing) {
+                    is MaglevFill -> {
+                        "Fill:" + thing.segments.joinToString(", ") { "[${it.strokeId}:${it.start}-${it.end}]" }
+                    }
+                    is MaglevStroke -> {
+                        val mode = thing.params.mode.hrName
+                        "Stroke[$mode]:"+thing.drawPoints.length
+                    }
+                    else -> "Unknown Thing"
+                }
+                "$id:$thingText"
+            }
+            val text = described.joinToString("\n")
+            Hybrid.clipboard.postToClipboard(text)
+
         }
     }
 }

@@ -10,7 +10,6 @@ import sgui.components.ITreeView
 import sgui.components.ITreeViewNonUI.*
 import sgui.components.ITreeViewNonUI.DropDirection.*
 import sgui.core.components.IToggleButton
-import sgui.core.components.crossContainer.ICrossPanel
 import sgui.core.components.events.MouseEvent
 import sgui.core.components.events.MouseEvent.MouseButton.LEFT
 import sgui.core.components.events.MouseEvent.MouseButton.RIGHT
@@ -19,7 +18,6 @@ import sgui.core.systems.IGlobalMouseHook
 import sgui.core.transfer.ITransferObject
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
-import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.TreeChangeEvent
@@ -165,58 +163,6 @@ private constructor(
         }
     }
 
-    private inner class NodeLayerPanel
-    private constructor(
-        val node: Node,
-        master: IMasterControl,
-        private val imp: ICrossPanel) : IComponent by imp
-    {
-        constructor(node: Node, master: IMasterControl)
-                : this(node,  master, Hybrid.ui.CrossPanel())
-
-        private val thumbnail = Hybrid.ui.ImageBox()
-        private val thumbnailContract : IThumbnailAccessContract?
-        private val editableLabel =  Hybrid.ui.EditableLabel(node.name)
-        private val littleLabel = Hybrid.ui.Label()
-
-        init {
-            thumbnailContract =  master.workspaceSet.currentWorkspace?.run {
-                master.nativeThumbnailStore.contractThumbnail(node, this) {img ->thumbnail.setImage(img)}
-            }
-
-            imp.ref = this
-            opaque = false
-            background = Colors.TRANSPARENT
-
-            //editableLabel.opaque = false
-            editableLabel.textBind.addObserver { new, _ -> node.name = new }
-            littleLabel.textSize = 8
-
-            if( node is GroupNode){
-                if( node.flattened)
-                    littleLabel.text = "FLAT"
-
-                val selected = workspace?.viewSystem?.animScrollViewModule?.selectedGroups ?: emptyList()
-                if( selected.contains(node))
-                    littleLabel.text = "A"
-
-            }
-
-            imp.setLayout {
-                rows += {
-                    add(thumbnail, 32, 32)
-                    addGap(2)
-                    this += {
-                        add(editableLabel, height = 16)
-                        add(littleLabel, height = 10)
-                    }
-                    height = 32
-                }
-            }
-        }
-
-        fun triggerRename() { editableLabel.startEditing()}
-    }
     // endregion
 
     // region Bindings
@@ -244,6 +190,9 @@ private constructor(
             }
         })
 
+    // NOTE: Only needed for updating Labels; this might be overkill
+    private val _animObsK = master.centralObservatory.currentAnimationBind.addWeakObserver { _, _ -> rebuild()  }
+
     init {
             tree.onClickHandler = {evt, node ->
             val ws = workspace
@@ -254,13 +203,12 @@ private constructor(
             if( node != null && ws != null) {
                 val spNode = node.value
                 if (evt.button == RIGHT && evt.type == RELEASED ) {
-                    println("A")
                     master.contextMenus.LaunchContextMenu(evt.point, NodeMenus.schemeForNode(ws, spNode), spNode)
                 }
 
-                if( altMode && spNode is GroupNode) {
-                    val on = evt.button == LEFT
-                    ws.viewSystem.animScrollViewModule.setGroup( spNode, on )
+                if( evt.type == RELEASED && altMode && spNode is GroupNode) {
+                    val currentlyOn = ws.viewSystem.animScrollViewModule.selectedGroups.contains(spNode)
+                    ws.viewSystem.animScrollViewModule.setGroup( spNode, !currentlyOn )
                     rebuild()
                 }
             }

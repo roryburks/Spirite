@@ -3,7 +3,6 @@ buildscript {
 
     repositories {
         mavenCentral()
-        jcenter()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -13,7 +12,7 @@ buildscript {
 
 
 group 'Spirite'
-version '0.2.5'
+version '0.2.7'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
@@ -26,12 +25,10 @@ sourceCompatibility = 1.8
 
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
 dependencies {
-    implementation 'com.beust:klaxon:5.0.1'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
 

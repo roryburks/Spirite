@@ -1,5 +1,6 @@
 package spirite.gui.views.groupView
 
+import rb.glow.Color
 import rb.glow.Colors
 import rb.owl.bindable.addObserver
 import sgui.components.IComponent
@@ -23,7 +24,7 @@ private constructor(
     val node: Node,
     val sprite: SpriteLayer,
     val master: IMasterControl,
-    private val imp: ICrossPanel) : IComponent by imp
+    private val _imp: ICrossPanel) : IComponent by _imp
 {
     constructor(node: Node, sprite: SpriteLayer, master: IMasterControl)
             : this(node, sprite, master,  Hybrid.ui.CrossPanel())
@@ -31,12 +32,13 @@ private constructor(
     val thumbnail = Hybrid.ui.ImageBox()
     val toggleButton = Hybrid.ui.ToggleButton(false)
     val editableLabel = Hybrid.ui.EditableLabel(node.name)
+    private val littleLabel = Hybrid.ui.Label()
     val thumbnailContract = master.workspaceSet.currentWorkspace?.run {
         master.nativeThumbnailStore.contractThumbnail(node, this) {img ->thumbnail.setImage(img)}
     }
 
     init {
-        imp.ref = this
+        _imp.ref = this
         opaque = false
         background = Colors.TRANSPARENT
 
@@ -47,6 +49,11 @@ private constructor(
 
         //editableLabel.opaque = false
         editableLabel.textBind.addObserver { new, _-> node.name = new }
+        littleLabel.textSize = 8
+        littleLabel.textColor = Color.Make(239,228,175)
+
+        // Determine littleLabel Text
+        littleLabel.text = GroupViewHelper.determineLittleLabelText(master, node)
 
         setLayout()
 
@@ -60,12 +67,15 @@ private constructor(
         partContracts?.forEach { it.release() }
         partContracts = null
 
-        imp.setLayout {
+        _imp.setLayout {
             rows.addFlatGroup { add(toggleButton) }
             rows += {
                 add(thumbnail, 32, 32)
                 addGap(2)
-                add(editableLabel, height = 16)
+                this += {
+                    add(editableLabel, height = 16)
+                    add(littleLabel, height = 10)
+                }
                 height = 32
             }
 

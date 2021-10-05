@@ -16,8 +16,12 @@ object SpriteLayerContextMenus {
         menuItems.add(MenuItem("Copy To All Linked Layer", SpriteCommands.CopySpritePartsAll))
         //menuItems.add(MenuItem("DEBUG: Copy Across Direct", SpriteCommands.CopyAcrossMirrored))
 
-        if( part.context.parts.any { it.handle.medium is MaglevMedium })
-        menuItems.add(MenuItem("Flatten Layer", SpriteCommands.FlattenMaglevs))
+        if( part.context.parts.any { it.handle.medium is MaglevMedium }) {
+            menuItems.add(MenuItem("Flatten Layer", SpriteCommands.FlattenMaglevs))
+        }
+        if( part.handle.medium is MaglevMedium) {
+            menuItems.add(MenuItem("Describe Maglev Layer", SpriteCommands.Debug.DescribeMaglevThings))
+        }
 
         return menuItems
     }

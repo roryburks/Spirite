@@ -9,6 +9,14 @@ import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.groupTree.Node
 
+object FfaLayerLexicalHelper {
+    fun getLexiconOfNode( layer: FfaLayerLexical, node: Node ) : Char? {
+        val reverseMap = mutableMapOf<Node, Char>()
+        layer.lexicalMap.forEach { reverseMap[it.value] = it.key }
+        return reverseMap[node]
+    }
+}
+
 class FfaLayerLexical
 constructor(
     context: FixedFrameAnimation,
@@ -22,7 +30,8 @@ constructor(
     // TODO: Make Undoable?
     override var name by OnChangeDelegate(name) { anim.triggerFFAChange(this)}
 
-    private val lexicalMap : MutableMap<Char, Node> = mutableMapOf()
+    val lexicalMap : Map<Char, Node> get() = _lexicalMap
+    private val _lexicalMap : MutableMap<Char, Node> = mutableMapOf()
     var lexicon: String = lexicon
         get() {
             val gapChar = when {
@@ -37,7 +46,7 @@ constructor(
                 if( frame.marker == GAP)
                     repeat(frame.length) {sb.append(gapChar)}
                 if( frame.node != null) {
-                    val keyCode  = lexicalMap.asSequence()
+                    val keyCode  = _lexicalMap.asSequence()
                             .filter { it.value == frame.node }
                             .firstOrNull()?.key ?: continue
                     repeat(frame.length) {sb.append(keyCode)}
@@ -66,7 +75,7 @@ constructor(
     // region IFFALayerLinked
     override fun shouldUpdate(contract: FFAUpdateContract): Boolean = contract.changedNodes.contains(groupLink)
     override fun groupLinkUpdated() {
-        lexicalMap.clear()
+        _lexicalMap.clear()
 
         // Remap as best we can
         val alphabetSansExplicit = DefaultAnimCharMap.getCharList().asSequence()
@@ -75,8 +84,8 @@ constructor(
         groupLink.children.asReversed().asSequence()
                 .filterIsInstance<LayerNode>()
                 .zip(alphabetSansExplicit)
-                .forEach { lexicalMap[it.second] = it.first }
-        sharedExplicitMap.forEach { (t, u) -> lexicalMap[t] = u }
+                .forEach { _lexicalMap[it.second] = it.first }
+        sharedExplicitMap.forEach { (t, u) -> _lexicalMap[t] = u }
 
         // Remove any references to no-longer-extant layers
         val remainingNodes = groupLink.children.toHashSet()
@@ -97,7 +106,7 @@ constructor(
                     when( it) {
                         ' ', '_', '-' -> FfaFrameStructure(null, GAP, 1)
                         else -> {
-                            val node = lexicalMap[it] ?: return@mapNotNull null
+                            val node = _lexicalMap[it] ?: return@mapNotNull null
                             FfaFrameStructure(node, FRAME, 1)
                         }
                     }

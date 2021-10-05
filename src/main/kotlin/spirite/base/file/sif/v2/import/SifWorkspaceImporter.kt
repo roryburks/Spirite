@@ -357,7 +357,7 @@ class SifWorkspaceImporter(
             workspace.viewSystem.setCurrentNode(viewId, selected)
 
             fView.nodeProperties.forEachIndexed { index, properties ->
-                val node = context.nodes[index]
+                val node = context.nodes.getOrNull(index) ?: return@forEachIndexed
 
                 val visible = (properties.bitmap.i == 1)
 
