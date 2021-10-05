@@ -4,7 +4,7 @@
 //import sgui.components.ITreeView.*
 //import sgui.components.ITreeViewNonUI.*
 //import sgui.swing.components.ResizeContainerPanel
-//import sgui.swing.advancedComponents.SwTreeView
+//import sgui.swing.advancedComponents.SwTreeView.SwTreeView
 //import sgui.components.IComponent
 //import sgui.basic.basic.SwButton
 //import sgui.basic.basic.SwLabel
