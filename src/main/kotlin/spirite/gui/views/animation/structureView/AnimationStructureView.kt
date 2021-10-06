@@ -50,7 +50,6 @@ class AnimationStructureView(val master: IMasterControl) : IOmniComponent {
                 subContainer.clearLayout()
             }
         }
-
     }
 
     override fun close() {
