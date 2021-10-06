@@ -125,9 +125,14 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
                 else -> {
                     val newBind = finder(new)
                     val newF = newBind.field
-                    currentContract = newBind.addObserver(newF != oldF){ newT: T, oldT: T ->
+                    // Creates a bind to watch the Observable within the newly selected Workspace
+                    currentContract = newBind.addObserver(false){ newT: T, oldT: T ->
                         binds.removeIf { it.observer.triggers?.forEach { it(newT, oldT) } == null }
                     }
+                    // Since the above bind can only be triggered on actual values of the new bindable, in order to
+                    // synthesize an accurate old -> new event to the TrackingBinder contracts, we invoke it manually
+                    if( oldF != newF)
+                        binds.removeIf { it.observer.triggers?.forEach { it(newF, oldF) } == null  }
                 }
             }
         }

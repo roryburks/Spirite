@@ -66,6 +66,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
             workspace?.animationManager?.animations?.
                     forEach { Branch(it, attributes, false) {Node(it, detailAttributes)} }
         }
+        list.selected = workspace?.animationManager?.currentAnimation
 
         workspace?.animationManager?.animations
     }
@@ -102,8 +103,8 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
         }.observer()
     )
 
-    private val _wsObsK = master.workspaceSet.currentWorkspaceBind.addWeakObserver {  _, _ ->  rebuild()}
-    private val _curAnimK = master.centralObservatory.currentAnimationBind.addWeakObserver { new, old ->  list.selected = new}
+    private val _wsObsK = master.workspaceSet.currentWorkspaceBind.addWeakObserver {  new, old -> if(new != old) rebuild()}
+    private val _curAnimK = master.centralObservatory.currentAnimationBind.addWeakObserver { new, old ->  if( new != old) list.selected = new}
 
     override fun close() {
         _animObsK.void()
