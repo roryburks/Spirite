@@ -16,14 +16,14 @@ class JOGLContext  : IGLContext {
     }
 
     override fun runInGLContext(run: () -> Unit) {
-        if(!inContext) {
+        //if(!inContext) {
             JOGLProvider.context.makeCurrent()
             inContext = true
-        }
+        //}
         run()
-        if( inContext) {
+        //if( inContext) {
             JOGLProvider.context.release()
             inContext = false
-        }
+        //}
     }
 }

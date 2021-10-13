@@ -34,6 +34,7 @@ class SpritePartOnlyIsolator(
 )  : IIsolator, ISpriteLayerIsolator
 {
     val ancestors by lazy { selectedNode.ancestors.toHashSet() }
+    val parent = selectedNode.parent
     val selectedPartName by lazy { ((selectedNode as? LayerNode)?.layer as? SpriteLayer)?.activePart?.partName }
 
     override fun getIsolationForPart(part: SpritePart) = when {
@@ -41,7 +42,11 @@ class SpritePartOnlyIsolator(
         else -> NilNodeIsolator
     }
 
-    override fun getIsolatorForNode(node: Node) = this
+    override fun getIsolatorForNode(node: Node) : IIsolator {
+        return if( ancestors.contains(node) || node.parent == parent)  this
+            else TrivialNodeIsolator
+
+    }
 
     override val isDrawn: Boolean get() = true
     override val rubric: RenderRubric? get() = null
