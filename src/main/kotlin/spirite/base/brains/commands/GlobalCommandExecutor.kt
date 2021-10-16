@@ -199,7 +199,28 @@ object GlobalCommands
         LayerFixes.copyUnusedMediumsIntoSprite(workspace)
     }
 
+    val TabWorkspace = GlobalCommand("select-next-workspace") { master, workspaceSet ->
+        when(val ws = workspaceSet.currentWorkspace) {
+            null ->  {
+                println("1")
+                workspaceSet.currentWorkspace = workspaceSet.workspaces.firstOrNull()
+            }
+            else -> {
+                val list = workspaceSet.workspaces
+                val indexOf = list.indexOf(ws)
+                if( indexOf == -1){
+                    println("2")
+                    workspaceSet.currentWorkspace = workspaceSet.workspaces.firstOrNull()
+                }
+                else {
+                    val newWs = list[(indexOf +1) % list.count()]
+                    workspaceSet.currentWorkspace = newWs
+                }
+            }
+        }
+    }
 
+    // region helper
     private fun copyVisible(master: IMasterControl, workspace: IImageWorkspace) : RawImage {
         val workspaceImage = master.renderEngine.renderWorkspace(workspace)
 
@@ -284,4 +305,5 @@ object GlobalCommands
 
         Hybrid.clipboard.postToClipboard(image)
     }
+    // endregion
 }
