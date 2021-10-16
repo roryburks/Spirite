@@ -2,6 +2,7 @@ package sgui.core.components
 
 import rb.owl.bindable.Bindable
 import sgui.components.IComponent
+import sgui.core.components.events.MouseEvent
 
 interface ITabbedPane : IComponent
 {
@@ -16,6 +17,7 @@ interface ITabbedPane : IComponent
     fun setComponentAt( index: Int, newComponent: IComponent?)
     fun setTitleAt(index: Int, newTitle: String)
     fun removeTabAt( index: Int)
+    fun setMouseListener( action: ((Int, MouseEvent)->Unit)?)
 }
 
 abstract class TabbedPanePartial : ITabbedPane {
@@ -33,5 +35,8 @@ abstract class TabbedPanePartial : ITabbedPane {
 
     override val components: List<IComponent?> get() = tabs.map { it.component }
     override val titles: List<String> get() = tabs.map { it.title }
+
+    override fun setMouseListener(action: ((Int, MouseEvent) -> Unit)?) { _mouseAction = action}
+    protected var _mouseAction : ((Int, MouseEvent)->Unit)? = null
 }
 

@@ -5,11 +5,14 @@ import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
 import sgui.core.components.ITabbedPane
 import sgui.core.components.crossContainer.ICrossPanel
+import sgui.core.components.events.MouseEvent
 import sgui.swing.SwIcon
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
+import spirite.base.brains.commands.GlobalCommands
 import spirite.base.imageData.IImageWorkspace
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
+import spirite.gui.menus.MenuItem
 import spirite.sguiHybrid.Hybrid
 
 
@@ -34,6 +37,16 @@ constructor(val master: IMasterControl, private val tabPane: ITabbedPane)
             }
             containers.forEach { it.clearLayout() }
             containers.getOrNull(new)?.setLayout { rows.add(workSection) }
+        }
+
+        tabPane.setMouseListener { tab, mouseEvent ->
+            if( mouseEvent.button == MouseEvent.MouseButton.RIGHT && mouseEvent.type == MouseEvent.MouseEventType.CLICKED) {
+                val ws = master.workspaceSet.workspaces.getOrNull(tab) ?: return@setMouseListener
+                val scheme = listOf<MenuItem>(
+                    MenuItem("Close Workspace", GlobalCommands.CloseWorkspace)
+                )
+                master.contextMenus.LaunchContextMenu(mouseEvent.point, scheme, ws)
+            }
         }
     }
 

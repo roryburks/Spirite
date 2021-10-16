@@ -29,6 +29,7 @@ import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
@@ -51,7 +52,7 @@ class GlobalCommandExecutor(
     override fun executeCommand(string: String, extra: Any?): Boolean {
         try
         {
-            commands[string]?.action?.invoke(master, workspaceSet) ?: return false
+            commands[string]?.action?.invoke(master, workspaceSet, extra) ?: return false
             return true
         }catch (e : CommandNotValidException)
         {
@@ -68,7 +69,7 @@ private val commands  = HashMap<String,GlobalCommand>()
 class GlobalCommand
 internal constructor(
         val name: String,
-        val action: (master: IMasterControl, workspaceSet: MWorkspaceSet)->Unit)
+        val action: (master: IMasterControl, workspaceSet: MWorkspaceSet, data: Any?)->Unit)
     : ICommand
 {
     init {commands[name] = this}
@@ -81,7 +82,7 @@ object GlobalCommands
 {
     private val _imageCreator : IImageCreator get() = DiSet_Hybrid.imageCreator
 
-    val NewWorkspace  = GlobalCommand("newWorkspace") { master, workspaceSet ->
+    val NewWorkspace  = GlobalCommand("newWorkspace") { master, workspaceSet, _ ->
         val result = master.dialog.invokeWorkspaceSizeDialog("New Workspace") ?: throw CommandNotValidException
         val newWorkspace = master.createWorkspace(result.width, result.height)
         newWorkspace.groupTree.addNewSimpleLayer(null, "Background", DYNAMIC)
@@ -89,7 +90,7 @@ object GlobalCommands
         master.workspaceSet.addWorkspace(newWorkspace)
     }
 
-    val SaveWorkspace = GlobalCommand("saveWorkspace") {master, workspaceSet ->
+    val SaveWorkspace = GlobalCommand("saveWorkspace") {master, workspaceSet, _ ->
         val workspace = workspaceSet.currentMWorkspace ?: throw CommandNotValidException
         val wsfile = workspace.file
 
@@ -102,38 +103,38 @@ object GlobalCommands
         }
     }
 
-    val SaveWorkspaceAs = GlobalCommand("saveWorkspaceAs") {master, workspaceSet ->
+    val SaveWorkspaceAs = GlobalCommand("saveWorkspaceAs") {master, workspaceSet, _ ->
         val workspace = workspaceSet.currentMWorkspace  ?: throw CommandNotValidException
         val file = master.dialog.pickFile(SAVE_SIF) ?: throw CommandNotValidException
         master.fileManager.saveWorkspace(workspace, file)
     }
-    val Open = GlobalCommand("open") {master, _ ->
+    val Open = GlobalCommand("open") {master, _, _ ->
         master.fileManager.openFile(master.dialog.pickFile(FilePickType.OPEN) ?: throw CommandNotValidException)}
-    val ImportAaf = GlobalCommand("importAaf") {master, workspaceSet ->
+    val ImportAaf = GlobalCommand("importAaf") {master, workspaceSet, _ ->
         val workspace = workspaceSet.currentMWorkspace  ?: throw CommandNotValidException
         val file = master.dialog.pickFile(AAF) ?: throw CommandNotValidException
         AafImporter.importIntoWorkspace(file, workspace)
     }
-    val Export = GlobalCommand("export") {master, workspaceSet ->
+    val Export = GlobalCommand("export") {master, workspaceSet, _ ->
         master.fileManager.exportToImage(
                 master.workspaceSet.currentWorkspace ?: throw CommandNotValidException,
                 master.dialog.pickFile(FilePickType.EXPORT) ?: throw CommandNotValidException)
 
     }
     val ExportAs = GlobalCommand("exportAs", Export.action)
-    val Copy = GlobalCommand("copy") {master, workspaceSet ->
+    val Copy = GlobalCommand("copy") {master, workspaceSet, _ ->
         val workspace = workspaceSet.currentMWorkspace ?: throw CommandNotValidException
         copy(master, workspace, false)
     }
-    val CopyVisible = GlobalCommand("copyVisible") {master, workspaceSet ->
+    val CopyVisible = GlobalCommand("copyVisible") {master, workspaceSet, _ ->
         val workspace = workspaceSet.currentMWorkspace ?: throw CommandNotValidException
         Hybrid.clipboard.postToClipboard(copyVisible(master, workspace))
     }
-    val Cut = GlobalCommand("cut") {master, workspaceSet ->
+    val Cut = GlobalCommand("cut") {master, workspaceSet, _ ->
         val workspace = workspaceSet.currentMWorkspace ?: throw CommandNotValidException
         copy(master, workspace, true)
     }
-    val Paste = GlobalCommand("paste") {master, workspaceSet ->
+    val Paste = GlobalCommand("paste") {master, workspaceSet, _ ->
         val workspace = workspaceSet.currentMWorkspace
 
         when(val thing = Hybrid.clipboard.getFromClipboard()) {
@@ -170,7 +171,7 @@ object GlobalCommands
             else -> throw CommandNotValidException
         }
     }
-    val PasteAsLayer = GlobalCommand("pasteAsLayer") { master, workspaceSet ->
+    val PasteAsLayer = GlobalCommand("pasteAsLayer") { master, workspaceSet, _ ->
         val image = (Hybrid.clipboard.getFromClipboard(SinglySet(Image)) as? IImage) ?: throw CommandNotValidException
         val workspace = master.workspaceSet.currentWorkspace
         if( workspace == null)
@@ -178,10 +179,10 @@ object GlobalCommands
         else
             workspace.groupTree.addSimpleLayerFromImage(workspace.groupTree.selectedNode, "Pasted", image)
     }
-    val PurgeUndoHistory = GlobalCommand("purgeUndoHistory") {_, workspaceSet ->
+    val PurgeUndoHistory = GlobalCommand("purgeUndoHistory") {_, workspaceSet, _ ->
         workspaceSet.currentWorkspace?.undoEngine?.reset()
     }
-    val CopyAllLayer = GlobalCommand("almightyDebug") {master, workspaceSet ->
+    val CopyAllLayer = GlobalCommand("almightyDebug") {master, workspaceSet, _ ->
         val workspace = workspaceSet.currentMWorkspace ?: throw CommandNotValidException
         val spriteLayer = ((workspace.groupTree.selectedNode as? LayerNode)?.layer as? SpriteLayer) ?: throw CommandNotValidException
         val partName = spriteLayer.activePart?.partName ?: throw CommandNotValidException
@@ -194,22 +195,20 @@ object GlobalCommands
                 .forEach { workspace.mediumRepository.replaceMediumDirect(it.handle, med.dupe(workspace)) }
     }
 
-    val ImportUnused = GlobalCommand("importUnused") { master: IMasterControl, workspaceSet: MWorkspaceSet ->
+    val ImportUnused = GlobalCommand("importUnused") { master: IMasterControl, workspaceSet: MWorkspaceSet, _ ->
         val workspace = workspaceSet.currentMWorkspace ?: throw CommandNotValidException
         LayerFixes.copyUnusedMediumsIntoSprite(workspace)
     }
 
-    val TabWorkspace = GlobalCommand("select-next-workspace") { master, workspaceSet ->
+    val TabWorkspace = GlobalCommand("select-next-workspace") { master, workspaceSet, _ ->
         when(val ws = workspaceSet.currentWorkspace) {
             null ->  {
-                println("1")
                 workspaceSet.currentWorkspace = workspaceSet.workspaces.firstOrNull()
             }
             else -> {
                 val list = workspaceSet.workspaces
                 val indexOf = list.indexOf(ws)
                 if( indexOf == -1){
-                    println("2")
                     workspaceSet.currentWorkspace = workspaceSet.workspaces.firstOrNull()
                 }
                 else {
@@ -218,6 +217,16 @@ object GlobalCommands
                 }
             }
         }
+    }
+
+    val CloseWorkspace = GlobalCommand("close-worspace") {master, workspaceSet, data ->
+        val ws = when(data) {
+            null -> workspaceSet.currentWorkspace
+            is ImageWorkspace -> data
+            else -> null
+        } ?: return@GlobalCommand
+
+        workspaceSet.removeWorkspace(ws)
     }
 
     // region helper

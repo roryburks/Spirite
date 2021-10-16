@@ -2,15 +2,23 @@ package sgui.swing.components
 
 import rb.owl.bindable.addObserver
 import sgui.components.IComponent
+import sgui.core.UIPoint
 import sgui.core.components.TabbedPanePartial
+import sgui.swing.SUIPoint
 import sgui.swing.skin.Skin.BevelBorder.*
 import sgui.swing.skin.Skin.TabbedPane.*
+import sgui.swing.systems.mouseSystem.SystemMouseAdapter
 import sguiSwing.components.ISwComponent
 import sguiSwing.components.SwComponent
 import sguiSwing.components.jcomponent
 import java.awt.*
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
+import javax.swing.JCheckBox
+import javax.swing.JLabel
 import javax.swing.JTabbedPane
 import javax.swing.plaf.basic.BasicTabbedPaneUI
+import javax.swing.plaf.metal.MetalTabbedPaneUI
 
 class SwTabbedPane
 private constructor(
@@ -23,6 +31,41 @@ private constructor(
     init {
         selectedIndexBind.addObserver { new, _ -> imp.selectedIndex = new }
         imp.addChangeListener { selectedIndex = imp.selectedIndex }
+
+        // A bit messy (1) because of a lot of duplicate code, (2) because the convert method is in a companion object
+        // in an unintuitive place and (3) maybe should support multi mouse actions
+        imp.addMouseListener(object : MouseListener {
+            override fun mouseClicked(e: MouseEvent?) {
+                val p = e?.point ?: return
+                val tab = imp.ui.tabForCoordinate(imp, p.x, p.y)
+                val evt = SystemMouseAdapter.convert(e, sgui.core.components.events.MouseEvent.MouseEventType.CLICKED)
+                _mouseAction?.invoke(tab, evt)
+            }
+            override fun mousePressed(e: MouseEvent?) {
+                val p = e?.point ?: return
+                val tab = imp.ui.tabForCoordinate(imp, p.x, p.y)
+                val evt = SystemMouseAdapter.convert(e, sgui.core.components.events.MouseEvent.MouseEventType.PRESSED)
+                _mouseAction?.invoke(tab, evt)
+            }
+            override fun mouseReleased(e: MouseEvent?) {
+                val p = e?.point ?: return
+                val tab = imp.ui.tabForCoordinate(imp, p.x, p.y)
+                val evt = SystemMouseAdapter.convert(e, sgui.core.components.events.MouseEvent.MouseEventType.RELEASED)
+                _mouseAction?.invoke(tab, evt)
+            }
+            override fun mouseEntered(e: MouseEvent?) {
+                val p = e?.point ?: return
+                val tab = imp.ui.tabForCoordinate(imp, p.x, p.y)
+                val evt = SystemMouseAdapter.convert(e, sgui.core.components.events.MouseEvent.MouseEventType.ENTERED)
+                _mouseAction?.invoke(tab, evt)
+            }
+            override fun mouseExited(e: MouseEvent?) {
+                val p = e?.point ?: return
+                val tab = imp.ui.tabForCoordinate(imp, p.x, p.y)
+                val evt = SystemMouseAdapter.convert(e, sgui.core.components.events.MouseEvent.MouseEventType.EXITED)
+                _mouseAction?.invoke(tab, evt)
+            }
+        })
     }
 
     override fun addTab(title: String, component: IComponent?) {
