@@ -19,6 +19,8 @@ import sgui.core.transfer.ITransferObject
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.services.IAnimationManagementSvc
 import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.TreeChangeEvent
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
@@ -182,30 +184,34 @@ private constructor(
 
     // region Bindings
 
-    private val groupTreeObserver = object: TreeObserver {
+
+    private val treeSelectionK= tree.selectedBind.addObserver { new, _ ->  workspace?.groupTree?.selectedNode = new}
+    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ -> tree.selected = new }
+
+    // Group of Bindings that change as the WS changs
+    private var _groupTreeK : IContract? = null
+    private val _groupTreeObs = object: TreeObserver {
         override fun treeStructureChanged(evt : TreeChangeEvent) {rebuild()}
         override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {_nodeMap[node]?.checked = node.isVisible}
     }
-
-    private val treeSelectionK= tree.selectedBind.addObserver { new, _ ->  workspace?.groupTree?.selectedNode = new}
-
-    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ -> tree.selected = new }
-
-    // Note: this is only an abstract binding because workspace is changing, so that which it is "bound" to is constantly
-    //  changing.
-    private var treeObsK : IContract? = null
+    private var _animStructK : IContract? = null
+    private var _animStructObs = object : IAnimationManagementSvc.AnimationStructureChangeObserver {
+        override fun animationStructureChanged(animation: Animation) { internalRefresh() }
+    }
     private val wsObsK = master.workspaceSet.workspaceObserver.addWeakObserver(
         object : WorkspaceObserver {
             override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
             override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {}
             override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
-                treeObsK?.void()
+                _groupTreeK?.void()
+                _animStructK?.void()
                 rebuild()
-                treeObsK = selectedWorkspace?.groupTree?.treeObservable?.addWeakObserver(groupTreeObserver)
+                _groupTreeK = selectedWorkspace?.groupTree?.treeObservable?.addWeakObserver(_groupTreeObs)
+                _animStructK = selectedWorkspace?.animationManager?.animationStructureChangeObservable?.addWeakObserver(_animStructObs)
             }
         })
 
-    private val _animObsK = master.centralObservatory.currentAnimationBind.addWeakObserver { _, _ -> internalRefresh()  }
+    private val _animObsK = master.centralObservatory.currentAnimationBind.addWeakObserver { _, _ -> internalRefresh() }
 
     init {
             tree.onClickHandler = {evt, node ->
