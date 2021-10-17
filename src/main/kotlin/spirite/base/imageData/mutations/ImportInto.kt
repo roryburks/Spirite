@@ -4,6 +4,6 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.sguiHybrid.transferables.ILayerBuilder
 
 
-fun MImageWorkspace.ImportInto(layerBuilder: ILayerBuilder) {
-    groupTree.apply { importLayer(selectedNode, "ImportedLayer", layerBuilder.buildLayer(this@ImportInto)) }
+fun MImageWorkspace.importInto(layerBuilder: ILayerBuilder) {
+    groupTree.apply { importLayer(selectedNode, "${layerBuilder.name} [imported]", layerBuilder.buildLayer(this@importInto)) }
 }

@@ -34,7 +34,7 @@ import spirite.base.imageData.groupTree.GroupNode
 import spirite.base.imageData.groupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.MediumType.DYNAMIC
-import spirite.base.imageData.mutations.ImportInto
+import spirite.base.imageData.mutations.importInto
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Rect
@@ -161,7 +161,7 @@ object GlobalCommands
             is ILayerBuilder -> {
                 val wsToImport = workspace
                         ?: (master.createWorkspace(thing.width, thing.height).also { workspaceSet.addWorkspace(it) })
-                wsToImport.ImportInto(thing)
+                wsToImport.importInto(thing)
             }
             is INodeBuilder -> {
                 val wsToImport = workspace

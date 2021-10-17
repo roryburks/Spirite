@@ -31,7 +31,7 @@ object SwClipboard : IClipboard
     override fun postToClipboard(any: Any) {
         val transferable = when(any) {
             is GroupNode -> TransferableGroupNode(any)
-            is Layer ->  TransferableSpiriteLayer(any)
+            is TransferableLayerData ->  TransferableSpiriteLayer(any.layer, any.originalLayerName)
             is IImage -> TransferableImage(any)
             is String -> TransferableString(any)
             else -> throw NotImplementedError("Don't know how to convert object into a Transferable")

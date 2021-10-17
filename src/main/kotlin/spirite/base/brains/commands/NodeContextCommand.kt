@@ -21,6 +21,7 @@ import spirite.base.imageData.mediums.magLev.MaglevMedium
 import spirite.core.hybrid.DiSet_Hybrid
 import spirite.core.util.StringUtil
 import spirite.sguiHybrid.Hybrid
+import spirite.sguiHybrid.transferables.TransferableLayerData
 
 class NodeContextCommand(
         val workspaceSet: MWorkspaceSet,
@@ -94,9 +95,9 @@ object NodeCommands {
 
     val Duplicate = NodeCommand("duplicate") {workspace, node, _ ->
         node?.also { workspace.groupTree.duplicateInto(it) }}
-    val Copy = NodeCommand("copy") { _, node, _ ->
+    val Copy = NodeCommand("copy") { ws, node, _ ->
         when( node) {
-            is LayerNode -> Hybrid.clipboard.postToClipboard(node.layer)
+            is LayerNode -> Hybrid.clipboard.postToClipboard(TransferableLayerData(node))
             is GroupNode -> Hybrid.clipboard.postToClipboard(node)
             else -> throw CommandNotValidException
         }
