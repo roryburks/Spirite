@@ -4,6 +4,7 @@ import rb.owl.bindable.addObserver
 import rb.owl.observer
 import rbJvm.owl.addWeakObserver
 import sgui.components.IComponent
+import sgui.components.ITreeViewNonUI
 import sgui.components.ITreeViewNonUI.ITreeComponent
 import sgui.components.ITreeViewNonUI.ITreeNodeAttributes
 import sgui.core.components.events.MouseEvent
@@ -53,9 +54,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
     }
     private val detailAttributes = object : ITreeNodeAttributes<Animation> {
         override fun makeComponent(t: Animation): ITreeComponent {
-            return object : ITreeComponent {
-                override val component: IComponent = Hybrid.ui.Button(t.name).also{dnd.addListener(it, t)}
-            }
+            return ITreeViewNonUI.SimpleTreeComponent(Hybrid.ui.Button(t.name).also{dnd.addListener(it, t)})
         }
     }
 

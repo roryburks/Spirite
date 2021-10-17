@@ -19,6 +19,11 @@ private constructor(
     constructor(node: Node, master: IMasterControl)
             : this(node,  master, Hybrid.ui.CrossPanel())
 
+    fun internalRefresh(){
+        // Determine littleLabel Text
+        littleLabel.text = GroupViewHelper.determineLittleLabelText(master, node)
+    }
+
     private val thumbnail = Hybrid.ui.ImageBox()
     private val thumbnailContract = master.workspaceSet.currentWorkspace?.run {
         master.nativeThumbnailStore.contractThumbnail(node, this) {img ->thumbnail.setImage(img)}
@@ -38,8 +43,7 @@ private constructor(
         littleLabel.textSize = 8
         littleLabel.textColor = Color.Make(239,228,175)
 
-        // Determine littleLabel Text
-        littleLabel.text = GroupViewHelper.determineLittleLabelText(master, node)
+        internalRefresh()
 
         _imp.setLayout {
             rows += {

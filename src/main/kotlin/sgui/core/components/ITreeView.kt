@@ -70,6 +70,7 @@ interface ITreeViewNonUI<T>{
         val component: IComponent
         val leftComponent: IComponent? get() = null
         fun onRename() {}
+        fun onClear() {}
     }
     class SimpleTreeComponent(override val component: IComponent) : ITreeComponent
 

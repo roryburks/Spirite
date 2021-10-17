@@ -29,12 +29,19 @@ private constructor(
     constructor(node: Node, sprite: SpriteLayer, master: IMasterControl)
             : this(node, sprite, master,  Hybrid.ui.CrossPanel())
 
-    val thumbnail = Hybrid.ui.ImageBox()
-    val toggleButton = Hybrid.ui.ToggleButton(false)
-    val editableLabel = Hybrid.ui.EditableLabel(node.name)
-    private val littleLabel = Hybrid.ui.Label()
+    fun internalRefresh(){
+        // Determine littleLabel Text
+        _littleLabel.text = GroupViewHelper.determineLittleLabelText(master, node)
+    }
+
+    fun onRename() { _editableLabel.startEditing()}
+
+    private val _thumbnail = Hybrid.ui.ImageBox()
+    private val _toggleButton = Hybrid.ui.ToggleButton(false)
+    private val _editableLabel = Hybrid.ui.EditableLabel(node.name)
+    private val _littleLabel = Hybrid.ui.Label()
     val thumbnailContract = master.workspaceSet.currentWorkspace?.run {
-        master.nativeThumbnailStore.contractThumbnail(node, this) {img ->thumbnail.setImage(img)}
+        master.nativeThumbnailStore.contractThumbnail(node, this) {img ->_thumbnail.setImage(img)}
     }
 
     init {
@@ -42,21 +49,18 @@ private constructor(
         opaque = false
         background = Colors.TRANSPARENT
 
-        toggleButton.plainStyle = true
-        toggleButton.setOffIcon(Rig_New);
-        toggleButton.setOnIcon(Rig_Remove);
-        toggleButton.checkBind.addObserver { _, _ ->  setLayout()}
+        _toggleButton.plainStyle = true
+        _toggleButton.setOffIcon(Rig_New);
+        _toggleButton.setOnIcon(Rig_Remove);
+        _toggleButton.checkBind.addObserver { _, _ ->  setLayout()}
 
         //editableLabel.opaque = false
-        editableLabel.textBind.addObserver { new, _-> node.name = new }
-        littleLabel.textSize = 8
-        littleLabel.textColor = Color.Make(239,228,175)
+        _editableLabel.textBind.addObserver { new, _-> node.name = new }
+        _littleLabel.textSize = 8
+        _littleLabel.textColor = Color.Make(239,228,175)
 
-        // Determine littleLabel Text
-        littleLabel.text = GroupViewHelper.determineLittleLabelText(master, node)
-
+        internalRefresh()
         setLayout()
-
         markAsPassThrough()
     }
 
@@ -68,18 +72,18 @@ private constructor(
         partContracts = null
 
         _imp.setLayout {
-            rows.addFlatGroup { add(toggleButton) }
+            rows.addFlatGroup { add(_toggleButton) }
             rows += {
-                add(thumbnail, 32, 32)
+                add(_thumbnail, 32, 32)
                 addGap(2)
                 this += {
-                    add(editableLabel, height = 16)
-                    add(littleLabel, height = 10)
+                    add(_editableLabel, height = 16)
+                    add(_littleLabel, height = 10)
                 }
                 height = 32
             }
 
-            if (toggleButton.checked) {
+            if (_toggleButton.checked) {
                 rows.addFlatGroup {
                     sprite.parts.forEach {part ->
                         add(SpriteLayerDisplayButton(part, master),12,12)

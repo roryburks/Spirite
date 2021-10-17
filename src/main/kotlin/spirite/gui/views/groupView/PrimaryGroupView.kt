@@ -81,12 +81,22 @@ private constructor(
         //println("Rebuilt Tree in ${Hybrid.timing.currentMilli - startTime} ms")
     }
 
+    private fun internalRefresh(){
+        _nodeComponents.forEach { it.onInternalRefresh() }
+    }
+
     // region SubComponents
     private val groupAttributes = BaseNodeAttributes()
-    private val nongroupAttributes = NormalLaterNodeAttributes()
+    private val nongroupAttributes = NormalLayerNodeAttributes()
     private val spriteLayerAttributes = SpriteLayerNodeAttributes()
+    private val _nodeComponents = mutableListOf<IPgvTreeComponent>()
 
-    private abstract inner class BaseNodeTreeComponent(val t: Node) : ITreeComponent {
+    interface IPgvTreeComponent : ITreeComponent {
+        // An internal refresh is a refresh for the Tree Attributes, but not of the tree structure.
+        fun onInternalRefresh()
+    }
+
+    private abstract inner class BaseNodeTreeComponent(val t: Node) : IPgvTreeComponent {
         override val leftComponent: IComponent = Hybrid.ui.CrossPanel().also { comp ->
             comp.background = Colors.TRANSPARENT
             comp.opaque = false
@@ -116,15 +126,19 @@ private constructor(
                 rows.addGap(4)
             }
         }
+        init { _nodeComponents.add(this) }
+        override fun onClear() { _nodeComponents.remove(this)}
     }
+
     // NOTE: I hate this pattern, but it gets me out the door quicker and is technically efficient (just heavily coupled / hidden complexity)
     private val _nodeMap = mutableMapOf<Node, IToggleButton>()
     private val _hangingContracts = mutableListOf<IContract>()
 
     private inner class NormalNodeComponent( t: Node) : BaseNodeTreeComponent(t) {
         override val component = NodeLayerPanel(t,master)
-
         override fun onRename() {component.triggerRename()}
+        override fun onInternalRefresh() { component.internalRefresh() }
+        override fun onClear() { _nodeComponents.remove(this)}
     }
 
     private open inner class BaseNodeAttributes : ITreeNodeAttributes<Node> {
@@ -149,7 +163,8 @@ private constructor(
             }
         }
     }
-    private inner class NormalLaterNodeAttributes : BaseNodeAttributes() {
+
+    private inner class NormalLayerNodeAttributes : BaseNodeAttributes() {
         override val isLeaf get() = true
     }
 
@@ -157,9 +172,9 @@ private constructor(
         override fun makeComponent(t: Node) = TreeComponent(t)
         private inner class TreeComponent(t: Node) : BaseNodeTreeComponent(t) {
             override val component = SpriteLayerNodePanel(t, (t as LayerNode).layer as SpriteLayer, master)
-
-            override fun onRename() {component.editableLabel.startEditing()}
-
+            override fun onRename() {component.onRename()}
+            override fun onInternalRefresh() { component.internalRefresh() }
+            override fun onClear() { _nodeComponents.remove(this)}
         }
     }
 
@@ -167,17 +182,17 @@ private constructor(
 
     // region Bindings
 
-    // Note: this is only an abstract binding because workspace is changing, so that which it is "bound" to is constantly
-    //  changing.
-    private val treeSelectionK= tree.selectedBind.addObserver { new, _ ->  workspace?.groupTree?.selectedNode = new}
-
-    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ -> tree.selected = new }
-
     private val groupTreeObserver = object: TreeObserver {
         override fun treeStructureChanged(evt : TreeChangeEvent) {rebuild()}
         override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {_nodeMap[node]?.checked = node.isVisible}
     }
 
+    private val treeSelectionK= tree.selectedBind.addObserver { new, _ ->  workspace?.groupTree?.selectedNode = new}
+
+    private val selectedNodeK = master.centralObservatory.selectedNode.addWeakObserver { new, _ -> tree.selected = new }
+
+    // Note: this is only an abstract binding because workspace is changing, so that which it is "bound" to is constantly
+    //  changing.
     private var treeObsK : IContract? = null
     private val wsObsK = master.workspaceSet.workspaceObserver.addWeakObserver(
         object : WorkspaceObserver {
@@ -190,8 +205,7 @@ private constructor(
             }
         })
 
-    // NOTE: Only needed for updating Labels; this might be overkill
-    private val _animObsK = master.centralObservatory.currentAnimationBind.addWeakObserver { _, _ -> rebuild()  }
+    private val _animObsK = master.centralObservatory.currentAnimationBind.addWeakObserver { _, _ -> internalRefresh()  }
 
     init {
             tree.onClickHandler = {evt, node ->

@@ -88,8 +88,8 @@ private val defaultHotkeys = mapOf(
 
         WorkspaceCommands.StepUpViewModule.keyCommand to (Hotkey(KeyEvent.VK_TAB,0)),
         WorkspaceCommands.ToggleViewModuleMode.keyCommand to (Hotkey(KeyEvent.VK_TAB,  SHIFT)),
-        WorkspaceCommands.ResetOtherView.keyCommand to (Hotkey(KeyEvent.VK_TAB, CTRL or SHIFT)),
-        GlobalCommands.TabWorkspace.keyCommand to (Hotkey(KeyEvent.VK_TAB, CTRL)),
+        WorkspaceCommands.ResetOtherView.keyCommand to (Hotkey(KeyEvent.VK_TAB, CTRL)),
+        GlobalCommands.TabWorkspace.keyCommand to (Hotkey(KeyEvent.VK_TAB, CTRL  or SHIFT)),
     WorkspaceCommands.ViewScrollAnimViewDown.keyCommand to (Hotkey(KeyEvent.VK_UP, ALT)),
     WorkspaceCommands.ViewScrollAnimViewUp.keyCommand to (Hotkey(KeyEvent.VK_DOWN, ALT)),
 

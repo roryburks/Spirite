@@ -110,14 +110,11 @@ private constructor(private val imp : SwTreeViewImp<T>,
         return btn
     }
 
-    private val bindKs = mutableListOf<IContract>()
     override var buildingPaused = false
     private fun rebuildTree() {
         if( buildingPaused) return
-        //println("Intenal build event")
+        compToNodeMap.values.forEach { it.component?.onClear()}
         compToNodeMap.clear()
-        bindKs.forEach { it.void() }
-        bindKs.clear()
 
         fun buildCrossForNode(node: TreeNode<T>, existingGap: Int, initializer: CrossColInitializer)
         {
