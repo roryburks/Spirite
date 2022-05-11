@@ -21,7 +21,8 @@ object DemoLauncher {
                 frame.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
             }
         }catch (e : Exception) {
-            MDebug.handleError(FATAL, e.message ?: "Root-level exception caught.", e)
+            throw e
+            //MDebug.handleError(FATAL, e.message ?: "Root-level exception caught.", e)
         }
     }
 }
