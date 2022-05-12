@@ -1,12 +1,14 @@
-package rb.file.imgCodec
+package rb.glow.codec
 
 data class CodecImageData(
+    val width: Int,
+    val height: Int,
     val raw : ByteArray,
     val format: RawImageFormat,
     val premultipliedAlpha : Boolean = false)
 
 enum class RawImageFormat {
-    RGBA,
+    ARGB,
     RGB
 }
 

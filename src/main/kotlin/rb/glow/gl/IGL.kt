@@ -47,6 +47,7 @@ interface IGL {
     fun copyTexImage2D(target: Int, level: Int, internalformat: Int, x: Int, y: Int, width: Int, height: Int, border: Int)
 
     fun createBlankTextureSource(width: Int, height: Int) : ITextureSource
+    fun createTextureSourceFromData(width: Int, height: Int, array: ByteArray) : ITextureSource
 
     // Uniform stuff
     fun getUniformLocation(program: IGLProgram, name: String) : IGLUniformLocation?

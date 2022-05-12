@@ -161,6 +161,7 @@ class JOGL(
 
     inner class JOGLBlankTexture( val width: Int, val height: Int) : ITextureSource
     override fun createBlankTextureSource(width: Int, height: Int): ITextureSource = JOGLBlankTexture(width, height)
+    override fun createTextureSourceFromData(width: Int, height: Int, array: ByteArray) = JOGLTextureSource(width, height, ByteBuffer.wrap(array))
     // endregion
 
     // region Uniforms
