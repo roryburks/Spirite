@@ -5,9 +5,12 @@ import rb.glow.codec.CodecImageData
 import rb.glow.codec.IImageCodec
 import rb.glow.codec.CodecImageFormat
 import rb.vectrix.IMathLayer
+import rb.vectrix.mathUtil.b
 import rbJvm.glow.awt.RasterHelper
 import rbJvm.vectrix.JvmMathLayer
 import java.awt.image.BufferedImage
+import java.awt.image.ColorModel
+import java.awt.image.ComponentColorModel
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
@@ -44,6 +47,7 @@ class NativeJavaPngImageCodec(val _mathLayer : IMathLayer = JvmMathLayer)
         }
     }
 
+    var colorModel : ColorModel? = null
     override fun decode(data: ByteArray): CodecImageData {
         val baIn = ByteArrayInputStream(data)
         val bi = ImageIO.read(baIn)
@@ -52,7 +56,29 @@ class NativeJavaPngImageCodec(val _mathLayer : IMathLayer = JvmMathLayer)
         {
             BufferedImage.TYPE_INT_ARGB -> TODO()
             BufferedImage.TYPE_INT_ARGB_PRE -> TODO()
+            BufferedImage.TYPE_3BYTE_BGR -> {
+                val internalData = RasterHelper.getDataStorageFromBi(bi) as ByteArray
+                val remappedData =  ByteArray(bi.width*bi.height*4)
+                val to = bi.width * bi.height
+                for( i in 0 until to) {
+                    val b = internalData[i*3 + 0]
+                    val g = internalData[i*3 + 1]
+                    val r = internalData[i*3 + 2]
+                    remappedData[i*4 + 0] = 255.b
+                    remappedData[i*4 + 1] = r
+                    remappedData[i*4 + 2] = g
+                    remappedData[i*4 + 3] = b
+                }
+
+                return CodecImageData(
+                    bi.width,
+                    bi.height,
+                    remappedData,
+                    CodecImageFormat.ARGB,
+                    false )
+            }
             BufferedImage.TYPE_4BYTE_ABGR -> {
+                colorModel = bi.colorModel
                 val internalData = RasterHelper.getDataStorageFromBi(bi) as ByteArray
                 val remappedData =  ByteArray(bi.width*bi.height*4)
                 for( i in remappedData.indices.step(4)) {
@@ -60,10 +86,10 @@ class NativeJavaPngImageCodec(val _mathLayer : IMathLayer = JvmMathLayer)
                     val b = internalData[i + 1]
                     val g = internalData[i + 2]
                     val r = internalData[i + 3]
-                    remappedData[i + 0] = a
-                    remappedData[i + 1] = r
-                    remappedData[i + 2] = g
-                    remappedData[i + 3] = b
+                    remappedData[i + 0] = b
+                    remappedData[i + 1] = g
+                    remappedData[i + 2] = r
+                    remappedData[i + 3] = a
                 }
 
                 return CodecImageData(

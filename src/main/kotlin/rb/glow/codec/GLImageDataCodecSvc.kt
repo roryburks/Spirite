@@ -61,7 +61,7 @@ object GLImageDataCodecSvc : IGLImageDataCodecSvc
                     0,
                     GLC.RGBA,
                     GLC.BGRA,// !?
-                    GLC.UNSIGNED_INT_8_8_8_8, // ?
+                    GLC.UNSIGNED_INT_8_8_8_8_REV, // ?
                     texSrc)
 
 
