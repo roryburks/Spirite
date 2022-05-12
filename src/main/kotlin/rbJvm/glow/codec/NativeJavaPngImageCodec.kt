@@ -64,10 +64,10 @@ class NativeJavaPngImageCodec(val _mathLayer : IMathLayer = JvmMathLayer)
                     val b = internalData[i*3 + 0]
                     val g = internalData[i*3 + 1]
                     val r = internalData[i*3 + 2]
-                    remappedData[i*4 + 0] = 255.b
-                    remappedData[i*4 + 1] = r
-                    remappedData[i*4 + 2] = g
-                    remappedData[i*4 + 3] = b
+                    remappedData[i*4 + 0] = b
+                    remappedData[i*4 + 1] = g
+                    remappedData[i*4 + 2] = r
+                    remappedData[i*4 + 3] = 255.b
                 }
 
                 return CodecImageData(
