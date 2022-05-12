@@ -4,10 +4,10 @@ data class CodecImageData(
     val width: Int,
     val height: Int,
     val raw : ByteArray,
-    val format: RawImageFormat,
+    val format: CodecImageFormat,
     val premultipliedAlpha : Boolean = false)
 
-enum class RawImageFormat {
+enum class CodecImageFormat {
     ARGB,
     RGB
 }

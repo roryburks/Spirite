@@ -4,8 +4,6 @@ import rb.glow.gl.GLC
 import rb.glow.gl.GLImage
 import rb.glow.gle.IGLEngine
 import rbJvm.glow.awt.GLCreateTextureException
-import rbJvm.glow.jogl.JOGL
-import java.nio.ByteBuffer
 
 interface IGLImageDataCodecSvc {
     fun export(image: GLImage, gle: IGLEngine) : CodecImageData
@@ -40,13 +38,13 @@ object GLImageDataCodecSvc : IGLImageDataCodecSvc
             image.width,
             image.height,
             byteArray,
-            RawImageFormat.ARGB,
+            CodecImageFormat.ARGB,
             image.premultiplied)
     }
 
     override fun import(data: CodecImageData, gle: IGLEngine): GLImage {
         when( data.format) {
-            RawImageFormat.ARGB -> {
+            CodecImageFormat.ARGB -> {
                 val gl = gle.gl
 
                 val tex = gl.createTexture() ?: throw GLCreateTextureException("Failed to create texture.")
@@ -63,7 +61,7 @@ object GLImageDataCodecSvc : IGLImageDataCodecSvc
                     0,
                     GLC.RGBA,
                     GLC.BGRA,// !?
-                    GLC.UNSIGNED_INT_8_8_8_8_REV, // ?
+                    GLC.UNSIGNED_INT_8_8_8_8, // ?
                     texSrc)
 
 
