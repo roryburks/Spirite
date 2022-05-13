@@ -59,7 +59,7 @@ class QoiCodecTests {
     }
 
     @Test fun cycleFromPng(){
-        val inputFile = File("E:\\Bucket\\sif\\qoi_test_images\\testcard_rgba.png")
+        val inputFile = File("E:\\Bucket\\sif\\qoi_test_images\\dice.png")
         //val inputFile = File("$_outputDir/simplepng.png")
         val outputFile = File("$_outputDir/qoiCodec_roundTrip.png")
 
